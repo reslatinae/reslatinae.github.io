@@ -1,0 +1,43 @@
+h1{
+	margin: 3%;
+	text-align: center;
+}
+p{
+	margin: 3%;
+	font-size: 1.1em;
+}
+aside img{
+	border: solid;
+	width: 300px;
+	height: 300px;	
+	object-fit: contain;
+	margin: 2.5%;
+	border-radius: 2%;
+}
+.dropdown-button:hover{
+  background-color: #e4e5ed;	
+}
+
+/* Style for the dropdown buttons */
+.dropdown-button{
+    position: relative;
+    border: none;
+	background: none;
+	padding: none;
+	cursor: default;
+}
+
+/* Style for the dropdown menus */
+.dropdown-menu1{
+	cursor: pointer;
+	display: none;
+	position: absolute;
+	top: 100%;
+	background-color: #f9f9f9;
+	border: 1px solid #ccc;
+	margin-left: 5px;
+	z-index: 1; 
+	font-size: 85%; 
+}
+
+	
