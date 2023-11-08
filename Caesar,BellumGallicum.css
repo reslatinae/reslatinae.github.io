@@ -2,9 +2,15 @@
 	margin-left: 7px;
 	margin-right: 7px;
 	margin-top: 3px;
+	z-index: 1;
 }
+.dropdown-menu{
+	position: relative;
+	z-index:5;
+}
+	
 .navbar-brand{
-	margin-left: 15px;
+	margin-left: 23%;
 }
 h1{
 	margin: 3%;
@@ -16,7 +22,7 @@ p{
 	margin-right: 3%;
 	font-size: 1.1em;
 }
-aside img{
+.bottom img{
 	border: solid;
 	width: 300px;
 	height: 300px;	
@@ -24,6 +30,24 @@ aside img{
 	margin: 2.5%;
 	border-radius: 2%;
 }
+.top{
+background: #e6e6e6;
+padding-left: 2.75%;
+padding-right:2.75%;
+padding-top: 0.4%;
+padding-bottom: 0.4%;
+position: relative;
+z-index:1;
+}
+
+.top div{
+/*width: 10.5%;*/
+padding-left: 4.5%;
+padding-right: 4.5%;
+display: inline-block;
+text-align: justify;
+}
+
 .dropdown-button:hover{
   background-color: #e4e5ed;	
 }
@@ -41,7 +65,10 @@ aside img{
 button{
 	padding: 0;	
 }
-
+/*
+div{
+	display: block;
+*/
 /* Style for the dropdown menus */
 .dropdown-menu1{
 	cursor: pointer;
@@ -57,3 +84,32 @@ button{
 	padding-right: 2px;
 }
 
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  /*border-bottom: 1px dotted black;  If you want dots under the hoverable text */
+  opacity: 1;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  top: 100%;
+  left: 50%;
+  margin-left: -39%; /* Use half of the width (120/2 = 60), to center the tooltip */
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
