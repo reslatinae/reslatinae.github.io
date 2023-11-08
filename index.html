@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Caesar,BellumGallicum</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-	<link rel="stylesheet" href="Caesar,BellumGallicum.css">
+	<link rel="stylesheet" href="css/Caesar,BellumGallicum.css">
 	<script src = "js/Caesar,BellumGallicum.js"></script>	
   </head>
   <body>
@@ -16,7 +16,7 @@
   <!-- Links -->
     <ul class="navbar-nav">
 	 <li class="navbar-brand">
-      <img src="SPQR_laurier.svg" alt="Logo" width="45" height="35">
+      <img src="images/SPQR_laurier.svg" alt="Logo" width="45" height="35">
     </li>
    
     <!-- Dropdown -->
@@ -25,25 +25,42 @@
 	 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Resources</button>
         <div class="dropdown-menu">
         <a class="dropdown-item" href="https://lrc.la.utexas.edu/eieol_toc/latol">Latin Online</a>
+		<a class="dropdown-item" href="https://dcc.dickinson.edu/grammar/latin/credits-and-reuse">Allen and Greenough's Latin Grammar</a>
 		<a class="dropdown-item">More resources can be added here ...</a>
       </div>
 	  </li>
-	  <li class="nav-item dropdown">
-	  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Abbreviations</button>
-	    <div class="dropdown-menu">
-	    <a style="background-color: #ff8080;" class="dropdown-item">Subj – subject</a>
-		<a style="background-color: #99ddff;" class="dropdown-item">Acc – accusative object</a>
-		<a style="background-color: #ccffff;" class="dropdown-item">Dat – dative object</a>		
-		<a style="background-color: #d9b3ff;" class="dropdown-item">Gen – genitive object</a>		
-		<a style="background-color: #ffc34d;" class="dropdown-item">Abl – ablative</a>
-		<a style="background-color: #ffb3b3;" class="dropdown-item">Pred – predicative</a>
-		<a style="background-color: #99ffbb;" class="dropdown-item">Adv – adverb</a>		
-		<a style="background-color: #ffd9b3;" class="dropdown-item">Prep – prepositional phrase</a>
-		<a style="background-color: #66cc00;" class="dropdown-item">Verb – verb</a>			
-	  </div>	  
-    </li>
   </ul>
 </nav>
+
+<aside class="top">
+  <div class="tooltip">Subj
+  <span class="tooltiptext">Subject (in the nominative)</span>
+</div>  
+  <div class="tooltip">Acc
+  <span class="tooltiptext">Accusative object</span>
+</div>  
+  <div class="tooltip">Dat
+  <span class="tooltiptext">Dative object</span>
+</div>  
+  <div class="tooltip">Gen
+  <span class="tooltiptext">Genitive object</span>
+</div>  
+ <div class="tooltip">Abl
+  <span class="tooltiptext">Ablative</span>
+</div>  
+ <div class="tooltip">Pred
+  <span class="tooltiptext">Predicative</span>
+</div>  
+ <div class="tooltip">Adv
+  <span class="tooltiptext">Adverb</span>
+</div>  
+ <div class="tooltip">Prep
+  <span class="tooltiptext">Prepositional phrase</span>
+</div>  
+ <div class="tooltip">Verb
+  <span class="tooltiptext">The finite verb of a clause or subordinate clause</span>
+</div>  
+</aside>
    
    <h1>Caesar, <i> De Bello Gallico </i> 1.1</h1>
    <p style="font-size: 15px;"><i>The following exercise is designed to highlight the steps you need to make when translating Latin texts. 
@@ -51,7 +68,7 @@
    When you click on a word once, a dropdown menu will appear, and you will need to choose between the following: subject, accusative object, dative object, genitive object, ablative, predicative, adverb, prepositional phrase, or verb. 
    Once you double-click on the correct function, the word will be highlighted in colour. 
    When you have gone through a sentence in this way, you will be able to see the function of each word or group of words, and you can start to translate the sentence accordingly.
-   If the sentence has a subordinate clause, you can analyse it in more detail in the line below the parent clause.</p>
+   If the sentence has a subordinate clause, you can analyse it in more detail in the line below the parent clause.</i></p>
       
 <p><button class="dropdown-button" id="subj3" data-target-menu="Msubj3">Gallia</button> <button class="dropdown-button" id="verb3" data-target-menu="Mverb3">est</button> <button class="dropdown-button" id="pred1" data-target-menu="Mpred1">omnis</button> <button class="dropdown-button" id="verb4" data-target-menu="Mverb4">divisa</button> <button class="dropdown-button" id="prep4" data-target-menu="Mprep4">in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli appellantur</button>.
 <p style="text-indent: 16.2em;"><button class="dropdown-button" id="acc2" data-target-menu="Macc2">quarum unam</button> <button class="dropdown-button" id="verb5" data-target-menu="Mverb5">incolunt</button> <button class="dropdown-button" id="subj5" data-target-menu="Msubj5">Belgae</button>, <button class="dropdown-button" id="acc3" data-target-menu="Macc3">aliam</button> <button class="dropdown-button" id="subj7" data-target-menu="Msubj7">Aquitani</button>, <button class="dropdown-button" id="acc4" data-target-menu="Macc4">tertiam</button> <button class="dropdown-button" id="subj6" data-target-menu="Msubj6">qui ipsorum lingua Celtae, nostra Galli appellantur</button>.</p>
@@ -60,11 +77,11 @@
 <p><button class="dropdown-button" id="acc1" data-target-menu="Macc1">Gallos</button> <button class="dropdown-button" id="prep2" data-target-menu="Mprep2">ab Aquitanis</button> <button class="dropdown-button" id="subj2" data-target-menu="Msubj2">Garunna flumen</button>, <button class="dropdown-button" id="prep5" data-target-menu="Mprep5">a Belgis</button> <button class="dropdown-button" id="subj4" data-target-menu="Msubj4">Matrona et Sequana</button> <button class="dropdown-button" id="verb2" data-target-menu="Mverb2">dividit</button>.</p> 
 <p>...</p>
 
-<aside>
-<img class="img-responsive" src="Gaius_Iulius_Caesar_(Vatican_Museum).jpg" alt="Julius Caesar">
-<img class="img-responsive" src="Map-of-Gallia.jpg" alt="Map of Gaul">
-<img class="img-responsive" src="caesars_campaigns_in_gaul_1st_century_bc.jpg" alt="Caesar's campaigns in Gaul">
-<img class="img-responsive" src="Siege-alesia-vercingetorix-jules-cesar.jpg" alt="Vercingetorix before Caesar">
+<aside class="bottom">
+<img class="img-responsive" src="images/Gaius_Iulius_Caesar_(Vatican_Museum).jpg" alt="Julius Caesar">
+<img class="img-responsive" src="images/Map-of-Gallia.jpg" alt="Map of Gaul">
+<img class="img-responsive" src="images/caesars_campaigns_in_gaul_1st_century_bc.jpg" alt="Caesar's campaigns in Gaul">
+<img class="img-responsive" src="images/Siege-alesia-vercingetorix-jules-cesar.jpg" alt="Vercingetorix before Caesar">
 </aside>
 
 
