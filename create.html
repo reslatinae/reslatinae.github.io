@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Create Syntax Analysis</title>
-    <link rel="stylesheet" href="Gallia1.css">
+    <link rel="stylesheet" href="css/Gallia1.css">
 </head>
 <body>
     <header>
@@ -44,8 +44,8 @@
     </div>
     
 	<section id="key-value-instructions" style="display: none;">
-    Next, for each word, you enter its syntactical function. Make sure to use one of the following options: subj(ect), acc(usative object), dat(ive object), gen(itive object), abl(ative), pred(icative), adv(erb), prep(ositional phrase), verb, AcI (accusative with infinitive), NcI (nominative with infinitiv), abl(ative) abs(olute), or other (e.g. for conjunctions, interjections, etc.).<br>
-	If subsequent words have the same function (such as 'dictum' and 'est', which would both be classified as 'verb'), they will in the resulting document be grouped together ('dictum est'). Keep this in mind for more complex constructions, such as accusative with infinitive: e.g., each word in 'quam Gallos obtinere' will need to be classified as 'AcI' for these words to appear as a group with that syntactical function.
+    Next, for each word, you enter its syntactical function. Make sure to use one of the following options: subj(ect), acc(usative object), dat(ive object), gen(itive object), abl(ative), pred(icative), adv(erb), prep(ositional phrase), verb act(ive/deponent), verb pass(ive), Inf(initive), AcI (accusative with infinitive), NcI (nominative with infinitiv), abl(ative) abs(olute), or other (e.g. for conjunctions, interjections, etc.).<br>
+	If subsequent words have the same function (such as 'dictum' and 'est', which would both be classified as 'verb pass'), they will in the resulting document be grouped together ('dictum est'). Keep this in mind for more complex constructions, such as accusative with infinitive: e.g., each word in 'quam Gallos obtinere' will need to be classified as 'AcI' for these words to appear as a group with that syntactical function.
 </section>
 	
     <div class="result-container" id="result-container"></div>
@@ -116,7 +116,7 @@ document.getElementById("input").addEventListener("submit", function(event) {
                 var inputField = document.createElement("input");
                 inputField.type = "text";
                 inputField.classList.add("key-value-input");
-                inputField.placeholder = `Enter input for '${word}': subj, acc, dat, gen, abl, pred, adv, prep, verb, aci, nci, abl abs, other`;
+                inputField.placeholder = `Enter input for '${word}': subj, acc, dat, gen, abl, pred, adv, prep, verb act, verb pass, inf, aci, nci, abl abs, other`;
                 userInputContainer.appendChild(inputField);
             });
 
@@ -154,7 +154,7 @@ function submitKeyValuePairs() {
     inputFields.forEach(function(input, index) {
         var word = input.placeholder.split("'")[1];
         var value = input.value.trim().toLowerCase();
-        var allowedOptions = ['subj', 'acc', 'dat', 'gen', 'abl', 'pred', 'adv', 'prep', 'verb', 'aci', 'nci', 'abl abs', 'other'];
+        var allowedOptions = ['subj', 'acc', 'dat', 'gen', 'abl', 'pred', 'adv', 'prep', 'verb act', 'verb pass', 'inf', 'aci', 'nci', 'abl abs', 'other'];
 
         if (!allowedOptions.includes(value)) {
             hasInvalidInput = true;
@@ -293,7 +293,6 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
     margin-right: 10px;
 	}
 
-
 	.submit-button {
     margin-top: 10px;
     background-color: #616161;
@@ -304,7 +303,7 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
 	}
 
     .translation-container {
-        margin: 30px 0 3%; /* Add margin to separate from other elements */
+        margin: 30px 0 3%; 
     }
 </style>
 
@@ -315,7 +314,7 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
     <p style='font-size: 15px;'>\
     <i>This page is designed to help you translate ancient Greek or Latin sentences. 
 	One click on each word or group of words will open a button that will ask you to choose the syntactical function:<br> 
-	subject, accusative object, dative object, genitive object, ablative, predicative, adverb, prepositional phrase, verb, accusative with infinitive, nominative with infinitiv, ablative absolute, or other (i.e., conjunctions, interjections, etc.).<br>
+	subject, accusative object, dative object, genitive object, ablative, predicative, adverb, prepositional phrase, verb (active/passive), infinitive, accusative with infinitive, nominative with infinitiv, ablative absolute, or other (i.e., conjunctions, interjections, etc.).<br>
     If you were right, the answer will be displayed in green, if you were wrong, the correct answer will appear in red. 
 	Once you have analysed each word in a sentence, a textbox will appear into which you can write your translation. 
 	In the end, you can take a screenshot, save the webpage or print it as a pdf, so you can discuss your translations in class.</i><br>
@@ -358,7 +357,9 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
             <label><input type="radio" name="word-option" value="pred">Predicative</label>
             <label><input type="radio" name="word-option" value="adv">Adverb</label>
             <label><input type="radio" name="word-option" value="prep">Prepositional phrase</label>
-            <label><input type="radio" name="word-option" value="verb">Verb</label>
+            <label><input type="radio" name="word-option" value="verb act">Verb (active/deponent)</label>
+			<label><input type="radio" name="word-option" value="verb pass">Verb (passive)</label>
+			<label><input type="radio" name="word-option" value="inf">Infinitive</label>
 			<label><input type="radio" name="word-option" value="aci">Accusative with infinitive</label>
             <label><input type="radio" name="word-option" value="nci">Nominative with infinitive</label>
             <label><input type="radio" name="word-option" value="abl abs">Ablative absolute</label>
@@ -386,7 +387,9 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
         'pred': '#ffb3b3',
         'adv': '#FF69B4',
         'prep': '#ffd9b3',
-        'verb': '#66cc00',
+        'Verb act': '#66cc00',  
+		'Verb pass': '#4d9900',
+		'Inf': '#408000',
 		'aci': '#0099e6',
         'nci': '#ff6666',
         'abl abs': '#cc8800',
