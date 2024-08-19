@@ -1,633 +1,238 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Caesar,BellumGallicum</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-	<link rel="stylesheet" href="Caesar,BellumGallicum.css">
-  </head>
-  <body>
-  <section>   
-      
-   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-  
-  <!-- Links -->
-    <ul class="navbar-nav">
-	 <li class="navbar-brand">
-      <img src="SPQR_laurier.svg" alt="Logo" width="45" height="35">
-    </li>
-   
-    <!-- Dropdown -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/Gallia1.css">
+	<head>
+    <title>Syntactical Analysis Page 1</title>
+	</head>
+<body>
+<h1>Analysing and Translating Greek or Latin Sentences</h1>
 
-    <li class="nav-item dropdown">
-	 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Resources</button>
-        <div class="dropdown-menu">
-        <a class="dropdown-item" href="https://lrc.la.utexas.edu/eieol_toc/latol">Latin Online</a>
-		<a class="dropdown-item" href="https://dcc.dickinson.edu/grammar/latin/credits-and-reuse">Allen and Greenough's Latin Grammar</a>
-		<a class="dropdown-item">More resources can be added here ...</a>
-      </div>
-	  </li>
-  </ul>
-</nav>
+<p>
+    <i>This page is designed to help you translate ancient Greek or Latin sentences. 
+	One click on each word or group of words will open a button that will ask you to choose the syntactical function:<br> 
+	subject, accusative object, dative object, genitive object, ablative, predicative, adverb, prepositional phrase, verb, conjunction, accusative with infinitive, nominative with infinitiv, or ablative absolute.<br>
+    If you were right, the answer will be displayed in green, if you were wrong, the correct answer will appear in red. 
+	Once you have analysed each word in a sentence, a textbox will appear into which you can write your translation. 
+	In the end, you can take a screenshot, save the webpage or print it as a pdf, so you can discuss your translations in class.</i><br>
+	<br>
+    If you are a teacher and want to create a page similar to this one with your own sentences, simply click on 
+	<a href="Galliacreate5.html">this link.</a>
+	</p>
+	
+<p>
+<div class="sentence-container">
+    <span class="hover-word" data-correct-answer="Subj" id="word-1">Gallia</span>
+    <span class="hover-word" data-correct-answer="Verb" id="word-2">est</span>
+    <span class="hover-word" data-correct-answer="Pred" id="word-3">omnis</span>
+    <span class="hover-word" data-correct-answer="Verb" id="word-4">divisa</span>
+    <span class="hover-word" data-correct-answer="Prep" id="word-5">in partes tres,</span>
+	<span class="hover-word" data-correct-answer="Acc" id="word-6">quarum unam</span>
+	<span class="hover-word" data-correct-answer="Verb" id="word-7">incolunt</span> 
+	<span class="hover-word" data-correct-answer="Subj" id="word-8">Belgae,</span>
+	<span class="hover-word" data-correct-answer="Acc" id="word-9">aliam</span>
+	<span class="hover-word" data-correct-answer="Subj" id="word-10">Aquitani,</span>
+	<span class="hover-word" data-correct-answer="Acc" id="word-11">tertiam</span>
+	<span class="hover-word" data-correct-answer="Subj" id="word-12">qui</span>
+	<span class="hover-word" data-correct-answer="Abl" id="word-13">ipsorum lingua</span>
+	<span class="hover-word" data-correct-answer="Pred" id="word-14">Celtae,</span>
+	<span class="hover-word" data-correct-answer="Abl" id="word-15">nostra</span>
+	<span class="hover-word" data-correct-answer="Pred" id="word-16">Galli</span>
+	<span class="hover-word" data-correct-answer="Verb" id="word-17">appellantur.</span><br>
+	<br>
+	</div>
+	<div class="sentence-container">
+    <span class="hover-word" data-correct-answer="Subj" id="word-18">Hi omnes</span>
+    <span class="hover-word" data-correct-answer="Abl" id="word-19">lingua, institutis, legibus</span>
+    <span class="hover-word" data-correct-answer="Prep" id="word-20">inter se</span>
+	<span class="hover-word" data-correct-answer="Verb" id="word-21">differunt.</span><br>
+	<br>
+	</div>
+	<div class="sentence-container">
+	<span class="hover-word" data-correct-answer="Acc" id="word-22">Gallos</span>
+    <span class="hover-word" data-correct-answer="Prep" id="word-23">ab Aquitanis</span>
+    <span class="hover-word" data-correct-answer="Subj" id="word-24">Garumna flumen,</span>
+    <span class="hover-word" data-correct-answer="Prep" id="word-25">a Belgis</span>
+    <span class="hover-word" data-correct-answer="Subj" id="word-26">Matrona et Sequana</span>
+	<span class="hover-word" data-correct-answer="Verb" id="word-27">dividit.</span><br>
+	<br>
+	</div>
+	<div class="sentence-container">
+	<span class="hover-word" data-correct-answer="Verb" id="word-28">Horum omnium fortissimi sunt</span>
+    <span class="hover-word" data-correct-answer="Subj" id="word-29">Belgae,</span>
+    <span class="hover-word" data-correct-answer="Conj" id="word-30">propterea quod</span>
+    <span class="hover-word" data-correct-answer="Prep" id="word-31">a cultu atque humanitate provinciae</span>
+    <span class="hover-word" data-correct-answer="Adv" id="word-32">longissime</span>
+	<span class="hover-word" data-correct-answer="Verb" id="word-33">absunt.</span><br>
+	<br>
+	</div>
+	[...]
+	<div class="sentence-container">
+	<span class="hover-word" data-correct-answer="Subj" id="word-34">Eorum una pars,</span>
+    <span class="hover-word" data-correct-answer="AcI" id="word-35">quam Gallos obtinere</span>
+    <span class="hover-word" data-correct-answer="Verb" id="word-36">dictum est,</span>
+    <span class="hover-word" data-correct-answer="Acc" id="word-37">initium</span>
+    <span class="hover-word" data-correct-answer="Verb" id="word-38">capit</span>
+	<span class="hover-word" data-correct-answer="Prep" id="word-39">a flumine Rhodano.</span><br>
+	<br>
+	</div>
 
-<aside class="top">
-  <div class="tooltip">Subj
-  <span class="tooltiptext">Subject (in the nominative)</span>
-</div>  
-  <div class="tooltip">Acc
-  <span class="tooltiptext">Accusative object</span>
-</div>  
-  <div class="tooltip">Dat
-  <span class="tooltiptext">Dative object</span>
-</div>  
-  <div class="tooltip">Gen
-  <span class="tooltiptext">Genitive object</span>
-</div>  
- <div class="tooltip">Abl
-  <span class="tooltiptext">Ablative</span>
-</div>  
- <div class="tooltip">Pred
-  <span class="tooltiptext">Predicative</span>
-</div>  
- <div class="tooltip">Adv
-  <span class="tooltiptext">Adverb</span>
-</div>  
- <div class="tooltip">Prep
-  <span class="tooltiptext">Prepositional phrase</span>
-</div>  
- <div class="tooltip">Verb
-  <span class="tooltiptext">The finite verb of a clause or subordinate clause</span>
-</div>  
-</aside>
-   
-   <h1>Caesar, <i> De Bello Gallico </i> 1.1</h1>
-   <p style="font-size: 15px;"><i>The following exercise is designed to highlight the steps you need to make when translating Latin texts. 
-   When you hover over a word, you can see which words belong together, fulfilling the same function in the sentence. 
-   When you click on a word once, a dropdown menu will appear, and you will need to choose between the following: subject, accusative object, dative object, genitive object, ablative, predicative, adverb, prepositional phrase, or verb. 
-   Once you double-click on the correct function, the word will be highlighted in colour. 
-   When you have gone through a sentence in this way, you will be able to see the function of each word or group of words, and you can start to translate the sentence accordingly.
-   If the sentence has a subordinate clause, you can analyse it in more detail in the line below the parent clause.</i></p>
-      
-<p><button class="dropdown-button" id="subj3" data-target-menu="Msubj3">Gallia</button> <button class="dropdown-button" id="verb3" data-target-menu="Mverb3">est</button> <button class="dropdown-button" id="pred1" data-target-menu="Mpred1">omnis</button> <button class="dropdown-button" id="verb4" data-target-menu="Mverb4">divisa</button> <button class="dropdown-button" id="prep4" data-target-menu="Mprep4">in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli appellantur</button>.
-<p style="text-indent: 16.2em;"><button class="dropdown-button" id="acc2" data-target-menu="Macc2">quarum unam</button> <button class="dropdown-button" id="verb5" data-target-menu="Mverb5">incolunt</button> <button class="dropdown-button" id="subj5" data-target-menu="Msubj5">Belgae</button>, <button class="dropdown-button" id="acc3" data-target-menu="Macc3">aliam</button> <button class="dropdown-button" id="subj7" data-target-menu="Msubj7">Aquitani</button>, <button class="dropdown-button" id="acc4" data-target-menu="Macc4">tertiam</button> <button class="dropdown-button" id="subj6" data-target-menu="Msubj6">qui ipsorum lingua Celtae, nostra Galli appellantur</button>.</p>
-<p style="text-indent: 40.3em;"><button class="dropdown-button" id="subj8" data-target-menu="Msubj8">qui</button> <button class="dropdown-button" id="abl3" data-target-menu="Mabl3">ipsorum lingua</button> <button class="dropdown-button" id="pred4" data-target-menu="Mpred4">Celtae</button>, <button class="dropdown-button" id="abl4" data-target-menu="Mabl4">nostra</button> <button class="dropdown-button" id="pred3" data-target-menu="Mpred3">Galli</button> <button class="dropdown-button" id="verb6" data-target-menu="Mverb6">appellantur</button>.</p>
-<p><button class="dropdown-button" id="subj1" data-target-menu="Msubj1">hi omnes</button> <button class="dropdown-button" id="abl1" data-target-menu="Mabl1">lingua, institutis, legibus</button> <button class="dropdown-button" id="prep1" data-target-menu="Mprep1">inter se</button> <button class="dropdown-button" id="verb1" data-target-menu="Mverb1">differunt</button>.</p>
-<p><button class="dropdown-button" id="acc1" data-target-menu="Macc1">Gallos</button> <button class="dropdown-button" id="prep2" data-target-menu="Mprep2">ab Aquitanis</button> <button class="dropdown-button" id="subj2" data-target-menu="Msubj2">Garunna flumen</button>, <button class="dropdown-button" id="prep5" data-target-menu="Mprep5">a Belgis</button> <button class="dropdown-button" id="subj4" data-target-menu="Msubj4">Matrona et Sequana</button> <button class="dropdown-button" id="verb2" data-target-menu="Mverb2">dividit</button>.</p> 
-<p>...</p>
+<form id="radio-menu-form" action="your-server-endpoint" method="post">
+    <div id="radio-menu-template" class="radio-menu">
+        <label><input type="radio" name="word-option" value="Subj">Subject</label><br>
+        <label><input type="radio" name="word-option" value="Gen">Genitive object</label><br>
+        <label><input type="radio" name="word-option" value="Dat">Dative object</label><br>
+        <label><input type="radio" name="word-option" value="Acc">Accusative object</label><br>
+        <label><input type="radio" name="word-option" value="Abl">Ablative</label><br>
+        <label><input type="radio" name="word-option" value="Pred">Predicative</label><br>
+        <label><input type="radio" name="word-option" value="Adv">Adverb</label><br>
+        <label><input type="radio" name="word-option" value="Prep">Prepositional phrase</label><br>
+        <label><input type="radio" name="word-option" value="Verb">Verb</label><br>
+		<label><input type="radio" name="word-option" value="Conj">Conjunction</label><br>
+		<label><input type="radio" name="word-option" value="AcI">Accusative with Infinitive</label><br>
+        <label><input type="radio" name="word-option" value="NcI">Nominative with Infinitive</label><br>
+        <label><input type="radio" name="word-option" value="Abl abs">Ablative absolute</label><br>		
+        <button type="submit" class="submit-button">Submit</button>
+    </div>
+</form>
 
-<aside class="bottom">
-<img class="img-responsive" src="Gaius_Iulius_Caesar_(Vatican_Museum).jpg" alt="Julius Caesar">
-<img class="img-responsive" src="Map-of-Gallia.jpg" alt="Map of Gaul">
-<img class="img-responsive" src="caesars_campaigns_in_gaul_1st_century_bc.jpg" alt="Caesar's campaigns in Gaul">
-<img class="img-responsive" src="Siege-alesia-vercingetorix-jules-cesar.jpg" alt="Vercingetorix before Caesar">
-</aside>
-
-
-<!-- Dropdown Menus -->
-<div class="dropdown-menu1" id="Msubj1">
-<div class="dropdown-options"></div>
- <div class="green-option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
+<div id="translation-container" style="display:none; margin-top: 20px;">
+    <label for="translation">Enter your translation:</label><br>
+    <textarea id="translation" rows="1" cols="50"></textarea><br>
+	<button type="button" id="submit-translation">Submit Translation</button>
 </div>
 
-<div class="dropdown-menu1" id="Msubj2">
-<div class="dropdown-options"></div>
- <div class="green-option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
+<div class="background-container">
+    <aside class="bottom">
+        <img class="responsive-img" src="https://img.freepik.com/free-vector/broken-abandoned-ancient-greek-temple-garden_107791-27100.jpg?t=st=1723731126~exp=1723734726~hmac=ebeaea273203dccca814581b4da6c693be87d899430781fcdeab6ab42174d602&w=1380" alt="Broken abandoned ancient Greek temple in garden">
+        <div class="image-credit">           
+        </div>
+    </aside>
 </div>
 
-<div class="dropdown-menu1" id="Msubj3">
-<div class="dropdown-options"></div>
- <div class="green-option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+<p><a href="Galliacredentials.html">Credentials</a></p>
 
-<div class="dropdown-menu1" id="Msubj4">
-<div class="dropdown-options"></div>
- <div class="green-option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+<script>
+    const backgroundColors = {
+        'Subj': '#ff8080', 
+        'Gen': '#FF6347',  
+        'Dat': '#8A2BE2',  
+        'Acc': '#99ddff',  
+        'Abl': '#ffc34d',  
+        'Pred': '#ffb3b3', 
+        'Adv': '#FF69B4',  
+        'Prep': '#ffd9b3', 
+        'Verb': '#66cc00',  
+		'Conj': '#a6a6a6',
+		'AcI': '#0099e6',
+		'NcI': '#ff6666',
+		'Abl abs': '#cc8800'
+    };	
+	
+document.addEventListener('DOMContentLoaded', function () {
+    const radioMenu = document.getElementById('radio-menu-template');
+    const submitButton = radioMenu.querySelector('.submit-button');
+    radioMenu.style.display = 'none';
 
-<div class="dropdown-menu1" id="Msubj5">
-<div class="dropdown-options"></div>
- <div class="green-option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+    document.querySelectorAll('.hover-word').forEach(word => {
+        word.addEventListener('click', function(event) {
+            event.stopPropagation();
+            document.querySelectorAll('.hover-word').forEach(w => w.classList.remove('active'));
 
-<div class="dropdown-menu1" id="Msubj6">
-<div class="dropdown-options"></div>
- <div class="green-option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+            word.classList.add('active');
 
-<div class="dropdown-menu1" id="Msubj7">
-<div class="dropdown-options"></div>
- <div class="green-option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+            // Clear any previously selected radio button
+            const radioButtons = radioMenu.querySelectorAll('input[name="word-option"]');
+            radioButtons.forEach(button => button.checked = false);
 
-<div class="dropdown-menu1" id="Msubj8">
-<div class="dropdown-options"></div>
- <div class="green-option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+            const rect = word.getBoundingClientRect();
 
-<div class="dropdown-menu1" id="Msubj9">
-<div class="dropdown-options"></div>
- <div class="green-option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+            // Position the radio menu relative to the clicked word
+            radioMenu.style.display = 'block';
+            radioMenu.style.position = 'absolute';
+            radioMenu.style.top = `${rect.bottom + window.scrollY}px`;
+            radioMenu.style.left = `${rect.left + window.scrollX}px`;
 
-<div class="dropdown-menu1" id="Msubj10">
-<div class="dropdown-options"></div>
- <div class="green-option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+            // Check if the submit button is out of view
+            const submitButtonRect = submitButton.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
 
-<div class="dropdown-menu1" id="Macc1">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="green-option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+            if (submitButtonRect.bottom > viewportHeight) {
+                // Fix the submit button to the bottom of the viewport
+                submitButton.style.position = 'fixed';
+                submitButton.style.bottom = '10px';
+                submitButton.style.left = '50%';
+                submitButton.style.transform = 'translateX(-50%)';
+                submitButton.style.zIndex = '1000'; // Ensure it stays on top
+            } else {
+                // Reset the submit button position if it's in view
+                submitButton.style.position = 'static';
+                submitButton.style.transform = 'none';
+                submitButton.style.bottom = 'auto';
+                submitButton.style.left = 'auto';
+            }
+        });
+    });
 
-<div class="dropdown-menu1" id="Macc2">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="green-option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+    document.getElementById('radio-menu-form').addEventListener('submit', function(event) {
+        event.preventDefault();
 
-<div class="dropdown-menu1" id="Macc3">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="green-option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+        const selectedOption = this.querySelector('input[name="word-option"]:checked').value;
+        const currentWord = document.querySelector('.hover-word.active');
 
-<div class="dropdown-menu1" id="Macc4">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="green-option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+        if (currentWord) {
+            const correctAnswer = currentWord.getAttribute('data-correct-answer');
+            let functionLabel = currentWord.querySelector('.function-label');
 
-<div class="dropdown-menu1" id="Macc5">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="green-option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+            if (!functionLabel) {
+                functionLabel = document.createElement('span');
+                functionLabel.classList.add('function-label');
+                currentWord.appendChild(functionLabel);
+            }
 
-<div class="dropdown-menu1" id="Mabl1">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="green-option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+            functionLabel.textContent = correctAnswer;
+            functionLabel.style.color = selectedOption === correctAnswer ? 'green' : 'red';
+            currentWord.style.backgroundColor = backgroundColors[correctAnswer];
 
-<div class="dropdown-menu1" id="Mabl2">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="green-option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+            radioMenu.style.display = 'none';
+            currentWord.classList.remove('active');
 
-<div class="dropdown-menu1" id="Mabl3">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="green-option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
+            const sentenceContainer = currentWord.closest('.sentence-container');
+            checkIfAllOptionsSelected(sentenceContainer);
+        }
+    });
 
-<div class="dropdown-menu1" id="Mabl4">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="green-option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mabl5">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="green-option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mprep1">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="green-option">Prep</div>
- <div class="option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mprep2">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="green-option">Prep</div>
- <div class="option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mprep3">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="green-option">Prep</div>
- <div class="option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mprep4">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="green-option">Prep</div>
- <div class="option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mprep5">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="green-option">Prep</div>
- <div class="option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mverb1">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="green-option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mverb2">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="green-option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mverb3">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="green-option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mverb4">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="green-option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mverb5">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="green-option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mverb6">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="green-option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mpred1">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="green-option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mpred2">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="green-option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mpred3">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="green-option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
-
-<div class="dropdown-menu1" id="Mpred4">
-<div class="dropdown-options"></div>
- <div class="option">Subj</div>
- <div class="option">Acc</div>
- <div class="option">Dat</div>
- <div class="option">Gen</div>
- <div class="option">Abl</div>
- <div class="green-option">Pred</div>
- <div class="option">Adv</div>
- <div class="option">Prep</div>
- <div class="option">Verb</div>
-</div>
-
-</section> 
- <script>  
-	// Add click event listeners to the buttons to open their associated menus
-let buttons = document.querySelectorAll(".dropdown-button");
-buttons.forEach((button) => {
-    button.addEventListener("click", function () {
-        let targetMenuId = button.getAttribute("data-target-menu");
-        let targetMenu = document.getElementById(targetMenuId);
-
-// Calculate the button's position
-            let buttonRect = button.getBoundingClientRect();
-            let top = buttonRect.bottom + window.scrollY;
-            let left = buttonRect.left + window.scrollX;
-
-            // Set the menu's position to match the button's position
-            targetMenu.style.top = top + "px";
-            targetMenu.style.left = left + "px";
-
-        // Toggle the display of the associated menu
-        if (targetMenu.style.display === "none" || targetMenu.style.display === "") {
-            targetMenu.style.display = "block";
-        } else {
-            targetMenu.style.display = "none";
+    document.addEventListener('click', function(event) {
+        if (!radioMenu.contains(event.target) && !event.target.classList.contains('hover-word')) {
+            radioMenu.style.display = 'none';
+            document.querySelectorAll('.hover-word').forEach(w => w.classList.remove('active'));
         }
     });
 });
 
-// Add event listeners for each dropdown menu
-let dropdownMenus = document.querySelectorAll(".dropdown-menu1");
-dropdownMenus.forEach((menu) => {
-    let optionsContainer = menu.querySelector(".dropdown-options");
-	//console.log(optionsContainer);
+function checkIfAllOptionsSelected(sentenceContainer) {
+    const allWords = sentenceContainer.querySelectorAll('.hover-word');
+    let allSelected = true;
 
-    // Add a double-click event listener to each menu
-    menu.addEventListener("dblclick", function (event) {
-        console.log("Double-click event triggered");
-		//console.log(event.srcElement.parentElement.id);
-		console.log(event);
-		
-        let clickedOption = event.target;
-		//console.log(clickedOption);
-		
-		if (clickedOption.classList.contains("green-option")) {
-            clickedOption.classList.add("selected-option");
-			console.log("green-option");
-	        //event.srcElement.parentElement.hidden = "true";
-			myid = event.srcElement.parentElement.id;
-				
-let element = document.getElementById(myid);
-let list = element.querySelectorAll(".option"); 
-            list.forEach((list) => {list.style.display = "none";});
-			console.log(list);
-			let list2 = element.querySelectorAll(".green-option.selected-option"); 
-			console.log(list2);
-            let farbe = "none";
-			list2.forEach((list2) => {list2.style.display = "block";});	
-			if (myid.substring(1,5) == "verb") {
-			list2.forEach((list2) => {list2.style.background = "#66cc00";});	
-			farbe = "#66cc00";
-			}
-			if (myid.substring(1,4) == "abl") {
-			list2.forEach((list2) => {list2.style.background = "#ffc34d";});	
-			farbe = "#ffc34d";
-			}
-			if (myid.substring(1,5) == "prep") {
-			list2.forEach((list2) => {list2.style.background = "#ffd9b3";});	
-			farbe = "#ffd9b3";
-			}			
-			if (myid.substring(1,4) == "acc") {
-			list2.forEach((list2) => {list2.style.background = "#99ddff";});	
-			farbe = "#99ddff";
-			}				
-			if (myid.substring(1,5) == "subj") {
-			list2.forEach((list2) => {list2.style.background = "#ff8080";});	
-			farbe = "#ff8080";
-			}
-			if (myid.substring(1,5) == "pred") {
-			list2.forEach((list2) => {list2.style.background = "#ffb3b3";});	
-			farbe = "#ffb3b3";
-			}
-			
-			weckle = myid.substring(1);
-			window[weckle].style="background-color:" + farbe;			
+    allWords.forEach(word => {
+        if (!word.querySelector('.function-label')) {
+            allSelected = false;
         }
     });
-});
+
+    if (allSelected && !sentenceContainer.querySelector('.translation-container')) {
+        const translationContainer = document.createElement('div');
+        translationContainer.className = 'translation-container';
+        translationContainer.innerHTML = `
+            <label for="translation">Enter your translation:</label><br>
+            <textarea class="translation" rows="2" cols="50"></textarea><br>
+        `;
+        sentenceContainer.appendChild(translationContainer);
+    }
+}
+
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
- 
-  </body>
+
+</body>
 </html>
