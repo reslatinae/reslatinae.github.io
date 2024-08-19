@@ -12,7 +12,7 @@
 <p>
     <i>This page is designed to help you translate ancient Greek or Latin sentences. 
 	One click on each word or group of words will open a button that will ask you to choose the syntactical function:<br> 
-	subject, accusative object, dative object, genitive object, ablative, predicative, adverb, prepositional phrase, verb, conjunction, accusative with infinitive, nominative with infinitiv, or ablative absolute.<br>
+	subject, accusative object, dative object, genitive object, ablative, predicative, adverb, prepositional phrase, verb, accusative with infinitive, nominative with infinitiv, ablative absolute, or other (i.e., conjunctions, interjections, etc.).<br>
     If you were right, the answer will be displayed in green, if you were wrong, the correct answer will appear in red. 
 	Once you have analysed each word in a sentence, a textbox will appear into which you can write your translation. 
 	In the end, you can take a screenshot, save the webpage or print it as a pdf, so you can discuss your translations in class.</i><br>
@@ -61,7 +61,7 @@
 	<div class="sentence-container">
 	<span class="hover-word" data-correct-answer="Verb" id="word-28">Horum omnium fortissimi sunt</span>
     <span class="hover-word" data-correct-answer="Subj" id="word-29">Belgae,</span>
-    <span class="hover-word" data-correct-answer="Conj" id="word-30">propterea quod</span>
+    <span class="hover-word" data-correct-answer="other" id="word-30">propterea quod</span>
     <span class="hover-word" data-correct-answer="Prep" id="word-31">a cultu atque humanitate provinciae</span>
     <span class="hover-word" data-correct-answer="Adv" id="word-32">longissime</span>
 	<span class="hover-word" data-correct-answer="Verb" id="word-33">absunt.</span><br>
@@ -89,10 +89,10 @@
         <label><input type="radio" name="word-option" value="Adv">Adverb</label><br>
         <label><input type="radio" name="word-option" value="Prep">Prepositional phrase</label><br>
         <label><input type="radio" name="word-option" value="Verb">Verb</label><br>
-		<label><input type="radio" name="word-option" value="Conj">Conjunction</label><br>
 		<label><input type="radio" name="word-option" value="AcI">Accusative with Infinitive</label><br>
         <label><input type="radio" name="word-option" value="NcI">Nominative with Infinitive</label><br>
         <label><input type="radio" name="word-option" value="Abl abs">Ablative absolute</label><br>		
+		<label><input type="radio" name="word-option" value="Other">Other</label><br>
         <button type="submit" class="submit-button">Submit</button>
     </div>
 </form>
@@ -124,10 +124,10 @@
         'Adv': '#FF69B4',  
         'Prep': '#ffd9b3', 
         'Verb': '#66cc00',  
-		'Conj': '#a6a6a6',
 		'AcI': '#0099e6',
 		'NcI': '#ff6666',
-		'Abl abs': '#cc8800'
+		'Abl abs': '#cc8800',
+		'Other': '#a6a6a6'
     };	
 	
 document.addEventListener('DOMContentLoaded', function () {
