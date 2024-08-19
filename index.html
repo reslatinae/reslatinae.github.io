@@ -12,7 +12,7 @@
 <p>
     <i>This page is designed to help you translate ancient Greek or Latin sentences. 
 	One click on each word or group of words will open a button that will ask you to choose the syntactical function:<br> 
-	subject, accusative object, dative object, genitive object, ablative, predicative, adverb, prepositional phrase, verb, accusative with infinitive, nominative with infinitiv, ablative absolute, or other (i.e., conjunctions, interjections, etc.).<br>
+	subject, accusative object, dative object, genitive object, ablative, predicative, adverb, prepositional phrase, verb (active/passive), infinitive, accusative with infinitive, nominative with infinitiv, ablative absolute, or other (i.e., conjunctions, interjections, etc.).<br>
     If you were right, the answer will be displayed in green, if you were wrong, the correct answer will appear in red. 
 	Once you have analysed each word in a sentence, a textbox will appear into which you can write your translation. 
 	In the end, you can take a screenshot, save the webpage or print it as a pdf, so you can discuss your translations in class.</i><br>
@@ -24,12 +24,12 @@
 <p>
 <div class="sentence-container">
     <span class="hover-word" data-correct-answer="Subj" id="word-1">Gallia</span>
-    <span class="hover-word" data-correct-answer="Verb" id="word-2">est</span>
+    <span class="hover-word" data-correct-answer="Verb pass" id="word-2">est</span>
     <span class="hover-word" data-correct-answer="Pred" id="word-3">omnis</span>
-    <span class="hover-word" data-correct-answer="Verb" id="word-4">divisa</span>
+    <span class="hover-word" data-correct-answer="Verb pass" id="word-4">divisa</span>
     <span class="hover-word" data-correct-answer="Prep" id="word-5">in partes tres,</span>
 	<span class="hover-word" data-correct-answer="Acc" id="word-6">quarum unam</span>
-	<span class="hover-word" data-correct-answer="Verb" id="word-7">incolunt</span> 
+	<span class="hover-word" data-correct-answer="Verb act" id="word-7">incolunt</span> 
 	<span class="hover-word" data-correct-answer="Subj" id="word-8">Belgae,</span>
 	<span class="hover-word" data-correct-answer="Acc" id="word-9">aliam</span>
 	<span class="hover-word" data-correct-answer="Subj" id="word-10">Aquitani,</span>
@@ -39,14 +39,14 @@
 	<span class="hover-word" data-correct-answer="Pred" id="word-14">Celtae,</span>
 	<span class="hover-word" data-correct-answer="Abl" id="word-15">nostra</span>
 	<span class="hover-word" data-correct-answer="Pred" id="word-16">Galli</span>
-	<span class="hover-word" data-correct-answer="Verb" id="word-17">appellantur.</span><br>
+	<span class="hover-word" data-correct-answer="Verb pass" id="word-17">appellantur.</span><br>
 	<br>
 	</div>
 	<div class="sentence-container">
     <span class="hover-word" data-correct-answer="Subj" id="word-18">Hi omnes</span>
     <span class="hover-word" data-correct-answer="Abl" id="word-19">lingua, institutis, legibus</span>
     <span class="hover-word" data-correct-answer="Prep" id="word-20">inter se</span>
-	<span class="hover-word" data-correct-answer="Verb" id="word-21">differunt.</span><br>
+	<span class="hover-word" data-correct-answer="Verb act" id="word-21">differunt.</span><br>
 	<br>
 	</div>
 	<div class="sentence-container">
@@ -55,25 +55,25 @@
     <span class="hover-word" data-correct-answer="Subj" id="word-24">Garumna flumen,</span>
     <span class="hover-word" data-correct-answer="Prep" id="word-25">a Belgis</span>
     <span class="hover-word" data-correct-answer="Subj" id="word-26">Matrona et Sequana</span>
-	<span class="hover-word" data-correct-answer="Verb" id="word-27">dividit.</span><br>
+	<span class="hover-word" data-correct-answer="Verb act" id="word-27">dividit.</span><br>
 	<br>
 	</div>
 	<div class="sentence-container">
-	<span class="hover-word" data-correct-answer="Verb" id="word-28">Horum omnium fortissimi sunt</span>
+	<span class="hover-word" data-correct-answer="Verb act" id="word-28">Horum omnium fortissimi sunt</span>
     <span class="hover-word" data-correct-answer="Subj" id="word-29">Belgae,</span>
     <span class="hover-word" data-correct-answer="Other" id="word-30">propterea quod</span>
     <span class="hover-word" data-correct-answer="Prep" id="word-31">a cultu atque humanitate provinciae</span>
     <span class="hover-word" data-correct-answer="Adv" id="word-32">longissime</span>
-	<span class="hover-word" data-correct-answer="Verb" id="word-33">absunt.</span><br>
+	<span class="hover-word" data-correct-answer="Verb act" id="word-33">absunt.</span><br>
 	<br>
 	</div>
 	[...]
 	<div class="sentence-container">
 	<span class="hover-word" data-correct-answer="Subj" id="word-34">Eorum una pars,</span>
     <span class="hover-word" data-correct-answer="AcI" id="word-35">quam Gallos obtinere</span>
-    <span class="hover-word" data-correct-answer="Verb" id="word-36">dictum est,</span>
+    <span class="hover-word" data-correct-answer="Verb pass" id="word-36">dictum est,</span>
     <span class="hover-word" data-correct-answer="Acc" id="word-37">initium</span>
-    <span class="hover-word" data-correct-answer="Verb" id="word-38">capit</span>
+    <span class="hover-word" data-correct-answer="Verb act" id="word-38">capit</span>
 	<span class="hover-word" data-correct-answer="Prep" id="word-39">a flumine Rhodano.</span><br>
 	<br>
 	</div>
@@ -88,7 +88,9 @@
         <label><input type="radio" name="word-option" value="Pred">Predicative</label><br>
         <label><input type="radio" name="word-option" value="Adv">Adverb</label><br>
         <label><input type="radio" name="word-option" value="Prep">Prepositional phrase</label><br>
-        <label><input type="radio" name="word-option" value="Verb">Verb</label><br>
+        <label><input type="radio" name="word-option" value="Verb act">Verb (active/deponent)</label><br>
+		<label><input type="radio" name="word-option" value="Verb pass">Verb (passive)</label><br>
+		<label><input type="radio" name="word-option" value="Inf">Infinitive</label><br>
 		<label><input type="radio" name="word-option" value="AcI">Accusative with Infinitive</label><br>
         <label><input type="radio" name="word-option" value="NcI">Nominative with Infinitive</label><br>
         <label><input type="radio" name="word-option" value="Abl abs">Ablative absolute</label><br>		
@@ -123,11 +125,13 @@
         'Pred': '#ffb3b3', 
         'Adv': '#FF69B4',  
         'Prep': '#ffd9b3', 
-        'Verb': '#66cc00',  
-		'AcI': '#0099e6',
-		'NcI': '#ff6666',
-		'Abl abs': '#cc8800',
-		'Other': '#a6a6a6'
+        'Verb act': '#66cc00',  
+	'Verb pass': '#4d9900',
+	'Inf': '#408000',
+	'AcI': '#0099e6',
+	'NcI': '#ff6666',
+	'Abl abs': '#cc8800',
+	'Other': '#a6a6a6'
     };	
 	
 document.addEventListener('DOMContentLoaded', function () {
@@ -231,8 +235,6 @@ function checkIfAllOptionsSelected(sentenceContainer) {
         sentenceContainer.appendChild(translationContainer);
     }
 }
-
 </script>
-
 </body>
 </html>
