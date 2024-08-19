@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Create Syntax Analysis</title>
-    <link rel="stylesheet" href="Gallia1.css">
+    <link rel="stylesheet" href="css/Gallia1.css">
 </head>
 <body>
     <header>
@@ -90,7 +90,7 @@ document.getElementById("input").addEventListener("submit", function(event) {
     } else {
         errorMessageElement.textContent = "";
 
-        var sentencesArray = enteredText.match(/[^.!:·]+[.!?:·]*/g).map(sentence => sentence.trim()).filter(Boolean);
+        var sentencesArray = enteredText.match(/[^.!?:·]+[.!?:·]*/g).map(sentence => sentence.trim()).filter(Boolean);
         
         resultContainer.innerHTML = "";
         var userInputContainer = document.getElementById("user-input-container");
