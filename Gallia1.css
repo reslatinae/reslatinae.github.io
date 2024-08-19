@@ -22,6 +22,11 @@ h1 {
   color: var(--main-color);
 }
 
+.intro-text {
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
 /* Grid Layout */
 .grid {
   display: grid;
@@ -37,6 +42,7 @@ h1 {
 /* Background and Image Styles */
 .background-container {
   position: relative;
+  margin-top: 20px;
   text-align: center;
   overflow: hidden;
 }
@@ -63,6 +69,7 @@ h1 {
   cursor: pointer;
   background-color: var(--hover-bg-color);
   margin: 20px 5px 0 0;
+  padding: 5px;
   text-align: center;
   display: inline-block;
 }
@@ -89,8 +96,21 @@ h1 {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.radio-menu label {
+    margin-right: 10px;
+}
+
+.submit-button {
+    margin-top: 10px;
+    background-color: #616161;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
 .translation-container {
-  margin: 0.5% 0 3%;
+  margin: 1% 0 1%;
 }
 
 /* Form Element Styles */
