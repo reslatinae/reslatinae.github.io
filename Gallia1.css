@@ -133,6 +133,9 @@ input[type="text"], textarea {
 
 textarea {
   resize: vertical;
+  width: 100%;
+  height: 60px;
+  resize: vertical;
 }
 
 textarea.translation {
