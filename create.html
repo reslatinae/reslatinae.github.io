@@ -150,6 +150,8 @@ function submitKeyValuePairs() {
     var keyValuePairs = [];
     var hasInvalidInput = false;
     var currentSentence = [];
+    var previousValue = null;
+    var group = [];
 
     inputFields.forEach(function(input, index) {
         var word = input.placeholder.split("'")[1];
@@ -160,15 +162,30 @@ function submitKeyValuePairs() {
             hasInvalidInput = true;
             input.style.borderColor = "red";
         } else {
-            currentSentence.push({word: word, function: value});
             input.style.borderColor = "";
+
+            if (previousValue && value === previousValue) {
+                // Continue grouping the words
+                group.push(word);
+            } else {
+                // Push the previous group if exists
+                if (group.length > 0) {
+                    currentSentence.push({ word: group.join(' '), function: previousValue });
+                    group = [];
+                }
+                group.push(word); // Start a new group
+            }
+
+            previousValue = value;
 
             if (word.endsWith('.') || index === inputFields.length - 1) {
                 if (index === inputFields.length - 1 && !word.endsWith('.')) {
-                    currentSentence[currentSentence.length - 1].word += '.';
+                    group[group.length - 1] += '.';
                 }
+                currentSentence.push({ word: group.join(' '), function: value });
                 keyValuePairs = keyValuePairs.concat(currentSentence);
                 currentSentence = [];
+                group = [];
             }
         }
     });
@@ -177,10 +194,10 @@ function submitKeyValuePairs() {
         resultContainer.innerHTML = "<p class='error'>Please fill in all the input fields correctly.</p>";
     } else {
         var enteredTitle = document.getElementById("pagetitle").value.trim();
-        var enteredImageURL = document.getElementById("imageurl").value.trim(); // Retrieve the image URL here
+        var enteredImageURL = document.getElementById("imageurl").value.trim();
         var htmlContent = generateNewHtml(keyValuePairs, enteredTitle, enteredImageURL);
         var filename = "syntactical_analysis.html";
-        downloadGeneratedHtml(filename, htmlContent);        
+        downloadGeneratedHtml(filename, htmlContent);
     }
 }
 
@@ -322,28 +339,31 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
 	
     <div id="sentence-container">`;
 
-    let sentenceIndex = 0;
+   let sentenceIndex = 0;
     let currentSentence = [];
 
-  for (let pair of keyValuePairs) {
-    currentSentence.push(pair);
-    
-    if (pair.word.endsWith('.')) {
-        html += `<div class="sentence-block">`;  // New wrapper div
-        html += `<p1 data-sentence-index="${sentenceIndex}">`;
-        for (let wordPair of currentSentence) {
-            html += `<span class="hover-word" data-correct-answer="${wordPair.function}">${wordPair.word}<span class="function-name">${wordPair.function}</span></span> `;
+    keyValuePairs.forEach(pair => {
+        currentSentence.push(pair);
+
+        if (pair.word.endsWith('.')) {
+            html += `<div class="sentence-block">`; // New wrapper div
+            html += `<p1 data-sentence-index="${sentenceIndex}">`;
+
+            currentSentence.forEach(wordPair => {
+                html += `<span class="hover-word" data-correct-answer="${wordPair.function}">${wordPair.word}<span class="function-name">${wordPair.function}</span></span> `;
+            });
+
+            html += `</p1>
+            <div id="translation-container-${sentenceIndex}" class="translation-container" style="display:none;">
+                <textarea class="translation" rows="4" placeholder="Enter your translation for this sentence here"></textarea>
+            </div>`;
+            html += `</div>`; // Close the wrapper div
+
+            currentSentence = [];
+            sentenceIndex++;
         }
-        html += `</p1>
-        <div id="translation-container-${sentenceIndex}" class="translation-container" style="display:none;">
-            <textarea class="translation" rows="4" placeholder="Enter your translation for this sentence here"></textarea>
-        </div>`;
-        html += `</div>`;  // Close the wrapper div
-        
-        currentSentence = [];
-        sentenceIndex++;
-    }
-}
+    });
+
 
     html += `</div>
 
@@ -388,12 +408,12 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
         'adv': '#FF69B4',
         'prep': '#ffd9b3',
         'verb act': '#66cc00',  
-	'verb pass': '#4d9900',
-	'inf': '#408000',
-	'aci': '#0099e6',
+		'verb pass': '#4d9900',
+		'inf': '#408000',
+		'aci': '#0099e6',
         'nci': '#ff6666',
         'abl abs': '#cc8800',
-	'other': '#a6a6a6'
+		'other': '#a6a6a6'
     };
 
     document.addEventListener('DOMContentLoaded', function () {
