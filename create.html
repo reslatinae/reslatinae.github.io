@@ -250,7 +250,7 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
         font-size: 120%;		
     }
 
- .background-container {
+	.background-container {
     display: flex;
     flex-direction: column;
     justify-content: flex-end; /* Align items towards the bottom */
@@ -258,14 +258,14 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
     margin-top: auto; /* Allow content above to push it down */
     }
 
-.responsive-img {
+	.responsive-img {
     max-width: 100%; /* Ensure the image does not exceed the width of its container */
     height: auto; /* Maintain aspect ratio */
     max-height: 30vh; /* Limit the height to 30% of viewport height */
     display: inline-block; /* Align image properly within its container */
     border-radius: 1%;    
     margin-top: 10%; /* Pull the image a bit closer to the text */
-}
+	}
 	
     .hover-word {
         position: relative;
@@ -357,7 +357,7 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
             <div id="translation-container-${sentenceIndex}" class="translation-container" style="display:none;">
                 <textarea class="translation" rows="4" placeholder="Enter your translation for this sentence here"></textarea>
             </div>`;
-            html += `</div>`; // Close the wrapper div
+            html += `</div>`;
 
             currentSentence = [];
             sentenceIndex++;
@@ -428,54 +428,97 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
         if (activeWord) activeWord.classList.remove('active');
         activeWord = event.target.classList.contains('hover-word') ? event.target : event.target.parentElement;
         activeWord.classList.add('active');
-        
+
+        // Initialize attempt count if it doesn't exist
+        if (typeof activeWord.attemptCount === 'undefined') {
+            activeWord.attemptCount = 0;
+        }
+
+        // Position the radio menu
         const rect = activeWord.getBoundingClientRect();
         radioMenu.style.display = 'block';
         radioMenu.style.top = (rect.bottom + window.scrollY) + 'px';
         radioMenu.style.left = (rect.left + window.scrollX) + 'px';
-        
-		// Check if the submit button is out of view
-const submitButtonRect = submitButton.getBoundingClientRect();
-const viewportHeight = window.innerHeight;
 
-if (submitButtonRect.bottom > viewportHeight) {
-    // Fix the submit button to the bottom of the viewport
-    submitButton.style.position = 'fixed';
-    submitButton.style.bottom = '10px';
-    submitButton.style.left = '50%';
-    submitButton.style.transform = 'translateX(-50%)';
-    submitButton.style.zIndex = '1000'; // Ensure it stays on top
-} else {
-    // Reset the submit button position if it's in view
-    submitButton.style.position = 'static';
-    submitButton.style.transform = 'none';
-    submitButton.style.bottom = 'auto';
-    submitButton.style.left = 'auto';
-}
-		
+        // Ensure the submit button is visible or fixed
+        const submitButtonRect = submitButton.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+
+        if (submitButtonRect.bottom > viewportHeight) {
+            submitButton.style.position = 'fixed';
+            submitButton.style.bottom = '10px';
+            submitButton.style.left = '50%';
+            submitButton.style.transform = 'translateX(-50%)';
+            submitButton.style.zIndex = '1000';
+        } else {
+            submitButton.style.position = 'static';
+            submitButton.style.transform = 'none';
+            submitButton.style.bottom = 'auto';
+            submitButton.style.left = 'auto';
+        }
+
+        // Clear previous radio button selection
         document.querySelectorAll("input[name='word-option']").forEach(input => input.checked = false);
     }
 });
 
-        document.getElementById('radio-menu-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const selectedOption = document.querySelector('input[name="word-option"]:checked').value;
-            const correctAnswer = activeWord.getAttribute('data-correct-answer');
+ document.getElementById('radio-menu-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const selectedOption = document.querySelector('input[name="word-option"]:checked').value;
+    const correctAnswer = activeWord.getAttribute('data-correct-answer');
 
-            let label = document.createElement('div');
+    // Increment attempt count
+    if (!activeWord.attemptCount) activeWord.attemptCount = 0;
+    activeWord.attemptCount += 1;
+
+    // Remove any existing feedback message
+    let feedbackMessage = document.getElementById('feedback-message');
+    if (feedbackMessage) {
+        feedbackMessage.remove();
+    }
+
+    // Create a new feedback message element
+    feedbackMessage = document.createElement('div');
+    feedbackMessage.id = 'feedback-message';
+    feedbackMessage.style.position = 'fixed';
+    feedbackMessage.style.bottom = '20px';
+    feedbackMessage.style.left = '50%';
+    feedbackMessage.style.transform = 'translateX(-50%)';
+    feedbackMessage.style.padding = '10px 20px';
+    feedbackMessage.style.backgroundColor = '#ffdddd';
+    feedbackMessage.style.color = 'red';
+    feedbackMessage.style.border = '1px solid red';
+    feedbackMessage.style.borderRadius = '5px';
+    feedbackMessage.style.zIndex = '1000'; // Ensure it stays on top
+    feedbackMessage.style.fontSize = '16px';
+
+    document.body.appendChild(feedbackMessage);
+
+    // First attempt: Incorrect answer
+    if (activeWord.attemptCount === 1 && selectedOption !== correctAnswer) {
+        feedbackMessage.textContent = 'This is not correct. Please try again.';
+    } 
+    // Second attempt or correct answer
+    else {
+        feedbackMessage.remove(); // Remove the feedback message on correct or second attempt
+        let label = activeWord.querySelector('.function-label');
+        if (!label) {
+            label = document.createElement('div');
             label.className = 'function-label';
-            label.textContent = selectedOption;
-            label.style.color = (selectedOption === correctAnswer) ? 'green' : 'red';
-            
-            activeWord.style.backgroundColor = backgroundColors[correctAnswer] || '#e4e5ed';
-			activeWord.appendChild(label);
+            activeWord.appendChild(label);
+        }
+        label.textContent = correctAnswer;
+        label.style.color = (selectedOption === correctAnswer) ? 'green' : 'red';
+        activeWord.style.backgroundColor = backgroundColors[correctAnswer] || '#e4e5ed';
 
-            radioMenu.style.display = 'none';
-            activeWord.classList.remove('active');
-            activeWord = null;
+        radioMenu.style.display = 'none';
+        activeWord.classList.remove('active');
+        activeWord = null;
 
-            checkIfAllWordsLabeled();
-        });
+        // Check if all words are labeled
+        checkIfAllWordsLabeled();
+    }
+});
 
          function checkIfAllWordsLabeled() {
             const sentences = sentenceContainer.querySelectorAll('p1');
