@@ -126,12 +126,12 @@
         'Adv': '#FF69B4',  
         'Prep': '#ffd9b3', 
         'Verb act': '#66cc00',  
-	'Verb pass': '#4d9900',
-	'Inf': '#408000',
-	'AcI': '#0099e6',
-	'NcI': '#ff6666',
-	'Abl abs': '#cc8800',
-	'Other': '#a6a6a6'
+		'Verb pass': '#4d9900',
+		'Inf': '#408000',
+		'AcI': '#0099e6',
+		'NcI': '#ff6666',
+		'Abl abs': '#cc8800',
+		'Other': '#a6a6a6'
     };	
 	
 document.addEventListener('DOMContentLoaded', function () {
@@ -140,37 +140,33 @@ document.addEventListener('DOMContentLoaded', function () {
     radioMenu.style.display = 'none';
 
     document.querySelectorAll('.hover-word').forEach(word => {
+        word.setAttribute('data-attempts', '0');  // Initialize attempt counter
         word.addEventListener('click', function(event) {
             event.stopPropagation();
             document.querySelectorAll('.hover-word').forEach(w => w.classList.remove('active'));
 
             word.classList.add('active');
 
-            // Clear any previously selected radio button
             const radioButtons = radioMenu.querySelectorAll('input[name="word-option"]');
             radioButtons.forEach(button => button.checked = false);
 
             const rect = word.getBoundingClientRect();
 
-            // Position the radio menu relative to the clicked word
             radioMenu.style.display = 'block';
             radioMenu.style.position = 'absolute';
             radioMenu.style.top = `${rect.bottom + window.scrollY}px`;
             radioMenu.style.left = `${rect.left + window.scrollX}px`;
 
-            // Check if the submit button is out of view
             const submitButtonRect = submitButton.getBoundingClientRect();
             const viewportHeight = window.innerHeight;
 
             if (submitButtonRect.bottom > viewportHeight) {
-                // Fix the submit button to the bottom of the viewport
                 submitButton.style.position = 'fixed';
                 submitButton.style.bottom = '10px';
                 submitButton.style.left = '50%';
                 submitButton.style.transform = 'translateX(-50%)';
-                submitButton.style.zIndex = '1000'; // Ensure it stays on top
+                submitButton.style.zIndex = '1000';
             } else {
-                // Reset the submit button position if it's in view
                 submitButton.style.position = 'static';
                 submitButton.style.transform = 'none';
                 submitButton.style.bottom = 'auto';
@@ -188,6 +184,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (currentWord) {
             const correctAnswer = currentWord.getAttribute('data-correct-answer');
             let functionLabel = currentWord.querySelector('.function-label');
+            let attempts = parseInt(currentWord.getAttribute('data-attempts'));
 
             if (!functionLabel) {
                 functionLabel = document.createElement('span');
@@ -195,12 +192,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 currentWord.appendChild(functionLabel);
             }
 
-            functionLabel.textContent = correctAnswer;
-            functionLabel.style.color = selectedOption === correctAnswer ? 'green' : 'red';
-            currentWord.style.backgroundColor = backgroundColors[correctAnswer];
+            if (selectedOption === correctAnswer) {
+                functionLabel.textContent = correctAnswer;
+                functionLabel.style.color = 'green';
+                currentWord.style.backgroundColor = backgroundColors[correctAnswer];
+                radioMenu.style.display = 'none';
+                currentWord.classList.remove('active');
+            } else {
+                attempts++;
+                currentWord.setAttribute('data-attempts', attempts);
 
-            radioMenu.style.display = 'none';
-            currentWord.classList.remove('active');
+                if (attempts < 2) {
+                    alert('This is not correct. Please try again.');
+                } else {
+                    functionLabel.textContent = correctAnswer;
+                    functionLabel.style.color = 'red';
+                    currentWord.style.backgroundColor = backgroundColors[correctAnswer];
+                    radioMenu.style.display = 'none';
+                    currentWord.classList.remove('active');
+                }
+            }
 
             const sentenceContainer = currentWord.closest('.sentence-container');
             checkIfAllOptionsSelected(sentenceContainer);
