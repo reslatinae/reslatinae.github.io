@@ -141,11 +141,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelectorAll('.hover-word').forEach(word => {
         word.setAttribute('data-attempts', '0');  // Initialize attempt counter
+        word.setAttribute('data-correct', 'false');  // Track if the word is correct
         word.addEventListener('click', function(event) {
             event.stopPropagation();
             document.querySelectorAll('.hover-word').forEach(w => w.classList.remove('active'));
-		    word.classList.add('active');
-			word.setAttribute('data-attempts', '0');  // Initialize attempt counter
+            word.classList.add('active');
 
             const radioButtons = radioMenu.querySelectorAll('input[name="word-option"]');
             radioButtons.forEach(button => button.checked = false);
@@ -175,48 +175,50 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-document.getElementById('radio-menu-form').addEventListener('submit', function(event) {
-    event.preventDefault();
+    document.getElementById('radio-menu-form').addEventListener('submit', function(event) {
+        event.preventDefault();
 
-    const selectedOption = this.querySelector('input[name="word-option"]:checked').value;
-    const currentWord = document.querySelector('.hover-word.active');
+        const selectedOption = this.querySelector('input[name="word-option"]:checked').value;
+        const currentWord = document.querySelector('.hover-word.active');
 
-    if (currentWord) {
-        const correctAnswer = currentWord.getAttribute('data-correct-answer');
-        let functionLabel = currentWord.querySelector('.function-label');
-        let attempts = parseInt(currentWord.getAttribute('data-attempts'));
+        if (currentWord) {
+            const correctAnswer = currentWord.getAttribute('data-correct-answer');
+            let functionLabel = currentWord.querySelector('.function-label');
+            let attempts = parseInt(currentWord.getAttribute('data-attempts'));
 
-        if (!functionLabel) {
-            functionLabel = document.createElement('span');
-            functionLabel.classList.add('function-label');
-            currentWord.appendChild(functionLabel);
-        }
+            if (!functionLabel) {
+                functionLabel = document.createElement('span');
+                functionLabel.classList.add('function-label');
+                currentWord.appendChild(functionLabel);
+            }
 
-        if (selectedOption === correctAnswer) {
-            functionLabel.textContent = correctAnswer;
-            functionLabel.style.color = 'green';
-            currentWord.style.backgroundColor = backgroundColors[correctAnswer];
-            radioMenu.style.display = 'none';
-            currentWord.classList.remove('active');
-        } else {
-            attempts++;
-            currentWord.setAttribute('data-attempts', attempts);
-
-            if (attempts < 2) {
-                alert('This is not correct. Please try again.');
-            } else {
+            if (selectedOption === correctAnswer) {
                 functionLabel.textContent = correctAnswer;
-                functionLabel.style.color = 'red';
+                functionLabel.style.color = 'green';
                 currentWord.style.backgroundColor = backgroundColors[correctAnswer];
+                currentWord.setAttribute('data-correct', 'true');  // Mark word as correct
                 radioMenu.style.display = 'none';
                 currentWord.classList.remove('active');
-            }
-        }
+            } else {
+                attempts++;
+                currentWord.setAttribute('data-attempts', attempts);
 
-        const sentenceContainer = currentWord.closest('.sentence-container');
-        checkIfAllOptionsSelected(sentenceContainer);  // Add this line to check after each attempt
-    }
-});
+                if (attempts < 2) {
+                    alert('This is not correct. Please try again.');
+                } else {
+                    functionLabel.textContent = correctAnswer;
+                    functionLabel.style.color = 'red';
+                    currentWord.style.backgroundColor = backgroundColors[correctAnswer];
+                    currentWord.setAttribute('data-correct', 'true');  // Mark word as correct even if incorrect initially
+                    radioMenu.style.display = 'none';
+                    currentWord.classList.remove('active');
+                }
+            }
+
+            const sentenceContainer = currentWord.closest('.sentence-container');
+            checkIfLastAnalyzedCorrect(sentenceContainer);  // Check if the last analyzed word completes the sentence
+        }
+    });
 
     document.addEventListener('click', function(event) {
         if (!radioMenu.contains(event.target) && !event.target.classList.contains('hover-word')) {
@@ -226,41 +228,29 @@ document.getElementById('radio-menu-form').addEventListener('submit', function(e
     });
 });
 
-function checkIfAllOptionsSelected(sentenceContainer) {
-    const allWords = sentenceContainer.querySelectorAll('.hover-word');
-    let allSelected = true;
-
-    allWords.forEach(word => {
-        if (!word.querySelector('.function-label')) {
-            allSelected = false;
-        }
-    });
-
-    if (allSelected && !sentenceContainer.querySelector('.translation-container')) {
-        const translationContainer = document.createElement('div');
-        translationContainer.className = 'translation-container';
-        translationContainer.innerHTML = `
-            <label for="translation">Enter your translation:</label><br>
-            <textarea class="translation" rows="2" cols="50"></textarea><br>
-        `;
-        sentenceContainer.appendChild(translationContainer);
-    }
-}
-
-function checkIfAllOptionsSelected(sentenceContainer) {
+function checkIfLastAnalyzedCorrect(sentenceContainer) {
     const allWords = sentenceContainer.querySelectorAll('.hover-word');
     let allCorrect = true;
+    let lastAnalyzedCorrect = false;
 
     allWords.forEach(word => {
-        const functionLabel = word.querySelector('.function-label');
-        const correctAnswer = word.getAttribute('data-correct-answer');
-
-        if (!functionLabel || functionLabel.textContent !== correctAnswer) {
+        const isCorrect = word.getAttribute('data-correct') === 'true';
+        if (!isCorrect) {
             allCorrect = false;
         }
     });
 
-    if (allCorrect && !sentenceContainer.querySelector('.translation-container')) {
+    // Check if the last word analyzed (with 'true' data-correct) is the final word needed for completion
+    allWords.forEach((word, index) => {
+        if (word.getAttribute('data-correct') === 'true') {
+            if (index === allWords.length - 1) {  // Check if this is the last word analyzed
+                lastAnalyzedCorrect = true;
+            }
+        }
+    });
+
+    // If all words are correct and the last analyzed word was correct, show the translation container
+    if (lastAnalyzedCorrect && allCorrect && !sentenceContainer.querySelector('.translation-container')) {
         const translationContainer = document.createElement('div');
         translationContainer.className = 'translation-container';
         translationContainer.innerHTML = `
