@@ -471,28 +471,29 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
     if (!activeWord.attemptCount) activeWord.attemptCount = 0;
     activeWord.attemptCount += 1;
 
-    // Remove any existing feedback message
-    let feedbackMessage = document.getElementById('feedback-message');
-    if (feedbackMessage) {
-        feedbackMessage.remove();
+  // First attempt: Incorrect answer
+if (activeWord.attemptCount === 1 && selectedOption !== correctAnswer) {
+    alert('This is not correct. Please try again.');
+} 
+// Second attempt or correct answer
+else {
+    let label = activeWord.querySelector('.function-label');
+    if (!label) {
+        label = document.createElement('div');
+        label.className = 'function-label';
+        activeWord.appendChild(label);
     }
+    label.textContent = correctAnswer;
+    label.style.color = (selectedOption === correctAnswer) ? 'green' : 'red';
+    activeWord.style.backgroundColor = backgroundColors[correctAnswer] || '#e4e5ed';
 
-    // Create a new feedback message element
-    feedbackMessage = document.createElement('div');
-    feedbackMessage.id = 'feedback-message';
-    feedbackMessage.style.position = 'fixed';
-    feedbackMessage.style.bottom = '20px';
-    feedbackMessage.style.left = '50%';
-    feedbackMessage.style.transform = 'translateX(-50%)';
-    feedbackMessage.style.padding = '10px 20px';
-    feedbackMessage.style.backgroundColor = '#ffdddd';
-    feedbackMessage.style.color = 'red';
-    feedbackMessage.style.border = '1px solid red';
-    feedbackMessage.style.borderRadius = '5px';
-    feedbackMessage.style.zIndex = '1000'; // Ensure it stays on top
-    feedbackMessage.style.fontSize = '16px';
+    radioMenu.style.display = 'none';
+    activeWord.classList.remove('active');
+    activeWord = null;
 
-    document.body.appendChild(feedbackMessage);
+    // Check if all words are labeled
+    checkIfAllWordsLabeled();
+}
 
     // First attempt: Incorrect answer
     if (activeWord.attemptCount === 1 && selectedOption !== correctAnswer) {
@@ -500,7 +501,6 @@ function generateNewHtml(keyValuePairs, pageTitle, imageURL) {
     } 
     // Second attempt or correct answer
     else {
-        feedbackMessage.remove(); // Remove the feedback message on correct or second attempt
         let label = activeWord.querySelector('.function-label');
         if (!label) {
             label = document.createElement('div');
