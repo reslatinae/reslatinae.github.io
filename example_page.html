@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Example Analysis: Caesar, Catullus & Vergil</title>
+    <style>
+        :root { --main-font: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; }
+        
+        body, button, input, textarea, select { font-family: var(--main-font); }
+
+        body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background-color: #f4f4f9; color: #333; }
+        h1 { text-align: center; color: #444; margin-bottom: 30px; font-weight: normal; letter-spacing: 1px; }
+        h2 { border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-top: 40px; color: #555; }
+        
+        .instruction-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 0.95rem; line-height: 1.6; color: #856404; }
+        .teacher-note { background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 4px; margin-bottom: 25px; font-size: 1rem; color: #333; }
+        
+        .exercise-wrapper { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); line-height: 5.5; }
+
+        .hover-word { cursor: pointer; background: #e4e5ed; padding: 4px 12px; border-radius: 4px; border-bottom: 3px solid #ccc; font-size: 1.4rem; position: relative; display: inline-block; line-height: 1.2; transition: all 0.2s; }
+        .s-group { display: inline-block; position: relative; border: 2px solid #555; border-bottom:none; border-radius: 8px 8px 0 0; padding: 25px 8px 5px 8px; margin: 0 2px; vertical-align: bottom; }
+        .g-label { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; background: white; border: 1px solid #555; border-radius: 4px; padding: 2px 8px; white-space: nowrap; color: #555; text-transform: uppercase; cursor: pointer; }
+        .punct { font-size: 1.4rem; margin: 0 1px; vertical-align: baseline; display:inline-block; }
+        
+        .trans-box { margin: 20px 0 50px; line-height: 1.5; }
+        textarea { width: 100%; height: 80px; font-size: 1.2rem; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; margin-top: 8px; width: 150px; text-align: center; color: green; pointer-events: none; }
+        
+        .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #bbb; padding: 0; z-index: 1000; border-radius: 4px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); max-height: 400px; overflow-y: auto; min-width: 160px; line-height: 1.2; }
+        .radio-menu input[type="radio"] { display: none; }
+        .radio-menu label { display: block; padding: 1px 8px; cursor: pointer; border-bottom: none; font-size: 0.85rem; font-weight: bold; color: #333; }
+        .radio-menu label:hover { background-color: #007bff; color: white; }
+
+        .footer-toolbar { margin-top: 60px; padding: 30px; border-top: 1px solid #ddd; display: flex; justify-content: center; gap: 20px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; background: #333; }
+        .ex-img { max-width: 100%; height: auto; display: block; margin: 30px auto 10px auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-height: 300px; object-fit: contain; }
+
+        #toast-container {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1001;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+        #toast-container.show { visibility: visible; opacity: 1; bottom: 50px; }
+        #toast-container.error { background-color: #333; border-bottom: 4px solid #d32f2f; }
+        #toast-container.success { background-color: #333; border-bottom: 4px solid #28a745; }
+        
+        /* Pattern Mode */
+        body.pattern-mode .hover-word[data-done="true"] {
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.3) 5px, rgba(255,255,255,0.3) 10px);
+            border: 2px solid #333 !important;
+        }
+        body.pattern-mode .hover-word[data-done="true"]:nth-child(even) {
+             background-image: radial-gradient(rgba(255,255,255,0.4) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.4) 20%, transparent 20%);
+             background-position: 0 0, 5px 5px;
+             background-size: 10px 10px;
+        }
+        body.pattern-mode .s-group { border-style: dashed !important; border-width: 3px !important; }
+
+        /* High Contrast Mode */
+        body.high-contrast { background-color: #121212; color: #ffffff; }
+        body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #1e1e1e; color: #fff; border: 1px solid #444; }
+        body.high-contrast .instruction-box { background-color: #332b00; border-color: #665500; color: #ffeb3b; }
+        body.high-contrast .teacher-note { background-color: #1e1e1e !important; border: 1px solid #555 !important; color: #fff !important; }
+        body.high-contrast .hover-word { background-color: #333; color: #fff; border-bottom: 3px solid #777; }
+        body.high-contrast .hover-word[data-done="true"] { border: 2px solid #fff !important; color: #000; font-weight: bold; }
+        body.high-contrast .s-group { border-color: #fff !important; }
+        body.high-contrast .g-label { background: #000; color: #fff; border-color: #fff; }
+        body.high-contrast .punct { color: #fff; }
+        body.high-contrast textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
+
+        @media (max-width: 768px) {
+            body { margin: 15px; line-height: 4.0; }
+            .exercise-wrapper { padding: 15px; }
+            .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 80%; }
+        }
+        @media print { 
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } 
+            .footer-toolbar, .radio-menu, .instruction-box { display: none !important; } 
+            .ex-img { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Example Analysis: Caesar, Catullus & Vergil</h1>
+    
+    <div class="instruction-box">
+    This page is designed to help you translate Latin sentences. One click on a word or group of words will open a button that will ask you to choose the syntactical function:<br>
+    subject, accusative object, dative object, genitive object, ablative, predicative, prepositional phrase, adverb, verb, infinitive, participial phrase, or other (i.e., conjunctions, interjections, etc.). Larger syntactic functions (labelled '?') can have any of these functions, as well as those of relative clause or any other subordinate clause.<br>
+    Once you have analysed each word in a sentence, a textbox will appear into which you can write your translation. In the end, you can save the webpage or print it, so you can discuss your translations in class.
+    </div>
+
+    <div class="exercise-wrapper">
+        <div id="exercise">
+            <h2>Caesar, De Bello Gallico 1.1</h2>
+            <div class="sentence-container">
+                <span class="hover-word" data-ans="Subject">Gallia</span> <span class="hover-word" data-ans="Verb">est</span> <span class="hover-word" data-ans="Predicative">omnis</span> <span class="hover-word" data-ans="Verb">divisa</span> <span class="hover-word" data-ans="Prepositional phrase">in partes tres</span><span class="punct">,</span> 
+                <div class="s-group" data-ans="Relative clause"><span class="g-label">?</span><span class="hover-word" data-ans="Accusative object">quarum unam</span> <span class="hover-word" data-ans="Verb">incolunt</span> <span class="hover-word" data-ans="Subject">Belgae</span><span class="punct">,</span> <span class="hover-word" data-ans="Accusative object">aliam</span> <span class="hover-word" data-ans="Subject">Aquitani</span><span class="punct">,</span> <span class="hover-word" data-ans="Accusative object">tertiam</span> 
+                <div class="s-group" data-ans="Subject"><span class="g-label">?</span><span class="hover-word" data-ans="Subject">qui</span> <span class="hover-word" data-ans="Ablative">ipsorum lingua</span> <span class="hover-word" data-ans="Predicative">Celtae</span><span class="punct">,</span> <span class="hover-word" data-ans="Ablative">nostra</span> <span class="hover-word" data-ans="Predicative">Galli</span> <span class="hover-word" data-ans="Verb">appellantur</span><span class="punct">.</span></div></div>
+            </div>
+            <div id="t-container-0" class="trans-box" style="display:none;"><textarea placeholder="Enter translation..."></textarea></div>
+            
+            <div class="sentence-container">
+                <span class="hover-word" data-ans="Subject">Hi omnes</span> <span class="hover-word" data-ans="Ablative">lingua, institutis, legibus</span> <span class="hover-word" data-ans="Prepositional phrase">inter se</span> <span class="hover-word" data-ans="Verb">differunt</span><span class="punct">.</span> 
+            </div>
+            <div id="t-container-1" class="trans-box" style="display:none;"><textarea placeholder="Enter translation..."></textarea></div>
+            
+            <div class="sentence-container">
+                <span class="hover-word" data-ans="Accusative object">Gallos</span> <span class="hover-word" data-ans="Prepositional phrase">ab Aquitanis</span> <span class="hover-word" data-ans="Subject">Garumna flumen</span><span class="punct">,</span> <span class="hover-word" data-ans="Prepositional phrase">a Belgis</span> <span class="hover-word" data-ans="Subject">Matrona et Sequana</span> <span class="hover-word" data-ans="Verb">dividit</span><span class="punct">.</span> 
+            </div>
+            <div id="t-container-2" class="trans-box" style="display:none;"><textarea placeholder="Enter translation..."></textarea></div>
+
+            <h2>Catullus 64.1—7</h2>
+            <div class="sentence-container">
+                <div class="s-group" data-ans="Subject"><span class="g-label">?</span><span class="hover-word" data-ans="Ablative">Peliaco</span> <span class="hover-word" data-ans="Adverb">quondam</span> <span class="hover-word" data-ans="Participial phrase">prognatae</span> <span class="hover-word" data-ans="Ablative">vertice</span> <span class="hover-word" data-ans="Subject">pinus</span></div> <span class="hover-word" data-ans="Verb">dicuntur</span> 
+                <div class="s-group" data-ans="Infinitive"><span class="g-label">?</span><span class="hover-word" data-ans="Prepositional phrase">liquidas Neptuni</span> <span class="hover-word" data-ans="Infinitive">nasse</span> <span class="hover-word" data-ans="Prepositional phrase">per undas Phasidos ad fluctus et fines Aeetaeos</span><span class="punct">,</span></div> 
+                <div class="s-group" data-ans="Subordinate clause"><span class="g-label">?</span><span class="hover-word" data-ans="Other">cum</span> <span class="hover-word" data-ans="Subject">lecti iuvenes, Argiuae robora pubis</span><span class="punct">,</span> 
+                <div class="s-group" data-ans="Participial phrase"><span class="g-label">?</span><span class="hover-word" data-ans="Accusative object">auratam</span> <span class="hover-word" data-ans="Participial phrase">optantes</span> <span class="hover-word" data-ans="Dative object">Colchis</span> <span class="hover-word" data-ans="Infinitive">avertere</span> <span class="hover-word" data-ans="Accusative object">pellem</span></div> 
+                <span class="hover-word" data-ans="Verb">ausi sunt</span> 
+                <div class="s-group" data-ans="Infinitive"><span class="g-label">?</span><span class="hover-word" data-ans="Accusative object">vada salsa</span> <span class="hover-word" data-ans="Ablative">cita</span> <span class="hover-word" data-ans="Infinitive">decurrere</span> <span class="hover-word" data-ans="Ablative">puppi</span><span class="punct">,</span></div> 
+                <div class="s-group" data-ans="Participial phrase"><span class="g-label">?</span><span class="hover-word" data-ans="Accusative object">caerula</span> <span class="hover-word" data-ans="Participial phrase">verrentes</span> <span class="hover-word" data-ans="Ablative">abiegnis</span> <span class="hover-word" data-ans="Accusative object">aequora</span> <span class="hover-word" data-ans="Ablative">palmis</span><span class="punct">.</span></div></div> 
+            </div>
+            <div id="t-container-3" class="trans-box" style="display:none;"><textarea placeholder="Enter translation..."></textarea></div>
+
+            <h2>Vergil, Aeneid 1.1—7</h2>
+            <div class="sentence-container">
+                <span class="hover-word" data-ans="Accusative object">Arma virumque</span> <span class="hover-word" data-ans="Verb">canō</span><span class="punct">,</span> 
+                <div class="s-group" data-ans="Relative clause"><span class="g-label">?</span><span class="hover-word" data-ans="Prepositional phrase">Trōiae</span> <span class="hover-word" data-ans="Subject">quī</span> <span class="hover-word" data-ans="Predicative">prīmus</span> <span class="hover-word" data-ans="Prepositional phrase">ab ōrīs</span> <span class="hover-word" data-ans="Accusative object">Ītaliam</span><span class="punct">,</span> <span class="hover-word" data-ans="Ablative">fātō</span> <span class="hover-word" data-ans="Predicative">profugus</span><span class="punct">,</span> <span class="hover-word" data-ans="Accusative object">Lāvīniaque</span> <span class="hover-word" data-ans="Verb">vēnit</span> <span class="hover-word" data-ans="Accusative object">lītora, multum</span></div> 
+                <span class="hover-word" data-ans="Subject">ille</span> <span class="hover-word" data-ans="Ablative">et terrīs</span> <span class="hover-word" data-ans="Participial phrase">iactātus</span> <span class="hover-word" data-ans="Ablative">et altō vī superum</span> <span class="hover-word" data-ans="Prepositional phrase">saevae memorem Iūnōnis ob īram</span><span class="punct">;</span> <span class="hover-word" data-ans="Accusative object">multa</span> <span class="hover-word" data-ans="Adverb">quoque</span> <span class="hover-word" data-ans="Ablative">et bellō</span> <span class="hover-word" data-ans="Participial phrase">passus</span><span class="punct">,</span> 
+                <div class="s-group" data-ans="Subordinate clause"><span class="g-label">?</span><span class="hover-word" data-ans="Other">dum</span> <span class="hover-word" data-ans="Verb">conderet</span> <span class="hover-word" data-ans="Accusative object">urbem</span><span class="punct">,</span> <span class="hover-word" data-ans="Verb">inferretque</span> <span class="hover-word" data-ans="Accusative object">deōs</span> <span class="hover-word" data-ans="Dative object">Latiō</span><span class="punct">,</span> 
+                <div class="s-group" data-ans="Subordinate clause"><span class="g-label">?</span><span class="hover-word" data-ans="Subject">genus</span> <span class="hover-word" data-ans="Adverb">unde</span> <span class="hover-word" data-ans="Subject">Latīnum, Albānīque patrēs, atque altae moenia Rōmae</span><span class="punct">.</span></div></div> 
+            </div>
+            <div id="t-container-4" class="trans-box" style="display:none;"><textarea placeholder="Enter translation..."></textarea></div>
+        </div>
+    </div>
+
+    <img src="https://img.freepik.com/free-vector/broken-abandoned-ancient-greek-temple-garden_107791-27100.jpg?t=st=1723731126~exp=1723734726~hmac=ebeaea273203dccca814581b4da6c693be87d899430781fcdeab6ab42174d602&w=1380" class="ex-img" alt="Exercise Image">
+    
+    <div class="footer-toolbar">
+        <button class="btn" onclick="togglePatterns()">Toggle Patterns</button>
+        <button class="btn" onclick="toggleContrast()">High Contrast</button>
+        <button class="btn" onclick="window.print()">Print Analysis</button> 
+        <button class="btn" onclick="downloadPage()">Download HTML</button>
+    </div>
+    
+    <div id="menu-common" class="radio-menu">
+        <form id="f-common">
+            <label><input type="radio" name="opt" value="Subject"> Subject</label>
+            <label><input type="radio" name="opt" value="Accusative object"> Accusative object</label>
+            <label><input type="radio" name="opt" value="Dative object"> Dative object</label>
+            <label><input type="radio" name="opt" value="Genitive object"> Genitive object</label>
+            <label><input type="radio" name="opt" value="Ablative"> Ablative</label>
+            <label><input type="radio" name="opt" value="Predicative"> Predicative</label>
+            <label><input type="radio" name="opt" value="Prepositional phrase"> Prepositional phrase</label>
+            <label><input type="radio" name="opt" value="Adverb"> Adverb</label>
+            <label><input type="radio" name="opt" value="Verb"> Verb</label>
+            <label><input type="radio" name="opt" value="Infinitive"> Infinitive</label>
+            <label><input type="radio" name="opt" value="Participial phrase"> Participial phrase</label>
+            <label><input type="radio" name="opt" value="Relative clause"> Relative clause</label>
+            <label><input type="radio" name="opt" value="Subordinate clause"> Subordinate clause</label>
+            <label><input type="radio" name="opt" value="Other"> Other</label>
+        </form>
+    </div>
+    <div id="toast-container"></div>
+    
+    <script>
+        const colors = { 
+            'Subject': '#66bb6a', 'Accusative object': '#42a5f5', 'Dative object': '#ab47bc', 
+            'Genitive object': '#26c6da', 'Ablative': '#ffa726', 'Predicative': '#e1bee7', 
+            'Prepositional phrase': '#fdd835', 'Adverb': '#ffee58', 'Verb': '#ff4d4d', 
+            'Infinitive': '#d32f2f', 'Participial phrase': '#ffcdd2', 'Relative clause': '#78909c', 
+            'Subordinate clause': '#8d6e63', 'Other': '#e0e0e0'
+        }; 
+        let activeEl = null; let mode = "";
+        const menu = document.getElementById('menu-common');
+        
+        document.querySelectorAll('.hover-word, .g-label').forEach(el => {
+            el.onclick = (e) => {
+                e.stopPropagation();
+                if(el.dataset.done) return;
+                activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
+                if(window.innerWidth > 768) { menu.style.top=e.pageY+"px"; menu.style.left=e.pageX+"px"; }
+                menu.style.display="block"; 
+            };
+        });
+        
+        document.getElementById('f-common').onchange = (e) => {
+            const sel = e.target.value; 
+            const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans;
+            
+            if(sel === correct) {
+                solve(activeEl, correct, mode);
+                showToast("Correct!", false);
+            } else { 
+                let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1;
+                activeEl.dataset.mistakes = mistakes;
+                if(mistakes >= 2) {
+                      showToast("Incorrect. The correct answer is: " + correct, true);
+                      solve(activeEl, correct, mode);
+                } else {
+                      showToast('Incorrect label, try again!', true);
+                }
+            }
+            menu.style.display = "none"; e.target.checked = false; check();
+        };
+
+        function showToast(msg, isError) {
+            const x = document.getElementById("toast-container");
+            x.textContent = msg;
+            x.className = isError ? "show error" : "show success";
+            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+        }
+        
+        function togglePatterns() { document.body.classList.toggle('pattern-mode'); }
+        function toggleContrast() { document.body.classList.toggle('high-contrast'); }
+
+        function solve(el, ans, m) {
+            if(m === "word") {
+                const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
+                el.style.backgroundColor = colors[ans]; el.dataset.done = "true";
+            } else { 
+                el.textContent = ans; el.dataset.done = "true"; el.style.background = "#e8f5e9"; 
+            }
+        }
+
+        function check() { 
+            document.querySelectorAll('.sentence-container').forEach((s, i) => { 
+                const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')];
+                if(items.length > 0 && items.every(item => item.dataset.done === "true")) {
+                    const b = document.getElementById('t-container-' + i); if(b) b.style.display = 'block';
+                }
+            }); 
+        }
+        function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
+        document.addEventListener('mousedown', (e) => { if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; });
+    </script>
+</body>
+</html>
