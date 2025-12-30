@@ -27,11 +27,11 @@
             color: var(--text-color); 
         }
 
-        h1 { text-align: center; color: #444; margin-bottom: 30px; font-weight: normal; letter-spacing: 1px; }
+        h1 { text-align: center; color: #444; margin-bottom: 20px; font-weight: normal; letter-spacing: 1px; font-size: 1.8rem; }
 
         .container { 
             background: var(--container-bg); 
-            padding: 30px; 
+            padding: 25px; 
             border-radius: 12px; 
             box-shadow: var(--shadow); 
             margin-bottom: 20px; 
@@ -40,56 +40,71 @@
         .instruction-box { 
             background: #fff3cd; 
             border: 1px solid #ffeeba; 
-            padding: 15px; 
+            padding: 12px; 
             border-radius: 8px; 
             margin-bottom: 20px; 
-            font-size: 0.95rem; 
-            line-height: 1.6; 
+            font-size: 0.9rem; 
+            line-height: 1.5; 
             color: #856404;
         }
-        .instruction-box h3 { margin-top: 0; border-bottom: 1px solid #ffeeba; padding-bottom: 5px; font-size: 1.1rem; }
+        .instruction-box h3 { margin-top: 0; border-bottom: 1px solid #ffeeba; padding-bottom: 5px; font-size: 1rem; }
         .instruction-box a { color: #856404; text-decoration: underline; font-weight: bold; }
 
         /* PALETTE */
         .palette { 
             position: sticky; top: 0; 
             background: white; 
-            padding: 15px; 
+            padding: 10px; 
             border: 1px solid #ddd; 
             border-radius: 8px; 
             z-index: 1000; 
             box-shadow: var(--shadow); 
-            margin-bottom: 20px; 
+            margin-bottom: 15px; 
         }
-        .palette-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .palette-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
         .p-btn { 
-            padding: 6px 12px; 
-            border-radius: 6px; 
+            padding: 5px 10px; 
+            border-radius: 5px; 
             border: 2px solid transparent; 
             cursor: pointer; 
             font-weight: bold; 
-            font-size: 0.85rem; 
+            font-size: 0.8rem; 
             transition: all 0.2s; 
             color: black !important; 
         }
         .p-btn.active { border-color: #333; transform: scale(1.05); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
+        /* COMPACT EDITOR AREA */
         #tagging-area { 
-            padding: 40px; 
+            padding: 30px; 
             border: 1px solid #e0e0e0; 
             min-height: 400px; 
             background: #fff; 
             border-radius: 8px; 
             display: block; 
-            line-height: 6.5; 
+            line-height: 5.0; /* Increased slightly to prevent label overlap */
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
         }
         
-        /* Interactive Words in Editor */
-        .tag-word { display: inline-block; margin: 0 4px; position: relative; font-size: 1.4rem; vertical-align: middle; color: black; padding: 4px 12px; border-radius: 4px; cursor: pointer; border-bottom: 2px solid #ccc; white-space: nowrap; height: 1.8rem; line-height: 1.8rem; }
+        /* COMPACT WORDS */
+        .tag-word { 
+            display: inline-block; 
+            margin: 0 2px; 
+            position: relative; 
+            font-size: 1.15rem; 
+            vertical-align: middle; 
+            color: black; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            border-bottom: 2px solid #ccc; 
+            white-space: nowrap; 
+            height: 1.6rem; 
+            line-height: 1.6rem; 
+        }
         
-        /* Punctuation - Plain text in Editor */
-        .punct-span { display: inline-block; margin: 0 1px; font-size: 1.4rem; vertical-align: middle; color: black; background: transparent; border: none; padding: 0; font-weight: bold; cursor: default; }
+        /* Punctuation */
+        .punct-span { display: inline-block; margin: 0 1px; font-size: 1.15rem; vertical-align: middle; color: black; background: transparent; border: none; padding: 0; font-weight: bold; cursor: default; }
 
         /* Visual Styles for Groups in Editor */
         .grouped-word { border-bottom: 4px solid #6f42c1 !important; background-color: #f3e5f5; }
@@ -98,30 +113,31 @@
 
         .split-right { border-right: 4px dashed #ff4444 !important; margin-right: 12px; }
         
+        /* COMPACT LABEL */
         .tag-word::after { 
             content: attr(data-func); 
             display: block; 
             position: absolute; 
-            top: 45px; 
+            top: 38px; /* Moved down to create clear separation from the word */
             left: 50%; 
             transform: translateX(-50%); 
-            font-size: 0.55rem; 
+            font-size: 0.5rem; 
             color: #d32f2f; 
             font-weight: 800; 
             text-transform: uppercase; 
             pointer-events: none;
             background: rgba(255,255,255,0.9);
-            padding: 1px 3px;
+            padding: 0 2px;
             line-height: 1;
             border-radius: 3px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         
         .side-panel { background: #eee; padding: 15px; border-radius: 8px; margin-top: 20px; }
-        .group-item { background: white; padding: 10px; margin: 8px 0; border-radius: 6px; display: flex; justify-content: space-between; border-left: 5px solid #6f42c1; align-items: center; }
+        .group-item { background: white; padding: 8px; margin: 5px 0; border-radius: 6px; display: flex; justify-content: space-between; border-left: 5px solid #6f42c1; align-items: center; font-size: 0.9rem; }
         
         /* Buttons */
-        .btn-action { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; color: white; transition: opacity 0.2s; font-size: 0.95rem; }
+        .btn-action { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; color: white; transition: opacity 0.2s; font-size: 0.9rem; }
         .btn-action:hover { opacity: 0.9; }
         
         /* Active State for Tool Buttons */
@@ -152,9 +168,9 @@
             background: transparent;
             color: #666;
             border: 1px solid #ccc;
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
@@ -163,13 +179,13 @@
 
         /* Input Row in Setup */
         .setup-row { display: flex; gap: 15px; margin-bottom: 20px; }
-        .setup-input { padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 1.1rem; }
+        .setup-input { padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; }
 
         /* Credits Link */
         .credits-link {
             text-align: center;
             margin-top: 30px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .credits-link a { color: #666; text-decoration: none; border-bottom: 1px dashed #999; cursor: pointer; }
         .credits-link a:hover { color: #000; border-bottom-style: solid; }
@@ -187,15 +203,13 @@
             .container { padding: 15px; }
             .setup-row { flex-direction: column; gap: 10px; }
             
-            /* Unstick palette on mobile */
             .palette { position: relative; top: 0; padding: 10px; overflow-x: auto; }
             .palette-grid { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
             .p-btn { white-space: nowrap; padding: 12px 15px; } 
 
-            /* Editor area adjustments */
             #tagging-area { padding: 15px; line-height: 4.5; } 
-            .tag-word { font-size: 1.15rem; padding: 6px 8px; margin: 2px; }
-            .tag-word::after { font-size: 0.5rem; top: 38px; }
+            .tag-word { font-size: 1rem; padding: 4px 6px; margin: 1px; }
+            .tag-word::after { font-size: 0.45rem; top: 32px; }
             
             .btn-action { width: 100%; margin-bottom: 8px; font-size: 1rem; }
             .modal-box { width: 90%; }
@@ -228,11 +242,11 @@
             <input type="text" id="pageimage" class="setup-input" placeholder="Optional: Image URL" style="flex: 1;"/>
         </div>
 
-        <textarea id="teachernotes" rows="3" style="width:100%; padding:12px; margin-bottom:20px; border-radius:6px; border:1px solid #ccc; font-size:1rem; box-sizing:border-box;" placeholder="Optional: Context / Teacher Notes (e.g. 'Watch out for ablatives...')"></textarea>
+        <textarea id="teachernotes" rows="3" style="width:100%; padding:10px; margin-bottom:20px; border-radius:6px; border:1px solid #ccc; font-size:1rem; box-sizing:border-box;" placeholder="Optional: Context / Teacher Notes (e.g. 'Watch out for ablatives...')"></textarea>
 
-        <textarea id="entertext" rows="6" style="width:100%; padding:15px; border-radius:8px; border:1px solid #ccc; font-size:1rem; box-sizing: border-box;" placeholder="Paste Latin text here..."></textarea>
+        <textarea id="entertext" rows="6" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:1rem; box-sizing: border-box;" placeholder="Paste Latin text here..."></textarea>
         
-        <div style="background:#eef6ff; padding:25px; border-radius:10px; margin:25px 0; border:2px dashed #007bff;">
+        <div style="background:#eef6ff; padding:20px; border-radius:10px; margin:25px 0; border:2px dashed #007bff;">
             <button class="btn-action" style="background:#007bff;" onclick="copyAIPrompt()">1. Copy AI Prompt</button>
             <textarea id="ai-json" rows="2" style="width:100%; margin: 15px 0; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing: border-box;" placeholder="Paste JSON here..."></textarea>
             <button class="btn-action" style="background:#28a745;" onclick="importAI()">2. Import</button>
@@ -790,12 +804,12 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes) {
         .instruction-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 0.95rem; line-height: 1.6; color: #856404; }
         .teacher-note { background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 4px; margin-bottom: 25px; font-size: 1rem; color: #333; }
         
-        .exercise-wrapper { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); line-height: 5.5; }
+        .exercise-wrapper { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); line-height: 3.8; }
 
-        .hover-word { cursor: pointer; background: #e4e5ed; padding: 4px 12px; border-radius: 4px; border-bottom: 3px solid #ccc; font-size: 1.4rem; position: relative; display: inline-block; line-height: 1.2; transition: all 0.2s; }
-        .s-group { display: inline-block; position: relative; border: 2px solid #555; border-bottom:none; border-radius: 8px 8px 0 0; padding: 25px 8px 5px 8px; margin: 0 2px; vertical-align: bottom; }
-        .g-label { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; background: white; border: 1px solid #555; border-radius: 4px; padding: 2px 8px; white-space: nowrap; color: #555; text-transform: uppercase; cursor: pointer; }
-        .punct { font-size: 1.4rem; margin: 0 1px; vertical-align: baseline; display:inline-block; }
+        .hover-word { cursor: pointer; background: #e4e5ed; padding: 2px 8px; border-radius: 4px; border-bottom: 3px solid #ccc; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.2; transition: all 0.2s; }
+        .s-group { display: inline-block; position: relative; border: 2px solid #555; border-bottom:none; border-radius: 8px 8px 0 0; padding: 15px 5px 5px 5px; margin: 0 2px; vertical-align: bottom; }
+        .g-label { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; background: white; border: 1px solid #555; border-radius: 4px; padding: 2px 8px; white-space: nowrap; color: #555; text-transform: uppercase; cursor: pointer; }
+        .punct { font-size: 1.15rem; margin: 0 1px; vertical-align: baseline; display:inline-block; }
         
         .trans-box { margin: 20px 0 50px; line-height: 1.5; }
         textarea { width: 100%; height: 80px; font-size: 1.2rem; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
