@@ -1,264 +1,993 @@
 <!DOCTYPE html>
 <html lang="en">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="Gallia1.css">
-	<head>
-    <title>Syntactical Analysis Page 1</title>
-	</head>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Syntactic Creator - Didactic Edition</title>
+    <style>
+        :root { 
+            --main-font: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            --bg-color: #f4f4f9;
+            --container-bg: #ffffff;
+            --primary-color: #007bff;
+            --text-color: #333;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* GLOBAL FONT RESET */
+        body, button, input, textarea, select { 
+            font-family: var(--main-font); 
+        }
+
+        body { 
+            margin: 2% auto; 
+            max-width: 1200px;
+            padding: 0 20px;
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+        }
+
+        h1 { text-align: center; color: #444; margin-bottom: 30px; font-weight: normal; letter-spacing: 1px; }
+
+        .container { 
+            background: var(--container-bg); 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
+            margin-bottom: 20px; 
+        }
+        
+        .instruction-box { 
+            background: #fff3cd; 
+            border: 1px solid #ffeeba; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            font-size: 0.95rem; 
+            line-height: 1.6; 
+            color: #856404;
+        }
+        .instruction-box h3 { margin-top: 0; border-bottom: 1px solid #ffeeba; padding-bottom: 5px; font-size: 1.1rem; }
+        .instruction-box a { color: #856404; text-decoration: underline; font-weight: bold; }
+
+        /* PALETTE */
+        .palette { 
+            position: sticky; top: 0; 
+            background: white; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            z-index: 1000; 
+            box-shadow: var(--shadow); 
+            margin-bottom: 20px; 
+        }
+        .palette-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .p-btn { 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            border: 2px solid transparent; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 0.85rem; 
+            transition: all 0.2s; 
+            color: black !important; 
+        }
+        .p-btn.active { border-color: #333; transform: scale(1.05); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        #tagging-area { 
+            padding: 40px; 
+            border: 1px solid #e0e0e0; 
+            min-height: 400px; 
+            background: #fff; 
+            border-radius: 8px; 
+            display: block; 
+            line-height: 6.5; 
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+        
+        /* Interactive Words in Editor */
+        .tag-word { display: inline-block; margin: 0 4px; position: relative; font-size: 1.4rem; vertical-align: middle; color: black; padding: 4px 12px; border-radius: 4px; cursor: pointer; border-bottom: 2px solid #ccc; white-space: nowrap; height: 1.8rem; line-height: 1.8rem; }
+        
+        /* Punctuation - Plain text in Editor */
+        .punct-span { display: inline-block; margin: 0 1px; font-size: 1.4rem; vertical-align: middle; color: black; background: transparent; border: none; padding: 0; font-weight: bold; cursor: default; }
+
+        /* Visual Styles for Groups in Editor */
+        .grouped-word { border-bottom: 4px solid #6f42c1 !important; background-color: #f3e5f5; }
+        .group-start { border-left: 2px solid #6f42c1; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+        .group-end { border-right: 2px solid #6f42c1; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+
+        .split-right { border-right: 4px dashed #ff4444 !important; margin-right: 12px; }
+        
+        .tag-word::after { 
+            content: attr(data-func); 
+            display: block; 
+            position: absolute; 
+            top: 45px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            font-size: 0.55rem; 
+            color: #d32f2f; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            pointer-events: none;
+            background: rgba(255,255,255,0.9);
+            padding: 1px 3px;
+            line-height: 1;
+            border-radius: 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .side-panel { background: #eee; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .group-item { background: white; padding: 10px; margin: 8px 0; border-radius: 6px; display: flex; justify-content: space-between; border-left: 5px solid #6f42c1; align-items: center; }
+        
+        /* Buttons */
+        .btn-action { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; color: white; transition: opacity 0.2s; font-size: 0.95rem; }
+        .btn-action:hover { opacity: 0.9; }
+        
+        /* Active State for Tool Buttons */
+        .btn-action.active-mode {
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.3);
+            transform: scale(0.98);
+            outline: 3px solid #333;
+        }
+        #split-mode-btn.active-mode { outline-color: #dc3545; background: #c82333 !important; }
+        #group-mode-btn.active-mode { outline-color: #6f42c1; background: #5a32a3 !important; }
+
+        .del-btn { color: #ff4444; cursor: pointer; font-weight: bold; padding: 0 10px; font-size: 1.2rem; }
+
+        .custom-label-row { margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd; display: flex; gap: 5px; align-items: center; }
+        .custom-input { flex-grow: 1; padding: 5px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.9rem; }
+        .add-btn { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
+
+        /* Subtle Save/Load Row */
+        .project-mini-row { 
+            margin-top: 15px; 
+            padding-top: 10px; 
+            border-top: 1px solid #eee; 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 15px; 
+        }
+        .subtle-btn {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ccc;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .subtle-btn:hover { background: #f0f0f0; color: #333; border-color: #999; }
+
+        /* Input Row in Setup */
+        .setup-row { display: flex; gap: 15px; margin-bottom: 20px; }
+        .setup-input { padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 1.1rem; }
+
+        /* Credits Link */
+        .credits-link {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+        .credits-link a { color: #666; text-decoration: none; border-bottom: 1px dashed #999; cursor: pointer; }
+        .credits-link a:hover { color: #000; border-bottom-style: solid; }
+
+        /* MODAL STYLES */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-box { background: white; padding: 25px; border-radius: 8px; width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-title { font-weight: bold; margin-bottom: 15px; font-size: 1.1rem; }
+        .modal-input { width: 100%; padding: 10px; margin-bottom: 20px; font-size: 1.1rem; box-sizing: border-box; border: 2px solid #007bff; border-radius: 5px; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+        /* MOBILE / TABLET OPTIMIZATIONS */
+        @media (max-width: 768px) {
+            body { margin: 10px; padding: 0; }
+            .container { padding: 15px; }
+            .setup-row { flex-direction: column; gap: 10px; }
+            
+            /* Unstick palette on mobile */
+            .palette { position: relative; top: 0; padding: 10px; overflow-x: auto; }
+            .palette-grid { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
+            .p-btn { white-space: nowrap; padding: 12px 15px; } 
+
+            /* Editor area adjustments */
+            #tagging-area { padding: 15px; line-height: 4.5; } 
+            .tag-word { font-size: 1.15rem; padding: 6px 8px; margin: 2px; }
+            .tag-word::after { font-size: 0.5rem; top: 38px; }
+            
+            .btn-action { width: 100%; margin-bottom: 8px; font-size: 1rem; }
+            .modal-box { width: 90%; }
+        }
+        
+        /* AUTO SAVE NOTIFICATION */
+        #autosave-status {
+            position: fixed; bottom: 10px; right: 10px; font-size: 0.8rem; color: #888; opacity: 0; transition: opacity 0.5s;
+        }
+    </style>
+</head>
 <body>
-<h1>Analysing and Translating Greek or Latin Sentences</h1>
 
-<p>
-    <i>This page is designed to help you translate ancient Greek or Latin sentences. 
-	One click on each word or group of words will open a button that will ask you to choose the syntactical function:<br> 
-	subject, accusative object, dative object, genitive object, ablative, predicative, adverb, prepositional phrase, verb (active/passive), infinitive, accusative with infinitive, nominative with infinitiv, ablative absolute, or other (i.e., conjunctions, interjections, etc.).<br>
-    If you were right, the answer will be displayed in green, if you were wrong, the correct answer will appear in red. 
-	Once you have analysed each word in a sentence, a textbox will appear into which you can write your translation. 
-	In the end, you can take a screenshot, save the webpage or print it as a pdf, so you can discuss your translations in class.</i><br>
-	<br>
-    If you are a teacher and want to create a page similar to this one with your own sentences, simply click on 
-	<a href="https://reslatinae.github.io/create.html">this link.</a>
-	</p>
-	
-<p>
-<div class="sentence-container">
-    <span class="hover-word" data-correct-answer="Subj" id="word-1">Gallia</span>
-    <span class="hover-word" data-correct-answer="Verb pass" id="word-2">est</span>
-    <span class="hover-word" data-correct-answer="Pred" id="word-3">omnis</span>
-    <span class="hover-word" data-correct-answer="Verb pass" id="word-4">divisa</span>
-    <span class="hover-word" data-correct-answer="Prep" id="word-5">in partes tres,</span>
-	<span class="hover-word" data-correct-answer="Acc" id="word-6">quarum unam</span>
-	<span class="hover-word" data-correct-answer="Verb act" id="word-7">incolunt</span> 
-	<span class="hover-word" data-correct-answer="Subj" id="word-8">Belgae,</span>
-	<span class="hover-word" data-correct-answer="Acc" id="word-9">aliam</span>
-	<span class="hover-word" data-correct-answer="Subj" id="word-10">Aquitani,</span>
-	<span class="hover-word" data-correct-answer="Acc" id="word-11">tertiam</span>
-	<span class="hover-word" data-correct-answer="Subj" id="word-12">qui</span>
-	<span class="hover-word" data-correct-answer="Abl" id="word-13">ipsorum lingua</span>
-	<span class="hover-word" data-correct-answer="Pred" id="word-14">Celtae,</span>
-	<span class="hover-word" data-correct-answer="Abl" id="word-15">nostra</span>
-	<span class="hover-word" data-correct-answer="Pred" id="word-16">Galli</span>
-	<span class="hover-word" data-correct-answer="Verb pass" id="word-17">appellantur.</span><br>
-	<br>
-	</div>
-	<div class="sentence-container">
-    <span class="hover-word" data-correct-answer="Subj" id="word-18">Hi omnes</span>
-    <span class="hover-word" data-correct-answer="Abl" id="word-19">lingua, institutis, legibus</span>
-    <span class="hover-word" data-correct-answer="Prep" id="word-20">inter se</span>
-	<span class="hover-word" data-correct-answer="Verb act" id="word-21">differunt.</span><br>
-	<br>
-	</div>
-	<div class="sentence-container">
-	<span class="hover-word" data-correct-answer="Acc" id="word-22">Gallos</span>
-    <span class="hover-word" data-correct-answer="Prep" id="word-23">ab Aquitanis</span>
-    <span class="hover-word" data-correct-answer="Subj" id="word-24">Garumna flumen,</span>
-    <span class="hover-word" data-correct-answer="Prep" id="word-25">a Belgis</span>
-    <span class="hover-word" data-correct-answer="Subj" id="word-26">Matrona et Sequana</span>
-	<span class="hover-word" data-correct-answer="Verb act" id="word-27">dividit.</span><br>
-	<br>
-	</div>
-	<div class="sentence-container">
-	<span class="hover-word" data-correct-answer="Verb act" id="word-28">Horum omnium fortissimi sunt</span>
-    <span class="hover-word" data-correct-answer="Subj" id="word-29">Belgae,</span>
-    <span class="hover-word" data-correct-answer="Other" id="word-30">propterea quod</span>
-    <span class="hover-word" data-correct-answer="Prep" id="word-31">a cultu atque humanitate provinciae</span>
-    <span class="hover-word" data-correct-answer="Adv" id="word-32">longissime</span>
-	<span class="hover-word" data-correct-answer="Verb act" id="word-33">absunt.</span><br>
-	<br>
-	</div>
-	[...]
-	<div class="sentence-container">
-	<span class="hover-word" data-correct-answer="Subj" id="word-34">Eorum una pars,</span>
-    <span class="hover-word" data-correct-answer="AcI" id="word-35">quam Gallos obtinere</span>
-    <span class="hover-word" data-correct-answer="Verb pass" id="word-36">dictum est,</span>
-    <span class="hover-word" data-correct-answer="Acc" id="word-37">initium</span>
-    <span class="hover-word" data-correct-answer="Verb act" id="word-38">capit</span>
-	<span class="hover-word" data-correct-answer="Prep" id="word-39">a flumine Rhodano.</span><br>
-	<br>
-	</div>
+    <h1>Syntactic Analysis Creator</h1>
 
-<form id="radio-menu-form" action="your-server-endpoint" method="post">
-    <div id="radio-menu-template" class="radio-menu">
-        <label><input type="radio" name="word-option" value="Subj">Subject</label><br>
-        <label><input type="radio" name="word-option" value="Gen">Genitive object</label><br>
-        <label><input type="radio" name="word-option" value="Dat">Dative object</label><br>
-        <label><input type="radio" name="word-option" value="Acc">Accusative object</label><br>
-        <label><input type="radio" name="word-option" value="Abl">Ablative</label><br>
-        <label><input type="radio" name="word-option" value="Pred">Predicative</label><br>
-        <label><input type="radio" name="word-option" value="Adv">Adverb</label><br>
-        <label><input type="radio" name="word-option" value="Prep">Prepositional phrase</label><br>
-        <label><input type="radio" name="word-option" value="Verb act">Verb (active/deponent)</label><br>
-		<label><input type="radio" name="word-option" value="Verb pass">Verb (passive)</label><br>
-		<label><input type="radio" name="word-option" value="Inf">Infinitive</label><br>
-		<label><input type="radio" name="word-option" value="AcI">Accusative with Infinitive</label><br>
-        <label><input type="radio" name="word-option" value="NcI">Nominative with Infinitive</label><br>
-        <label><input type="radio" name="word-option" value="Abl abs">Ablative absolute</label><br>		
-		<label><input type="radio" name="word-option" value="Other">Other</label><br>
-        <button type="submit" class="submit-button">Submit</button>
-    </div>
-</form>
-
-<div id="translation-container" style="display:none; margin-top: 20px;">
-    <label for="translation">Enter your translation:</label><br>
-    <textarea id="translation" rows="1" cols="50"></textarea><br>
-	<button type="button" id="submit-translation">Submit Translation</button>
-</div>
-
-<div class="background-container">
-    <aside class="bottom">
-        <img class="responsive-img" src="https://img.freepik.com/free-vector/broken-abandoned-ancient-greek-temple-garden_107791-27100.jpg?t=st=1723731126~exp=1723734726~hmac=ebeaea273203dccca814581b4da6c693be87d899430781fcdeab6ab42174d602&w=1380" alt="Broken abandoned ancient Greek temple in garden">
-        <div class="image-credit">           
+    <div id="setup-screen" class="container">
+        <div class="instruction-box">        
+            <h3>Step 1: Setup Instruction</h3>
+            <ol style="margin-bottom:0; padding-left:20px;">
+            This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br>
+            On this page, you will be asked to provide a title, optional notes for the students, a picture for the student page (optional) and a text or a few sentences. Then, click 'Copy AI Prompt' and paste the prompt into a large language model such as ChatGPT or Gemini. Finally, paste the JSON code the AI gives you into the box and click 'Import' or 'Start manual creation'.
+            </ol>
+            <div style="margin-top:15px; font-style:italic;">
+                Want to see what the final result looks like? <a href="example_page.html" target="_blank">View an Example Page here.</a>
+            </div>
         </div>
-    </aside>
-</div>
+        
+        <div class="setup-row">
+            <input type="text" id="pagetitle" class="setup-input" placeholder="Exercise Title" style="flex: 2;"/>
+            <input type="text" id="pageimage" class="setup-input" placeholder="Optional: Image URL" style="flex: 1;"/>
+        </div>
 
-<p><a href="https://reslatinae.github.io/Credentials.html">Credentials</a></p>
+        <textarea id="teachernotes" rows="3" style="width:100%; padding:12px; margin-bottom:20px; border-radius:6px; border:1px solid #ccc; font-size:1rem; box-sizing:border-box;" placeholder="Optional: Context / Teacher Notes (e.g. 'Watch out for ablatives...')"></textarea>
+
+        <textarea id="entertext" rows="6" style="width:100%; padding:15px; border-radius:8px; border:1px solid #ccc; font-size:1rem; box-sizing: border-box;" placeholder="Paste Latin text here..."></textarea>
+        
+        <div style="background:#eef6ff; padding:25px; border-radius:10px; margin:25px 0; border:2px dashed #007bff;">
+            <button class="btn-action" style="background:#007bff;" onclick="copyAIPrompt()">1. Copy AI Prompt</button>
+            <textarea id="ai-json" rows="2" style="width:100%; margin: 15px 0; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing: border-box;" placeholder="Paste JSON here..."></textarea>
+            <button class="btn-action" style="background:#28a745;" onclick="importAI()">2. Import</button>
+            <span style="margin: 0 15px; font-weight:bold; color:#555;">OR</span>
+            <label class="btn-action" style="background:#17a2b8; cursor: pointer; display:inline-block;">
+                Load Saved Project <input type="file" style="display:none" onchange="loadProject(this)">
+            </label>
+        </div>
+        <button class="btn-action" style="background:#3c3c3c; width:100%;" onclick="startManual()">Start Manual Creation</button>
+
+        <div class="credits-link">
+            <a onclick="showCredits()">Credits</a>
+        </div>
+    </div>
+
+    <div id="credits-screen" class="container" style="display:none; text-align:center; padding: 50px;">
+        <h2 style="margin-top:0;">Credentials</h2>
+        <p style="font-size:1.1rem; line-height: 1.6; color: #555; margin: 30px 0;">
+            This tool was created by Anke Walter. I gratefully acknowledge the help of Dr. Josef Ludescher, ChatGPT and Gemini.
+        </p>
+        <button class="btn-action" style="background:#6c757d;" onclick="hideCredits()">Back to Creator</button>
+    </div>
+
+    <div id="editor-screen" style="display:none;">
+        
+        <div class="instruction-box">
+            <h3>Step 2: Editing Instruction</h3>
+            <ul style="margin-bottom:0; padding-left:20px;">
+                Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. At the bottom of the page, you can review and remove syntactic groups. You can create new labels as well. At the end, hit 'Export Student Page'.
+            </ul>
+        </div>
+
+        <div class="palette">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                 <div id="mode-status" style="font-weight:bold; color:#007bff; font-size:1rem;">Mode: Tagging (Other)</div>
+                 <div class="custom-label-row" style="margin:0; padding:0; border:none;">
+                    <input type="text" id="new-label-input" class="custom-input" placeholder="New Label" style="width:120px;">
+                    <button class="add-btn" onclick="addCustomLabel()">+</button>
+                </div>
+            </div>
+
+            <div class="palette-grid" id="label-palette"></div>
+            
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">
+                <button class="btn-action" id="split-mode-btn" style="background:#dc3545; flex:1;" onclick="toggleSplitMode()">Manual Split</button>
+                <button class="btn-action" id="group-mode-btn" style="background:#6f42c1; flex:1;" onclick="toggleGroupMode()">Draw Bracket</button>
+                <button class="btn-action" style="background:#000; flex:1;" onclick="exportToStudent()">Export Student Page</button>
+            </div>
+
+            <div class="project-mini-row">
+                <button class="subtle-btn" onclick="saveProject()">💾 Save Work</button>
+                <label class="subtle-btn">
+                    📂 Load Work <input type="file" style="display:none" onchange="loadProject(this)">
+                </label>
+            </div>
+        </div>
+        
+        <div id="tagging-area"></div>
+
+        <div class="side-panel">
+            <strong>Active Brackets (Syntactical Groups):</strong>
+            <div id="group-list"></div>
+        </div>
+    </div>
+
+    <div id="group-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title">Name this Syntactic Group:</div>
+            <input type="text" id="group-name-input" class="modal-input" list="label-suggestions" placeholder="Type to search (e.g. 's' for Subject)...">
+            <datalist id="label-suggestions"></datalist>
+            
+            <div class="modal-actions">
+                <button class="btn-action" style="background:#6c757d; padding: 8px 15px;" onclick="closeGroupModal()">Cancel</button>
+                <button class="btn-action" style="background:#007bff; padding: 8px 15px;" onclick="saveGroupFromModal()">Save Group</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="autosave-status">Autosaved</div>
 
 <script>
-    const backgroundColors = {
-        'Subj': '#ff8080', 
-        'Gen': '#FF6347',  
-        'Dat': '#8A2BE2',  
-        'Acc': '#99ddff',  
-        'Abl': '#ffc34d',  
-        'Pred': '#ffb3b3', 
-        'Adv': '#FF69B4',  
-        'Prep': '#ffd9b3', 
-        'Verb act': '#66cc00',  
-		'Verb pass': '#4d9900',
-		'Inf': '#408000',
-		'AcI': '#0099e6',
-		'NcI': '#ff6666',
-		'Abl abs': '#cc8800',
-		'Other': '#a6a6a6'
-    };	
-	
-document.addEventListener('DOMContentLoaded', function () {
-    const radioMenu = document.getElementById('radio-menu-template');
-    const submitButton = radioMenu.querySelector('.submit-button');
-    radioMenu.style.display = 'none';
+// --- NAVIGATION FUNCTIONS ---
+function showCredits() {
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('credits-screen').style.display = 'block';
+}
 
-    document.querySelectorAll('.hover-word').forEach(word => {
-        word.setAttribute('data-attempts', '0');  // Initialize attempt counter
-        word.setAttribute('data-correct', 'false');  // Track if the word is correct
-        word.addEventListener('click', function(event) {
-            event.stopPropagation();
-            document.querySelectorAll('.hover-word').forEach(w => w.classList.remove('active'));
-            word.classList.add('active');
+function hideCredits() {
+    document.getElementById('credits-screen').style.display = 'none';
+    document.getElementById('setup-screen').style.display = 'block';
+}
 
-            const radioButtons = radioMenu.querySelectorAll('input[name="word-option"]');
-            radioButtons.forEach(button => button.checked = false);
+// --- CORE VARIABLES ---
+let functions = [
+    'Subject', 
+    'Accusative object', 
+    'Dative object', 
+    'Genitive object', 
+    'Ablative', 
+    'Predicative', 
+    'Prepositional phrase', 
+    'Adverb', 
+    'Verb', 
+    'Infinitive', 
+    'Participial phrase', 
+    'Relative clause', 
+    'Subordinate clause', 
+    'Other'
+];
 
-            const rect = word.getBoundingClientRect();
+let colors = { 
+    'Subject': '#66bb6a',              
+    'Accusative object': '#42a5f5',    
+    'Dative object': '#ab47bc',        
+    'Genitive object': '#26c6da',      
+    'Ablative': '#ffa726',             
+    'Predicative': '#e1bee7',          
+    'Prepositional phrase': '#fdd835', 
+    'Adverb': '#ffee58',               
+    'Verb': '#ff4d4d',                 
+    'Infinitive': '#d32f2f',           
+    'Participial phrase': '#ffcdd2',   
+    'Relative clause': '#78909c',      
+    'Subordinate clause': '#8d6e63',   
+    'Other': '#e0e0e0' 
+};
 
-            radioMenu.style.display = 'block';
-            radioMenu.style.position = 'absolute';
-            radioMenu.style.top = `${rect.bottom + window.scrollY}px`;
-            radioMenu.style.left = `${rect.left + window.scrollX}px`;
+const preps = ["a", "ab", "ad", "ante", "apud", "circum", "contra", "cum", "de", "e", "ex", "extra", "in", "infra", "inter", "intra", "ob", "per", "post", "prae", "pro", "prope", "propter", "sine", "sub", "super", "trans", "ultra"];
+const sentenceEnders = ['.', '!', '?', '·'];
 
-            const submitButtonRect = submitButton.getBoundingClientRect();
-            const viewportHeight = window.innerHeight;
+let activeFunc = 'Other', groupMode = false, splitMode = false, startIdx = null, currentGroups = [];
+let pendingGroupStart = null, pendingGroupEnd = null;
 
-            if (submitButtonRect.bottom > viewportHeight) {
-                submitButton.style.position = 'fixed';
-                submitButton.style.bottom = '10px';
-                submitButton.style.left = '50%';
-                submitButton.style.transform = 'translateX(-50%)';
-                submitButton.style.zIndex = '1000';
-            } else {
-                submitButton.style.position = 'static';
-                submitButton.style.transform = 'none';
-                submitButton.style.bottom = 'auto';
-                submitButton.style.left = 'auto';
-            }
-        });
-    });
+// --- AUTO SAVE LOGIC ---
+function triggerAutoSave() {
+    // Only save if we are in editor mode or have content
+    if(document.getElementById('editor-screen').style.display === 'block' || document.getElementById('entertext').value.length > 5) {
+        let currentWords = [];
+        const taggingArea = document.getElementById('tagging-area');
+        if(taggingArea.children.length > 0) {
+             currentWords = Array.from(taggingArea.childNodes).map((node) => {
+                const isPunct = node.classList.contains('punct-span');
+                return { w: node.textContent, f: isPunct ? 'Punct' : (node.dataset.func || 'Other') };
+            });
+        }
+        
+        const saveData = {
+            title: document.getElementById('pagetitle').value,
+            image: document.getElementById('pageimage').value,
+            text: document.getElementById('entertext').value,
+            notes: document.getElementById('teachernotes').value,
+            groups: currentGroups,
+            funcs: functions,
+            cols: colors,
+            words: currentWords,
+            timestamp: new Date().getTime()
+        };
+        localStorage.setItem('latin_tool_autosave', JSON.stringify(saveData));
+        
+        const status = document.getElementById('autosave-status');
+        status.style.opacity = '1';
+        setTimeout(() => { status.style.opacity = '0'; }, 2000);
+    }
+}
 
-    document.getElementById('radio-menu-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const selectedOption = this.querySelector('input[name="word-option"]:checked').value;
-        const currentWord = document.querySelector('.hover-word.active');
-
-        if (currentWord) {
-            const correctAnswer = currentWord.getAttribute('data-correct-answer');
-            let functionLabel = currentWord.querySelector('.function-label');
-            let attempts = parseInt(currentWord.getAttribute('data-attempts'));
-
-            if (!functionLabel) {
-                functionLabel = document.createElement('span');
-                functionLabel.classList.add('function-label');
-                currentWord.appendChild(functionLabel);
-            }
-
-            if (selectedOption === correctAnswer) {
-                functionLabel.textContent = correctAnswer;
-                functionLabel.style.color = 'green';
-                currentWord.style.backgroundColor = backgroundColors[correctAnswer];
-                currentWord.setAttribute('data-correct', 'true');  // Mark word as correct
-                radioMenu.style.display = 'none';
-                currentWord.classList.remove('active');
-            } else {
-                attempts++;
-                currentWord.setAttribute('data-attempts', attempts);
-
-                if (attempts < 2) {
-                    alert('This is not correct. Please try again.');
-                } else {
-                    functionLabel.textContent = correctAnswer;
-                    functionLabel.style.color = 'red';
-                    currentWord.style.backgroundColor = backgroundColors[correctAnswer];
-                    currentWord.setAttribute('data-correct', 'true');  // Mark word as correct even if incorrect initially
-                    radioMenu.style.display = 'none';
-                    currentWord.classList.remove('active');
+// Check for autosave on load
+window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('latin_tool_autosave');
+    if(saved) {
+        try {
+            const data = JSON.parse(saved);
+            // Only prompt if data is less than 24 hours old
+            if(new Date().getTime() - data.timestamp < 24 * 60 * 60 * 1000) {
+                if(confirm("Found an unsaved project from " + new Date(data.timestamp).toLocaleTimeString() + ". Restore it?")) {
+                    restoreAutoSave(data);
                 }
             }
-
-            const sentenceContainer = currentWord.closest('.sentence-container');
-            checkIfLastAnalyzedCorrect(sentenceContainer);  // Check if the last analyzed word completes the sentence
-        }
-    });
-
-    document.addEventListener('click', function(event) {
-        if (!radioMenu.contains(event.target) && !event.target.classList.contains('hover-word')) {
-            radioMenu.style.display = 'none';
-            document.querySelectorAll('.hover-word').forEach(w => w.classList.remove('active'));
-        }
-    });
+        } catch(e) { console.error("Autosave Error", e); }
+    }
+    // Start interval
+    setInterval(triggerAutoSave, 10000); // Every 10 seconds
 });
 
-function checkIfLastAnalyzedCorrect(sentenceContainer) {
-    const allWords = sentenceContainer.querySelectorAll('.hover-word');
-    let allCorrect = true;
-    let lastAnalyzedCorrect = false;
+function restoreAutoSave(data) {
+    if(data.title) document.getElementById('pagetitle').value = data.title;
+    if(data.image) document.getElementById('pageimage').value = data.image;
+    if(data.text) document.getElementById('entertext').value = data.text;
+    if(data.notes) document.getElementById('teachernotes').value = data.notes;
+    if(data.funcs) functions = data.funcs;
+    if(data.cols) colors = data.cols;
+    if(data.groups) currentGroups = data.groups;
+    
+    if(data.words && data.words.length > 0) {
+        initEditor(data.words);
+    }
+}
 
-    allWords.forEach(word => {
-        const isCorrect = word.getAttribute('data-correct') === 'true';
-        if (!isCorrect) {
-            allCorrect = false;
-        }
+
+// --- LOGIC ---
+function addCustomLabel() {
+    const input = document.getElementById('new-label-input');
+    const name = input.value.trim();
+    if(!name) return;
+    if(functions.includes(name)) { alert("Label already exists!"); return; }
+    functions.push(name);
+    const randomColor = `hsl(${Math.floor(Math.random() * 360)}, 70%, 85%)`;
+    colors[name] = randomColor;
+    renderPalette();
+    input.value = ''; 
+}
+
+function saveProject() {
+    const domWords = Array.from(document.getElementById('tagging-area').childNodes).map((node) => {
+        const isPunct = node.classList.contains('punct-span');
+        return { w: node.textContent, f: isPunct ? 'Punct' : (node.dataset.func || 'Other') };
     });
+    const projectData = { 
+        title: document.getElementById('pagetitle').value, 
+        image: document.getElementById('pageimage').value,
+        notes: document.getElementById('teachernotes').value, // Save notes
+        words: domWords, 
+        groups: currentGroups, 
+        customFunctions: functions, 
+        customColors: colors 
+    };
+    const blob = new Blob([JSON.stringify(projectData, null, 2)], {type: "application/json"});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = (projectData.title || "latin_project") + ".json"; a.click();
+}
 
-    // Check if the last word analyzed (with 'true' data-correct) is the final word needed for completion
-    allWords.forEach((word, index) => {
-        if (word.getAttribute('data-correct') === 'true') {
-            if (index === allWords.length - 1) {  // Check if this is the last word analyzed
-                lastAnalyzedCorrect = true;
+function loadProject(input) {
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if(data.customFunctions) functions = data.customFunctions;
+            if(data.customColors) colors = data.customColors;
+            if(data.groups) currentGroups = data.groups;
+            if(data.title) document.getElementById('pagetitle').value = data.title;
+            if(data.image) document.getElementById('pageimage').value = data.image;
+            if(data.notes) document.getElementById('teachernotes').value = data.notes; // Load notes
+            if(data.words) {
+                initEditor(data.words);
+                document.getElementById('setup-screen').style.display = 'none';
+                document.getElementById('editor-screen').style.display = 'block';
+            }
+        } catch(err) { console.error(err); alert("Error loading file."); }
+    };
+    reader.readAsText(file);
+    input.value = ''; 
+}
+
+function copyAIPrompt() {
+    const txt = document.getElementById('entertext').value;
+    const p = `Analyze Latin syntax of: "${txt}". 
+    1. STRICT RULE: Maintain the EXACT word order.
+    2. PHRASES: Adjacent phrase words get same function. 
+    3. HYPERBATON: Split phrases get same function but kept in place.
+    4. PUNCTUATION: Include punctuation as separate tokens "f": "Punct".
+    5. Return JSON: { "words": [{"w": "Arma", "f": "Accusative object"}, ...], "groups": [{"label": "Relative clause", "start": 0, "end": 4}] } 
+    Labels: ${functions.join(', ')}.`;
+    navigator.clipboard.writeText(p).then(() => alert("Strict Order Prompt copied!"));
+}
+
+function processTokens(rawTokens) {
+    let temp = [];
+    rawTokens.forEach(t => {
+        const isEnclitic = /^-?(que|ne|ve)$/i.test(t);
+        const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(t);
+        if (!hasLetters) { temp.push({ w: t, f: 'Punct' }); }
+        else if (isEnclitic && temp.length > 0 && /[a-zA-Z]/.test(temp[temp.length-1].w)) { temp[temp.length-1].w += t.replace(/^-/, ''); }
+        else { temp.push({ w: t, f: 'Other' }); }
+    });
+    let welded = [];
+    for(let i=0; i < temp.length; i++) {
+        let curr = temp[i];
+        if(preps.includes(curr.w.toLowerCase()) && i+1 < temp.length && /[a-zA-Z]/.test(temp[i+1].w)) {
+            welded.push({ w: curr.w + " " + temp[i+1].w.replace(/^-/, ''), f: 'Prepositional phrase' });
+            i++;
+        } else { welded.push(curr); }
+    }
+    return welded;
+}
+
+function importAI() {
+    try {
+        const raw = document.getElementById('ai-json').value;
+        const cleanJson = raw.replace(/```json/g, '').replace(/```/g, '');
+        const d = JSON.parse(cleanJson);
+        currentGroups = (d.groups || []).filter(g => g.label && g.label.toLowerCase() !== "main clause" && g.start != null && g.end != null);
+        d.words.forEach(w => {
+            w.w = w.w.replace(/-/g, ' ');
+            if (!/[a-zA-Z\u00C0-\u017F]/.test(w.w)) w.f = "Punct";
+            else if (w.f === "Main clause") w.f = "Other";
+        });
+        initEditor(d.words);
+    } catch(e) { console.error(e); alert("JSON error. Check console."); }
+}
+
+function startManual() {
+    const rawInput = document.getElementById('entertext').value;
+    const tokens = rawInput.match(/[a-zA-Z\u00C0-\u017F-]+|[^a-zA-Z\u00C0-\u017F\s]+/gi);
+    if (!tokens) return;
+    initEditor(processTokens(tokens));
+}
+
+function initEditor(words) {
+    const area = document.getElementById('tagging-area');
+    area.innerHTML = '';
+    words.forEach((item, i) => {
+        const span = document.createElement('span');
+        const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(item.w);
+        const isPunct = !hasLetters || item.f === 'Punct';
+        span.textContent = item.w;
+        span.className = isPunct ? 'punct-span' : 'tag-word';
+        span.dataset.idx = i;
+        span.id = `word-${i}`; 
+
+        if(!isPunct) {
+            let func = item.f || 'Other';
+            if(func === "Main clause") func = "Other";
+            if(!colors[func]) {
+                 functions.push(func);
+                 colors[func] = `hsl(${Math.floor(Math.random() * 360)}, 70%, 85%)`;
+            }
+            span.dataset.func = func;
+            span.style.backgroundColor = colors[func];
+            span.onclick = function() { handleWordClick(this); };
+        } else { span.dataset.func = 'Punct'; }
+        area.appendChild(span);
+    });
+    renderPalette();
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('credits-screen').style.display = 'none';
+    document.getElementById('editor-screen').style.display = 'block';
+    updateGroupUI();
+}
+
+function renderPalette() {
+    const p = document.getElementById('label-palette');
+    p.innerHTML = '';
+    functions.forEach(f => {
+        const b = document.createElement('button');
+        b.className = 'p-btn' + (f === activeFunc ? ' active' : '');
+        b.style.backgroundColor = colors[f]; b.textContent = f;
+        b.onclick = () => { activeFunc = f; groupMode = splitMode = false; updatePalette(); updateButtonStates(); };
+        p.appendChild(b);
+    });
+}
+
+function updatePalette() {
+    document.querySelectorAll('.p-btn').forEach(b => b.classList.toggle('active', b.textContent === activeFunc));
+    document.getElementById('mode-status').textContent = `Mode: Tagging (${activeFunc})`;
+}
+
+function updateButtonStates() {
+    document.getElementById('split-mode-btn').classList.toggle('active-mode', splitMode);
+    document.getElementById('group-mode-btn').classList.toggle('active-mode', groupMode);
+    if (splitMode || groupMode) {
+        document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('mode-status').textContent = splitMode ? "Mode: Manual Split" : "Mode: Drawing Bracket";
+    }
+}
+
+function handleWordClick(el) {
+    const idx = parseInt(el.dataset.idx);
+    if(splitMode) { el.classList.toggle('split-right'); } 
+    else if(groupMode) {
+        if(startIdx === null) { startIdx = idx; el.style.outline = "3px solid #6f42c1"; } 
+        else {
+            pendingGroupStart = Math.min(startIdx, idx);
+            pendingGroupEnd = Math.max(startIdx, idx);
+            openGroupModal();
+            startIdx = null;
+            document.querySelectorAll('.tag-word').forEach(s => s.style.outline = "none");
+        }
+    } else { el.dataset.func = activeFunc; el.style.backgroundColor = colors[activeFunc]; }
+}
+
+function openGroupModal() {
+    const modal = document.getElementById('group-modal');
+    const datalist = document.getElementById('label-suggestions');
+    const input = document.getElementById('group-name-input');
+    datalist.innerHTML = '';
+    functions.forEach(f => {
+        const opt = document.createElement('option'); opt.value = f; datalist.appendChild(opt);
+    });
+    input.value = ''; modal.style.display = 'flex'; input.focus();
+}
+
+function closeGroupModal() { document.getElementById('group-modal').style.display = 'none'; }
+
+function saveGroupFromModal() {
+    const label = document.getElementById('group-name-input').value;
+    if(label && pendingGroupStart !== null) {
+        currentGroups.push({ start: pendingGroupStart, end: pendingGroupEnd, label: label });
+        updateGroupUI();
+    }
+    closeGroupModal();
+}
+document.getElementById('group-name-input').addEventListener("keypress", function(event) { if (event.key === "Enter") saveGroupFromModal(); });
+document.getElementById('group-name-input').addEventListener("keyup", function(event) { if (event.key === "Escape") closeGroupModal(); });
+
+function updateGroupUI() {
+    const list = document.getElementById('group-list');
+    const wordSpans = Array.from(document.querySelectorAll('.tag-word, .punct-span'));
+    wordSpans.forEach(s => { s.classList.remove('grouped-word', 'group-start', 'group-end'); s.title = ""; });
+    currentGroups.forEach(g => {
+        for(let i = g.start; i <= g.end; i++) {
+            const el = document.getElementById(`word-${i}`);
+            if(el && el.classList.contains('punct-span')) continue;
+            if(el) {
+                el.classList.add('grouped-word');
+                if(i === g.start) el.classList.add('group-start');
+                if(i === g.end) el.classList.add('group-end');
+                el.title = g.label;
             }
         }
     });
+    list.innerHTML = '';
+    currentGroups.forEach((g, i) => {
+        const slice = wordSpans.slice(g.start, g.end + 1);
+        const phrase = slice.length > 0 ? slice.map(s => s.textContent).join(' ') : "Invalid Range";
+        const d = document.createElement('div'); d.className = 'group-item';
+        d.innerHTML = `<span><strong>${g.label}</strong>: "${phrase}"</span><span class="del-btn" onclick="removeGroup(${i})">✖</span>`;
+        list.appendChild(d);
+    });
+}
+function removeGroup(index) { currentGroups.splice(index, 1); updateGroupUI(); }
+function toggleSplitMode() { splitMode = !splitMode; groupMode = false; activeFunc = "Other"; updatePalette(); updateButtonStates(); }
+function toggleGroupMode() { groupMode = !groupMode; splitMode = false; activeFunc = "Other"; updatePalette(); updateButtonStates(); }
 
-    // If all words are correct and the last analyzed word was correct, show the translation container
-    if (lastAnalyzedCorrect && allCorrect && !sentenceContainer.querySelector('.translation-container')) {
-        const translationContainer = document.createElement('div');
-        translationContainer.className = 'translation-container';
-        translationContainer.innerHTML = `
-            <label for="translation">Enter your translation:</label><br>
-            <textarea class="translation" rows="2" cols="50"></textarea><br>
-        `;
-        sentenceContainer.appendChild(translationContainer);
+function exportToStudent() {
+    // 1. Convert DOM nodes to a temporary array
+    const nodes = Array.from(document.getElementById('tagging-area').childNodes);
+    let tempTokens = nodes.map(node => {
+        const isPunct = node.classList.contains('punct-span');
+        return { 
+            w: node.textContent, 
+            f: isPunct ? 'Punct' : node.dataset.func,
+            isSplit: node.classList.contains('split-right'),
+            idx: parseInt(node.dataset.idx)
+        };
+    });
+
+    // 2. Pre-process: Bridge punctuation if surrounding words match
+    for(let i = 1; i < tempTokens.length - 1; i++) {
+        let curr = tempTokens[i];
+        if(curr.f === 'Punct') {
+            let prev = tempTokens[i-1];
+            let nextIdx = i + 1;
+            while(nextIdx < tempTokens.length && tempTokens[nextIdx].f === 'Punct') {
+                nextIdx++;
+            }
+            if(nextIdx < tempTokens.length) {
+                let next = tempTokens[nextIdx];
+                if(prev.f !== 'Punct' && prev.f !== 'Other' && prev.f === next.f && !prev.isSplit) {
+                    curr.f = prev.f; 
+                }
+            }
+        }
     }
+
+    // 3. Perform the Merge
+    let merged = []; let current = null;
+    tempTokens.forEach((token, i) => {
+        const isMergeableType = !['Punct', 'Other'].includes(token.f);
+        const prevToken = i > 0 ? tempTokens[i-1] : null;
+        const splitExists = prevToken && prevToken.isSplit;
+        const canMerge = current && current.f === token.f && isMergeableType && !splitExists;
+        
+        if (canMerge) {
+            current.w += (['.', ',', ';', ':', '!', '?'].includes(token.w) ? '' : ' ') + token.w; 
+            current.originalIndices.push(token.idx);
+        } else {
+            if (current) merged.push(current);
+            current = { w: token.w, f: token.f, originalIndices: [token.idx] };
+        }
+    });
+    if (current) merged.push(current);
+
+    // 4. Update Group Indices based on merged words
+    const updatedGroups = currentGroups.map(g => {
+        const newStart = merged.findIndex(m => m.originalIndices.includes(g.start));
+        let newEnd = merged.findIndex(m => m.originalIndices.includes(g.end));
+        if(newEnd === -1) newEnd = newStart; 
+        return { ...g, start: newStart, end: newEnd };
+    });
+
+    const titleInput = document.getElementById('pagetitle').value || "latin_exercise";
+    const filename = titleInput.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".html";
+    const imgUrl = document.getElementById('pageimage').value;
+    const teacherNotes = document.getElementById('teachernotes').value;
+    
+    const blob = new Blob([generateStudentHTML(merged, updatedGroups, document.getElementById('pagetitle').value || "Exercise", functions, imgUrl, teacherNotes)], {type: 'text/html'});
+    const a = document.createElement('a'); 
+    a.href = URL.createObjectURL(blob); 
+    a.download = filename; 
+    a.click();
+}
+
+function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes) {
+    const filteredLabels = allLabels.filter(l => l !== "Main clause");
+    
+    // PATTERN CSS GENERATOR
+    const patternCSS = `
+        body.pattern-mode .hover-word[data-done="true"] {
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.3) 5px, rgba(255,255,255,0.3) 10px);
+            border: 2px solid #333 !important;
+        }
+        body.pattern-mode .hover-word[data-done="true"]:nth-child(even) {
+             background-image: radial-gradient(rgba(255,255,255,0.4) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.4) 20%, transparent 20%);
+             background-position: 0 0, 5px 5px;
+             background-size: 10px 10px;
+        }
+        body.pattern-mode .s-group {
+            border-style: dashed !important;
+            border-width: 3px !important;
+        }
+    `;
+
+    // HIGH CONTRAST CSS GENERATOR
+    const contrastCSS = `
+        body.high-contrast { background-color: #121212; color: #ffffff; }
+        body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #1e1e1e; color: #fff; border: 1px solid #444; }
+        body.high-contrast .instruction-box { background-color: #332b00; border-color: #665500; color: #ffeb3b; }
+        body.high-contrast .teacher-note { background: #1e1e1e !important; border: 1px solid #555 !important; color: #fff !important; }
+        
+        body.high-contrast .hover-word {
+            background-color: #333;
+            color: #fff;
+            border-bottom: 3px solid #777;
+        }
+        /* When solved, make the background color distinct but text readable */
+        body.high-contrast .hover-word[data-done="true"] {
+            border: 2px solid #fff !important;
+            color: #000; /* Ensure text is readable on pastel colors */
+            font-weight: bold;
+        }
+        body.high-contrast .s-group { border-color: #fff !important; }
+        body.high-contrast .g-label { background: #000; color: #fff; border-color: #fff; }
+        body.high-contrast .punct { color: #fff; }
+        body.high-contrast textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
+    `;
+
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+        :root { --main-font: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; }
+        
+        body, button, input, textarea, select { font-family: var(--main-font); }
+
+        body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background-color: #f4f4f9; color: #333; }
+        h1 { text-align: center; color: #444; margin-bottom: 30px; font-weight: normal; letter-spacing: 1px; }
+        
+        .instruction-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 0.95rem; line-height: 1.6; color: #856404; }
+        .teacher-note { background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 4px; margin-bottom: 25px; font-size: 1rem; color: #333; }
+        
+        .exercise-wrapper { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); line-height: 5.5; }
+
+        .hover-word { cursor: pointer; background: #e4e5ed; padding: 4px 12px; border-radius: 4px; border-bottom: 3px solid #ccc; font-size: 1.4rem; position: relative; display: inline-block; line-height: 1.2; transition: all 0.2s; }
+        .s-group { display: inline-block; position: relative; border: 2px solid #555; border-bottom:none; border-radius: 8px 8px 0 0; padding: 25px 8px 5px 8px; margin: 0 2px; vertical-align: bottom; }
+        .g-label { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; background: white; border: 1px solid #555; border-radius: 4px; padding: 2px 8px; white-space: nowrap; color: #555; text-transform: uppercase; cursor: pointer; }
+        .punct { font-size: 1.4rem; margin: 0 1px; vertical-align: baseline; display:inline-block; }
+        
+        .trans-box { margin: 20px 0 50px; line-height: 1.5; }
+        textarea { width: 100%; height: 80px; font-size: 1.2rem; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; margin-top: 8px; width: 150px; text-align: center; color: green; pointer-events: none; }
+        
+        .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #bbb; padding: 0; z-index: 1000; border-radius: 4px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); max-height: 400px; overflow-y: auto; min-width: 160px; line-height: 1.2; }
+        .radio-menu input[type="radio"] { display: none; }
+        .radio-menu label { display: block; padding: 1px 8px; cursor: pointer; border-bottom: none; font-size: 0.85rem; font-weight: bold; color: #333; }
+        .radio-menu label:hover { background-color: #007bff; color: white; }
+
+        .footer-toolbar { margin-top: 60px; padding: 30px; border-top: 1px solid #ddd; display: flex; justify-content: center; gap: 20px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; background: #333; }
+        .ex-img { max-width: 100%; height: auto; display: block; margin: 30px auto 10px auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-height: 300px; object-fit: contain; }
+
+        #toast-container {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1001;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+        #toast-container.show { visibility: visible; opacity: 1; bottom: 50px; }
+        #toast-container.error { background-color: #333; border-bottom: 4px solid #d32f2f; }
+        #toast-container.success { background-color: #333; border-bottom: 4px solid #28a745; }
+        
+        ${patternCSS}
+        ${contrastCSS}
+
+        @media (max-width: 768px) {
+            body { margin: 15px; line-height: 4.0; }
+            .exercise-wrapper { padding: 15px; }
+            .hover-word { font-size: 1.15rem; padding: 6px 10px; }
+            .g-label { top: -20px; font-size: 10px; padding: 2px 4px; }
+            .s-group { padding-top: 20px; margin: 0 2px; }
+            .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 80%; max-height: 60%; box-shadow: 0 0 50px rgba(0,0,0,0.5); border-radius: 8px; }
+            .radio-menu label { padding: 12px 15px; font-size: 1rem; border-bottom: 1px solid #eee; }
+        }
+        @media print { 
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } 
+            .footer-toolbar, .radio-menu, .instruction-box { display: none !important; } 
+            .ex-img { display: none !important; }
+        }
+    </style></head><body>
+    <h1>${title}</h1>
+    
+    <div class="instruction-box">
+    This page is designed to help you translate Latin sentences. One click on a word or group of words will open a button that will ask you to choose the syntactical function:<br>
+    subject, accusative object, dative object, genitive object, ablative, predicative, prepositional phrase, adverb, verb, infinitive, participial phrase, or other (i.e., conjunctions, interjections, etc.). Larger syntactic functions (labelled '?') can have any of these functions, as well as those of relative clause or any other subordinate clause.<br>
+    Once you have analysed each word in a sentence, a textbox will appear into which you can write your translation. In the end, you can save the webpage or print it, so you can discuss your translations in class.
+    </div>
+
+    ${notes ? `<div class="teacher-note"><strong>Note:</strong> ${notes.replace(/\n/g, '<br>')}</div>` : ''}
+
+    <div class="exercise-wrapper">
+        <div id="exercise">${generateExerciseHTML(words, groups)}</div>
+    </div>
+
+    ${imgUrl ? `<img src="${imgUrl}" class="ex-img" alt="Exercise Image">` : ''}
+    
+    <div class="footer-toolbar">
+        <button class="btn" onclick="togglePatterns()">Toggle Patterns</button>
+        <button class="btn" onclick="toggleContrast()">High Contrast</button>
+        <button class="btn" onclick="window.print()">Print Analysis</button> 
+        <button class="btn" onclick="downloadPage()">Download HTML</button>
+    </div>
+    
+    <div id="menu-common" class="radio-menu"><form id="f-common">${filteredLabels.map(l => `<label><input type="radio" name="opt" value="${l}"> ${l}</label>`).join('')}</form></div>
+    <div id="toast-container"></div>
+    
+    <script>
+        const colors = ${JSON.stringify(colors)}; let activeEl = null; let mode = "";
+        const menu = document.getElementById('menu-common');
+        document.querySelectorAll('.hover-word, .g-label').forEach(el => {
+            el.onclick = (e) => {
+                e.stopPropagation();
+                if(el.dataset.done) return;
+                activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
+                if(window.innerWidth > 768) { menu.style.top=e.pageY+"px"; menu.style.left=e.pageX+"px"; }
+                menu.style.display="block"; 
+            };
+        });
+        document.getElementById('f-common').onchange = (e) => {
+            const sel = e.target.value; 
+            const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans;
+            
+            if(sel === correct) {
+                solve(activeEl, correct, mode);
+                showToast("Correct!", false);
+            } else { 
+                let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1;
+                activeEl.dataset.mistakes = mistakes;
+                if(mistakes >= 2) {
+                      showToast("Incorrect. The correct answer is: " + correct, true);
+                      solve(activeEl, correct, mode);
+                } else {
+                      showToast('Incorrect label, try again!', true);
+                }
+            }
+            menu.style.display = "none"; e.target.checked = false; check();
+        };
+
+        function showToast(msg, isError) {
+            const x = document.getElementById("toast-container");
+            x.textContent = msg;
+            x.className = isError ? "show error" : "show success";
+            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+        }
+        
+        function togglePatterns() { document.body.classList.toggle('pattern-mode'); }
+        function toggleContrast() { document.body.classList.toggle('high-contrast'); }
+
+        function solve(el, ans, m) {
+            if(m === "word") {
+                const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
+                el.style.backgroundColor = colors[ans]; el.dataset.done = "true";
+            } else { 
+                el.textContent = ans; el.dataset.done = "true"; el.style.background = "#e8f5e9"; 
+            }
+        }
+
+        function check() { 
+            document.querySelectorAll('.sentence-container').forEach((s, i) => { 
+                const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')];
+                if(items.length > 0 && items.every(item => item.dataset.done === "true")) {
+                    const b = document.getElementById('t-container-' + i); if(b) b.style.display = 'block';
+                }
+            }); 
+        }
+        function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
+        document.addEventListener('mousedown', (e) => { if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; });
+    <\/script></body></html>`;
+}
+
+function generateExerciseHTML(words, groups) {
+    let sIdx = 0, html = '<div class="sentence-container">';
+    const sentenceEnders = ['.', '!', '?', '·'];
+    let pendingClosers = ""; 
+
+    words.forEach((word, idx) => {
+        const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(word.w);
+        let isFakeWord = !hasLetters; 
+        let isPunct = word.f === 'Punct' || isFakeWord;
+        
+        // CHECK NEXT WORD TO SEE IF IT IS PUNCTUATION
+        let nextWord = words[idx + 1];
+        let nextIsPunct = nextWord && (!/[a-zA-Z\u00C0-\u017F]/.test(nextWord.w) || nextWord.f === 'Punct');
+
+        let content = isPunct 
+                  ? `<span class="punct">${word.w}</span>` 
+                  : `<span class="hover-word" data-ans="${word.f}">${word.w}</span>`;
+        
+        let openDivs = "", closeDivs = "";
+
+        groups.forEach(g => {
+            if(idx === g.start) openDivs += `<div class="s-group" data-ans="${g.label}"><span class="g-label">?</span>`;
+            if(idx === g.end) closeDivs += `</div>`;
+        });
+
+        // Tweak spacing: if inside a merged button (i.e., not Punct logic), we handle spaces inside w.
+        // But for the HTML generation here, simple spacing logic applies.
+        let spacing = nextIsPunct ? "" : " ";
+
+        if (isPunct) {
+            html += openDivs + content + pendingClosers + closeDivs + spacing;
+            pendingClosers = ""; 
+        } else {
+            html += openDivs + content;
+            if (closeDivs && nextIsPunct) {
+                pendingClosers = closeDivs;
+            } else {
+                html += closeDivs;
+            }
+            html += spacing;
+        }
+
+        if (isPunct && sentenceEnders.some(end => word.w.includes(end))) {
+            html += `</div><div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="Enter translation..."></textarea></div><div class="sentence-container">`;
+            sIdx++;
+        }
+    });
+    return html + "</div>";
 }
 </script>
 </body>
