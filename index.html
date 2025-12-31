@@ -35,8 +35,34 @@
             border-radius: 12px; 
             box-shadow: var(--shadow); 
             margin-bottom: 20px; 
+            position: relative;
         }
         
+        /* Language Toggle */
+        .lang-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+        }
+        .lang-btn {
+            background: #eee;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+        .lang-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #0056b3;
+            opacity: 1;
+            font-weight: bold;
+        }
+
         .instruction-box { 
             background: #fff3cd; 
             border: 1px solid #ffeeba; 
@@ -48,7 +74,7 @@
             color: #856404;
         }
         .instruction-box h3 { margin-top: 0; border-bottom: 1px solid #ffeeba; padding-bottom: 5px; font-size: 1rem; }
-        .instruction-box a { color: #856404; text-decoration: underline; font-weight: bold; }
+        .instruction-box a { color: #856404; text-decoration: underline; font-weight: bold; cursor: pointer; }
 
         /* PALETTE */
         .palette { 
@@ -82,7 +108,7 @@
             background: #fff; 
             border-radius: 8px; 
             display: block; 
-            line-height: 5.0; /* Increased slightly to prevent label overlap */
+            line-height: 4.5; 
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
         }
         
@@ -113,24 +139,25 @@
 
         .split-right { border-right: 4px dashed #ff4444 !important; margin-right: 12px; }
         
-        /* COMPACT LABEL */
+        /* COMPACT LABEL (SHORT FORM) */
         .tag-word::after { 
-            content: attr(data-func); 
+            content: attr(data-short); 
             display: block; 
             position: absolute; 
-            top: 38px; /* Moved down to create clear separation from the word */
+            top: 36px; 
             left: 50%; 
             transform: translateX(-50%); 
-            font-size: 0.5rem; 
+            font-size: 0.6rem; 
             color: #d32f2f; 
             font-weight: 800; 
             text-transform: uppercase; 
             pointer-events: none;
             background: rgba(255,255,255,0.9);
-            padding: 0 2px;
-            line-height: 1;
+            padding: 0 3px;
+            line-height: 1.1;
             border-radius: 3px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            white-space: nowrap;
         }
         
         .side-panel { background: #eee; padding: 15px; border-radius: 8px; margin-top: 20px; }
@@ -202,6 +229,7 @@
             body { margin: 10px; padding: 0; }
             .container { padding: 15px; }
             .setup-row { flex-direction: column; gap: 10px; }
+            .lang-switch { top: 10px; right: 10px; }
             
             .palette { position: relative; top: 0; padding: 10px; overflow-x: auto; }
             .palette-grid { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
@@ -209,7 +237,7 @@
 
             #tagging-area { padding: 15px; line-height: 4.5; } 
             .tag-word { font-size: 1rem; padding: 4px 6px; margin: 1px; }
-            .tag-word::after { font-size: 0.45rem; top: 32px; }
+            .tag-word::after { font-size: 0.5rem; top: 32px; }
             
             .btn-action { width: 100%; margin-bottom: 8px; font-size: 1rem; }
             .modal-box { width: 90%; }
@@ -223,17 +251,23 @@
 </head>
 <body>
 
-    <h1>Syntactic Analysis Creator</h1>
+    <h1 id="app-heading">Syntactic Analysis Creator</h1>
 
     <div id="setup-screen" class="container">
+        
+        <div class="lang-switch">
+            <button class="lang-btn active" onclick="setLanguage('en')">🇬🇧 English</button>
+            <button class="lang-btn" onclick="setLanguage('de')">🇩🇪 Deutsch</button>
+        </div>
+
         <div class="instruction-box">        
-            <h3>Step 1: Setup Instruction</h3>
-            <ol style="margin-bottom:0; padding-left:20px;">
-            This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br>
-            On this page, you will be asked to provide a title, optional notes for the students, a picture for the student page (optional) and a text or a few sentences. Then, click 'Copy AI Prompt' and paste the prompt into a large language model such as ChatGPT or Gemini. Finally, paste the JSON code the AI gives you into the box and click 'Import' or 'Start manual creation'.
-            </ol>
+            <h3 id="instr-h3">Step 1: Setup Instruction</h3>
+            <div id="instr-body">
+                This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br>
+                On this page, you will be asked to provide a title, optional notes for the students, a picture for the student page (optional) and a text or a few sentences. Then, click 'Copy AI Prompt' and paste the prompt into a large language model such as ChatGPT or Gemini. Finally, paste the JSON code the AI gives you into the box and click 'Import' or 'Start manual creation'.
+            </div>
             <div style="margin-top:15px; font-style:italic;">
-                Want to see what the final result looks like? <a href="example_page.html" target="_blank">View an Example Page here.</a>
+                <span id="example-link-text">Want to see what the final result looks like?</span> <a href="example_page.html" target="_blank" id="link-example">View Example</a>
             </div>
         </div>
         
@@ -247,15 +281,15 @@
         <textarea id="entertext" rows="6" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:1rem; box-sizing: border-box;" placeholder="Paste Latin text here..."></textarea>
         
         <div style="background:#eef6ff; padding:20px; border-radius:10px; margin:25px 0; border:2px dashed #007bff;">
-            <button class="btn-action" style="background:#007bff;" onclick="copyAIPrompt()">1. Copy AI Prompt</button>
+            <button class="btn-action" style="background:#007bff;" onclick="copyAIPrompt()" id="btn-copy-ai">1. Copy AI Prompt</button>
             <textarea id="ai-json" rows="2" style="width:100%; margin: 15px 0; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing: border-box;" placeholder="Paste JSON here..."></textarea>
-            <button class="btn-action" style="background:#28a745;" onclick="importAI()">2. Import</button>
-            <span style="margin: 0 15px; font-weight:bold; color:#555;">OR</span>
+            <button class="btn-action" style="background:#28a745;" onclick="importAI()" id="btn-import">2. Import</button>
+            <span style="margin: 0 15px; font-weight:bold; color:#555;" id="or-text">OR</span>
             <label class="btn-action" style="background:#17a2b8; cursor: pointer; display:inline-block;">
-                Load Saved Project <input type="file" style="display:none" onchange="loadProject(this)">
+                <span id="btn-load">Load Saved Project</span> <input type="file" style="display:none" onchange="loadProject(this)">
             </label>
         </div>
-        <button class="btn-action" style="background:#3c3c3c; width:100%;" onclick="startManual()">Start Manual Creation</button>
+        <button class="btn-action" style="background:#3c3c3c; width:100%;" onclick="startManual()" id="btn-manual">Start Manual Creation</button>
 
         <div class="credits-link">
             <a onclick="showCredits()">Credits</a>
@@ -265,17 +299,17 @@
     <div id="credits-screen" class="container" style="display:none; text-align:center; padding: 50px;">
         <h2 style="margin-top:0;">Credentials</h2>
         <p style="font-size:1.1rem; line-height: 1.6; color: #555; margin: 30px 0;">
-            This tool was created by Anke Walter. I gratefully acknowledge the help of ??, ChatGPT and Gemini.
+            This tool was created by Anke Walter. I gratefully acknowledge the help of J. L., ChatGPT and Gemini.
         </p>
-        <button class="btn-action" style="background:#6c757d;" onclick="hideCredits()">Back to Creator</button>
+        <button class="btn-action" style="background:#6c757d;" onclick="hideCredits()">Back</button>
     </div>
 
     <div id="editor-screen" style="display:none;">
         
         <div class="instruction-box">
-            <h3>Step 2: Editing Instruction</h3>
-            <ul style="margin-bottom:0; padding-left:20px;">
-                Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. At the bottom of the page, you can review and remove syntactic groups. You can create new labels as well. At the end, hit 'Export Student Page'.
+            <h3 id="edit-h3">Step 2: Editing Instruction</h3>
+            <ul style="margin-bottom:0; padding-left:20px;" id="edit-body">
+                Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. At the bottom of the page, you can review and remove syntactic groups. Use 'Undo' to revert your last action. At the end, hit 'Export Student Page'.
             </ul>
         </div>
 
@@ -291,15 +325,16 @@
             <div class="palette-grid" id="label-palette"></div>
             
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">
+                <button class="btn-action" id="undo-btn" style="background:#ff9800; flex:0.5;" onclick="undo()">↶ Undo</button>
                 <button class="btn-action" id="split-mode-btn" style="background:#dc3545; flex:1;" onclick="toggleSplitMode()">Manual Split</button>
                 <button class="btn-action" id="group-mode-btn" style="background:#6f42c1; flex:1;" onclick="toggleGroupMode()">Draw Bracket</button>
-                <button class="btn-action" style="background:#000; flex:1;" onclick="exportToStudent()">Export Student Page</button>
+                <button class="btn-action" style="background:#000; flex:1;" onclick="exportToStudent()" id="btn-export">Export Student Page</button>
             </div>
 
             <div class="project-mini-row">
-                <button class="subtle-btn" onclick="saveProject()">💾 Save Work</button>
+                <button class="subtle-btn" onclick="saveProject()" id="btn-save-work">💾 Save Work</button>
                 <label class="subtle-btn">
-                    📂 Load Work <input type="file" style="display:none" onchange="loadProject(this)">
+                    <span id="btn-load-work">📂 Load Work</span> <input type="file" style="display:none" onchange="loadProject(this)">
                 </label>
             </div>
         </div>
@@ -307,20 +342,20 @@
         <div id="tagging-area"></div>
 
         <div class="side-panel">
-            <strong>Active Brackets (Syntactical Groups):</strong>
+            <strong id="active-group-title">Active Brackets (Syntactical Groups):</strong>
             <div id="group-list"></div>
         </div>
     </div>
 
     <div id="group-modal" class="modal-overlay">
         <div class="modal-box">
-            <div class="modal-title">Name this Syntactic Group:</div>
+            <div class="modal-title" id="modal-title-text">Name this Syntactic Group:</div>
             <input type="text" id="group-name-input" class="modal-input" list="label-suggestions" placeholder="Type to search (e.g. 's' for Subject)...">
             <datalist id="label-suggestions"></datalist>
             
             <div class="modal-actions">
-                <button class="btn-action" style="background:#6c757d; padding: 8px 15px;" onclick="closeGroupModal()">Cancel</button>
-                <button class="btn-action" style="background:#007bff; padding: 8px 15px;" onclick="saveGroupFromModal()">Save Group</button>
+                <button class="btn-action" style="background:#6c757d; padding: 8px 15px;" onclick="closeGroupModal()" id="btn-cancel">Cancel</button>
+                <button class="btn-action" style="background:#007bff; padding: 8px 15px;" onclick="saveGroupFromModal()" id="btn-save-group">Save Group</button>
             </div>
         </div>
     </div>
@@ -328,6 +363,110 @@
     <div id="autosave-status">Autosaved</div>
 
 <script>
+// --- MULTI-LANGUAGE CONFIG ---
+let currentLang = 'en';
+
+const LANG = {
+    en: {
+        heading: "Syntactic Analysis Creator",
+        instrH3: "Step 1: Setup Instruction",
+        instrBody: "This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br>On this page, you will be asked to provide a title, optional notes for the students, a picture for the student page (optional) and a text or a few sentences. Then, click 'Copy AI Prompt' and paste the prompt into a large language model such as ChatGPT or Gemini. Finally, paste the JSON code the AI gives you into the box and click 'Import' or 'Start manual creation'.",
+        exampleLink: "Want to see what the final result looks like?",
+        linkText: "View Example",
+        phTitle: "Exercise Title",
+        phImage: "Optional: Image URL",
+        phNotes: "Optional: Context / Teacher Notes (e.g. 'Watch out for ablatives...')",
+        phText: "Paste Latin text here...",
+        phJson: "Paste JSON here...",
+        btnCopy: "1. Copy AI Prompt",
+        btnImport: "2. Import",
+        btnLoad: "Load Saved Project",
+        or: "OR",
+        btnManual: "Start Manual Creation",
+        editH3: "Step 2: Editing Instruction",
+        editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. At the bottom of the page, you can review and remove syntactic groups. Use 'Undo' to revert your last action. At the end, hit 'Export Student Page'.",
+        phLabel: "New Label",
+        btnUndo: "↶ Undo",
+        btnSplit: "Manual Split",
+        btnBracket: "Draw Bracket",
+        btnExport: "Export Student Page",
+        btnSaveWork: "💾 Save Work",
+        btnLoadWork: "📂 Load Work",
+        groupTitle: "Active Brackets (Syntactical Groups):",
+        modalTitle: "Name this Syntactic Group:",
+        btnCancel: "Cancel",
+        btnSaveGroup: "Save Group",
+        modeTag: "Mode: Tagging",
+        modeSplit: "Mode: Manual Split",
+        modeBracket: "Mode: Drawing Bracket"
+    },
+    de: {
+        heading: "Syntaktische Analyse - Ersteller",
+        instrH3: "Schritt 1: Einrichtung",
+        instrBody: "Diese Seite ermöglicht es Ihnen, eigene Sätze für die syntaktische Analyse zu erstellen. Die Idee ist, dass Sie Ihren Schülern Unterstützung bei der Analyse und Übersetzung geben, z. B. indem Sie anzeigen, welche Wortgruppen zusammengehören. So verstehen die Schüler die Syntax eines Satzes, bevor sie mit der Übersetzung beginnen.<br>Geben Sie einen Titel, optionale Hinweise, ein Bild (optional) und den lateinischen Text ein. Klicken Sie dann auf 'KI-Prompt kopieren', fügen Sie diesen in ChatGPT oder Gemini ein und kopieren Sie den JSON-Code der KI in das Importfeld. Klicken Sie abschließend auf 'Importieren' oder 'Manuell starten'.",
+        exampleLink: "Möchten Sie sehen, wie das Ergebnis aussieht?",
+        linkText: "Beispiel ansehen",
+        phTitle: "Übungstitel",
+        phImage: "Optional: Bild-URL",
+        phNotes: "Optional: Kontext / Lehrerhinweise (z.B. 'Achtet auf den Ablativ...')",
+        phText: "Lateinischen Text hier einfügen...",
+        phJson: "JSON hier einfügen...",
+        btnCopy: "1. KI-Prompt kopieren",
+        btnImport: "2. Importieren",
+        btnLoad: "Gespeichertes Projekt laden",
+        or: "ODER",
+        btnManual: "Manuelle Erstellung starten",
+        editH3: "Schritt 2: Bearbeitung",
+        editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter mit gleicher Funktion verschmelzen automatisch, es sei denn, Sie nutzen 'Manuell trennen'. Um größere Gruppen zu erstellen, klicken Sie auf 'Klammer zeichnen', wählen Sie Start- und Endwort und benennen die Gruppe. Nutzen Sie 'Rückgängig' bei Fehlern. Klicken Sie am Ende auf 'Schülerseite exportieren'.",
+        phLabel: "Neues Label",
+        btnUndo: "↶ Rückgängig",
+        btnSplit: "Manuell trennen",
+        btnBracket: "Klammer zeichnen",
+        btnExport: "Schülerseite exportieren",
+        btnSaveWork: "💾 Speichern",
+        btnLoadWork: "📂 Laden",
+        groupTitle: "Aktive Klammern (Syntaktische Gruppen):",
+        modalTitle: "Name der syntaktischen Gruppe:",
+        btnCancel: "Abbrechen",
+        btnSaveGroup: "Speichern",
+        modeTag: "Modus: Markieren",
+        modeSplit: "Modus: Manuell trennen",
+        modeBracket: "Modus: Klammer zeichnen"
+    }
+};
+
+// GRAMMAR CONFIG
+const GRAMMAR = {
+    en: {
+        funcs: ['Subject', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Predicative', 'Prepositional phrase', 'Adverb', 'Verb', 'Infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Other'],
+        abbr: {
+            'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Other': 'Other', 'Main clause': 'Main'
+        }
+    },
+    de: {
+        funcs: ['Subjekt', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionalphrase', 'Adverb', 'Verb', 'Infinitiv', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Sonstiges'],
+        abbr: {
+            'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Prädikativum': 'Präd', 'Präpositionalphrase': 'Präp. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Sonstiges': 'Sonst.', 'Main clause': 'Hauptsatz'
+        }
+    }
+};
+
+const BASE_COLORS = ['#66bb6a', '#42a5f5', '#ab47bc', '#26c6da', '#ffa726', '#e1bee7', '#fdd835', '#ffee58', '#ff4d4d', '#d32f2f', '#ffcdd2', '#78909c', '#8d6e63', '#e0e0e0'];
+
+// Globals
+let functions = [...GRAMMAR.en.funcs];
+let abbreviations = {...GRAMMAR.en.abbr};
+let colors = {}; 
+
+function mapColors(funcList) {
+    let c = {};
+    funcList.forEach((f, i) => {
+        c[f] = BASE_COLORS[i] || '#ccc';
+    });
+    return c;
+}
+colors = mapColors(functions);
+
 // --- NAVIGATION FUNCTIONS ---
 function showCredits() {
     document.getElementById('setup-screen').style.display = 'none';
@@ -339,61 +478,184 @@ function hideCredits() {
     document.getElementById('setup-screen').style.display = 'block';
 }
 
-// --- CORE VARIABLES ---
-let functions = [
-    'Subject', 
-    'Accusative object', 
-    'Dative object', 
-    'Genitive object', 
-    'Ablative', 
-    'Predicative', 
-    'Prepositional phrase', 
-    'Adverb', 
-    'Verb', 
-    'Infinitive', 
-    'Participial phrase', 
-    'Relative clause', 
-    'Subordinate clause', 
-    'Other'
-];
+function setLanguage(lang) {
+    const oldLang = currentLang;
+    currentLang = lang;
+    const txt = LANG[lang];
+    
+    // Update Toggle Buttons
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.lang-btn[onclick="setLanguage('${lang}')"]`).classList.add('active');
 
-let colors = { 
-    'Subject': '#66bb6a',              
-    'Accusative object': '#42a5f5',    
-    'Dative object': '#ab47bc',        
-    'Genitive object': '#26c6da',      
-    'Ablative': '#ffa726',             
-    'Predicative': '#e1bee7',          
-    'Prepositional phrase': '#fdd835', 
-    'Adverb': '#ffee58',               
-    'Verb': '#ff4d4d',                 
-    'Infinitive': '#d32f2f',           
-    'Participial phrase': '#ffcdd2',   
-    'Relative clause': '#78909c',      
-    'Subordinate clause': '#8d6e63',   
-    'Other': '#e0e0e0' 
-};
+    // Update UI Text
+    document.getElementById('app-heading').textContent = txt.heading;
+    document.getElementById('instr-h3').textContent = txt.instrH3;
+    document.getElementById('instr-body').innerHTML = txt.instrBody;
+    document.getElementById('example-link-text').textContent = txt.exampleLink;
+    document.getElementById('link-example').textContent = txt.linkText;
+    document.getElementById('pagetitle').placeholder = txt.phTitle;
+    document.getElementById('pageimage').placeholder = txt.phImage;
+    document.getElementById('teachernotes').placeholder = txt.phNotes;
+    document.getElementById('entertext').placeholder = txt.phText;
+    document.getElementById('ai-json').placeholder = txt.phJson;
+    document.getElementById('btn-copy-ai').textContent = txt.btnCopy;
+    document.getElementById('btn-import').textContent = txt.btnImport;
+    document.getElementById('or-text').textContent = txt.or;
+    document.getElementById('btn-load').textContent = txt.btnLoad;
+    document.getElementById('btn-manual').textContent = txt.btnManual;
+    
+    document.getElementById('edit-h3').textContent = txt.editH3;
+    document.getElementById('edit-body').innerHTML = txt.editBody;
+    document.getElementById('new-label-input').placeholder = txt.phLabel;
+    
+    document.getElementById('undo-btn').textContent = txt.btnUndo;
+    document.getElementById('split-mode-btn').textContent = txt.btnSplit;
+    document.getElementById('group-mode-btn').textContent = txt.btnBracket;
+    document.getElementById('btn-export').textContent = txt.btnExport;
+    document.getElementById('btn-save-work').textContent = txt.btnSaveWork;
+    document.getElementById('btn-load-work').textContent = txt.btnLoadWork;
+    document.getElementById('active-group-title').textContent = txt.groupTitle;
+    document.getElementById('modal-title-text').textContent = txt.modalTitle;
+    document.getElementById('btn-cancel').textContent = txt.btnCancel;
+    document.getElementById('btn-save-group').textContent = txt.btnSaveGroup;
+
+    // UPDATE EXAMPLE LINK
+    const exampleLink = document.getElementById('link-example');
+    if(lang === 'de') exampleLink.href = "example_page_de.html";
+    else exampleLink.href = "example_page.html";
+
+    // --- SMART TRANSLATION LOGIC ---
+    if(document.getElementById('editor-screen').style.display === 'block') {
+        const oldList = GRAMMAR[oldLang].funcs;
+        const newList = GRAMMAR[lang].funcs;
+        
+        const idxActive = oldList.indexOf(activeFunc);
+        if(idxActive !== -1) {
+            activeFunc = newList[idxActive];
+        }
+
+        const wordSpans = document.querySelectorAll('.tag-word');
+        wordSpans.forEach(span => {
+            const currentF = span.dataset.func;
+            const idx = oldList.indexOf(currentF);
+            if(idx !== -1) {
+                const newF = newList[idx];
+                span.dataset.func = newF;
+                
+                const newAbbr = GRAMMAR[lang].abbr[newF] || (newF.length > 6 ? newF.substring(0,5)+"." : newF);
+                span.dataset.short = newAbbr;
+                
+                span.style.backgroundColor = BASE_COLORS[idx] || '#ccc';
+            }
+        });
+
+        currentGroups.forEach(g => {
+            const idx = oldList.indexOf(g.label);
+            if(idx !== -1) {
+                g.label = newList[idx];
+            }
+        });
+        updateGroupUI();
+    }
+
+    functions = [...GRAMMAR[lang].funcs];
+    abbreviations = {...GRAMMAR[lang].abbr};
+    colors = mapColors(functions);
+    
+    if(document.getElementById('editor-screen').style.display === 'block') {
+        renderPalette();
+        updateStatus();
+    }
+}
 
 const preps = ["a", "ab", "ad", "ante", "apud", "circum", "contra", "cum", "de", "e", "ex", "extra", "in", "infra", "inter", "intra", "ob", "per", "post", "prae", "pro", "prope", "propter", "sine", "sub", "super", "trans", "ultra"];
 const sentenceEnders = ['.', '!', '?', '·'];
 
 let activeFunc = 'Other', groupMode = false, splitMode = false, startIdx = null, currentGroups = [];
 let pendingGroupStart = null, pendingGroupEnd = null;
+let historyStack = [];
+
+// --- UNDO FUNCTIONALITY ---
+function saveState() {
+    const currentWords = Array.from(document.getElementById('tagging-area').childNodes).map(node => {
+        const isPunct = node.classList.contains('punct-span');
+        return { 
+            w: node.textContent, 
+            f: isPunct ? 'Punct' : (node.dataset.func || 'Other'),
+            isSplit: node.classList.contains('split-right'),
+            idx: node.dataset.idx
+        };
+    });
+    const groupsCopy = JSON.parse(JSON.stringify(currentGroups));
+    historyStack.push({ words: currentWords, groups: groupsCopy });
+    if (historyStack.length > 50) historyStack.shift();
+}
+
+function undo() {
+    if (historyStack.length === 0) {
+        alert("Nothing to undo!");
+        return;
+    }
+    const lastState = historyStack.pop();
+    currentGroups = lastState.groups;
+    restoreEditorState(lastState.words);
+    startIdx = null; 
+    document.querySelectorAll('.tag-word').forEach(s => s.style.outline = "none");
+}
+
+function restoreEditorState(words) {
+    const area = document.getElementById('tagging-area');
+    area.innerHTML = '';
+    words.forEach((item, i) => {
+        const span = document.createElement('span');
+        const isPunct = item.f === 'Punct';
+        span.textContent = item.w;
+        span.className = isPunct ? 'punct-span' : 'tag-word';
+        if (item.isSplit) span.classList.add('split-right');
+        
+        span.dataset.idx = i;
+        span.id = `word-${i}`; 
+
+        if(!isPunct) {
+            let func = item.f || 'Other';
+            if(func === "Main clause") func = "Other";
+            
+            if(!colors[func]) {
+                 functions.push(func);
+                 colors[func] = `hsl(${Math.floor(Math.random() * 360)}, 70%, 85%)`;
+                 renderPalette();
+            }
+            span.dataset.func = func;
+            
+            const shortLabel = abbreviations[func] || (func.length > 6 ? func.substring(0,5)+"." : func);
+            span.dataset.short = shortLabel;
+
+            span.style.backgroundColor = colors[func];
+            span.onclick = function() { handleWordClick(this); };
+        } else { span.dataset.func = 'Punct'; }
+        area.appendChild(span);
+    });
+    updateGroupUI();
+}
 
 // --- AUTO SAVE LOGIC ---
 function triggerAutoSave() {
-    // Only save if we are in editor mode or have content
     if(document.getElementById('editor-screen').style.display === 'block' || document.getElementById('entertext').value.length > 5) {
         let currentWords = [];
         const taggingArea = document.getElementById('tagging-area');
         if(taggingArea.children.length > 0) {
              currentWords = Array.from(taggingArea.childNodes).map((node) => {
                 const isPunct = node.classList.contains('punct-span');
-                return { w: node.textContent, f: isPunct ? 'Punct' : (node.dataset.func || 'Other') };
+                return { 
+                    w: node.textContent, 
+                    f: isPunct ? 'Punct' : (node.dataset.func || 'Other'),
+                    isSplit: node.classList.contains('split-right')
+                };
             });
         }
         
         const saveData = {
+            lang: currentLang, 
             title: document.getElementById('pagetitle').value,
             image: document.getElementById('pageimage').value,
             text: document.getElementById('entertext').value,
@@ -401,6 +663,7 @@ function triggerAutoSave() {
             groups: currentGroups,
             funcs: functions,
             cols: colors,
+            abbr: abbreviations,
             words: currentWords,
             timestamp: new Date().getTime()
         };
@@ -412,13 +675,13 @@ function triggerAutoSave() {
     }
 }
 
-// Check for autosave on load
 window.addEventListener('DOMContentLoaded', () => {
+    setLanguage('en'); 
+
     const saved = localStorage.getItem('latin_tool_autosave');
     if(saved) {
         try {
             const data = JSON.parse(saved);
-            // Only prompt if data is less than 24 hours old
             if(new Date().getTime() - data.timestamp < 24 * 60 * 60 * 1000) {
                 if(confirm("Found an unsaved project from " + new Date(data.timestamp).toLocaleTimeString() + ". Restore it?")) {
                     restoreAutoSave(data);
@@ -426,21 +689,25 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         } catch(e) { console.error("Autosave Error", e); }
     }
-    // Start interval
-    setInterval(triggerAutoSave, 10000); // Every 10 seconds
+    setInterval(triggerAutoSave, 10000);
 });
 
 function restoreAutoSave(data) {
+    if(data.lang) setLanguage(data.lang);
     if(data.title) document.getElementById('pagetitle').value = data.title;
     if(data.image) document.getElementById('pageimage').value = data.image;
     if(data.text) document.getElementById('entertext').value = data.text;
     if(data.notes) document.getElementById('teachernotes').value = data.notes;
     if(data.funcs) functions = data.funcs;
     if(data.cols) colors = data.cols;
+    if(data.abbr) abbreviations = data.abbr;
     if(data.groups) currentGroups = data.groups;
     
     if(data.words && data.words.length > 0) {
-        initEditor(data.words);
+        restoreEditorState(data.words);
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('editor-screen').style.display = 'block';
+        renderPalette();
     }
 }
 
@@ -454,6 +721,7 @@ function addCustomLabel() {
     functions.push(name);
     const randomColor = `hsl(${Math.floor(Math.random() * 360)}, 70%, 85%)`;
     colors[name] = randomColor;
+    abbreviations[name] = name.substring(0,4) + '.';
     renderPalette();
     input.value = ''; 
 }
@@ -461,16 +729,22 @@ function addCustomLabel() {
 function saveProject() {
     const domWords = Array.from(document.getElementById('tagging-area').childNodes).map((node) => {
         const isPunct = node.classList.contains('punct-span');
-        return { w: node.textContent, f: isPunct ? 'Punct' : (node.dataset.func || 'Other') };
+        return { 
+            w: node.textContent, 
+            f: isPunct ? 'Punct' : (node.dataset.func || 'Other'),
+            isSplit: node.classList.contains('split-right')
+        };
     });
     const projectData = { 
+        lang: currentLang,
         title: document.getElementById('pagetitle').value, 
         image: document.getElementById('pageimage').value,
-        notes: document.getElementById('teachernotes').value, // Save notes
+        notes: document.getElementById('teachernotes').value, 
         words: domWords, 
         groups: currentGroups, 
         customFunctions: functions, 
-        customColors: colors 
+        customColors: colors, 
+        customAbbr: abbreviations
     };
     const blob = new Blob([JSON.stringify(projectData, null, 2)], {type: "application/json"});
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = (projectData.title || "latin_project") + ".json"; a.click();
@@ -483,16 +757,19 @@ function loadProject(input) {
     reader.onload = function(e) {
         try {
             const data = JSON.parse(e.target.result);
+            if(data.lang) setLanguage(data.lang);
             if(data.customFunctions) functions = data.customFunctions;
             if(data.customColors) colors = data.customColors;
+            if(data.customAbbr) abbreviations = data.customAbbr;
             if(data.groups) currentGroups = data.groups;
             if(data.title) document.getElementById('pagetitle').value = data.title;
             if(data.image) document.getElementById('pageimage').value = data.image;
-            if(data.notes) document.getElementById('teachernotes').value = data.notes; // Load notes
+            if(data.notes) document.getElementById('teachernotes').value = data.notes; 
             if(data.words) {
-                initEditor(data.words);
+                restoreEditorState(data.words);
                 document.getElementById('setup-screen').style.display = 'none';
                 document.getElementById('editor-screen').style.display = 'block';
+                renderPalette();
             }
         } catch(err) { console.error(err); alert("Error loading file."); }
     };
@@ -502,14 +779,52 @@ function loadProject(input) {
 
 function copyAIPrompt() {
     const txt = document.getElementById('entertext').value;
-    const p = `Analyze Latin syntax of: "${txt}". 
+    const exObj = functions[1]; 
+    
+    const promptText = currentLang === 'de' 
+    ? `Analysiere die lateinische Syntax von: "${txt}".
+    1. STRIKTE REGEL: Behalte die EXAKTE Wortreihenfolge bei.
+    2. PHRASEN: Benachbarte Wörter einer Phrase erhalten die gleiche Funktion.
+    3. HYPERBATON: Getrennte Phrasen erhalten die gleiche Funktion, bleiben aber an ihrem Platz.
+    4. INTERPUNKTION: Interpunktion als eigene Tokens "f": "Punct".
+    5. Antworte mit JSON: { "words": [{"w": "Arma", "f": "${exObj}"}, ...], "groups": [{"label": "Relativsatz", "start": 0, "end": 4}] }
+    Verwende diese Labels: ${functions.join(', ')}.`
+    : `Analyze Latin syntax of: "${txt}". 
     1. STRICT RULE: Maintain the EXACT word order.
     2. PHRASES: Adjacent phrase words get same function. 
     3. HYPERBATON: Split phrases get same function but kept in place.
     4. PUNCTUATION: Include punctuation as separate tokens "f": "Punct".
-    5. Return JSON: { "words": [{"w": "Arma", "f": "Accusative object"}, ...], "groups": [{"label": "Relative clause", "start": 0, "end": 4}] } 
+    5. Return JSON: { "words": [{"w": "Arma", "f": "${exObj}"}, ...], "groups": [{"label": "Relative clause", "start": 0, "end": 4}] } 
     Labels: ${functions.join(', ')}.`;
-    navigator.clipboard.writeText(p).then(() => alert("Strict Order Prompt copied!"));
+
+    navigator.clipboard.writeText(promptText).then(() => alert(currentLang === 'de' ? "Prompt kopiert!" : "Prompt copied!"));
+}
+
+// Helper to merge prep+noun
+function applyPrepositionMerging(tokens) {
+    let welded = [];
+    const prepLabel = currentLang === 'de' ? 'Präpositionalphrase' : 'Prepositional phrase';
+    
+    for(let i=0; i < tokens.length; i++) {
+        let curr = tokens[i];
+        let pureWord = curr.w.split(" ")[0].toLowerCase().replace(/[^a-z]/g, "");
+        
+        if(preps.includes(pureWord) && i+1 < tokens.length) {
+            let nextW = tokens[i+1];
+            if(nextW.f !== 'Punct') {
+                welded.push({ 
+                    w: curr.w + " " + nextW.w.replace(/^-/, ''), 
+                    f: prepLabel
+                });
+                i++; 
+            } else {
+                welded.push(curr); 
+            }
+        } else {
+            welded.push(curr);
+        }
+    }
+    return welded;
 }
 
 function processTokens(rawTokens) {
@@ -521,15 +836,7 @@ function processTokens(rawTokens) {
         else if (isEnclitic && temp.length > 0 && /[a-zA-Z]/.test(temp[temp.length-1].w)) { temp[temp.length-1].w += t.replace(/^-/, ''); }
         else { temp.push({ w: t, f: 'Other' }); }
     });
-    let welded = [];
-    for(let i=0; i < temp.length; i++) {
-        let curr = temp[i];
-        if(preps.includes(curr.w.toLowerCase()) && i+1 < temp.length && /[a-zA-Z]/.test(temp[i+1].w)) {
-            welded.push({ w: curr.w + " " + temp[i+1].w.replace(/^-/, ''), f: 'Prepositional phrase' });
-            i++;
-        } else { welded.push(curr); }
-    }
-    return welded;
+    return applyPrepositionMerging(temp);
 }
 
 function importAI() {
@@ -543,7 +850,9 @@ function importAI() {
             if (!/[a-zA-Z\u00C0-\u017F]/.test(w.w)) w.f = "Punct";
             else if (w.f === "Main clause") w.f = "Other";
         });
-        initEditor(d.words);
+        
+        const mergedWords = applyPrepositionMerging(d.words);
+        initEditor(mergedWords);
     } catch(e) { console.error(e); alert("JSON error. Check console."); }
 }
 
@@ -554,36 +863,19 @@ function startManual() {
     initEditor(processTokens(tokens));
 }
 
+// FORCE RESET function to allow clean slate
 function initEditor(words) {
-    const area = document.getElementById('tagging-area');
-    area.innerHTML = '';
-    words.forEach((item, i) => {
-        const span = document.createElement('span');
-        const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(item.w);
-        const isPunct = !hasLetters || item.f === 'Punct';
-        span.textContent = item.w;
-        span.className = isPunct ? 'punct-span' : 'tag-word';
-        span.dataset.idx = i;
-        span.id = `word-${i}`; 
-
-        if(!isPunct) {
-            let func = item.f || 'Other';
-            if(func === "Main clause") func = "Other";
-            if(!colors[func]) {
-                 functions.push(func);
-                 colors[func] = `hsl(${Math.floor(Math.random() * 360)}, 70%, 85%)`;
-            }
-            span.dataset.func = func;
-            span.style.backgroundColor = colors[func];
-            span.onclick = function() { handleWordClick(this); };
-        } else { span.dataset.func = 'Punct'; }
-        area.appendChild(span);
-    });
-    renderPalette();
+    // Reset to clean state for the current language
+    functions = [...GRAMMAR[currentLang].funcs];
+    abbreviations = {...GRAMMAR[currentLang].abbr};
+    colors = mapColors(functions);
+    historyStack = [];
+    
+    restoreEditorState(words);
     document.getElementById('setup-screen').style.display = 'none';
     document.getElementById('credits-screen').style.display = 'none';
     document.getElementById('editor-screen').style.display = 'block';
-    updateGroupUI();
+    renderPalette();
 }
 
 function renderPalette() {
@@ -596,11 +888,20 @@ function renderPalette() {
         b.onclick = () => { activeFunc = f; groupMode = splitMode = false; updatePalette(); updateButtonStates(); };
         p.appendChild(b);
     });
+    updateStatus();
 }
 
 function updatePalette() {
     document.querySelectorAll('.p-btn').forEach(b => b.classList.toggle('active', b.textContent === activeFunc));
-    document.getElementById('mode-status').textContent = `Mode: Tagging (${activeFunc})`;
+    updateStatus();
+}
+
+function updateStatus() {
+    let modeText = "";
+    if (splitMode) modeText = LANG[currentLang].modeSplit;
+    else if (groupMode) modeText = LANG[currentLang].modeBracket;
+    else modeText = LANG[currentLang].modeTag + ` (${activeFunc})`;
+    document.getElementById('mode-status').textContent = modeText;
 }
 
 function updateButtonStates() {
@@ -608,15 +909,20 @@ function updateButtonStates() {
     document.getElementById('group-mode-btn').classList.toggle('active-mode', groupMode);
     if (splitMode || groupMode) {
         document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('mode-status').textContent = splitMode ? "Mode: Manual Split" : "Mode: Drawing Bracket";
     }
+    updateStatus();
 }
 
 function handleWordClick(el) {
     const idx = parseInt(el.dataset.idx);
-    if(splitMode) { el.classList.toggle('split-right'); } 
+    if(splitMode) { 
+        saveState(); 
+        el.classList.toggle('split-right'); 
+    } 
     else if(groupMode) {
-        if(startIdx === null) { startIdx = idx; el.style.outline = "3px solid #6f42c1"; } 
+        if(startIdx === null) { 
+            startIdx = idx; el.style.outline = "3px solid #6f42c1"; 
+        } 
         else {
             pendingGroupStart = Math.min(startIdx, idx);
             pendingGroupEnd = Math.max(startIdx, idx);
@@ -624,7 +930,15 @@ function handleWordClick(el) {
             startIdx = null;
             document.querySelectorAll('.tag-word').forEach(s => s.style.outline = "none");
         }
-    } else { el.dataset.func = activeFunc; el.style.backgroundColor = colors[activeFunc]; }
+    } else { 
+        if (el.dataset.func !== activeFunc) {
+            saveState(); 
+            el.dataset.func = activeFunc; 
+            const shortLabel = abbreviations[activeFunc] || (activeFunc.length > 6 ? activeFunc.substring(0,5)+"." : activeFunc);
+            el.dataset.short = shortLabel;
+            el.style.backgroundColor = colors[activeFunc]; 
+        }
+    }
 }
 
 function openGroupModal() {
@@ -643,6 +957,7 @@ function closeGroupModal() { document.getElementById('group-modal').style.displa
 function saveGroupFromModal() {
     const label = document.getElementById('group-name-input').value;
     if(label && pendingGroupStart !== null) {
+        saveState(); 
         currentGroups.push({ start: pendingGroupStart, end: pendingGroupEnd, label: label });
         updateGroupUI();
     }
@@ -676,12 +991,15 @@ function updateGroupUI() {
         list.appendChild(d);
     });
 }
-function removeGroup(index) { currentGroups.splice(index, 1); updateGroupUI(); }
+function removeGroup(index) { 
+    saveState(); 
+    currentGroups.splice(index, 1); 
+    updateGroupUI(); 
+}
 function toggleSplitMode() { splitMode = !splitMode; groupMode = false; activeFunc = "Other"; updatePalette(); updateButtonStates(); }
 function toggleGroupMode() { groupMode = !groupMode; splitMode = false; activeFunc = "Other"; updatePalette(); updateButtonStates(); }
 
 function exportToStudent() {
-    // 1. Convert DOM nodes to a temporary array
     const nodes = Array.from(document.getElementById('tagging-area').childNodes);
     let tempTokens = nodes.map(node => {
         const isPunct = node.classList.contains('punct-span');
@@ -693,7 +1011,6 @@ function exportToStudent() {
         };
     });
 
-    // 2. Pre-process: Bridge punctuation if surrounding words match
     for(let i = 1; i < tempTokens.length - 1; i++) {
         let curr = tempTokens[i];
         if(curr.f === 'Punct') {
@@ -711,7 +1028,6 @@ function exportToStudent() {
         }
     }
 
-    // 3. Perform the Merge
     let merged = []; let current = null;
     tempTokens.forEach((token, i) => {
         const isMergeableType = !['Punct', 'Other'].includes(token.f);
@@ -729,7 +1045,6 @@ function exportToStudent() {
     });
     if (current) merged.push(current);
 
-    // 4. Update Group Indices based on merged words
     const updatedGroups = currentGroups.map(g => {
         const newStart = merged.findIndex(m => m.originalIndices.includes(g.start));
         let newEnd = merged.findIndex(m => m.originalIndices.includes(g.end));
@@ -742,17 +1057,47 @@ function exportToStudent() {
     const imgUrl = document.getElementById('pageimage').value;
     const teacherNotes = document.getElementById('teachernotes').value;
     
-    const blob = new Blob([generateStudentHTML(merged, updatedGroups, document.getElementById('pagetitle').value || "Exercise", functions, imgUrl, teacherNotes)], {type: 'text/html'});
+    // Pass currentLang to the generator
+    const blob = new Blob([generateStudentHTML(merged, updatedGroups, document.getElementById('pagetitle').value || "Exercise", functions, imgUrl, teacherNotes, currentLang)], {type: 'text/html'});
     const a = document.createElement('a'); 
     a.href = URL.createObjectURL(blob); 
     a.download = filename; 
     a.click();
 }
 
-function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes) {
-    const filteredLabels = allLabels.filter(l => l !== "Main clause");
+// Student Page Generator now accepts lang
+function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lang) {
+    const filteredLabels = allLabels.filter(l => l !== "Main clause" && l !== "Hauptsatz");
     
-    // PATTERN CSS GENERATOR
+    const studentTexts = {
+        en: {
+            instr: "This page is designed to help you translate Latin sentences. One click on a word or group of words will open a button that will ask you to choose the syntactical function.<br>Once you have analysed each word in a sentence, a textbox will appear into which you can write your translation.",
+            note: "Note:",
+            togglePat: "Toggle Patterns",
+            toggleCon: "High Contrast",
+            print: "Print Analysis",
+            download: "Download HTML",
+            correct: "Correct!",
+            incorrect: "Incorrect. The correct answer is: ",
+            tryAgain: "Incorrect label, try again!",
+            transPlaceholder: "Enter translation..."
+        },
+        de: {
+            instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen.<br>Sobald du jedes Wort in einem Satz analysiert hast, erscheint ein Textfeld für deine Übersetzung.",
+            note: "Hinweis:",
+            togglePat: "Muster umschalten",
+            toggleCon: "Hoher Kontrast",
+            print: "Drucken",
+            download: "HTML herunterladen",
+            correct: "Richtig!",
+            incorrect: "Falsch. Die richtige Antwort ist: ",
+            tryAgain: "Falsches Label, versuch es nochmal!",
+            transPlaceholder: "Übersetzung eingeben..."
+        }
+    };
+
+    const t = studentTexts[lang];
+
     const patternCSS = `
         body.pattern-mode .hover-word[data-done="true"] {
             background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.3) 5px, rgba(255,255,255,0.3) 10px);
@@ -769,7 +1114,6 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes) {
         }
     `;
 
-    // HIGH CONTRAST CSS GENERATOR
     const contrastCSS = `
         body.high-contrast { background-color: #121212; color: #ffffff; }
         body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #1e1e1e; color: #fff; border: 1px solid #444; }
@@ -781,10 +1125,9 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes) {
             color: #fff;
             border-bottom: 3px solid #777;
         }
-        /* When solved, make the background color distinct but text readable */
         body.high-contrast .hover-word[data-done="true"] {
             border: 2px solid #fff !important;
-            color: #000; /* Ensure text is readable on pastel colors */
+            color: #000; 
             font-weight: bold;
         }
         body.high-contrast .s-group { border-color: #fff !important; }
@@ -795,60 +1138,32 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes) {
 
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>
         :root { --main-font: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; }
-        
         body, button, input, textarea, select { font-family: var(--main-font); }
-
         body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background-color: #f4f4f9; color: #333; }
         h1 { text-align: center; color: #444; margin-bottom: 30px; font-weight: normal; letter-spacing: 1px; }
-        
         .instruction-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 0.95rem; line-height: 1.6; color: #856404; }
         .teacher-note { background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 4px; margin-bottom: 25px; font-size: 1rem; color: #333; }
-        
         .exercise-wrapper { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); line-height: 3.8; }
-
         .hover-word { cursor: pointer; background: #e4e5ed; padding: 2px 8px; border-radius: 4px; border-bottom: 3px solid #ccc; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.2; transition: all 0.2s; }
         .s-group { display: inline-block; position: relative; border: 2px solid #555; border-bottom:none; border-radius: 8px 8px 0 0; padding: 15px 5px 5px 5px; margin: 0 2px; vertical-align: bottom; }
         .g-label { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; background: white; border: 1px solid #555; border-radius: 4px; padding: 2px 8px; white-space: nowrap; color: #555; text-transform: uppercase; cursor: pointer; }
         .punct { font-size: 1.15rem; margin: 0 1px; vertical-align: baseline; display:inline-block; }
-        
         .trans-box { margin: 20px 0 50px; line-height: 1.5; }
         textarea { width: 100%; height: 80px; font-size: 1.2rem; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
         .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; margin-top: 8px; width: 150px; text-align: center; color: green; pointer-events: none; }
-        
         .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #bbb; padding: 0; z-index: 1000; border-radius: 4px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); max-height: 400px; overflow-y: auto; min-width: 160px; line-height: 1.2; }
         .radio-menu input[type="radio"] { display: none; }
         .radio-menu label { display: block; padding: 1px 8px; cursor: pointer; border-bottom: none; font-size: 0.85rem; font-weight: bold; color: #333; }
         .radio-menu label:hover { background-color: #007bff; color: white; }
-
         .footer-toolbar { margin-top: 60px; padding: 30px; border-top: 1px solid #ddd; display: flex; justify-content: center; gap: 20px; }
         .btn { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; background: #333; }
         .ex-img { max-width: 100%; height: auto; display: block; margin: 30px auto 10px auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-height: 300px; object-fit: contain; }
-
-        #toast-container {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 4px;
-            padding: 16px;
-            position: fixed;
-            z-index: 1001;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
-            font-size: 1rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            opacity: 0;
-            transition: opacity 0.3s, bottom 0.3s;
-        }
+        #toast-container { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 4px; padding: 16px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
         #toast-container.show { visibility: visible; opacity: 1; bottom: 50px; }
         #toast-container.error { background-color: #333; border-bottom: 4px solid #d32f2f; }
         #toast-container.success { background-color: #333; border-bottom: 4px solid #28a745; }
-        
         ${patternCSS}
         ${contrastCSS}
-
         @media (max-width: 768px) {
             body { margin: 15px; line-height: 4.0; }
             .exercise-wrapper { padding: 15px; }
@@ -858,38 +1173,21 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes) {
             .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 80%; max-height: 60%; box-shadow: 0 0 50px rgba(0,0,0,0.5); border-radius: 8px; }
             .radio-menu label { padding: 12px 15px; font-size: 1rem; border-bottom: 1px solid #eee; }
         }
-        @media print { 
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } 
-            .footer-toolbar, .radio-menu, .instruction-box { display: none !important; } 
-            .ex-img { display: none !important; }
-        }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .footer-toolbar, .radio-menu, .instruction-box { display: none !important; } .ex-img { display: none !important; } }
     </style></head><body>
     <h1>${title}</h1>
-    
-    <div class="instruction-box">
-    This page is designed to help you translate Latin sentences. One click on a word or group of words will open a button that will ask you to choose the syntactical function:<br>
-    subject, accusative object, dative object, genitive object, ablative, predicative, prepositional phrase, adverb, verb, infinitive, participial phrase, or other (i.e., conjunctions, interjections, etc.). Larger syntactic functions (labelled '?') can have any of these functions, as well as those of relative clause or any other subordinate clause.<br>
-    Once you have analysed each word in a sentence, a textbox will appear into which you can write your translation. In the end, you can save the webpage or print it, so you can discuss your translations in class.
-    </div>
-
-    ${notes ? `<div class="teacher-note"><strong>Note:</strong> ${notes.replace(/\n/g, '<br>')}</div>` : ''}
-
-    <div class="exercise-wrapper">
-        <div id="exercise">${generateExerciseHTML(words, groups)}</div>
-    </div>
-
+    <div class="instruction-box">${t.instr}</div>
+    ${notes ? `<div class="teacher-note"><strong>${t.note}</strong> ${notes.replace(/\n/g, '<br>')}</div>` : ''}
+    <div class="exercise-wrapper"><div id="exercise">${generateExerciseHTML(words, groups, t.transPlaceholder)}</div></div>
     ${imgUrl ? `<img src="${imgUrl}" class="ex-img" alt="Exercise Image">` : ''}
-    
     <div class="footer-toolbar">
-        <button class="btn" onclick="togglePatterns()">Toggle Patterns</button>
-        <button class="btn" onclick="toggleContrast()">High Contrast</button>
-        <button class="btn" onclick="window.print()">Print Analysis</button> 
-        <button class="btn" onclick="downloadPage()">Download HTML</button>
+        <button class="btn" onclick="togglePatterns()">${t.togglePat}</button>
+        <button class="btn" onclick="toggleContrast()">${t.toggleCon}</button>
+        <button class="btn" onclick="window.print()">${t.print}</button> 
+        <button class="btn" onclick="downloadPage()">${t.download}</button>
     </div>
-    
     <div id="menu-common" class="radio-menu"><form id="f-common">${filteredLabels.map(l => `<label><input type="radio" name="opt" value="${l}"> ${l}</label>`).join('')}</form></div>
     <div id="toast-container"></div>
-    
     <script>
         const colors = ${JSON.stringify(colors)}; let activeEl = null; let mode = "";
         const menu = document.getElementById('menu-common');
@@ -905,33 +1203,29 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes) {
         document.getElementById('f-common').onchange = (e) => {
             const sel = e.target.value; 
             const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans;
-            
             if(sel === correct) {
                 solve(activeEl, correct, mode);
-                showToast("Correct!", false);
+                showToast("${t.correct}", false);
             } else { 
                 let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1;
                 activeEl.dataset.mistakes = mistakes;
                 if(mistakes >= 2) {
-                      showToast("Incorrect. The correct answer is: " + correct, true);
-                      solve(activeEl, correct, mode);
+                       showToast("${t.incorrect}" + correct, true);
+                       solve(activeEl, correct, mode);
                 } else {
-                      showToast('Incorrect label, try again!', true);
+                       showToast("${t.tryAgain}", true);
                 }
             }
             menu.style.display = "none"; e.target.checked = false; check();
         };
-
         function showToast(msg, isError) {
             const x = document.getElementById("toast-container");
             x.textContent = msg;
             x.className = isError ? "show error" : "show success";
             setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
         }
-        
         function togglePatterns() { document.body.classList.toggle('pattern-mode'); }
         function toggleContrast() { document.body.classList.toggle('high-contrast'); }
-
         function solve(el, ans, m) {
             if(m === "word") {
                 const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
@@ -940,7 +1234,6 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes) {
                 el.textContent = ans; el.dataset.done = "true"; el.style.background = "#e8f5e9"; 
             }
         }
-
         function check() { 
             document.querySelectorAll('.sentence-container').forEach((s, i) => { 
                 const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')];
@@ -954,7 +1247,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes) {
     <\/script></body></html>`;
 }
 
-function generateExerciseHTML(words, groups) {
+function generateExerciseHTML(words, groups, placeholder) {
     let sIdx = 0, html = '<div class="sentence-container">';
     const sentenceEnders = ['.', '!', '?', '·'];
     let pendingClosers = ""; 
@@ -963,24 +1256,15 @@ function generateExerciseHTML(words, groups) {
         const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(word.w);
         let isFakeWord = !hasLetters; 
         let isPunct = word.f === 'Punct' || isFakeWord;
-        
-        // CHECK NEXT WORD TO SEE IF IT IS PUNCTUATION
         let nextWord = words[idx + 1];
         let nextIsPunct = nextWord && (!/[a-zA-Z\u00C0-\u017F]/.test(nextWord.w) || nextWord.f === 'Punct');
-
-        let content = isPunct 
-                  ? `<span class="punct">${word.w}</span>` 
-                  : `<span class="hover-word" data-ans="${word.f}">${word.w}</span>`;
-        
+        let content = isPunct ? `<span class="punct">${word.w}</span>` : `<span class="hover-word" data-ans="${word.f}">${word.w}</span>`;
         let openDivs = "", closeDivs = "";
 
         groups.forEach(g => {
             if(idx === g.start) openDivs += `<div class="s-group" data-ans="${g.label}"><span class="g-label">?</span>`;
             if(idx === g.end) closeDivs += `</div>`;
         });
-
-        // Tweak spacing: if inside a merged button (i.e., not Punct logic), we handle spaces inside w.
-        // But for the HTML generation here, simple spacing logic applies.
         let spacing = nextIsPunct ? "" : " ";
 
         if (isPunct) {
@@ -997,7 +1281,7 @@ function generateExerciseHTML(words, groups) {
         }
 
         if (isPunct && sentenceEnders.some(end => word.w.includes(end))) {
-            html += `</div><div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="Enter translation..."></textarea></div><div class="sentence-container">`;
+            html += `</div><div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="${placeholder}"></textarea></div><div class="sentence-container">`;
             sIdx++;
         }
     });
@@ -1006,4 +1290,3 @@ function generateExerciseHTML(words, groups) {
 </script>
 </body>
 </html>
-
