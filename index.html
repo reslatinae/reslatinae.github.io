@@ -3,21 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Syntactic Creator - Didactic Edition</title>
+    <title id="page-title">Latin Syntax Studio</title>
     <style>
         :root { 
-            --main-font: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-            --bg-color: #f4f4f9;
+            --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --bg-color: #f9fafb;
             --container-bg: #ffffff;
-            --primary-color: #007bff;
-            --text-color: #333;
-            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+            --primary-color: #3b82f6;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
         }
 
-        /* GLOBAL FONT RESET */
-        body, button, input, textarea, select { 
-            font-family: var(--main-font); 
-        }
+        body, button, input, textarea, select { font-family: var(--main-font); }
 
         body { 
             margin: 2% auto; 
@@ -25,271 +23,270 @@
             padding: 0 20px;
             background-color: var(--bg-color); 
             color: var(--text-color); 
+            line-height: 1.5;
         }
 
-        h1 { text-align: center; color: #444; margin-bottom: 20px; font-weight: normal; letter-spacing: 1px; font-size: 1.8rem; }
+        h1 { 
+            text-align: center; 
+            color: #111827; 
+            margin-bottom: 24px; 
+            font-weight: 600; 
+            letter-spacing: -0.025em; 
+            font-size: 1.8rem; 
+        }
 
         .container { 
             background: var(--container-bg); 
-            padding: 25px; 
-            border-radius: 12px; 
+            padding: 30px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-color);
             box-shadow: var(--shadow); 
-            margin-bottom: 20px; 
+            margin-bottom: 24px; 
             position: relative;
         }
         
-        /* Language Toggle */
-        .lang-switch {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 5px;
-        }
-        .lang-btn {
-            background: #eee;
-            border: 1px solid #ccc;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            opacity: 0.6;
-        }
-        .lang-btn.active {
-            background: #007bff;
-            color: white;
-            border-color: #0056b3;
-            opacity: 1;
-            font-weight: bold;
-        }
+        .lang-switch { position: absolute; top: 24px; right: 24px; display: flex; gap: 6px; }
+        .lang-btn { background: #f3f4f6; border: 1px solid transparent; padding: 6px 12px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; color: #4b5563; transition: all 0.2s; }
+        .lang-btn.active { background: #eff6ff; color: var(--primary-color); border-color: #bfdbfe; font-weight: 600; }
 
-        .instruction-box { 
-            background: #fff3cd; 
-            border: 1px solid #ffeeba; 
-            padding: 12px; 
-            border-radius: 8px; 
-            margin-bottom: 20px; 
-            font-size: 0.9rem; 
-            line-height: 1.5; 
-            color: #856404;
-        }
-        .instruction-box h3 { margin-top: 0; border-bottom: 1px solid #ffeeba; padding-bottom: 5px; font-size: 1rem; }
-        .instruction-box a { color: #856404; text-decoration: underline; font-weight: bold; cursor: pointer; }
+        .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 6px; margin-bottom: 24px; font-size: 0.95rem; color: #334155; }
+        .instruction-box h3 { margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; font-size: 1.05rem; font-weight: 600; color: #0f172a; }
+        .instruction-box a { color: var(--primary-color); text-decoration: none; font-weight: 500; cursor: pointer; }
+        .instruction-box a:hover { text-decoration: underline; }
 
-        /* PALETTE */
-        .palette { 
-            position: sticky; top: 0; 
-            background: white; 
-            padding: 10px; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            z-index: 1000; 
-            box-shadow: var(--shadow); 
-            margin-bottom: 15px; 
-        }
-        .palette-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-        .p-btn { 
-            padding: 5px 10px; 
-            border-radius: 5px; 
-            border: 2px solid transparent; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 0.8rem; 
-            transition: all 0.2s; 
-            color: black !important; 
-        }
-        .p-btn.active { border-color: #333; transform: scale(1.05); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .palette { position: sticky; top: 0; background: white; padding: 16px; border: 1px solid var(--border-color); border-radius: 6px; z-index: 1000; box-shadow: var(--shadow); margin-bottom: 20px; }
+        .palette-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .p-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: all 0.15s ease-in-out; color: #111827 !important; }
+        .p-btn.active { border-color: #111827; box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1); }
         
-        /* COMPACT EDITOR AREA */
         #tagging-area { 
-            padding: 30px; 
-            border: 1px solid #e0e0e0; 
+            padding: 40px 30px 30px 30px; 
+            border: 1px solid var(--border-color); 
             min-height: 400px; 
             background: #fff; 
-            border-radius: 8px; 
+            border-radius: 6px; 
             display: block; 
             line-height: 4.5; 
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+            transition: line-height 0.3s ease;
         }
         
-        /* COMPACT WORDS */
         .tag-word { 
             display: inline-block; 
             margin: 0 2px; 
             position: relative; 
             font-size: 1.15rem; 
             vertical-align: middle; 
-            color: black; 
+            color: #111827; 
             padding: 2px 8px; 
             border-radius: 4px; 
             cursor: pointer; 
-            border-bottom: 2px solid #ccc; 
+            border-bottom: 2px solid #e5e7eb; 
             white-space: nowrap; 
             height: 1.6rem; 
             line-height: 1.6rem; 
+            user-select: none; 
         }
         
-        /* Punctuation */
-        .punct-span { display: inline-block; margin: 0 1px; font-size: 1.15rem; vertical-align: middle; color: black; background: transparent; border: none; padding: 0; font-weight: bold; cursor: default; }
+        .punct-span { display: inline-block; margin: 0 2px; padding: 2px 2px; font-size: 1.15rem; vertical-align: middle; color: #111827; position: relative; font-weight: 500; cursor: pointer; user-select: none; border-bottom: 2px solid transparent; }
 
-        /* Visual Styles for Groups in Editor */
-        .grouped-word { border-bottom: 4px solid #6f42c1 !important; background-color: #f3e5f5; }
-        .group-start { border-left: 2px solid #6f42c1; border-top-left-radius: 0; border-bottom-left-radius: 0; }
-        .group-end { border-right: 2px solid #6f42c1; border-top-right-radius: 0; border-bottom-right-radius: 0; }
-
-        .split-right { border-right: 4px dashed #ff4444 !important; margin-right: 12px; }
+        .split-right { border-right: 3px dashed #ef4444 !important; margin-right: 12px; }
         
-        /* COMPACT LABEL (SHORT FORM) */
-        .tag-word::after { 
-            content: attr(data-short); 
-            display: block; 
-            position: absolute; 
-            top: 36px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            font-size: 0.6rem; 
-            color: #d32f2f; 
-            font-weight: 800; 
-            text-transform: uppercase; 
+        /* Tiered Bracket CSS System */
+        .group-bracket {
+            position: absolute;
+            left: -2px; 
+            right: -2px; 
+            border-top-width: 3px;
+            border-top-style: solid;
             pointer-events: none;
-            background: rgba(255,255,255,0.9);
-            padding: 0 3px;
-            line-height: 1.1;
-            border-radius: 3px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            z-index: 5;
+            border-radius: 6px;
+        }
+        .bracket-start {
+            border-left-width: 4px;
+            border-left-style: solid;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+        .bracket-end {
+            border-right-width: 4px;
+            border-right-style: solid;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+        
+        .bracket-badge {
+            position: absolute;
+            top: -24px;
+            left: 0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #111827;
+            pointer-events: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 10;
             white-space: nowrap;
         }
-        
-        .side-panel { background: #eee; padding: 15px; border-radius: 8px; margin-top: 20px; }
-        .group-item { background: white; padding: 8px; margin: 5px 0; border-radius: 6px; display: flex; justify-content: space-between; border-left: 5px solid #6f42c1; align-items: center; font-size: 0.9rem; }
-        
-        /* Buttons */
-        .btn-action { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; color: white; transition: opacity 0.2s; font-size: 0.9rem; }
-        .btn-action:hover { opacity: 0.9; }
-        
-        /* Active State for Tool Buttons */
-        .btn-action.active-mode {
-            box-shadow: inset 0 3px 5px rgba(0,0,0,0.3);
-            transform: scale(0.98);
-            outline: 3px solid #333;
-        }
-        #split-mode-btn.active-mode { outline-color: #dc3545; background: #c82333 !important; }
-        #group-mode-btn.active-mode { outline-color: #6f42c1; background: #5a32a3 !important; }
 
-        .del-btn { color: #ff4444; cursor: pointer; font-weight: bold; padding: 0 10px; font-size: 1.2rem; }
-
-        .custom-label-row { margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd; display: flex; gap: 5px; align-items: center; }
-        .custom-input { flex-grow: 1; padding: 5px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.9rem; }
-        .add-btn { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
-
-        /* Subtle Save/Load Row */
-        .project-mini-row { 
-            margin-top: 15px; 
-            padding-top: 10px; 
-            border-top: 1px solid #eee; 
-            display: flex; 
-            justify-content: flex-end; 
-            gap: 15px; 
-        }
-        .subtle-btn {
-            background: transparent;
-            color: #666;
-            border: 1px solid #ccc;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.75rem;
+        .clickable-label {
+            margin: 0 4px;
             cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
+            border-bottom: 1px dashed rgba(17,24,39,0.5);
+            transition: opacity 0.2s;
         }
-        .subtle-btn:hover { background: #f0f0f0; color: #333; border-color: #999; }
-
-        /* Input Row in Setup */
-        .setup-row { display: flex; gap: 15px; margin-bottom: 20px; }
-        .setup-input { padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; }
-
-        /* Credits Link */
-        .credits-link {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 0.85rem;
+        .clickable-label:hover { opacity: 0.7; }
+        
+        .bracket-end-controls {
+            position: absolute;
+            top: -24px;
+            right: 0;
+            padding: 2px 4px;
+            border-radius: 4px;
+            pointer-events: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            z-index: 10;
         }
-        .credits-link a { color: #666; text-decoration: none; border-bottom: 1px dashed #999; cursor: pointer; }
-        .credits-link a:hover { color: #000; border-bottom-style: solid; }
 
-        /* MODAL STYLES */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
-        .modal-box { background: white; padding: 25px; border-radius: 8px; width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .modal-title { font-weight: bold; margin-bottom: 15px; font-size: 1.1rem; }
-        .modal-input { width: 100%; padding: 10px; margin-bottom: 20px; font-size: 1.1rem; box-sizing: border-box; border: 2px solid #007bff; border-radius: 5px; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+        .badge-adj {
+            cursor: pointer;
+            background: rgba(0,0,0,0.1);
+            border-radius: 3px;
+            padding: 1px 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.55rem;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .badge-adj:hover { background: rgba(255,255,255,0.6); color: #111827; }
 
-        /* MOBILE / TABLET OPTIMIZATIONS */
+        .badge-del {
+            cursor: pointer;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            transition: background 0.2s;
+        }
+        .badge-del:hover { background: rgba(255,255,255,0.8); color: #7f1d1d; }
+
+        .tag-word::after { 
+            content: attr(data-short); display: block; position: absolute; top: 36px; left: 50%; transform: translateX(-50%); 
+            font-size: 0.65rem; color: #4b5563; font-weight: 600; text-transform: uppercase; pointer-events: none;
+            background: #f9fafb; border: 1px solid #e5e7eb; padding: 2px 4px; line-height: 1; border-radius: 3px; white-space: nowrap;
+        }
+        
+        .btn-action { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; color: white; transition: opacity 0.2s; font-size: 0.9rem; }
+        .btn-action:hover { opacity: 0.9; }
+        .btn-action.active-mode { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); outline: 2px solid #111827; outline-offset: 2px; }
+        #split-mode-btn.active-mode { outline-color: #ef4444; background: #dc2626 !important; }
+        #group-mode-btn.active-mode { outline-color: #8b5cf6; background: #7c3aed !important; }
+
+        .custom-label-row { display: flex; gap: 8px; align-items: center; }
+        .custom-input { flex-grow: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+        .custom-input:focus { border-color: var(--primary-color); }
+        .add-btn { background: #10b981; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+
+        .project-mini-row { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 12px; }
+        .subtle-btn { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; text-decoration: none; display: inline-block; font-weight: 500; }
+        .subtle-btn:hover { background: #e5e7eb; color: #111827; }
+
+        .setup-row { display: flex; gap: 16px; margin-bottom: 20px; }
+        .setup-input, textarea { padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+        .setup-input:focus, textarea:focus { border-color: var(--primary-color); }
+
+        .credits-link { text-align: center; margin-top: 32px; font-size: 0.85rem; }
+        .credits-link a { color: #6b7280; text-decoration: none; border-bottom: 1px dotted #9ca3af; cursor: pointer; }
+        .credits-link a:hover { color: #111827; border-bottom-style: solid; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.6); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-box { background: white; padding: 30px; border-radius: 8px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .modal-title { font-weight: 600; margin-bottom: 16px; font-size: 1.1rem; color: #111827; }
+        .modal-input { width: 100%; padding: 12px; margin-bottom: 24px; font-size: 1rem; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 6px; outline: none; }
+        .modal-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; }
+
         @media (max-width: 768px) {
             body { margin: 10px; padding: 0; }
-            .container { padding: 15px; }
-            .setup-row { flex-direction: column; gap: 10px; }
-            .lang-switch { top: 10px; right: 10px; }
-            
-            .palette { position: relative; top: 0; padding: 10px; overflow-x: auto; }
-            .palette-grid { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
-            .p-btn { white-space: nowrap; padding: 12px 15px; } 
-
-            #tagging-area { padding: 15px; line-height: 4.5; } 
+            .container { padding: 20px; }
+            .setup-row { flex-direction: column; gap: 12px; }
+            .lang-switch { top: 16px; right: 16px; }
+            .palette { position: relative; top: 0; padding: 16px; overflow-x: auto; }
+            .palette-grid { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px; }
+            .p-btn { white-space: nowrap; padding: 10px 14px; } 
+            #tagging-area { padding: 40px 20px 20px 20px; line-height: 4.5; } 
             .tag-word { font-size: 1rem; padding: 4px 6px; margin: 1px; }
-            .tag-word::after { font-size: 0.5rem; top: 32px; }
-            
+            .tag-word::after { font-size: 0.55rem; top: 32px; }
             .btn-action { width: 100%; margin-bottom: 8px; font-size: 1rem; }
             .modal-box { width: 90%; }
         }
         
-        /* AUTO SAVE NOTIFICATION */
-        #autosave-status {
-            position: fixed; bottom: 10px; right: 10px; font-size: 0.8rem; color: #888; opacity: 0; transition: opacity 0.5s;
-        }
+        #autosave-status { position: fixed; bottom: 16px; right: 16px; font-size: 0.85rem; color: #6b7280; background: white; padding: 6px 12px; border-radius: 4px; box-shadow: var(--shadow); opacity: 0; transition: opacity 0.5s; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <h1 id="app-heading">Syntactic Analysis Creator</h1>
+    <h1 id="app-heading">Latin Syntax Studio</h1>
 
     <div id="setup-screen" class="container">
         
         <div class="lang-switch">
-            <button class="lang-btn active" onclick="setLanguage('en')">🇬🇧 English</button>
-            <button class="lang-btn" onclick="setLanguage('de')">🇩🇪 Deutsch</button>
+            <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+            <button class="lang-btn" onclick="setLanguage('de')">DE</button>
         </div>
 
         <div class="instruction-box">        
             <h3 id="instr-h3">Step 1: Setup Instruction</h3>
             <div id="instr-body">
-                This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br>
+                This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br><br>
                 On this page, you will be asked to provide a title, optional notes for the students, a picture for the student page (optional) and a text or a few sentences. Then, click 'Copy AI Prompt' and paste the prompt into a large language model such as ChatGPT or Gemini. Finally, paste the JSON code the AI gives you into the box and click 'Import' or 'Start manual creation'.
             </div>
-            <div style="margin-top:15px; font-style:italic;">
+            <div style="margin-top:16px; font-style:italic;">
                 <span id="example-link-text">Want to see what the final result looks like?</span> <a href="example_page.html" target="_blank" id="link-example">View Example</a>
             </div>
         </div>
         
         <div class="setup-row">
-            <input type="text" id="pagetitle" class="setup-input" placeholder="Exercise Title" style="flex: 2;"/>
+            <input type="text" id="pagetitle" class="setup-input" placeholder="Exercise Title (e.g. Interactive Syntax Explorer)" style="flex: 2;"/>
             <input type="text" id="pageimage" class="setup-input" placeholder="Optional: Image URL" style="flex: 1;"/>
         </div>
 
-        <textarea id="teachernotes" rows="3" style="width:100%; padding:10px; margin-bottom:20px; border-radius:6px; border:1px solid #ccc; font-size:1rem; box-sizing:border-box;" placeholder="Optional: Context / Teacher Notes (e.g. 'Watch out for ablatives...')"></textarea>
+        <textarea id="teachernotes" rows="3" style="width:100%; box-sizing:border-box; margin-bottom:20px;" placeholder="Optional: Context / Teacher Notes (e.g. 'Watch out for ablatives...')"></textarea>
 
-        <textarea id="entertext" rows="6" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:1rem; box-sizing: border-box;" placeholder="Paste Latin text here..."></textarea>
+        <textarea id="entertext" rows="6" style="width:100%; box-sizing: border-box;" placeholder="Paste Latin text here..."></textarea>
         
-        <div style="background:#eef6ff; padding:20px; border-radius:10px; margin:25px 0; border:2px dashed #007bff;">
-            <button class="btn-action" style="background:#007bff;" onclick="copyAIPrompt()" id="btn-copy-ai">1. Copy AI Prompt</button>
-            <textarea id="ai-json" rows="2" style="width:100%; margin: 15px 0; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing: border-box;" placeholder="Paste JSON here..."></textarea>
-            <button class="btn-action" style="background:#28a745;" onclick="importAI()" id="btn-import">2. Import</button>
-            <span style="margin: 0 15px; font-weight:bold; color:#555;" id="or-text">OR</span>
-            <label class="btn-action" style="background:#17a2b8; cursor: pointer; display:inline-block;">
+        <div style="background:#f8fafc; padding:24px; border-radius:8px; margin:24px 0; border:1px solid #e2e8f0;">
+            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+                <label id="lbl-level" style="font-weight: 600; color: #0f172a;">Grammar Level:</label>
+                <select id="grammar-level-setup" class="setup-input" style="width: auto; padding: 8px 12px; background-color: #fff;" onchange="changeLevel(this.value)">
+                    <option value="beginner" id="opt-beg">Beginner</option>
+                    <option value="intermediate" id="opt-int">Intermediate</option>
+                    <option value="advanced" id="opt-adv" selected>Advanced (All)</option>
+                </select>
+            </div>
+
+            <button class="btn-action" style="background:var(--primary-color);" onclick="copyAIPrompt()" id="btn-copy-ai">1. Copy AI Prompt</button>
+            <textarea id="ai-json" rows="2" style="width:100%; margin: 16px 0; padding:12px; border:1px solid #d1d5db; border-radius:6px; box-sizing: border-box;" placeholder="Paste JSON here..."></textarea>
+            <button class="btn-action" style="background:#10b981;" onclick="importAI()" id="btn-import">2. Import</button>
+            <span style="margin: 0 16px; font-weight:600; color:#64748b; font-size: 0.9rem;" id="or-text">OR</span>
+            <label class="btn-action" style="background:#64748b; cursor: pointer; display:inline-block;">
                 <span id="btn-load">Load Saved Project</span> <input type="file" style="display:none" onchange="loadProject(this)">
             </label>
         </div>
-        <button class="btn-action" style="background:#3c3c3c; width:100%;" onclick="startManual()" id="btn-manual">Start Manual Creation</button>
+        <button class="btn-action" style="background:#1f2937; width:100%;" onclick="startManual()" id="btn-manual">Start Manual Creation</button>
 
         <div class="credits-link">
             <a onclick="showCredits()">Credits</a>
@@ -297,38 +294,47 @@
     </div>
 
     <div id="credits-screen" class="container" style="display:none; text-align:center; padding: 50px;">
-        <h2 style="margin-top:0;">Credentials</h2>
-        <p style="font-size:1.1rem; line-height: 1.6; color: #555; margin: 30px 0;">
+        <h2 style="margin-top:0; color: #111827;">Credentials</h2>
+        <p style="font-size:1.1rem; line-height: 1.6; color: #4b5563; margin: 30px 0;">
             This tool was created by Anke Walter. I gratefully acknowledge the help of J. L., ChatGPT and Gemini.
         </p>
-        <button class="btn-action" style="background:#6c757d;" onclick="hideCredits()">Back</button>
+        <button class="btn-action" style="background:#64748b;" onclick="hideCredits()">Back</button>
     </div>
 
     <div id="editor-screen" style="display:none;">
         
         <div class="instruction-box">
             <h3 id="edit-h3">Step 2: Editing Instruction</h3>
-            <ul style="margin-bottom:0; padding-left:20px;" id="edit-body">
-                Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. At the bottom of the page, you can review and remove syntactic groups. Use 'Undo' to revert your last action. At the end, hit 'Export Student Page'.
-            </ul>
+            <div style="margin-bottom:0;" id="edit-body">
+                Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups using the ◀ and ▶ arrows on their labels. Double-click any word to correct typos. Use 'Undo' to revert your last action. At the end, hit 'Export Student Page'.
+            </div>
         </div>
 
         <div class="palette">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                 <div id="mode-status" style="font-weight:bold; color:#007bff; font-size:1rem;">Mode: Tagging (Other)</div>
-                 <div class="custom-label-row" style="margin:0; padding:0; border:none;">
-                    <input type="text" id="new-label-input" class="custom-input" placeholder="New Label" style="width:120px;">
-                    <button class="add-btn" onclick="addCustomLabel()">+</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 12px; margin-bottom:16px;">
+                 <div id="mode-status" style="font-weight:600; color:var(--primary-color); font-size:1rem;">Mode: Tagging (Other)</div>
+                 
+                 <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <select id="grammar-level-editor" class="setup-input" style="padding: 6px 10px; font-size: 0.85rem; height: 35px;" onchange="changeLevel(this.value)">
+                        <option value="beginner" id="opt-beg-ed">Beginner</option>
+                        <option value="intermediate" id="opt-int-ed">Intermediate</option>
+                        <option value="advanced" id="opt-adv-ed" selected>Advanced (All)</option>
+                    </select>
+                    
+                    <div class="custom-label-row" style="margin:0; padding:0; border:none;">
+                        <input type="text" id="new-label-input" class="custom-input" placeholder="New Label" style="width:120px; height: 35px; box-sizing: border-box;">
+                        <button class="add-btn" onclick="addCustomLabel()" style="height: 35px; display: flex; align-items: center; justify-content: center;">+</button>
+                    </div>
                 </div>
             </div>
 
             <div class="palette-grid" id="label-palette"></div>
             
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">
-                <button class="btn-action" id="undo-btn" style="background:#ff9800; flex:0.5;" onclick="undo()">↶ Undo</button>
-                <button class="btn-action" id="split-mode-btn" style="background:#dc3545; flex:1;" onclick="toggleSplitMode()">Manual Split</button>
-                <button class="btn-action" id="group-mode-btn" style="background:#6f42c1; flex:1;" onclick="toggleGroupMode()">Draw Bracket</button>
-                <button class="btn-action" style="background:#000; flex:1;" onclick="exportToStudent()" id="btn-export">Export Student Page</button>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
+                <button class="btn-action" id="undo-btn" style="background:#f59e0b; flex:0.5;" onclick="undo()">↶ Undo</button>
+                <button class="btn-action" id="split-mode-btn" style="background:#ef4444; flex:1;" onclick="toggleSplitMode()">Manual Split</button>
+                <button class="btn-action" id="group-mode-btn" style="background:#8b5cf6; flex:1;" onclick="toggleGroupMode()">Draw Bracket</button>
+                <button class="btn-action" style="background:#111827; flex:1;" onclick="exportToStudent()" id="btn-export">Export Student Page</button>
             </div>
 
             <div class="project-mini-row">
@@ -341,21 +347,17 @@
         
         <div id="tagging-area"></div>
 
-        <div class="side-panel">
-            <strong id="active-group-title">Active Brackets (Syntactical Groups):</strong>
-            <div id="group-list"></div>
-        </div>
     </div>
 
     <div id="group-modal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-title" id="modal-title-text">Name this Syntactic Group:</div>
-            <input type="text" id="group-name-input" class="modal-input" list="label-suggestions" placeholder="Type to search (e.g. 's' for Subject)...">
+            <input type="text" id="group-name-input" class="modal-input" list="label-suggestions" placeholder="Type to search...">
             <datalist id="label-suggestions"></datalist>
             
             <div class="modal-actions">
-                <button class="btn-action" style="background:#6c757d; padding: 8px 15px;" onclick="closeGroupModal()" id="btn-cancel">Cancel</button>
-                <button class="btn-action" style="background:#007bff; padding: 8px 15px;" onclick="saveGroupFromModal()" id="btn-save-group">Save Group</button>
+                <button class="btn-action" style="background:#64748b;" onclick="closeGroupModal()" id="btn-cancel">Cancel</button>
+                <button class="btn-action" style="background:var(--primary-color);" onclick="saveGroupFromModal()" id="btn-save-group">Save</button>
             </div>
         </div>
     </div>
@@ -363,17 +365,44 @@
     <div id="autosave-status">Autosaved</div>
 
 <script>
-// --- MULTI-LANGUAGE CONFIG ---
+// --- MULTI-LANGUAGE & PRESETS CONFIG ---
 let currentLang = 'en';
+let currentLevel = 'advanced';
+
+function getOtherLabel() {
+    return currentLang === 'de' ? 'Sonstiges' : 'Other';
+}
+
+const PRESETS = {
+    en: {
+        beginner: ['Subject', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Prepositional phrase', 'Verb', 'Other'],
+        intermediate: ['Subject', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Predicative', 'Prepositional phrase', 'Adverb', 'Verb', 'Infinitive', 'Relative clause', 'Subordinate clause', 'Other'],
+        advanced: ['Subject', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Verb', 'Infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Accusative with infinitive', 'Other']
+    },
+    de: {
+        beginner: ['Subjekt', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Verb', 'Sonstiges'],
+        intermediate: ['Subjekt', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Verb', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Sonstiges'],
+        advanced: ['Subjekt', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Verb', 'Infinitiv', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'AcI', 'Sonstiges']
+    }
+};
+
+const ABBREVIATIONS = {
+    en: {
+        'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Accusative with infinitive': 'Acc+Inf', 'Other': 'Other', 'Main clause': 'Main'
+    },
+    de: {
+        'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'AcI': 'AcI', 'Sonstiges': 'Sonst.', 'Main clause': 'Hauptsatz'
+    }
+};
 
 const LANG = {
     en: {
-        heading: "Syntactic Analysis Creator",
+        heading: "Latin Syntax Studio",
         instrH3: "Step 1: Setup Instruction",
-        instrBody: "This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br>On this page, you will be asked to provide a title, optional notes for the students, a picture for the student page (optional) and a text or a few sentences. Then, click 'Copy AI Prompt' and paste the prompt into a large language model such as ChatGPT or Gemini. Finally, paste the JSON code the AI gives you into the box and click 'Import' or 'Start manual creation'.",
+        instrBody: "This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br><br>On this page, you will be asked to provide a title, optional notes for the students, a picture for the student page (optional) and a text or a few sentences. Then, click 'Copy AI Prompt' and paste the prompt into a large language model such as ChatGPT or Gemini. Finally, paste the JSON code the AI gives you into the box and click 'Import' or 'Start manual creation'.",
         exampleLink: "Want to see what the final result looks like?",
         linkText: "View Example",
-        phTitle: "Exercise Title",
+        phTitle: "Exercise Title (e.g. Interactive Syntax Explorer)",
         phImage: "Optional: Image URL",
         phNotes: "Optional: Context / Teacher Notes (e.g. 'Watch out for ablatives...')",
         phText: "Paste Latin text here...",
@@ -383,8 +412,13 @@ const LANG = {
         btnLoad: "Load Saved Project",
         or: "OR",
         btnManual: "Start Manual Creation",
+        lblLevel: "Grammar Level:",
+        optBeg: "Beginner",
+        optInt: "Intermediate",
+        optAdv: "Advanced (All)",
         editH3: "Step 2: Editing Instruction",
-        editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. At the bottom of the page, you can review and remove syntactic groups. Use 'Undo' to revert your last action. At the end, hit 'Export Student Page'.",
+        editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups using the ◀ and ▶ arrows on their labels. Double-click any word to correct typos. Use 'Undo' to revert your last action. At the end, hit 'Export Student Page'.",
+        editWordPrompt: "Edit word text:",
         phLabel: "New Label",
         btnUndo: "↶ Undo",
         btnSplit: "Manual Split",
@@ -392,7 +426,6 @@ const LANG = {
         btnExport: "Export Student Page",
         btnSaveWork: "💾 Save Work",
         btnLoadWork: "📂 Load Work",
-        groupTitle: "Active Brackets (Syntactical Groups):",
         modalTitle: "Name this Syntactic Group:",
         btnCancel: "Cancel",
         btnSaveGroup: "Save Group",
@@ -401,12 +434,12 @@ const LANG = {
         modeBracket: "Mode: Drawing Bracket"
     },
     de: {
-        heading: "Syntaktische Analyse - Ersteller",
+        heading: "Syntax-Werkstatt Latein",
         instrH3: "Schritt 1: Einrichtung",
-        instrBody: "Diese Seite ermöglicht es Ihnen, eigene Sätze für die syntaktische Analyse zu erstellen. Die Idee ist, dass Sie Ihren Schülern Unterstützung bei der Analyse und Übersetzung geben, z. B. indem Sie anzeigen, welche Wortgruppen zusammengehören. So verstehen die Schüler die Syntax eines Satzes, bevor sie mit der Übersetzung beginnen.<br>Geben Sie einen Titel, optionale Hinweise, ein Bild (optional) und den lateinischen Text ein. Klicken Sie dann auf 'KI-Prompt kopieren', fügen Sie diesen in ChatGPT oder Gemini ein und kopieren Sie den JSON-Code der KI in das Importfeld. Klicken Sie abschließend auf 'Importieren' oder 'Manuell starten'.",
+        instrBody: "Diese Seite ermöglicht es Ihnen, eigene Sätze für die syntaktische Analyse zu erstellen. Die Idee ist, dass Sie Ihren Schülern Unterstützung bei der Analyse und Übersetzung geben, z. B. indem Sie anzeigen, welche Wortgruppen zusammengehören. So verstehen die Schüler die Syntax eines Satzes, bevor Sie mit der Übersetzung beginnen.<br><br>Geben Sie einen Titel, optionale Hinweise, ein Bild (optional) und den lateinischen Text ein. Klicken Sie dann auf 'KI-Prompt kopieren', fügen Sie diesen in ChatGPT oder Gemini ein und kopieren Sie den JSON-Code der KI in das Importfeld. Klicken Sie abschließend auf 'Importieren' oder 'Manuell starten'.",
         exampleLink: "Möchten Sie sehen, wie das Ergebnis aussieht?",
         linkText: "Beispiel ansehen",
-        phTitle: "Übungstitel",
+        phTitle: "Übungstitel (z.B. Interaktives Syntax-Training)",
         phImage: "Optional: Bild-URL",
         phNotes: "Optional: Kontext / Lehrerhinweise (z.B. 'Achtet auf den Ablativ...')",
         phText: "Lateinischen Text hier einfügen...",
@@ -416,8 +449,13 @@ const LANG = {
         btnLoad: "Gespeichertes Projekt laden",
         or: "ODER",
         btnManual: "Manuelle Erstellung starten",
+        lblLevel: "Grammatik-Level:",
+        optBeg: "Anfänger",
+        optInt: "Fortgeschritten",
+        optAdv: "Profi (Alle)",
         editH3: "Schritt 2: Bearbeitung",
-        editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter mit gleicher Funktion verschmelzen automatisch, es sei denn, Sie nutzen 'Manuell trennen'. Um größere Gruppen zu erstellen, klicken Sie auf 'Klammer zeichnen', wählen Sie Start- und Endwort und benennen die Gruppe. Nutzen Sie 'Rückgängig' bei Fehlern. Klicken Sie am Ende auf 'Schülerseite exportieren'.",
+        editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter mit gleicher Funktion verschmelzen automatisch, es sei denn, Sie nutzen 'Manuell trennen'. Im Modus 'Manuell trennen' können Sie auch auf Mehrwortgruppen klicken, um diese wieder zu trennen. Um größere Gruppen zu erstellen, klicken Sie auf 'Klammer zeichnen', wählen Sie Start- und Endwort und benennen die Gruppe. Sie können auf den Namen einer Gruppe klicken, um ihn zu ändern. Sie können die Grenzen bestehender Gruppen mit den Pfeilen ◀ und ▶ an ihren Labels anpassen. Ein Doppelklick auf ein Wort ermöglicht die Korrektur von Tippfehlern. Nutzen Sie 'Rückgängig' bei Fehlern. Klicken Sie am Ende auf 'Schülerseite exportieren'.",
+        editWordPrompt: "Worttext bearbeiten:",
         phLabel: "Neues Label",
         btnUndo: "↶ Rückgängig",
         btnSplit: "Manuell trennen",
@@ -425,7 +463,6 @@ const LANG = {
         btnExport: "Schülerseite exportieren",
         btnSaveWork: "💾 Speichern",
         btnLoadWork: "📂 Laden",
-        groupTitle: "Aktive Klammern (Syntaktische Gruppen):",
         modalTitle: "Name der syntaktischen Gruppe:",
         btnCancel: "Abbrechen",
         btnSaveGroup: "Speichern",
@@ -435,39 +472,70 @@ const LANG = {
     }
 };
 
-// GRAMMAR CONFIG
-const GRAMMAR = {
-    en: {
-        funcs: ['Subject', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Predicative', 'Prepositional phrase', 'Adverb', 'Verb', 'Infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Other'],
-        abbr: {
-            'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Other': 'Other', 'Main clause': 'Main'
-        }
-    },
-    de: {
-        funcs: ['Subjekt', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionalphrase', 'Adverb', 'Verb', 'Infinitiv', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Sonstiges'],
-        abbr: {
-            'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Prädikativum': 'Präd', 'Präpositionalphrase': 'Präp. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Sonstiges': 'Sonst.', 'Main clause': 'Hauptsatz'
-        }
-    }
+// --- SEMANTIC COLOR SCHEME ---
+const SEMANTIC_COLORS = {
+    // Core Agent (Green force field)
+    'Subject': '#86efac', 
+    'Subjekt': '#86efac',
+
+    // Objects (Cool Blues & Purples)
+    'Accusative object': '#93c5fd', // Blue
+    'Akkusativobjekt': '#93c5fd',
+    'Dative object': '#a5b4fc', // Indigo / Lavender
+    'Dativobjekt': '#a5b4fc',
+    'Genitive object': '#d8b4fe', // Purple
+    'Genitivobjekt': '#d8b4fe',
+
+    // Verbal Family (Reds & Pinks - The Action force field)
+    'Verb': '#fca5a5', // Soft Red
+    'Infinitive': '#f0abfc', // Fuchsia / Magenta
+    'Infinitiv': '#f0abfc',
+    'Adverb': '#fbcfe8', // Pale Pink / Rose
+
+    // Circumstantials / Adverbials (Oranges & Yellows)
+    'Ablative': '#fdba74', // Orange
+    'Ablativ': '#fdba74',
+    'Ablative absolute': '#fcd34d', // Amber / Gold
+    'Ablativus absolutus': '#fcd34d',
+    'Prepositional phrase': '#fef08a', // Yellow
+    'Präpositionale Bestimmung': '#fef08a',
+
+    // Predicative (Teal)
+    'Predicative': '#5eead4', // Teal
+    'Prädikativum': '#5eead4',
+
+    // Complex Clauses (Distinct darks/blues/violets)
+    'Relative clause': '#60a5fa', // Stronger Blue
+    'Relativsatz': '#60a5fa',
+    'Subordinate clause': '#a78bfa', // Violet (Distinct from Relative)
+    'Nebensatz': '#a78bfa',
+    'Accusative with infinitive': '#818cf8', // Indigo
+    'AcI': '#818cf8',
+    'Participial phrase': '#c084fc', // Stronger Purple
+    'Partizipialkonstruktion': '#c084fc',
+
+    // Other
+    'Other': '#e5e7eb', 
+    'Sonstiges': '#e5e7eb'
 };
 
-const BASE_COLORS = ['#66bb6a', '#42a5f5', '#ab47bc', '#26c6da', '#ffa726', '#e1bee7', '#fdd835', '#ffee58', '#ff4d4d', '#d32f2f', '#ffcdd2', '#78909c', '#8d6e63', '#e0e0e0'];
-
-// Globals
-let functions = [...GRAMMAR.en.funcs];
-let abbreviations = {...GRAMMAR.en.abbr};
+let functions = [];
 let colors = {}; 
 
-function mapColors(funcList) {
-    let c = {};
-    funcList.forEach((f, i) => {
-        c[f] = BASE_COLORS[i] || '#ccc';
-    });
-    return c;
+function initGlobalColors() {
+    colors = { ...SEMANTIC_COLORS };
+    // Fallback for any label not defined above
+    PRESETS.en.advanced.forEach((f) => { if(!colors[f]) colors[f] = '#e5e7eb'; });
+    PRESETS.de.advanced.forEach((f) => { if(!colors[f]) colors[f] = '#e5e7eb'; });
 }
-colors = mapColors(functions);
 
-// --- NAVIGATION FUNCTIONS ---
+function getWordText(node) {
+    return Array.from(node.childNodes)
+        .filter(n => n.nodeType === Node.TEXT_NODE)
+        .map(n => n.textContent)
+        .join('').trim();
+}
+
 function showCredits() {
     document.getElementById('setup-screen').style.display = 'none';
     document.getElementById('credits-screen').style.display = 'block';
@@ -478,17 +546,58 @@ function hideCredits() {
     document.getElementById('setup-screen').style.display = 'block';
 }
 
+// AI Normalizer: Catches English labels on German page and corrects them instantly
+function normalizeLabel(label) {
+    if (!label) return getOtherLabel();
+    let lower = label.trim().toLowerCase();
+    
+    // Check against ALL advanced labels so it corrects properly even if preset is currently set to beginner
+    let match = PRESETS[currentLang].advanced.find(f => f.toLowerCase() === lower);
+    if (match) return match;
+    
+    let otherLang = currentLang === 'en' ? 'de' : 'en';
+    let otherIndex = PRESETS[otherLang].advanced.findIndex(f => f.toLowerCase() === lower);
+    if (otherIndex !== -1) {
+        return PRESETS[currentLang].advanced[otherIndex];
+    }
+    
+    if (currentLang === 'de') {
+        if(lower.includes('dative') || lower === 'dativ') return 'Dativobjekt';
+        if(lower.includes('accusative') || lower === 'akkusativ') return 'Akkusativobjekt';
+        if(lower.includes('genitive') || lower === 'genitiv') return 'Genitivobjekt';
+        if(lower.includes('prepositional')) return 'Präpositionale Bestimmung';
+        if(lower.includes('ablative abs')) return 'Ablativus absolutus';
+        if(lower.includes('relative')) return 'Relativsatz';
+        if(lower.includes('subordinate')) return 'Nebensatz';
+        if(lower.includes('participial')) return 'Partizipialkonstruktion';
+        if(lower.includes('subject')) return 'Subjekt';
+        if(lower.includes('infinitive') && !lower.includes('with')) return 'Infinitiv';
+    } else {
+        if(lower.includes('dativ')) return 'Dative object';
+        if(lower.includes('akkusativ')) return 'Accusative object';
+        if(lower.includes('genitiv')) return 'Genitive object';
+        if(lower.includes('präpositional')) return 'Prepositional phrase';
+        if(lower.includes('ablativus abs')) return 'Ablative absolute';
+        if(lower.includes('relativ')) return 'Relative clause';
+        if(lower.includes('neben')) return 'Subordinate clause';
+        if(lower.includes('partizipial')) return 'Participial phrase';
+        if(lower.includes('subjekt')) return 'Subject';
+        if(lower.includes('infinitiv') && !lower.includes('aci')) return 'Infinitive';
+    }
+    
+    return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 function setLanguage(lang) {
     const oldLang = currentLang;
     currentLang = lang;
     const txt = LANG[lang];
     
-    // Update Toggle Buttons
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`.lang-btn[onclick="setLanguage('${lang}')"]`).classList.add('active');
 
-    // Update UI Text
     document.getElementById('app-heading').textContent = txt.heading;
+    document.getElementById('page-title').textContent = txt.heading;
     document.getElementById('instr-h3').textContent = txt.instrH3;
     document.getElementById('instr-body').innerHTML = txt.instrBody;
     document.getElementById('example-link-text').textContent = txt.exampleLink;
@@ -504,6 +613,14 @@ function setLanguage(lang) {
     document.getElementById('btn-load').textContent = txt.btnLoad;
     document.getElementById('btn-manual').textContent = txt.btnManual;
     
+    document.getElementById('lbl-level').textContent = txt.lblLevel;
+    document.getElementById('opt-beg').textContent = txt.optBeg;
+    document.getElementById('opt-int').textContent = txt.optInt;
+    document.getElementById('opt-adv').textContent = txt.optAdv;
+    document.getElementById('opt-beg-ed').textContent = txt.optBeg;
+    document.getElementById('opt-int-ed').textContent = txt.optInt;
+    document.getElementById('opt-adv-ed').textContent = txt.optAdv;
+    
     document.getElementById('edit-h3').textContent = txt.editH3;
     document.getElementById('edit-body').innerHTML = txt.editBody;
     document.getElementById('new-label-input').placeholder = txt.phLabel;
@@ -514,20 +631,17 @@ function setLanguage(lang) {
     document.getElementById('btn-export').textContent = txt.btnExport;
     document.getElementById('btn-save-work').textContent = txt.btnSaveWork;
     document.getElementById('btn-load-work').textContent = txt.btnLoadWork;
-    document.getElementById('active-group-title').textContent = txt.groupTitle;
     document.getElementById('modal-title-text').textContent = txt.modalTitle;
     document.getElementById('btn-cancel').textContent = txt.btnCancel;
     document.getElementById('btn-save-group').textContent = txt.btnSaveGroup;
 
-    // UPDATE EXAMPLE LINK
     const exampleLink = document.getElementById('link-example');
     if(lang === 'de') exampleLink.href = "example_page_de.html";
     else exampleLink.href = "example_page.html";
 
-    // --- SMART TRANSLATION LOGIC ---
     if(document.getElementById('editor-screen').style.display === 'block') {
-        const oldList = GRAMMAR[oldLang].funcs;
-        const newList = GRAMMAR[lang].funcs;
+        const oldList = PRESETS[oldLang].advanced;
+        const newList = PRESETS[lang].advanced;
         
         const idxActive = oldList.indexOf(activeFunc);
         if(idxActive !== -1) {
@@ -542,10 +656,10 @@ function setLanguage(lang) {
                 const newF = newList[idx];
                 span.dataset.func = newF;
                 
-                const newAbbr = GRAMMAR[lang].abbr[newF] || (newF.length > 6 ? newF.substring(0,5)+"." : newF);
+                const newAbbr = ABBREVIATIONS[lang][newF] || (newF.length > 6 ? newF.substring(0,5)+"." : newF);
                 span.dataset.short = newAbbr;
                 
-                span.style.backgroundColor = BASE_COLORS[idx] || '#ccc';
+                span.style.backgroundColor = colors[newF] || '#e5e7eb';
             }
         });
 
@@ -558,13 +672,46 @@ function setLanguage(lang) {
         updateGroupUI();
     }
 
-    functions = [...GRAMMAR[lang].funcs];
-    abbreviations = {...GRAMMAR[lang].abbr};
-    colors = mapColors(functions);
+    functions = [...PRESETS[lang][currentLevel]];
     
     if(document.getElementById('editor-screen').style.display === 'block') {
+        // Keep active labels alive if changing languages
+        document.querySelectorAll('.tag-word').forEach(span => {
+            let f = span.dataset.func;
+            if(f && f !== 'Punct' && !functions.includes(f)) functions.push(f);
+        });
+        currentGroups.forEach(g => {
+            if(g.label && !functions.includes(g.label)) functions.push(g.label);
+        });
+        
         renderPalette();
         updateStatus();
+    }
+}
+
+function changeLevel(level) {
+    currentLevel = level;
+    document.getElementById('grammar-level-setup').value = level;
+    if(document.getElementById('grammar-level-editor')) {
+        document.getElementById('grammar-level-editor').value = level;
+    }
+    
+    functions = [...PRESETS[currentLang][level]];
+    
+    if (document.getElementById('editor-screen').style.display === 'block') {
+        // Ensure labels currently in use aren't hidden from the palette
+        document.querySelectorAll('.tag-word').forEach(span => {
+            let f = span.dataset.func;
+            if(f && f !== 'Punct' && !functions.includes(f)) {
+                functions.push(f);
+            }
+        });
+        currentGroups.forEach(g => {
+            if(g.label && !functions.includes(g.label)) {
+                functions.push(g.label);
+            }
+        });
+        renderPalette();
     }
 }
 
@@ -572,16 +719,15 @@ const preps = ["a", "ab", "ad", "ante", "apud", "circum", "contra", "cum", "de",
 const sentenceEnders = ['.', '!', '?', '·'];
 
 let activeFunc = 'Other', groupMode = false, splitMode = false, startIdx = null, currentGroups = [];
-let pendingGroupStart = null, pendingGroupEnd = null;
+let pendingGroupStart = null, pendingGroupEnd = null, editingGroupIndex = null;
 let historyStack = [];
 
-// --- UNDO FUNCTIONALITY ---
 function saveState() {
-    const currentWords = Array.from(document.getElementById('tagging-area').childNodes).map(node => {
+    const currentWords = Array.from(document.getElementById('tagging-area').children).map(node => {
         const isPunct = node.classList.contains('punct-span');
         return { 
-            w: node.textContent, 
-            f: isPunct ? 'Punct' : (node.dataset.func || 'Other'),
+            w: getWordText(node), 
+            f: isPunct ? 'Punct' : (node.dataset.func || getOtherLabel()),
             isSplit: node.classList.contains('split-right'),
             idx: node.dataset.idx
         };
@@ -617,45 +763,65 @@ function restoreEditorState(words) {
         span.id = `word-${i}`; 
 
         if(!isPunct) {
-            let func = item.f || 'Other';
-            if(func === "Main clause") func = "Other";
+            let func = item.f || getOtherLabel();
+            if(func === "Main clause" || func === "Hauptsatz") func = getOtherLabel();
             
             if(!colors[func]) {
-                 functions.push(func);
                  colors[func] = `hsl(${Math.floor(Math.random() * 360)}, 70%, 85%)`;
+            }
+            if(!functions.includes(func)) {
+                 functions.push(func);
                  renderPalette();
             }
             span.dataset.func = func;
             
-            const shortLabel = abbreviations[func] || (func.length > 6 ? func.substring(0,5)+"." : func);
+            const shortLabel = ABBREVIATIONS[currentLang][func] || (func.length > 6 ? func.substring(0,5)+"." : func);
             span.dataset.short = shortLabel;
 
             span.style.backgroundColor = colors[func];
             span.onclick = function() { handleWordClick(this); };
-        } else { span.dataset.func = 'Punct'; }
+            span.ondblclick = function(e) { handleWordDoubleClick(this, e); };
+        } else { 
+            span.dataset.func = 'Punct'; 
+            span.ondblclick = function(e) { handleWordDoubleClick(this, e); };
+        }
         area.appendChild(span);
     });
     updateGroupUI();
 }
 
-// --- AUTO SAVE LOGIC ---
+function handleWordDoubleClick(el, e) {
+    e.stopPropagation();
+    const currentText = getWordText(el);
+    const newText = prompt(LANG[currentLang].editWordPrompt, currentText);
+    if (newText !== null && newText.trim() !== "") {
+        saveState();
+        Array.from(el.childNodes).forEach(n => {
+            if(n.nodeType === Node.TEXT_NODE) n.textContent = '';
+        });
+        el.insertBefore(document.createTextNode(newText.trim()), el.firstChild);
+        triggerAutoSave();
+    }
+}
+
 function triggerAutoSave() {
     if(document.getElementById('editor-screen').style.display === 'block' || document.getElementById('entertext').value.length > 5) {
         let currentWords = [];
         const taggingArea = document.getElementById('tagging-area');
         if(taggingArea.children.length > 0) {
-             currentWords = Array.from(taggingArea.childNodes).map((node) => {
+             currentWords = Array.from(taggingArea.children).map((node) => {
                 const isPunct = node.classList.contains('punct-span');
                 return { 
-                    w: node.textContent, 
-                    f: isPunct ? 'Punct' : (node.dataset.func || 'Other'),
+                    w: getWordText(node), 
+                    f: isPunct ? 'Punct' : (node.dataset.func || getOtherLabel()),
                     isSplit: node.classList.contains('split-right')
                 };
             });
         }
         
         const saveData = {
-            lang: currentLang, 
+            lang: currentLang,
+            level: currentLevel,
             title: document.getElementById('pagetitle').value,
             image: document.getElementById('pageimage').value,
             text: document.getElementById('entertext').value,
@@ -663,7 +829,6 @@ function triggerAutoSave() {
             groups: currentGroups,
             funcs: functions,
             cols: colors,
-            abbr: abbreviations,
             words: currentWords,
             timestamp: new Date().getTime()
         };
@@ -676,7 +841,10 @@ function triggerAutoSave() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    initGlobalColors();
     setLanguage('en'); 
+    changeLevel('advanced');
+    activeFunc = getOtherLabel();
 
     const saved = localStorage.getItem('latin_tool_autosave');
     if(saved) {
@@ -694,13 +862,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function restoreAutoSave(data) {
     if(data.lang) setLanguage(data.lang);
+    if(data.level) changeLevel(data.level);
     if(data.title) document.getElementById('pagetitle').value = data.title;
     if(data.image) document.getElementById('pageimage').value = data.image;
     if(data.text) document.getElementById('entertext').value = data.text;
     if(data.notes) document.getElementById('teachernotes').value = data.notes;
     if(data.funcs) functions = data.funcs;
-    if(data.cols) colors = data.cols;
-    if(data.abbr) abbreviations = data.abbr;
+    if(data.cols) Object.assign(colors, data.cols);
     if(data.groups) currentGroups = data.groups;
     
     if(data.words && data.words.length > 0) {
@@ -711,8 +879,6 @@ function restoreAutoSave(data) {
     }
 }
 
-
-// --- LOGIC ---
 function addCustomLabel() {
     const input = document.getElementById('new-label-input');
     const name = input.value.trim();
@@ -721,30 +887,30 @@ function addCustomLabel() {
     functions.push(name);
     const randomColor = `hsl(${Math.floor(Math.random() * 360)}, 70%, 85%)`;
     colors[name] = randomColor;
-    abbreviations[name] = name.substring(0,4) + '.';
+    ABBREVIATIONS[currentLang][name] = name.substring(0,4) + '.';
     renderPalette();
     input.value = ''; 
 }
 
 function saveProject() {
-    const domWords = Array.from(document.getElementById('tagging-area').childNodes).map((node) => {
+    const domWords = Array.from(document.getElementById('tagging-area').children).map((node) => {
         const isPunct = node.classList.contains('punct-span');
         return { 
-            w: node.textContent, 
-            f: isPunct ? 'Punct' : (node.dataset.func || 'Other'),
+            w: getWordText(node), 
+            f: isPunct ? 'Punct' : (node.dataset.func || getOtherLabel()),
             isSplit: node.classList.contains('split-right')
         };
     });
     const projectData = { 
         lang: currentLang,
+        level: currentLevel,
         title: document.getElementById('pagetitle').value, 
         image: document.getElementById('pageimage').value,
         notes: document.getElementById('teachernotes').value, 
         words: domWords, 
         groups: currentGroups, 
         customFunctions: functions, 
-        customColors: colors, 
-        customAbbr: abbreviations
+        customColors: colors
     };
     const blob = new Blob([JSON.stringify(projectData, null, 2)], {type: "application/json"});
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = (projectData.title || "latin_project") + ".json"; a.click();
@@ -758,9 +924,9 @@ function loadProject(input) {
         try {
             const data = JSON.parse(e.target.result);
             if(data.lang) setLanguage(data.lang);
+            if(data.level) { changeLevel(data.level); } else { changeLevel('advanced'); }
             if(data.customFunctions) functions = data.customFunctions;
-            if(data.customColors) colors = data.customColors;
-            if(data.customAbbr) abbreviations = data.customAbbr;
+            if(data.customColors) Object.assign(colors, data.customColors);
             if(data.groups) currentGroups = data.groups;
             if(data.title) document.getElementById('pagetitle').value = data.title;
             if(data.image) document.getElementById('pageimage').value = data.image;
@@ -779,7 +945,7 @@ function loadProject(input) {
 
 function copyAIPrompt() {
     const txt = document.getElementById('entertext').value;
-    const exObj = functions[1]; 
+    const exObj = functions[1] || 'Accusative object'; 
     
     const promptText = currentLang === 'de' 
     ? `Analysiere die lateinische Syntax von: "${txt}".
@@ -787,26 +953,29 @@ function copyAIPrompt() {
     2. PHRASEN: Benachbarte Wörter einer Phrase erhalten die gleiche Funktion.
     3. HYPERBATON: Getrennte Phrasen erhalten die gleiche Funktion, bleiben aber an ihrem Platz.
     4. INTERPUNKTION: Interpunktion als eigene Tokens "f": "Punct".
-    5. Antworte mit JSON: { "words": [{"w": "Arma", "f": "${exObj}"}, ...], "groups": [{"label": "Relativsatz", "start": 0, "end": 4}] }
-    Verwende diese Labels: ${functions.join(', ')}.`
+    5. GRUPPEN (WICHTIG): Erstelle "groups" NUR für echte mehrteilige Phrasen/Sätze (z.B. Nebensätze, AcI), falls in den Labels vorhanden. Wenn es keine gibt, lass das Array zwingend leer: "groups": []
+    6. Antworte mit JSON: { "words": [{"w": "Arma", "f": "${exObj}"}, ...], "groups": [] }
+    Verwende ausschließlich diese Labels: ${functions.join(', ')}.`
     : `Analyze Latin syntax of: "${txt}". 
     1. STRICT RULE: Maintain the EXACT word order.
     2. PHRASES: Adjacent phrase words get same function. 
     3. HYPERBATON: Split phrases get same function but kept in place.
     4. PUNCTUATION: Include punctuation as separate tokens "f": "Punct".
-    5. Return JSON: { "words": [{"w": "Arma", "f": "${exObj}"}, ...], "groups": [{"label": "Relative clause", "start": 0, "end": 4}] } 
-    Labels: ${functions.join(', ')}.`;
+    5. GROUPS (IMPORTANT): ONLY create "groups" for true multi-word clauses (e.g., Subordinate clauses, AcI) if they exist in the label list. If there are none, you MUST leave the array empty: "groups": []
+    6. Return JSON: { "words": [{"w": "Arma", "f": "${exObj}"}, ...], "groups": [] } 
+    Use ONLY these Labels: ${functions.join(', ')}.`;
 
     navigator.clipboard.writeText(promptText).then(() => alert(currentLang === 'de' ? "Prompt kopiert!" : "Prompt copied!"));
 }
 
-// Helper to merge prep+noun
 function applyPrepositionMerging(tokens) {
     let welded = [];
-    const prepLabel = currentLang === 'de' ? 'Präpositionalphrase' : 'Prepositional phrase';
+    let map = {};
+    const prepLabel = currentLang === 'de' ? 'Präpositionale Bestimmung' : 'Prepositional phrase';
     
     for(let i=0; i < tokens.length; i++) {
         let curr = tokens[i];
+        map[i] = welded.length;
         let pureWord = curr.w.split(" ")[0].toLowerCase().replace(/[^a-z]/g, "");
         
         if(preps.includes(pureWord) && i+1 < tokens.length) {
@@ -816,6 +985,7 @@ function applyPrepositionMerging(tokens) {
                     w: curr.w + " " + nextW.w.replace(/^-/, ''), 
                     f: prepLabel
                 });
+                map[i+1] = welded.length - 1; 
                 i++; 
             } else {
                 welded.push(curr); 
@@ -824,7 +994,7 @@ function applyPrepositionMerging(tokens) {
             welded.push(curr);
         }
     }
-    return welded;
+    return { welded, map };
 }
 
 function processTokens(rawTokens) {
@@ -834,9 +1004,9 @@ function processTokens(rawTokens) {
         const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(t);
         if (!hasLetters) { temp.push({ w: t, f: 'Punct' }); }
         else if (isEnclitic && temp.length > 0 && /[a-zA-Z]/.test(temp[temp.length-1].w)) { temp[temp.length-1].w += t.replace(/^-/, ''); }
-        else { temp.push({ w: t, f: 'Other' }); }
+        else { temp.push({ w: t, f: getOtherLabel() }); }
     });
-    return applyPrepositionMerging(temp);
+    return applyPrepositionMerging(temp).welded;
 }
 
 function importAI() {
@@ -844,15 +1014,33 @@ function importAI() {
         const raw = document.getElementById('ai-json').value;
         const cleanJson = raw.replace(/```json/g, '').replace(/```/g, '');
         const d = JSON.parse(cleanJson);
-        currentGroups = (d.groups || []).filter(g => g.label && g.label.toLowerCase() !== "main clause" && g.start != null && g.end != null);
+        
+        let rawGroups = (d.groups || []).filter(g => g.label && g.label.toLowerCase() !== "main clause" && g.label.toLowerCase() !== "hauptsatz" && g.start != null && g.end != null && g.start <= g.end);
+        
+        rawGroups.forEach(g => {
+            g.label = normalizeLabel(g.label);
+        });
+
         d.words.forEach(w => {
             w.w = w.w.replace(/-/g, ' ');
             if (!/[a-zA-Z\u00C0-\u017F]/.test(w.w)) w.f = "Punct";
-            else if (w.f === "Main clause") w.f = "Other";
+            else if (w.f.toLowerCase() === "main clause" || w.f.toLowerCase() === "hauptsatz") w.f = getOtherLabel();
+            else w.f = normalizeLabel(w.f);
         });
         
-        const mergedWords = applyPrepositionMerging(d.words);
-        initEditor(mergedWords);
+        const mergeResult = applyPrepositionMerging(d.words);
+        
+        currentGroups = [];
+        rawGroups.forEach(g => {
+            let newStart = mergeResult.map[g.start] !== undefined ? mergeResult.map[g.start] : g.start;
+            let newEnd = mergeResult.map[g.end] !== undefined ? mergeResult.map[g.end] : g.end;
+            
+            if (newStart <= newEnd && newStart >= 0 && newEnd < mergeResult.welded.length) {
+                currentGroups.push({ start: newStart, end: newEnd, label: g.label });
+            }
+        });
+        
+        initEditor(mergeResult.welded);
     } catch(e) { console.error(e); alert("JSON error. Check console."); }
 }
 
@@ -863,12 +1051,8 @@ function startManual() {
     initEditor(processTokens(tokens));
 }
 
-// FORCE RESET function to allow clean slate
 function initEditor(words) {
-    // Reset to clean state for the current language
-    functions = [...GRAMMAR[currentLang].funcs];
-    abbreviations = {...GRAMMAR[currentLang].abbr};
-    colors = mapColors(functions);
+    functions = [...PRESETS[currentLang][currentLevel]];
     historyStack = [];
     
     restoreEditorState(words);
@@ -914,18 +1098,53 @@ function updateButtonStates() {
 }
 
 function handleWordClick(el) {
-    const idx = parseInt(el.dataset.idx);
+    const domIdx = parseInt(el.dataset.idx);
+    
     if(splitMode) { 
         saveState(); 
-        el.classList.toggle('split-right'); 
+        const text = getWordText(el);
+        
+        if (text.includes(' ')) {
+            let currentWords = Array.from(document.getElementById('tagging-area').children).map((node) => {
+                const isPunct = node.classList.contains('punct-span');
+                return { 
+                    w: getWordText(node), 
+                    f: isPunct ? 'Punct' : (node.dataset.func || getOtherLabel()),
+                    isSplit: node.classList.contains('split-right')
+                };
+            });
+            
+            const parts = text.split(/\s+/);
+            const shiftAmount = parts.length - 1;
+            
+            const newItems = parts.map((p, i) => ({
+                w: p,
+                f: getOtherLabel(), 
+                isSplit: i === parts.length - 1 ? currentWords[domIdx].isSplit : false
+            }));
+            
+            currentWords.splice(domIdx, 1, ...newItems);
+            
+            currentGroups = currentGroups.map(g => {
+                let newStart = g.start;
+                let newEnd = g.end;
+                if (g.start > domIdx) newStart += shiftAmount;
+                if (g.end >= domIdx) newEnd += shiftAmount;
+                return { ...g, start: newStart, end: newEnd };
+            });
+            
+            restoreEditorState(currentWords);
+        } else {
+            el.classList.toggle('split-right'); 
+        }
     } 
     else if(groupMode) {
         if(startIdx === null) { 
-            startIdx = idx; el.style.outline = "3px solid #6f42c1"; 
+            startIdx = domIdx; el.style.outline = "2px solid #8b5cf6"; outlineOffset = "2px";
         } 
         else {
-            pendingGroupStart = Math.min(startIdx, idx);
-            pendingGroupEnd = Math.max(startIdx, idx);
+            pendingGroupStart = Math.min(startIdx, domIdx);
+            pendingGroupEnd = Math.max(startIdx, domIdx);
             openGroupModal();
             startIdx = null;
             document.querySelectorAll('.tag-word').forEach(s => s.style.outline = "none");
@@ -934,7 +1153,7 @@ function handleWordClick(el) {
         if (el.dataset.func !== activeFunc) {
             saveState(); 
             el.dataset.func = activeFunc; 
-            const shortLabel = abbreviations[activeFunc] || (activeFunc.length > 6 ? activeFunc.substring(0,5)+"." : activeFunc);
+            const shortLabel = ABBREVIATIONS[currentLang][activeFunc] || (activeFunc.length > 6 ? activeFunc.substring(0,5)+"." : activeFunc);
             el.dataset.short = shortLabel;
             el.style.backgroundColor = colors[activeFunc]; 
         }
@@ -949,62 +1168,209 @@ function openGroupModal() {
     functions.forEach(f => {
         const opt = document.createElement('option'); opt.value = f; datalist.appendChild(opt);
     });
-    input.value = ''; modal.style.display = 'flex'; input.focus();
+    input.value = ''; 
+    modal.style.display = 'flex'; 
+    input.focus();
 }
 
-function closeGroupModal() { document.getElementById('group-modal').style.display = 'none'; }
+function editGroupLabel(index) {
+    editingGroupIndex = index;
+    const modal = document.getElementById('group-modal');
+    const datalist = document.getElementById('label-suggestions');
+    const input = document.getElementById('group-name-input');
+    datalist.innerHTML = '';
+    functions.forEach(f => {
+        const opt = document.createElement('option'); opt.value = f; datalist.appendChild(opt);
+    });
+    input.value = currentGroups[index].label;
+    modal.style.display = 'flex';
+    input.focus();
+}
+
+function closeGroupModal() { 
+    document.getElementById('group-modal').style.display = 'none'; 
+    editingGroupIndex = null;
+    pendingGroupStart = null;
+    pendingGroupEnd = null;
+}
 
 function saveGroupFromModal() {
-    const label = document.getElementById('group-name-input').value;
-    if(label && pendingGroupStart !== null) {
+    const label = document.getElementById('group-name-input').value.trim();
+    if(label) {
         saveState(); 
-        currentGroups.push({ start: pendingGroupStart, end: pendingGroupEnd, label: label });
+        
+        if(!functions.includes(label)) {
+            functions.push(label);
+            if(!colors[label]) colors[label] = `hsl(${Math.floor(Math.random() * 360)}, 70%, 85%)`;
+            ABBREVIATIONS[currentLang][label] = label.substring(0,4) + '.';
+            renderPalette();
+        }
+
+        if(editingGroupIndex !== null) {
+            currentGroups[editingGroupIndex].label = label;
+        } else if(pendingGroupStart !== null) {
+            currentGroups.push({ start: pendingGroupStart, end: pendingGroupEnd, label: label });
+        }
+        
         updateGroupUI();
+        triggerAutoSave();
     }
     closeGroupModal();
 }
+
 document.getElementById('group-name-input').addEventListener("keypress", function(event) { if (event.key === "Enter") saveGroupFromModal(); });
 document.getElementById('group-name-input').addEventListener("keyup", function(event) { if (event.key === "Escape") closeGroupModal(); });
 
+function adjustGroupStart(groupIndex, delta) {
+    let g = currentGroups[groupIndex];
+    let newStart = g.start + delta;
+    
+    while(newStart >= 0 && newStart <= g.end) {
+        let el = document.getElementById(`word-${newStart}`);
+        if (el && !el.classList.contains('punct-span')) break;
+        newStart += delta;
+    }
+    
+    if (newStart >= 0 && newStart <= g.end) {
+        let el = document.getElementById(`word-${newStart}`);
+        if (el && !el.classList.contains('punct-span')) {
+            saveState(); 
+            g.start = newStart;
+            updateGroupUI();
+            triggerAutoSave();
+        }
+    }
+}
+
+function adjustGroupEnd(groupIndex, delta) {
+    let g = currentGroups[groupIndex];
+    let newEnd = g.end + delta;
+    const maxIdx = document.getElementById('tagging-area').children.length - 1;
+    
+    while(newEnd >= g.start && newEnd <= maxIdx) {
+        let el = document.getElementById(`word-${newEnd}`);
+        if (el && !el.classList.contains('punct-span')) break;
+        newEnd += delta;
+    }
+    
+    if (newEnd >= g.start && newEnd <= maxIdx) {
+        let el = document.getElementById(`word-${newEnd}`);
+        if (el && !el.classList.contains('punct-span')) {
+            saveState(); 
+            g.end = newEnd;
+            updateGroupUI();
+            triggerAutoSave();
+        }
+    }
+}
+
 function updateGroupUI() {
-    const list = document.getElementById('group-list');
-    const wordSpans = Array.from(document.querySelectorAll('.tag-word, .punct-span'));
-    wordSpans.forEach(s => { s.classList.remove('grouped-word', 'group-start', 'group-end'); s.title = ""; });
-    currentGroups.forEach(g => {
-        for(let i = g.start; i <= g.end; i++) {
-            const el = document.getElementById(`word-${i}`);
-            if(el && el.classList.contains('punct-span')) continue;
-            if(el) {
-                el.classList.add('grouped-word');
-                if(i === g.start) el.classList.add('group-start');
-                if(i === g.end) el.classList.add('group-end');
-                el.title = g.label;
+    document.querySelectorAll('.group-bracket').forEach(e => e.remove());
+    
+    let sortedGroups = currentGroups.map((g, i) => ({...g, originalIndex: i}));
+    sortedGroups.sort((a, b) => (a.end - a.start) - (b.end - b.start));
+    
+    let tiers = [];
+    sortedGroups.forEach(g => {
+        let placed = false;
+        for(let t = 0; t < tiers.length; t++) {
+            let overlaps = tiers[t].some(other => Math.max(g.start, other.start) <= Math.min(g.end, other.end));
+            if(!overlaps) {
+                tiers[t].push(g);
+                g.tier = t;
+                placed = true;
+                break;
             }
         }
+        if(!placed) {
+            tiers.push([g]);
+            g.tier = tiers.length - 1;
+        }
     });
-    list.innerHTML = '';
-    currentGroups.forEach((g, i) => {
-        const slice = wordSpans.slice(g.start, g.end + 1);
-        const phrase = slice.length > 0 ? slice.map(s => s.textContent).join(' ') : "Invalid Range";
-        const d = document.createElement('div'); d.className = 'group-item';
-        d.innerHTML = `<span><strong>${g.label}</strong>: "${phrase}"</span><span class="del-btn" onclick="removeGroup(${i})">✖</span>`;
-        list.appendChild(d);
+
+    let maxTier = Math.max(-1, ...sortedGroups.map(g => g.tier));
+    let baseLineHeight = 4.5;
+    document.getElementById('tagging-area').style.lineHeight = Math.max(baseLineHeight, (maxTier + 2) * 1.6);
+
+    sortedGroups.forEach(g => {
+        let tierOffset = 26 + (g.tier * 32); 
+        let groupColor = colors[g.label] || '#8b5cf6';
+        
+        for(let j = g.start; j <= g.end; j++) {
+            let el = document.getElementById(`word-${j}`);
+            if(!el || el.classList.contains('punct-span')) continue;
+            
+            let bracket = document.createElement('div');
+            bracket.className = 'group-bracket';
+            bracket.style.top = `-${tierOffset}px`;
+            bracket.style.bottom = `-4px`;
+            bracket.style.borderTopColor = groupColor;
+            bracket.style.backgroundColor = groupColor + '26';
+            
+            if(j === g.start) {
+                bracket.classList.add('bracket-start');
+                bracket.style.left = `-${g.tier * 4}px`;
+                bracket.style.borderLeftColor = groupColor;
+                
+                let badge = document.createElement('div');
+                badge.className = 'bracket-badge';
+                badge.style.background = groupColor;
+                
+                let labelHTML = `<span class="clickable-label" title="Rename group" onclick="event.stopPropagation(); editGroupLabel(${g.originalIndex})">${g.label}</span>`;
+                
+                if (g.start === g.end) {
+                    badge.innerHTML = `
+                        <span class="badge-adj" title="Expand left" onclick="event.stopPropagation(); adjustGroupStart(${g.originalIndex}, -1)">◀</span>
+                        ${labelHTML}
+                        <span class="badge-adj" title="Expand right" onclick="event.stopPropagation(); adjustGroupEnd(${g.originalIndex}, 1)">▶</span>
+                        <span class="badge-del" style="margin-left:4px;" title="Remove group" onclick="event.stopPropagation(); removeGroup(${g.originalIndex})">✖</span>
+                    `;
+                } else {
+                    badge.innerHTML = `
+                        <span class="badge-adj" title="Expand left" onclick="event.stopPropagation(); adjustGroupStart(${g.originalIndex}, -1)">◀</span>
+                        <span class="badge-adj" title="Shrink right" onclick="event.stopPropagation(); adjustGroupStart(${g.originalIndex}, 1)">▶</span>
+                        ${labelHTML}
+                        <span class="badge-del" title="Remove group" onclick="event.stopPropagation(); removeGroup(${g.originalIndex})">✖</span>
+                    `;
+                }
+                bracket.appendChild(badge);
+            }
+            
+            if(j === g.end) {
+                bracket.classList.add('bracket-end');
+                bracket.style.right = `-${g.tier * 4}px`;
+                bracket.style.borderRightColor = groupColor;
+                
+                if(g.start !== g.end) {
+                    let endControls = document.createElement('div');
+                    endControls.className = 'bracket-end-controls';
+                    endControls.style.background = groupColor;
+                    endControls.innerHTML = `
+                        <span class="badge-adj" title="Shrink left" onclick="event.stopPropagation(); adjustGroupEnd(${g.originalIndex}, -1)">◀</span>
+                        <span class="badge-adj" title="Expand right" onclick="event.stopPropagation(); adjustGroupEnd(${g.originalIndex}, 1)">▶</span>
+                    `;
+                    bracket.appendChild(endControls);
+                }
+            }
+            el.appendChild(bracket);
+        }
     });
 }
+
 function removeGroup(index) { 
     saveState(); 
     currentGroups.splice(index, 1); 
     updateGroupUI(); 
 }
-function toggleSplitMode() { splitMode = !splitMode; groupMode = false; activeFunc = "Other"; updatePalette(); updateButtonStates(); }
-function toggleGroupMode() { groupMode = !groupMode; splitMode = false; activeFunc = "Other"; updatePalette(); updateButtonStates(); }
+function toggleSplitMode() { splitMode = !splitMode; groupMode = false; activeFunc = getOtherLabel(); updatePalette(); updateButtonStates(); }
+function toggleGroupMode() { groupMode = !groupMode; splitMode = false; activeFunc = getOtherLabel(); updatePalette(); updateButtonStates(); }
 
 function exportToStudent() {
-    const nodes = Array.from(document.getElementById('tagging-area').childNodes);
+    const nodes = Array.from(document.getElementById('tagging-area').children);
     let tempTokens = nodes.map(node => {
         const isPunct = node.classList.contains('punct-span');
         return { 
-            w: node.textContent, 
+            w: getWordText(node), 
             f: isPunct ? 'Punct' : node.dataset.func,
             isSplit: node.classList.contains('split-right'),
             idx: parseInt(node.dataset.idx)
@@ -1021,7 +1387,7 @@ function exportToStudent() {
             }
             if(nextIdx < tempTokens.length) {
                 let next = tempTokens[nextIdx];
-                if(prev.f !== 'Punct' && prev.f !== 'Other' && prev.f === next.f && !prev.isSplit) {
+                if(prev.f !== 'Punct' && prev.f !== getOtherLabel() && prev.f === next.f && !prev.isSplit) {
                     curr.f = prev.f; 
                 }
             }
@@ -1030,7 +1396,7 @@ function exportToStudent() {
 
     let merged = []; let current = null;
     tempTokens.forEach((token, i) => {
-        const isMergeableType = !['Punct', 'Other'].includes(token.f);
+        const isMergeableType = !['Punct', 'Other', 'Sonstiges'].includes(token.f);
         const prevToken = i > 0 ? tempTokens[i-1] : null;
         const splitExists = prevToken && prevToken.isSplit;
         const canMerge = current && current.f === token.f && isMergeableType && !splitExists;
@@ -1052,26 +1418,25 @@ function exportToStudent() {
         return { ...g, start: newStart, end: newEnd };
     });
 
-    const titleInput = document.getElementById('pagetitle').value || "latin_exercise";
+    const defaultTitle = currentLang === 'en' ? 'Interactive Syntax Explorer' : 'Interaktives Syntax-Training';
+    const titleInput = document.getElementById('pagetitle').value || defaultTitle;
     const filename = titleInput.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".html";
     const imgUrl = document.getElementById('pageimage').value;
     const teacherNotes = document.getElementById('teachernotes').value;
     
-    // Pass currentLang to the generator
-    const blob = new Blob([generateStudentHTML(merged, updatedGroups, document.getElementById('pagetitle').value || "Exercise", functions, imgUrl, teacherNotes, currentLang)], {type: 'text/html'});
+    const blob = new Blob([generateStudentHTML(merged, updatedGroups, titleInput, functions, imgUrl, teacherNotes, currentLang)], {type: 'text/html'});
     const a = document.createElement('a'); 
     a.href = URL.createObjectURL(blob); 
     a.download = filename; 
     a.click();
 }
 
-// Student Page Generator now accepts lang
 function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lang) {
     const filteredLabels = allLabels.filter(l => l !== "Main clause" && l !== "Hauptsatz");
     
     const studentTexts = {
         en: {
-            instr: "This page is designed to help you translate Latin sentences. One click on a word or group of words will open a button that will ask you to choose the syntactical function.<br>Once you have analysed each word in a sentence, a textbox will appear into which you can write your translation.",
+            instr: "This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words—or navigate to them using the Tab and Enter keys—to select their syntactical function.<br><br>Once you have correctly analyzed every word group in a sentence, a textbox will appear into which you can write your translation.",
             note: "Note:",
             togglePat: "Toggle Patterns",
             toggleCon: "High Contrast",
@@ -1080,10 +1445,11 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             correct: "Correct!",
             incorrect: "Incorrect. The correct answer is: ",
             tryAgain: "Incorrect label, try again!",
-            transPlaceholder: "Enter translation..."
+            transPlaceholder: "Enter translation...",
+            docTitle: "Interactive Syntax Explorer"
         },
         de: {
-            instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen.<br>Sobald du jedes Wort in einem Satz analysiert hast, erscheint ein Textfeld für deine Übersetzung.",
+            instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen.<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.",
             note: "Hinweis:",
             togglePat: "Muster umschalten",
             toggleCon: "Hoher Kontrast",
@@ -1092,92 +1458,88 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             correct: "Richtig!",
             incorrect: "Falsch. Die richtige Antwort ist: ",
             tryAgain: "Falsches Label, versuch es nochmal!",
-            transPlaceholder: "Übersetzung eingeben..."
+            transPlaceholder: "Übersetzung eingeben...",
+            docTitle: "Interaktives Syntax-Training"
         }
     };
 
     const t = studentTexts[lang];
+    const pageTitle = title ? title : t.docTitle;
 
     const patternCSS = `
         body.pattern-mode .hover-word[data-done="true"] {
-            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.3) 5px, rgba(255,255,255,0.3) 10px);
-            border: 2px solid #333 !important;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.4) 5px, rgba(255,255,255,0.4) 10px);
+            border: 2px solid #111827 !important;
         }
         body.pattern-mode .hover-word[data-done="true"]:nth-child(even) {
-             background-image: radial-gradient(rgba(255,255,255,0.4) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.4) 20%, transparent 20%);
+             background-image: radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%);
              background-position: 0 0, 5px 5px;
              background-size: 10px 10px;
         }
-        body.pattern-mode .s-group {
-            border-style: dashed !important;
-            border-width: 3px !important;
-        }
+        body.pattern-mode .s-group { border-style: dashed !important; border-width: 2px !important; }
     `;
 
     const contrastCSS = `
         body.high-contrast { background-color: #121212; color: #ffffff; }
-        body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #1e1e1e; color: #fff; border: 1px solid #444; }
+        body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #1e1e1e; color: #fff; border: 1px solid #333; }
         body.high-contrast .instruction-box { background-color: #332b00; border-color: #665500; color: #ffeb3b; }
-        body.high-contrast .teacher-note { background: #1e1e1e !important; border: 1px solid #555 !important; color: #fff !important; }
-        
-        body.high-contrast .hover-word {
-            background-color: #333;
-            color: #fff;
-            border-bottom: 3px solid #777;
-        }
-        body.high-contrast .hover-word[data-done="true"] {
-            border: 2px solid #fff !important;
-            color: #000; 
-            font-weight: bold;
-        }
+        body.high-contrast .teacher-note { background: #1e1e1e !important; border: 1px solid #444 !important; color: #e5e7eb !important; }
+        body.high-contrast .hover-word { background-color: #333; color: #fff; border-bottom: 2px solid #555; }
+        body.high-contrast .hover-word[data-done="true"] { border: 2px solid #fff !important; color: #000; font-weight: 600; }
         body.high-contrast .s-group { border-color: #fff !important; }
         body.high-contrast .g-label { background: #000; color: #fff; border-color: #fff; }
         body.high-contrast .punct { color: #fff; }
         body.high-contrast textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
     `;
 
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>
-        :root { --main-font: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; }
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${pageTitle}</title><style>
+        :root { --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
         body, button, input, textarea, select { font-family: var(--main-font); }
-        body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background-color: #f4f4f9; color: #333; }
-        h1 { text-align: center; color: #444; margin-bottom: 30px; font-weight: normal; letter-spacing: 1px; }
-        .instruction-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 0.95rem; line-height: 1.6; color: #856404; }
-        .teacher-note { background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 4px; margin-bottom: 25px; font-size: 1rem; color: #333; }
-        .exercise-wrapper { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); line-height: 3.8; }
-        .hover-word { cursor: pointer; background: #e4e5ed; padding: 2px 8px; border-radius: 4px; border-bottom: 3px solid #ccc; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.2; transition: all 0.2s; }
-        .s-group { display: inline-block; position: relative; border: 2px solid #555; border-bottom:none; border-radius: 8px 8px 0 0; padding: 15px 5px 5px 5px; margin: 0 2px; vertical-align: bottom; }
-        .g-label { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; background: white; border: 1px solid #555; border-radius: 4px; padding: 2px 8px; white-space: nowrap; color: #555; text-transform: uppercase; cursor: pointer; }
-        .punct { font-size: 1.15rem; margin: 0 1px; vertical-align: baseline; display:inline-block; }
-        .trans-box { margin: 20px 0 50px; line-height: 1.5; }
-        textarea { width: 100%; height: 80px; font-size: 1.2rem; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
-        .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; margin-top: 8px; width: 150px; text-align: center; color: green; pointer-events: none; }
-        .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #bbb; padding: 0; z-index: 1000; border-radius: 4px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); max-height: 400px; overflow-y: auto; min-width: 160px; line-height: 1.2; }
-        .radio-menu input[type="radio"] { display: none; }
-        .radio-menu label { display: block; padding: 1px 8px; cursor: pointer; border-bottom: none; font-size: 0.85rem; font-weight: bold; color: #333; }
-        .radio-menu label:hover { background-color: #007bff; color: white; }
-        .footer-toolbar { margin-top: 60px; padding: 30px; border-top: 1px solid #ddd; display: flex; justify-content: center; gap: 20px; }
-        .btn { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; background: #333; }
-        .ex-img { max-width: 100%; height: auto; display: block; margin: 30px auto 10px auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-height: 300px; object-fit: contain; }
-        #toast-container { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 4px; padding: 16px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
-        #toast-container.show { visibility: visible; opacity: 1; bottom: 50px; }
-        #toast-container.error { background-color: #333; border-bottom: 4px solid #d32f2f; }
-        #toast-container.success { background-color: #333; border-bottom: 4px solid #28a745; }
+        body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background-color: #f9fafb; color: #1f2937; line-height: 1.5; }
+        h1 { text-align: center; color: #111827; margin-bottom: 32px; font-weight: 600; letter-spacing: -0.025em; }
+        .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; color: #334155; }
+        .teacher-note { background: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 1rem; color: #1f2937; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .exercise-wrapper { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; line-height: 4.2; }
+        .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
+        .hover-word:focus-visible, .g-label:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+        .s-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom:none; border-radius: 6px 6px 0 0; padding: 20px 6px 6px 6px; margin: 0 4px; vertical-align: bottom; }
+        .g-label { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; background: white; border: 1px solid #94a3b8; border-radius: 4px; padding: 3px 8px; white-space: nowrap; color: #475569; text-transform: uppercase; cursor: pointer; }
+        .punct { font-size: 1.15rem; margin: 0 2px; vertical-align: baseline; display:inline-block; font-weight: 500; }
+        .trans-box { margin: 24px 0 50px; line-height: 1.5; }
+        textarea { width: 100%; height: 80px; font-size: 1.1rem; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; margin-top: 8px; width: 150px; text-align: center; color: #059669; pointer-events: none; }
+        
+        .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #e5e7eb; padding: 4px 0; z-index: 1000; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 85vh; overflow-y: auto; min-width: 150px; line-height: 1.2; }
+        .menu-btn { display: block; width: 100%; text-align: left; border: none; background: transparent; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #374151; transition: background-color 0.1s; font-family: inherit; }
+        .menu-btn:hover, .menu-btn:focus-visible { background-color: #f3f4f6; color: #111827; outline: none; }
+        .menu-btn:focus-visible { box-shadow: inset 2px 0 0 0 #3b82f6; }
+        
+        .footer-toolbar { margin-top: 40px; padding: 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font-weight: 500; color: white; background: #1f2937; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .ex-img { max-width: 100%; height: auto; display: block; margin: 30px auto 10px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 300px; object-fit: contain; }
+        #toast-container { visibility: hidden; min-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 14px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.95rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast-container.show { visibility: visible; opacity: 1; bottom: 40px; }
+        #toast-container.error { background-color: #7f1d1d; border: 1px solid #ef4444; }
+        #toast-container.success { background-color: #064e3b; border: 1px solid #10b981; }
         ${patternCSS}
         ${contrastCSS}
+        
         @media (max-width: 768px) {
-            body { margin: 15px; line-height: 4.0; }
-            .exercise-wrapper { padding: 15px; }
-            .hover-word { font-size: 1.15rem; padding: 6px 10px; }
-            .g-label { top: -20px; font-size: 10px; padding: 2px 4px; }
-            .s-group { padding-top: 20px; margin: 0 2px; }
-            .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 80%; max-height: 60%; box-shadow: 0 0 50px rgba(0,0,0,0.5); border-radius: 8px; }
-            .radio-menu label { padding: 12px 15px; font-size: 1rem; border-bottom: 1px solid #eee; }
+            body { margin: 15px; }
+            .exercise-wrapper { padding: 20px; line-height: 4.5; }
+            .hover-word { font-size: 1.1rem; padding: 6px 12px; }
+            .g-label { top: -16px; font-size: 10px; padding: 2px 6px; }
+            .s-group { padding-top: 24px; margin: 0 2px; }
+            .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-radius: 8px; }
+            .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f3f4f6; }
         }
-        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .footer-toolbar, .radio-menu, .instruction-box { display: none !important; } .ex-img { display: none !important; } }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; } .ex-img { display: none !important; } }
     </style></head><body>
-    <h1>${title}</h1>
+    <h1>${pageTitle}</h1>
     <div class="instruction-box">${t.instr}</div>
-    ${notes ? `<div class="teacher-note"><strong>${t.note}</strong> ${notes.replace(/\n/g, '<br>')}</div>` : ''}
+    ${notes ? `<div class="teacher-note"><span style="font-weight: 500;">${t.note}</span> ${notes.replace(/\n/g, '<br>')}</div>` : ''}
     <div class="exercise-wrapper"><div id="exercise">${generateExerciseHTML(words, groups, t.transPlaceholder)}</div></div>
     ${imgUrl ? `<img src="${imgUrl}" class="ex-img" alt="Exercise Image">` : ''}
     <div class="footer-toolbar">
@@ -1186,11 +1548,15 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         <button class="btn" onclick="window.print()">${t.print}</button> 
         <button class="btn" onclick="downloadPage()">${t.download}</button>
     </div>
-    <div id="menu-common" class="radio-menu"><form id="f-common">${filteredLabels.map(l => `<label><input type="radio" name="opt" value="${l}"> ${l}</label>`).join('')}</form></div>
+    <div id="menu-common" class="radio-menu">
+        ${filteredLabels.map(l => `<button type="button" class="menu-btn" data-val="${l}">${l}</button>`).join('')}
+    </div>
     <div id="toast-container"></div>
     <script>
         const colors = ${JSON.stringify(colors)}; let activeEl = null; let mode = "";
         const menu = document.getElementById('menu-common');
+        const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
+        
         document.querySelectorAll('.hover-word, .g-label').forEach(el => {
             el.onclick = (e) => {
                 e.stopPropagation();
@@ -1198,26 +1564,56 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
                 activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
                 if(window.innerWidth > 768) { menu.style.top=e.pageY+"px"; menu.style.left=e.pageX+"px"; }
                 menu.style.display="block"; 
+                menuBtns[0].focus();
+            };
+            
+            el.onkeydown = (e) => {
+                if(e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    el.click();
+                }
             };
         });
-        document.getElementById('f-common').onchange = (e) => {
-            const sel = e.target.value; 
-            const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans;
-            if(sel === correct) {
-                solve(activeEl, correct, mode);
-                showToast("${t.correct}", false);
-            } else { 
-                let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1;
-                activeEl.dataset.mistakes = mistakes;
-                if(mistakes >= 2) {
-                       showToast("${t.incorrect}" + correct, true);
-                       solve(activeEl, correct, mode);
-                } else {
-                       showToast("${t.tryAgain}", true);
+        
+        menuBtns.forEach((btn, index) => {
+            btn.onclick = (e) => {
+                const sel = btn.dataset.val; 
+                const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans;
+                if(sel === correct) {
+                    solve(activeEl, correct, mode);
+                    showToast("${t.correct}", false);
+                } else { 
+                    let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1;
+                    activeEl.dataset.mistakes = mistakes;
+                    if(mistakes >= 2) {
+                           showToast("${t.incorrect}" + correct, true);
+                           solve(activeEl, correct, mode);
+                    } else {
+                           showToast("${t.tryAgain}", true);
+                    }
                 }
-            }
-            menu.style.display = "none"; e.target.checked = false; check();
-        };
+                menu.style.display = "none"; 
+                check();
+                if (activeEl && !activeEl.dataset.done) {
+                    activeEl.focus();
+                }
+            };
+            
+            btn.onkeydown = (e) => {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    menuBtns[(index + 1) % menuBtns.length].focus();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    menuBtns[(index - 1 + menuBtns.length) % menuBtns.length].focus();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    menu.style.display = "none";
+                    if (activeEl) activeEl.focus();
+                }
+            };
+        });
+        
         function showToast(msg, isError) {
             const x = document.getElementById("toast-container");
             x.textContent = msg;
@@ -1230,8 +1626,10 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             if(m === "word") {
                 const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
                 el.style.backgroundColor = colors[ans]; el.dataset.done = "true";
+                el.removeAttribute('tabindex');
             } else { 
-                el.textContent = ans; el.dataset.done = "true"; el.style.background = "#e8f5e9"; 
+                el.textContent = ans; el.dataset.done = "true"; el.style.background = "#f0fdf4"; 
+                el.removeAttribute('tabindex');
             }
         }
         function check() { 
@@ -1258,11 +1656,11 @@ function generateExerciseHTML(words, groups, placeholder) {
         let isPunct = word.f === 'Punct' || isFakeWord;
         let nextWord = words[idx + 1];
         let nextIsPunct = nextWord && (!/[a-zA-Z\u00C0-\u017F]/.test(nextWord.w) || nextWord.f === 'Punct');
-        let content = isPunct ? `<span class="punct">${word.w}</span>` : `<span class="hover-word" data-ans="${word.f}">${word.w}</span>`;
+        let content = isPunct ? `<span class="punct">${word.w}</span>` : `<span class="hover-word" tabindex="0" data-ans="${word.f}">${word.w}</span>`;
         let openDivs = "", closeDivs = "";
 
         groups.forEach(g => {
-            if(idx === g.start) openDivs += `<div class="s-group" data-ans="${g.label}"><span class="g-label">?</span>`;
+            if(idx === g.start) openDivs += `<div class="s-group" data-ans="${g.label}"><span class="g-label" tabindex="0">?</span>`;
             if(idx === g.end) closeDivs += `</div>`;
         });
         let spacing = nextIsPunct ? "" : " ";
