@@ -82,9 +82,7 @@
     <h1>Example Analysis: Caesar, Catullus & Vergil</h1>
     
     <div class="instruction-box">
-    This page is designed to help you translate Latin sentences. One click on a word or group of words will open a button that will ask you to choose the syntactical function:<br>
-    Subject, accusative object, dative object, genitive object, ablative, predicative, prepositional phrase, adverb, verb, infinitive, participial phrase, or other (i.e., conjunctions, interjections, etc.). Larger syntactic functions (labelled '?') can have any of these functions, as well as those of relative clause or any other subordinate clause.<br><br>
-    Once you have analysed each word in a sentence, a textbox will appear into which you can write your translation. In the end, you can save the webpage or print it, so you can discuss your translations in class.
+        This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words—or navigate to them using the Tab and Enter keys—to select their syntactical function.<br><br>Once you have correctly analyzed every word group in a sentence, a textbox will appear into which you can write your translation.
     </div>
 
     <div class="exercise-wrapper">
@@ -161,7 +159,6 @@
     <div id="toast-container"></div>
     
     <script>
-        // Implemented the new "Force Field" concept color mapping
         const colors = { 
             'Subject': '#86efac', 
             'Accusative object': '#93c5fd', 
@@ -222,8 +219,21 @@
                 }
                 menu.style.display = "none"; 
                 check();
+                
+                // Focus Logic Fix
                 if (activeEl && !activeEl.dataset.done) {
                     activeEl.focus();
+                } else if (activeEl && activeEl.dataset.done) {
+                    const allItems = Array.from(document.querySelectorAll('.hover-word, .g-label'));
+                    const currentIndex = allItems.indexOf(activeEl);
+                    let nextEl = null;
+                    for(let i = currentIndex + 1; i < allItems.length; i++) {
+                        if(allItems[i].dataset.done !== "true") {
+                            nextEl = allItems[i];
+                            break;
+                        }
+                    }
+                    if(nextEl) nextEl.focus();
                 }
             };
             
