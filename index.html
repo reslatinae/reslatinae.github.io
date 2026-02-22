@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -66,16 +66,15 @@
             background: #fff; 
             border-radius: 6px; 
             display: block; 
-            line-height: 4.5; 
-            transition: line-height 0.3s ease;
+            line-height: 1.6; 
         }
         
         .tag-word { 
             display: inline-block; 
-            margin: 0 2px; 
+            margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; 
             position: relative; 
             font-size: 1.15rem; 
-            vertical-align: middle; 
+            vertical-align: bottom; 
             color: #111827; 
             padding: 2px 8px; 
             border-radius: 4px; 
@@ -85,11 +84,27 @@
             height: 1.6rem; 
             line-height: 1.6rem; 
             user-select: none; 
+            transition: margin-top 0.3s ease;
         }
         
-        .punct-span { display: inline-block; margin: 0 2px; padding: 2px 2px; font-size: 1.15rem; vertical-align: middle; color: #111827; position: relative; font-weight: 500; cursor: pointer; user-select: none; border-bottom: 2px solid transparent; }
+        .punct-span { 
+            display: inline-block; 
+            margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; 
+            padding: 2px 2px; 
+            font-size: 1.15rem; 
+            vertical-align: bottom; 
+            color: #111827; 
+            position: relative; 
+            font-weight: 500; 
+            cursor: pointer; 
+            user-select: none; 
+            border-bottom: 2px solid transparent; 
+            height: 1.6rem;
+            line-height: 1.6rem;
+            transition: margin-top 0.3s ease;
+        }
 
-        .split-right { border-right: 3px dashed #ef4444 !important; margin-right: 12px; }
+        .split-right { border-right: 3px dashed #ef4444 !important; margin-right: 12px !important; }
         
         /* Tiered Bracket CSS System */
         .group-bracket {
@@ -227,8 +242,9 @@
             .palette { position: relative; top: 0; padding: 16px; overflow-x: auto; }
             .palette-grid { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px; }
             .p-btn { white-space: nowrap; padding: 10px 14px; } 
-            #tagging-area { padding: 40px 20px 20px 20px; line-height: 4.5; } 
-            .tag-word { font-size: 1rem; padding: 4px 6px; margin: 1px; }
+            #tagging-area { padding: 40px 20px 20px 20px; line-height: 1.6; } 
+            .tag-word { font-size: 1rem; padding: 4px 6px; margin: var(--dynamic-margin-top, 24px) 1px 24px 1px; }
+            .punct-span { margin: var(--dynamic-margin-top, 24px) 1px 24px 1px; }
             .tag-word::after { font-size: 0.55rem; top: 32px; }
             .btn-action { width: 100%; margin-bottom: 8px; font-size: 1rem; }
             .modal-box { width: 90%; }
@@ -244,8 +260,8 @@
     <div id="setup-screen" class="container">
         
         <div class="lang-switch">
-            <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
-            <button class="lang-btn" onclick="setLanguage('de')">DE</button>
+            <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+            <button class="lang-btn active" onclick="setLanguage('de')">DE</button>
         </div>
 
         <div class="instruction-box">        
@@ -366,7 +382,7 @@
 
 <script>
 // --- MULTI-LANGUAGE & PRESETS CONFIG ---
-let currentLang = 'en';
+let currentLang = 'de';
 let currentLevel = 'advanced';
 
 function getOtherLabel() {
@@ -474,47 +490,34 @@ const LANG = {
 
 // --- SEMANTIC COLOR SCHEME ---
 const SEMANTIC_COLORS = {
-    // Core Agent (Green force field)
     'Subject': '#86efac', 
     'Subjekt': '#86efac',
-
-    // Objects (Cool Blues & Purples)
-    'Accusative object': '#93c5fd', // Blue
+    'Accusative object': '#93c5fd', 
     'Akkusativobjekt': '#93c5fd',
-    'Dative object': '#a5b4fc', // Indigo / Lavender
+    'Dative object': '#a5b4fc', 
     'Dativobjekt': '#a5b4fc',
-    'Genitive object': '#d8b4fe', // Purple
+    'Genitive object': '#d8b4fe', 
     'Genitivobjekt': '#d8b4fe',
-
-    // Verbal Family (Reds & Pinks - The Action force field)
-    'Verb': '#fca5a5', // Soft Red
-    'Infinitive': '#f0abfc', // Fuchsia / Magenta
+    'Verb': '#fca5a5', 
+    'Infinitive': '#f0abfc', 
     'Infinitiv': '#f0abfc',
-    'Adverb': '#fbcfe8', // Pale Pink / Rose
-
-    // Circumstantials / Adverbials (Oranges & Yellows)
-    'Ablative': '#fdba74', // Orange
+    'Adverb': '#fbcfe8', 
+    'Ablative': '#fdba74', 
     'Ablativ': '#fdba74',
-    'Ablative absolute': '#fcd34d', // Amber / Gold
+    'Ablative absolute': '#fcd34d', 
     'Ablativus absolutus': '#fcd34d',
-    'Prepositional phrase': '#fef08a', // Yellow
+    'Prepositional phrase': '#fef08a', 
     'Präpositionale Bestimmung': '#fef08a',
-
-    // Predicative (Teal)
-    'Predicative': '#5eead4', // Teal
+    'Predicative': '#5eead4', 
     'Prädikativum': '#5eead4',
-
-    // Complex Clauses (Distinct darks/blues/violets)
-    'Relative clause': '#60a5fa', // Stronger Blue
+    'Relative clause': '#60a5fa', 
     'Relativsatz': '#60a5fa',
-    'Subordinate clause': '#a78bfa', // Violet (Distinct from Relative)
+    'Subordinate clause': '#a78bfa', 
     'Nebensatz': '#a78bfa',
-    'Accusative with infinitive': '#818cf8', // Indigo
+    'Accusative with infinitive': '#818cf8', 
     'AcI': '#818cf8',
-    'Participial phrase': '#c084fc', // Stronger Purple
+    'Participial phrase': '#c084fc', 
     'Partizipialkonstruktion': '#c084fc',
-
-    // Other
     'Other': '#e5e7eb', 
     'Sonstiges': '#e5e7eb'
 };
@@ -524,7 +527,6 @@ let colors = {};
 
 function initGlobalColors() {
     colors = { ...SEMANTIC_COLORS };
-    // Fallback for any label not defined above
     PRESETS.en.advanced.forEach((f) => { if(!colors[f]) colors[f] = '#e5e7eb'; });
     PRESETS.de.advanced.forEach((f) => { if(!colors[f]) colors[f] = '#e5e7eb'; });
 }
@@ -546,12 +548,10 @@ function hideCredits() {
     document.getElementById('setup-screen').style.display = 'block';
 }
 
-// AI Normalizer: Catches English labels on German page and corrects them instantly
 function normalizeLabel(label) {
     if (!label) return getOtherLabel();
     let lower = label.trim().toLowerCase();
     
-    // Check against ALL advanced labels so it corrects properly even if preset is currently set to beginner
     let match = PRESETS[currentLang].advanced.find(f => f.toLowerCase() === lower);
     if (match) return match;
     
@@ -675,7 +675,6 @@ function setLanguage(lang) {
     functions = [...PRESETS[lang][currentLevel]];
     
     if(document.getElementById('editor-screen').style.display === 'block') {
-        // Keep active labels alive if changing languages
         document.querySelectorAll('.tag-word').forEach(span => {
             let f = span.dataset.func;
             if(f && f !== 'Punct' && !functions.includes(f)) functions.push(f);
@@ -699,7 +698,6 @@ function changeLevel(level) {
     functions = [...PRESETS[currentLang][level]];
     
     if (document.getElementById('editor-screen').style.display === 'block') {
-        // Ensure labels currently in use aren't hidden from the palette
         document.querySelectorAll('.tag-word').forEach(span => {
             let f = span.dataset.func;
             if(f && f !== 'Punct' && !functions.includes(f)) {
@@ -842,7 +840,7 @@ function triggerAutoSave() {
 
 window.addEventListener('DOMContentLoaded', () => {
     initGlobalColors();
-    setLanguage('en'); 
+    setLanguage('de'); 
     changeLevel('advanced');
     activeFunc = getOtherLabel();
 
@@ -944,24 +942,27 @@ function loadProject(input) {
 }
 
 function copyAIPrompt() {
-    const txt = document.getElementById('entertext').value;
+    const txtEl = document.getElementById('entertext');
+    txtEl.value = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
+    const txt = txtEl.value;
+    
     const exObj = functions[1] || 'Accusative object'; 
     
     const promptText = currentLang === 'de' 
     ? `Analysiere die lateinische Syntax von: "${txt}".
-    1. STRIKTE REGEL: Behalte die EXAKTE Wortreihenfolge bei.
+    1. STRIKTE REGEL: Behalte die EXAKTE Wortreihenfolge bei. Lass KEINE Wörter und KEINE Satzzeichen aus (insbesondere nicht den Schlusspunkt!).
     2. PHRASEN: Benachbarte Wörter einer Phrase erhalten die gleiche Funktion.
     3. HYPERBATON: Getrennte Phrasen erhalten die gleiche Funktion, bleiben aber an ihrem Platz.
-    4. INTERPUNKTION: Interpunktion als eigene Tokens "f": "Punct".
-    5. GRUPPEN (WICHTIG): Erstelle "groups" NUR für echte mehrteilige Phrasen/Sätze (z.B. Nebensätze, AcI), falls in den Labels vorhanden. Wenn es keine gibt, lass das Array zwingend leer: "groups": []
+    4. INTERPUNKTION: Jedes Satzzeichen (inkl. Schlusspunkt) wird als eigenes Token mit "f": "Punct" ausgegeben.
+    5. GRUPPEN: Identifiziere echte mehrteilige Sätze/Phrasen (z.B. Nebensatz, AcI, Partizipialkonstruktion), falls sie in den erlaubten Labels stehen. Gib sie im Array "groups" mit 0-basierten Start- und End-Indizes an. Beispiel: "groups": [{"start": 2, "end": 5, "label": "Nebensatz"}]. Wenn es keine gibt, lass das Array leer.
     6. Antworte mit JSON: { "words": [{"w": "Arma", "f": "${exObj}"}, ...], "groups": [] }
     Verwende ausschließlich diese Labels: ${functions.join(', ')}.`
     : `Analyze Latin syntax of: "${txt}". 
-    1. STRICT RULE: Maintain the EXACT word order.
+    1. STRICT RULE: Maintain the EXACT word order. Do NOT omit any words or punctuation marks (especially the final full stop!).
     2. PHRASES: Adjacent phrase words get same function. 
     3. HYPERBATON: Split phrases get same function but kept in place.
-    4. PUNCTUATION: Include punctuation as separate tokens "f": "Punct".
-    5. GROUPS (IMPORTANT): ONLY create "groups" for true multi-word clauses (e.g., Subordinate clauses, AcI) if they exist in the label list. If there are none, you MUST leave the array empty: "groups": []
+    4. PUNCTUATION: Include EVERY punctuation mark (including the final full stop) as a separate token "f": "Punct".
+    5. GROUPS: Identify true multi-word clauses (e.g., Subordinate clause, Accusative with infinitive, Participial phrase) if they exist in the allowed labels. Output them in the "groups" array with 0-based start and end indices. Example: "groups": [{"start": 2, "end": 5, "label": "Subordinate clause"}]. If there are none, leave the array empty.
     6. Return JSON: { "words": [{"w": "Arma", "f": "${exObj}"}, ...], "groups": [] } 
     Use ONLY these Labels: ${functions.join(', ')}.`;
 
@@ -1022,7 +1023,7 @@ function importAI() {
         });
 
         d.words.forEach(w => {
-            w.w = w.w.replace(/-/g, ' ');
+            w.w = w.w.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
             if (!/[a-zA-Z\u00C0-\u017F]/.test(w.w)) w.f = "Punct";
             else if (w.f.toLowerCase() === "main clause" || w.f.toLowerCase() === "hauptsatz") w.f = getOtherLabel();
             else w.f = normalizeLabel(w.f);
@@ -1035,6 +1036,9 @@ function importAI() {
             let newStart = mergeResult.map[g.start] !== undefined ? mergeResult.map[g.start] : g.start;
             let newEnd = mergeResult.map[g.end] !== undefined ? mergeResult.map[g.end] : g.end;
             
+            while(newStart <= newEnd && mergeResult.welded[newStart] && mergeResult.welded[newStart].f === 'Punct') newStart++;
+            while(newEnd >= newStart && mergeResult.welded[newEnd] && mergeResult.welded[newEnd].f === 'Punct') newEnd--;
+            
             if (newStart <= newEnd && newStart >= 0 && newEnd < mergeResult.welded.length) {
                 currentGroups.push({ start: newStart, end: newEnd, label: g.label });
             }
@@ -1045,7 +1049,10 @@ function importAI() {
 }
 
 function startManual() {
-    const rawInput = document.getElementById('entertext').value;
+    const txtEl = document.getElementById('entertext');
+    txtEl.value = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
+    const rawInput = txtEl.value;
+    
     const tokens = rawInput.match(/[a-zA-Z\u00C0-\u017F-]+|[^a-zA-Z\u00C0-\u017F\s]+/gi);
     if (!tokens) return;
     initEditor(processTokens(tokens));
@@ -1289,14 +1296,31 @@ function updateGroupUI() {
     });
 
     let maxTier = Math.max(-1, ...sortedGroups.map(g => g.tier));
-    let baseLineHeight = 4.5;
-    document.getElementById('tagging-area').style.lineHeight = Math.max(baseLineHeight, (maxTier + 2) * 1.6);
+    
+    let requiredMargin = maxTier >= 0 ? 60 + (maxTier * 32) : 24;
+    document.getElementById('tagging-area').style.setProperty('--dynamic-margin-top', requiredMargin + 'px');
 
     sortedGroups.forEach(g => {
         let tierOffset = 26 + (g.tier * 32); 
         let groupColor = colors[g.label] || '#8b5cf6';
         
-        for(let j = g.start; j <= g.end; j++) {
+        let actualStart = g.start;
+        while(actualStart <= g.end) {
+            let el = document.getElementById(`word-${actualStart}`);
+            if(el && !el.classList.contains('punct-span')) break;
+            actualStart++;
+        }
+        
+        let actualEnd = g.end;
+        while(actualEnd >= actualStart) {
+            let el = document.getElementById(`word-${actualEnd}`);
+            if(el && !el.classList.contains('punct-span')) break;
+            actualEnd--;
+        }
+
+        if (actualStart > actualEnd) return; 
+        
+        for(let j = actualStart; j <= actualEnd; j++) {
             let el = document.getElementById(`word-${j}`);
             if(!el || el.classList.contains('punct-span')) continue;
             
@@ -1307,7 +1331,7 @@ function updateGroupUI() {
             bracket.style.borderTopColor = groupColor;
             bracket.style.backgroundColor = groupColor + '26';
             
-            if(j === g.start) {
+            if(j === actualStart) {
                 bracket.classList.add('bracket-start');
                 bracket.style.left = `-${g.tier * 4}px`;
                 bracket.style.borderLeftColor = groupColor;
@@ -1318,7 +1342,7 @@ function updateGroupUI() {
                 
                 let labelHTML = `<span class="clickable-label" title="Rename group" onclick="event.stopPropagation(); editGroupLabel(${g.originalIndex})">${g.label}</span>`;
                 
-                if (g.start === g.end) {
+                if (actualStart === actualEnd) {
                     badge.innerHTML = `
                         <span class="badge-adj" title="Expand left" onclick="event.stopPropagation(); adjustGroupStart(${g.originalIndex}, -1)">◀</span>
                         ${labelHTML}
@@ -1336,12 +1360,12 @@ function updateGroupUI() {
                 bracket.appendChild(badge);
             }
             
-            if(j === g.end) {
+            if(j === actualEnd) {
                 bracket.classList.add('bracket-end');
                 bracket.style.right = `-${g.tier * 4}px`;
                 bracket.style.borderRightColor = groupColor;
                 
-                if(g.start !== g.end) {
+                if(actualStart !== actualEnd) {
                     let endControls = document.createElement('div');
                     endControls.className = 'bracket-end-controls';
                     endControls.style.background = groupColor;
@@ -1377,6 +1401,18 @@ function exportToStudent() {
         };
     });
 
+    tempTokens.forEach(token => {
+        if(token.f !== 'Punct') {
+            token.activeGroups = currentGroups
+                .filter(g => token.idx >= g.start && token.idx <= g.end)
+                .map(g => currentGroups.indexOf(g))
+                .sort()
+                .join(',');
+        } else {
+            token.activeGroups = "";
+        }
+    });
+
     for(let i = 1; i < tempTokens.length - 1; i++) {
         let curr = tempTokens[i];
         if(curr.f === 'Punct') {
@@ -1387,8 +1423,9 @@ function exportToStudent() {
             }
             if(nextIdx < tempTokens.length) {
                 let next = tempTokens[nextIdx];
-                if(prev.f !== 'Punct' && prev.f !== getOtherLabel() && prev.f === next.f && !prev.isSplit) {
+                if(prev.f !== 'Punct' && prev.f !== getOtherLabel() && prev.f === next.f && !prev.isSplit && prev.activeGroups === next.activeGroups) {
                     curr.f = prev.f; 
+                    curr.activeGroups = prev.activeGroups;
                 }
             }
         }
@@ -1399,14 +1436,16 @@ function exportToStudent() {
         const isMergeableType = !['Punct', 'Other', 'Sonstiges'].includes(token.f);
         const prevToken = i > 0 ? tempTokens[i-1] : null;
         const splitExists = prevToken && prevToken.isSplit;
-        const canMerge = current && current.f === token.f && isMergeableType && !splitExists;
+        const sameGroups = current && current.activeGroups === token.activeGroups;
+        
+        const canMerge = current && current.f === token.f && isMergeableType && !splitExists && sameGroups;
         
         if (canMerge) {
             current.w += (['.', ',', ';', ':', '!', '?'].includes(token.w) ? '' : ' ') + token.w; 
             current.originalIndices.push(token.idx);
         } else {
             if (current) merged.push(current);
-            current = { w: token.w, f: token.f, originalIndices: [token.idx] };
+            current = { w: token.w, f: token.f, originalIndices: [token.idx], activeGroups: token.activeGroups };
         }
     });
     if (current) merged.push(current);
@@ -1415,7 +1454,7 @@ function exportToStudent() {
         const newStart = merged.findIndex(m => m.originalIndices.includes(g.start));
         let newEnd = merged.findIndex(m => m.originalIndices.includes(g.end));
         if(newEnd === -1) newEnd = newStart; 
-        return { ...g, start: newStart, end: newEnd };
+        return { ...g, start: newStart, end: newEnd, label: g.label };
     });
 
     const defaultTitle = currentLang === 'en' ? 'Interactive Syntax Explorer' : 'Interaktives Syntax-Training';
@@ -1594,8 +1633,21 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
                 }
                 menu.style.display = "none"; 
                 check();
+                
+                // Focus Logic Fix
                 if (activeEl && !activeEl.dataset.done) {
                     activeEl.focus();
+                } else if (activeEl && activeEl.dataset.done) {
+                    const allItems = Array.from(document.querySelectorAll('.hover-word, .g-label'));
+                    const currentIndex = allItems.indexOf(activeEl);
+                    let nextEl = null;
+                    for(let i = currentIndex + 1; i < allItems.length; i++) {
+                        if(allItems[i].dataset.done !== "true") {
+                            nextEl = allItems[i];
+                            break;
+                        }
+                    }
+                    if(nextEl) nextEl.focus();
                 }
             };
             
@@ -1649,6 +1701,7 @@ function generateExerciseHTML(words, groups, placeholder) {
     let sIdx = 0, html = '<div class="sentence-container">';
     const sentenceEnders = ['.', '!', '?', '·'];
     let pendingClosers = ""; 
+    let containerOpen = true;
 
     words.forEach((word, idx) => {
         const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(word.w);
@@ -1679,11 +1732,21 @@ function generateExerciseHTML(words, groups, placeholder) {
         }
 
         if (isPunct && sentenceEnders.some(end => word.w.includes(end))) {
-            html += `</div><div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="${placeholder}"></textarea></div><div class="sentence-container">`;
+            html += `</div><div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="${placeholder}"></textarea></div>`;
             sIdx++;
+            containerOpen = false;
+            if (idx < words.length - 1) {
+                html += `<div class="sentence-container">`;
+                containerOpen = true;
+            }
         }
     });
-    return html + "</div>";
+    
+    if (containerOpen) {
+        html += "</div>";
+    }
+    
+    return html;
 }
 </script>
 </body>
