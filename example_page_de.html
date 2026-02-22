@@ -13,7 +13,6 @@
         
         .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; color: #334155; }
         .teacher-note { background: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 1rem; color: #1f2937; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        
         .exercise-wrapper { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; line-height: 4.2; }
         
         .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
@@ -42,7 +41,6 @@
         #toast-container.error { background-color: #7f1d1d; border: 1px solid #ef4444; }
         #toast-container.success { background-color: #064e3b; border: 1px solid #10b981; }
 
-        /* Pattern Mode */
         body.pattern-mode .hover-word[data-done="true"] {
             background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.4) 5px, rgba(255,255,255,0.4) 10px);
             border: 2px solid #111827 !important;
@@ -53,8 +51,7 @@
              background-size: 10px 10px;
         }
         body.pattern-mode .s-group { border-style: dashed !important; border-width: 2px !important; }
-
-        /* High Contrast Mode */
+        
         body.high-contrast { background-color: #121212; color: #ffffff; }
         body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #1e1e1e; color: #fff; border: 1px solid #333; }
         body.high-contrast .instruction-box { background-color: #332b00; border-color: #665500; color: #ffeb3b; }
@@ -82,35 +79,33 @@
     <h1>Beispielanalyse: Caesar, Catullus & Vergil</h1>
     
     <div class="instruction-box">
-    Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen.<br>
-    Subjekt, Akkusativobjekt, Dativobjekt, Genitivobjekt, Ablativ, Prädikativum, Präpositionalphrase, Adverb, Verb, Infinitiv, Partizipialkonstruktion oder Sonstiges (z.B. Konjunktionen, Interjektionen etc.). Größere syntaktische Gruppen (markiert mit '?') können jede dieser Funktionen haben, sowie die eines Relativsatzes oder eines anderen Nebensatzes.<br><br>
-    Sobald du jedes Wort in einem Satz analysiert hast, erscheint ein Textfeld für deine Übersetzung. Am Ende kannst du die Webseite speichern oder drucken, um deine Übersetzungen im Unterricht zu besprechen.
+        Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen.<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.
     </div>
 
     <div class="exercise-wrapper">
         <div id="exercise">
             <h2>Caesar, De Bello Gallico 1.1</h2>
             <div class="sentence-container">
-                <span class="hover-word" tabindex="0" data-ans="Subjekt">Gallia</span> <span class="hover-word" tabindex="0" data-ans="Verb">est</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">omnis</span> <span class="hover-word" tabindex="0" data-ans="Verb">divisa</span> <span class="hover-word" tabindex="0" data-ans="Präpositionalphrase">in partes tres</span><span class="punct">,</span> 
+                <span class="hover-word" tabindex="0" data-ans="Subjekt">Gallia</span> <span class="hover-word" tabindex="0" data-ans="Verb">est</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">omnis</span> <span class="hover-word" tabindex="0" data-ans="Verb">divisa</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">in partes tres</span><span class="punct">,</span> 
                 <div class="s-group" data-ans="Relativsatz"><span class="g-label" tabindex="0">?</span><span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">quarum unam</span> <span class="hover-word" tabindex="0" data-ans="Verb">incolunt</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Belgae</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">aliam</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Aquitani</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">tertiam</span> 
                 <div class="s-group" data-ans="Subjekt"><span class="g-label" tabindex="0">?</span><span class="hover-word" tabindex="0" data-ans="Subjekt">qui</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">ipsorum lingua</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">Celtae</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">nostra</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">Galli</span> <span class="hover-word" tabindex="0" data-ans="Verb">appellantur</span><span class="punct">.</span></div></div>
             </div>
             <div id="t-container-0" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div>
             
             <div class="sentence-container">
-                <span class="hover-word" tabindex="0" data-ans="Subjekt">Hi omnes</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">lingua, institutis, legibus</span> <span class="hover-word" tabindex="0" data-ans="Präpositionalphrase">inter se</span> <span class="hover-word" tabindex="0" data-ans="Verb">differunt</span><span class="punct">.</span> 
+                <span class="hover-word" tabindex="0" data-ans="Subjekt">Hi omnes</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">lingua, institutis, legibus</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">inter se</span> <span class="hover-word" tabindex="0" data-ans="Verb">differunt</span><span class="punct">.</span> 
             </div>
             <div id="t-container-1" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div>
             
             <div class="sentence-container">
-                <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Gallos</span> <span class="hover-word" tabindex="0" data-ans="Präpositionalphrase">ab Aquitanis</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Garumna flumen</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Präpositionalphrase">a Belgis</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Matrona et Sequana</span> <span class="hover-word" tabindex="0" data-ans="Verb">dividit</span><span class="punct">.</span> 
+                <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Gallos</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">ab Aquitanis</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Garumna flumen</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">a Belgis</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Matrona et Sequana</span> <span class="hover-word" tabindex="0" data-ans="Verb">dividit</span><span class="punct">.</span> 
             </div>
             <div id="t-container-2" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div>
 
             <h2>Catullus 64.1-7</h2>
             <div class="sentence-container">
                 <div class="s-group" data-ans="Subjekt"><span class="g-label" tabindex="0">?</span><span class="hover-word" tabindex="0" data-ans="Ablativ">Peliaco</span> <span class="hover-word" tabindex="0" data-ans="Adverb">quondam</span> <span class="hover-word" tabindex="0" data-ans="Partizipialkonstruktion">prognatae</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">vertice</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">pinus</span></div> <span class="hover-word" tabindex="0" data-ans="Verb">dicuntur</span> 
-                <div class="s-group" data-ans="Infinitiv"><span class="g-label" tabindex="0">?</span><span class="hover-word" tabindex="0" data-ans="Präpositionalphrase">liquidas Neptuni</span> <span class="hover-word" tabindex="0" data-ans="Infinitiv">nasse</span> <span class="hover-word" tabindex="0" data-ans="Präpositionalphrase">per undas Phasidos ad fluctus et fines Aeetaeos</span><span class="punct">,</span></div> 
+                <div class="s-group" data-ans="Infinitiv"><span class="g-label" tabindex="0">?</span><span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">liquidas Neptuni</span> <span class="hover-word" tabindex="0" data-ans="Infinitiv">nasse</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">per undas Phasidos ad fluctus et fines Aeetaeos</span><span class="punct">,</span></div> 
                 <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0">?</span><span class="hover-word" tabindex="0" data-ans="Sonstiges">cum</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">lecti iuvenes, Argiuae robora pubis</span><span class="punct">,</span> 
                 <div class="s-group" data-ans="Partizipialkonstruktion"><span class="g-label" tabindex="0">?</span><span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">auratam</span> <span class="hover-word" tabindex="0" data-ans="Partizipialkonstruktion">optantes</span> <span class="hover-word" tabindex="0" data-ans="Dativobjekt">Colchis</span> <span class="hover-word" tabindex="0" data-ans="Infinitiv">avertere</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">pellem</span></div> 
                 <span class="hover-word" tabindex="0" data-ans="Verb">ausi sunt</span> 
@@ -122,8 +117,8 @@
             <h2>Vergil, Aeneid 1.1-7</h2>
             <div class="sentence-container">
                 <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Arma virumque</span> <span class="hover-word" tabindex="0" data-ans="Verb">canō</span><span class="punct">,</span> 
-                <div class="s-group" data-ans="Relativsatz"><span class="g-label" tabindex="0">?</span><span class="hover-word" tabindex="0" data-ans="Präpositionalphrase">Trōiae</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">quī</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">prīmus</span> <span class="hover-word" tabindex="0" data-ans="Präpositionalphrase">ab ōrīs</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Ītaliam</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">fātō</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">profugus</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Lāvīniaque</span> <span class="hover-word" tabindex="0" data-ans="Verb">vēnit</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">lītora, multum</span></div> 
-                <span class="hover-word" tabindex="0" data-ans="Subjekt">ille</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">et terrīs</span> <span class="hover-word" tabindex="0" data-ans="Partizipialkonstruktion">iactātus</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">et altō vī superum</span> <span class="hover-word" tabindex="0" data-ans="Präpositionalphrase">saevae memorem Iūnōnis ob īram</span><span class="punct">;</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">multa</span> <span class="hover-word" tabindex="0" data-ans="Adverb">quoque</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">et bellō</span> <span class="hover-word" tabindex="0" data-ans="Partizipialkonstruktion">passus</span><span class="punct">,</span> 
+                <div class="s-group" data-ans="Relativsatz"><span class="g-label" tabindex="0">?</span><span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">Trōiae</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">quī</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">prīmus</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">ab ōrīs</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Ītaliam</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">fātō</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">profugus</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Lāvīniaque</span> <span class="hover-word" tabindex="0" data-ans="Verb">vēnit</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">lītora, multum</span></div> 
+                <span class="hover-word" tabindex="0" data-ans="Subjekt">ille</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">et terrīs</span> <span class="hover-word" tabindex="0" data-ans="Partizipialkonstruktion">iactātus</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">et altō vī superum</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">saevae memorem Iūnōnis ob īram</span><span class="punct">;</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">multa</span> <span class="hover-word" tabindex="0" data-ans="Adverb">quoque</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">et bellō</span> <span class="hover-word" tabindex="0" data-ans="Partizipialkonstruktion">passus</span><span class="punct">,</span> 
                 <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0">?</span><span class="hover-word" tabindex="0" data-ans="Sonstiges">dum</span> <span class="hover-word" tabindex="0" data-ans="Verb">conderet</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">urbem</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Verb">inferretque</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">deōs</span> <span class="hover-word" tabindex="0" data-ans="Dativobjekt">Latiō</span><span class="punct">,</span> 
                 <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0">?</span><span class="hover-word" tabindex="0" data-ans="Subjekt">genus</span> <span class="hover-word" tabindex="0" data-ans="Adverb">unde</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Latīnum, Albānīque patrēs, atque altae moenia Rōmae</span><span class="punct">.</span></div></div> 
             </div>
@@ -146,36 +141,39 @@
         <button type="button" class="menu-btn" data-val="Dativobjekt">Dativobjekt</button>
         <button type="button" class="menu-btn" data-val="Genitivobjekt">Genitivobjekt</button>
         <button type="button" class="menu-btn" data-val="Ablativ">Ablativ</button>
+        <button type="button" class="menu-btn" data-val="Ablativus absolutus">Ablativus absolutus</button>
         <button type="button" class="menu-btn" data-val="Prädikativum">Prädikativum</button>
-        <button type="button" class="menu-btn" data-val="Präpositionalphrase">Präpositionalphrase</button>
+        <button type="button" class="menu-btn" data-val="Präpositionale Bestimmung">Präpositionale Bestimmung</button>
         <button type="button" class="menu-btn" data-val="Adverb">Adverb</button>
         <button type="button" class="menu-btn" data-val="Verb">Verb</button>
         <button type="button" class="menu-btn" data-val="Infinitiv">Infinitiv</button>
         <button type="button" class="menu-btn" data-val="Partizipialkonstruktion">Partizipialkonstruktion</button>
         <button type="button" class="menu-btn" data-val="Relativsatz">Relativsatz</button>
         <button type="button" class="menu-btn" data-val="Nebensatz">Nebensatz</button>
+        <button type="button" class="menu-btn" data-val="AcI">AcI</button>
         <button type="button" class="menu-btn" data-val="Sonstiges">Sonstiges</button>
     </div>
     <div id="toast-container"></div>
     
     <script>
-        // Implemented the new "Force Field" concept color mapping
-        const colors = { 
-            'Subjekt': '#86efac', 
-            'Akkusativobjekt': '#93c5fd', 
-            'Dativobjekt': '#a5b4fc', 
-            'Genitivobjekt': '#d8b4fe', 
-            'Verb': '#fca5a5', 
-            'Infinitiv': '#f0abfc', 
-            'Adverb': '#fbcfe8', 
-            'Ablativ': '#fdba74', 
-            'Präpositionalphrase': '#fef08a', 
-            'Prädikativum': '#5eead4', 
-            'Relativsatz': '#60a5fa', 
-            'Nebensatz': '#a78bfa', 
-            'Partizipialkonstruktion': '#c084fc', 
-            'Sonstiges': '#e5e7eb'
-        }; 
+        const colors = {
+            "Subjekt": "#86efac",
+            "Akkusativobjekt": "#93c5fd",
+            "Dativobjekt": "#a5b4fc",
+            "Genitivobjekt": "#d8b4fe",
+            "Ablativ": "#fdba74",
+            "Ablativus absolutus": "#fcd34d",
+            "Prädikativum": "#5eead4",
+            "Präpositionale Bestimmung": "#fef08a",
+            "Adverb": "#fbcfe8",
+            "Verb": "#fca5a5",
+            "Infinitiv": "#f0abfc",
+            "Partizipialkonstruktion": "#c084fc",
+            "Relativsatz": "#60a5fa",
+            "Nebensatz": "#a78bfa",
+            "AcI": "#818cf8",
+            "Sonstiges": "#e5e7eb"
+        };
         
         let activeEl = null; let mode = "";
         const menu = document.getElementById('menu-common');
@@ -213,13 +211,26 @@
                            showToast("Falsch. Die richtige Antwort ist: " + correct, true);
                            solve(activeEl, correct, mode);
                     } else {
-                           showToast("Falsche Auswahl, versuch es nochmal!", true);
+                           showToast("Falsches Label, versuch es nochmal!", true);
                     }
                 }
                 menu.style.display = "none"; 
                 check();
+                
+                // Focus Logic Fix
                 if (activeEl && !activeEl.dataset.done) {
                     activeEl.focus();
+                } else if (activeEl && activeEl.dataset.done) {
+                    const allItems = Array.from(document.querySelectorAll('.hover-word, .g-label'));
+                    const currentIndex = allItems.indexOf(activeEl);
+                    let nextEl = null;
+                    for(let i = currentIndex + 1; i < allItems.length; i++) {
+                        if(allItems[i].dataset.done !== "true") {
+                            nextEl = allItems[i];
+                            break;
+                        }
+                    }
+                    if(nextEl) nextEl.focus();
                 }
             };
             
@@ -252,10 +263,10 @@
             if(m === "word") {
                 const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
                 el.style.backgroundColor = colors[ans]; el.dataset.done = "true";
-                el.removeAttribute('tabindex'); // remove from tab flow once correct
+                el.removeAttribute('tabindex'); 
             } else { 
                 el.textContent = ans; el.dataset.done = "true"; el.style.background = "#f0fdf4"; 
-                el.removeAttribute('tabindex'); // remove from tab flow once correct
+                el.removeAttribute('tabindex'); 
             }
         }
 
