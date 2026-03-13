@@ -312,7 +312,7 @@
     <div id="credits-screen" class="container" style="display:none; text-align:center; padding: 50px;">
         <h2 style="margin-top:0; color: #111827;">Credentials</h2>
         <p style="font-size:1.1rem; line-height: 1.6; color: #4b5563; margin: 30px 0;">
-            This tool was created by Anke Walter. I gratefully acknowledge the help of J. L., ChatGPT and Gemini.
+            This tool was created by Anke Walter. I gratefully acknowledge the help of J. L., ChatGPT und Gemini.
         </p>
         <button class="btn-action" style="background:#64748b;" onclick="hideCredits()">Back</button>
     </div>
@@ -396,9 +396,9 @@ const PRESETS = {
         advanced: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Accusative with infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Subjunction', 'Other']
     },
     de: {
-        beginner: ['Subjekt', 'Verb', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Sonstiges'],
-        intermediate: ['Subjekt', 'Verb', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Subjunktion', 'Sonstiges'],
-        advanced: ['Subjekt', 'Verb', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'AcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Subjunktion', 'Sonstiges']
+        beginner: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Sonstiges'],
+        intermediate: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Subjunktion', 'Sonstiges'],
+        advanced: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'AcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Subjunktion', 'Sonstiges']
     }
 };
 
@@ -407,7 +407,7 @@ const ABBREVIATIONS = {
         'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Subjunction': 'Subjunc', 'Accusative with infinitive': 'Acc+Inf', 'Other': 'Other', 'Main clause': 'Main'
     },
     de: {
-        'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Subjunktion': 'Subjunk', 'AcI': 'AcI', 'Sonstiges': 'Sonst.', 'Main clause': 'Hauptsatz'
+        'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Subjunktion': 'Subjunk', 'AcI': 'AcI', 'Sonstiges': 'Sonst.', 'Main clause': 'Hauptsatz'
     }
 };
 
@@ -499,6 +499,7 @@ const SEMANTIC_COLORS = {
     'Genitive object': '#d8b4fe', 
     'Genitivobjekt': '#d8b4fe',
     'Verb': '#fca5a5', 
+    'Prädikat': '#fca5a5',
     'Infinitive': '#f0abfc', 
     'Infinitiv': '#f0abfc',
     'Adverb': '#fbcfe8', 
@@ -575,6 +576,7 @@ function normalizeLabel(label) {
         if(lower.includes('participial')) return 'Partizipialkonstruktion';
         if(lower.includes('subject')) return 'Subjekt';
         if(lower.includes('infinitive') && !lower.includes('with')) return 'Infinitiv';
+        if(lower === 'verb') return 'Prädikat';
     } else {
         if(lower.includes('dativ')) return 'Dative object';
         if(lower.includes('akkusativ')) return 'Accusative object';
