@@ -391,23 +391,23 @@ function getOtherLabel() {
 
 const PRESETS = {
     en: {
-        beginner: ['Subject', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Prepositional phrase', 'Verb', 'Other'],
-        intermediate: ['Subject', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Predicative', 'Prepositional phrase', 'Adverb', 'Verb', 'Infinitive', 'Relative clause', 'Subordinate clause', 'Other'],
-        advanced: ['Subject', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Verb', 'Infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Accusative with infinitive', 'Other']
+        beginner: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Prepositional phrase', 'Other'],
+        intermediate: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Relative clause', 'Subordinate clause', 'Subjunction', 'Other'],
+        advanced: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Accusative with infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Subjunction', 'Other']
     },
     de: {
-        beginner: ['Subjekt', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Verb', 'Sonstiges'],
-        intermediate: ['Subjekt', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Verb', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Sonstiges'],
-        advanced: ['Subjekt', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Verb', 'Infinitiv', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'AcI', 'Sonstiges']
+        beginner: ['Subjekt', 'Verb', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Sonstiges'],
+        intermediate: ['Subjekt', 'Verb', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Subjunktion', 'Sonstiges'],
+        advanced: ['Subjekt', 'Verb', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'AcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Subjunktion', 'Sonstiges']
     }
 };
 
 const ABBREVIATIONS = {
     en: {
-        'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Accusative with infinitive': 'Acc+Inf', 'Other': 'Other', 'Main clause': 'Main'
+        'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Subjunction': 'Subjunc', 'Accusative with infinitive': 'Acc+Inf', 'Other': 'Other', 'Main clause': 'Main'
     },
     de: {
-        'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'AcI': 'AcI', 'Sonstiges': 'Sonst.', 'Main clause': 'Hauptsatz'
+        'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Subjunktion': 'Subjunk', 'AcI': 'AcI', 'Sonstiges': 'Sonst.', 'Main clause': 'Hauptsatz'
     }
 };
 
@@ -514,6 +514,8 @@ const SEMANTIC_COLORS = {
     'Relativsatz': '#60a5fa',
     'Subordinate clause': '#a78bfa', 
     'Nebensatz': '#a78bfa',
+    'Subjunction': '#bae6fd',
+    'Subjunktion': '#bae6fd',
     'Accusative with infinitive': '#818cf8', 
     'AcI': '#818cf8',
     'Participial phrase': '#c084fc', 
@@ -569,6 +571,7 @@ function normalizeLabel(label) {
         if(lower.includes('ablative abs')) return 'Ablativus absolutus';
         if(lower.includes('relative')) return 'Relativsatz';
         if(lower.includes('subordinate')) return 'Nebensatz';
+        if(lower.includes('subjunction')) return 'Subjunktion';
         if(lower.includes('participial')) return 'Partizipialkonstruktion';
         if(lower.includes('subject')) return 'Subjekt';
         if(lower.includes('infinitive') && !lower.includes('with')) return 'Infinitiv';
@@ -580,6 +583,7 @@ function normalizeLabel(label) {
         if(lower.includes('ablativus abs')) return 'Ablative absolute';
         if(lower.includes('relativ')) return 'Relative clause';
         if(lower.includes('neben')) return 'Subordinate clause';
+        if(lower.includes('subjunktion')) return 'Subjunction';
         if(lower.includes('partizipial')) return 'Participial phrase';
         if(lower.includes('subjekt')) return 'Subject';
         if(lower.includes('infinitiv') && !lower.includes('aci')) return 'Infinitive';
@@ -1485,7 +1489,14 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             incorrect: "Incorrect. The correct answer is: ",
             tryAgain: "Incorrect label, try again!",
             transPlaceholder: "Enter translation...",
-            docTitle: "Interactive Syntax Explorer"
+            docTitle: "Interactive Syntax Explorer",
+            practiseMode: "Practise Mode",
+            examMode: "Exam Mode",
+            resetWarn: "Changing the mode will reload the page and reset your progress. Continue?",
+            examResults: "Exam Results",
+            copyResults: "Copy to Clipboard",
+            copied: "Copied!",
+            close: "Close"
         },
         de: {
             instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen.<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.",
@@ -1498,7 +1509,14 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             incorrect: "Falsch. Die richtige Antwort ist: ",
             tryAgain: "Falsches Label, versuch es nochmal!",
             transPlaceholder: "Übersetzung eingeben...",
-            docTitle: "Interaktives Syntax-Training"
+            docTitle: "Interaktives Syntax-Training",
+            practiseMode: "Übungsmodus",
+            examMode: "Prüfungsmodus",
+            resetWarn: "Ein Moduswechsel lädt die Seite neu und setzt deinen Fortschritt zurück. Fortfahren?",
+            examResults: "Prüfungsergebnisse",
+            copyResults: "Ergebnisse kopieren",
+            copied: "Kopiert!",
+            close: "Schließen"
         }
     };
 
@@ -1529,6 +1547,12 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         body.high-contrast .g-label { background: #000; color: #fff; border-color: #fff; }
         body.high-contrast .punct { color: #fff; }
         body.high-contrast textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
+        body.high-contrast #btn-practise[style*="background: white"] { background: #333 !important; color: #fff !important; }
+        body.high-contrast #btn-exam[style*="background: white"] { background: #333 !important; color: #fff !important; }
+        body.high-contrast .mode-toggle-bg { background: #1e1e1e !important; border: 1px solid #555; }
+        body.high-contrast #results-modal .results-content { background: #1e1e1e; color: #fff; border: 1px solid #555; }
+        body.high-contrast #results-modal .results-title { color: #fff; }
+        body.high-contrast #results-modal .results-textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
     `;
 
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${pageTitle}</title><style>
@@ -1562,6 +1586,16 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         #toast-container.show { visibility: visible; opacity: 1; bottom: 40px; }
         #toast-container.error { background-color: #7f1d1d; border: 1px solid #ef4444; }
         #toast-container.success { background-color: #064e3b; border: 1px solid #10b981; }
+        
+        #results-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.8); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .results-content { background: white; padding: 40px; border-radius: 12px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .results-title { font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 16px; }
+        .results-score { font-size: 3rem; font-weight: 800; color: #3b82f6; margin-bottom: 24px; }
+        .results-textarea { width: 100%; height: 80px; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; resize: none; margin-bottom: 20px; font-family: monospace; font-size: 0.95rem; background: #f9fafb; color: #374151; outline: none; }
+        .results-textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .btn-copy { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; width: 100%; margin-bottom: 12px; }
+        .btn-copy:hover { background: #059669; }
+
         ${patternCSS}
         ${contrastCSS}
         
@@ -1574,12 +1608,20 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-radius: 8px; }
             .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f3f4f6; }
         }
-        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; } .ex-img { display: none !important; } }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal { display: none !important; } }
     </style></head><body>
     <h1>${pageTitle}</h1>
     <div class="instruction-box">${t.instr}</div>
     ${notes ? `<div class="teacher-note"><span style="font-weight: 500;">${t.note}</span> ${notes.replace(/\n/g, '<br>')}</div>` : ''}
-    <div class="exercise-wrapper"><div id="exercise">${generateExerciseHTML(words, groups, t.transPlaceholder)}</div></div>
+    <div class="exercise-wrapper">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div class="mode-toggle-bg" style="display: inline-flex; background: #e2e8f0; border-radius: 8px; padding: 4px;">
+                <button id="btn-practise" onclick="setMode('practise')" style="background: white; border: none; padding: 6px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #111827; font-size: 0.9rem;">${t.practiseMode}</button>
+                <button id="btn-exam" onclick="setMode('exam')" style="background: transparent; border: none; padding: 6px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; color: #475569; font-size: 0.9rem;">${t.examMode}</button>
+            </div>
+        </div>
+        <div id="exercise">${generateExerciseHTML(words, groups, t.transPlaceholder)}</div>
+    </div>
     ${imgUrl ? `<img src="${imgUrl}" class="ex-img" alt="Exercise Image">` : ''}
     <div class="footer-toolbar">
         <button class="btn" onclick="togglePatterns()">${t.togglePat}</button>
@@ -1590,11 +1632,45 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     <div id="menu-common" class="radio-menu">
         ${filteredLabels.map(l => `<button type="button" class="menu-btn" data-val="${l}">${l}</button>`).join('')}
     </div>
+    
+    <div id="results-modal">
+        <div class="results-content">
+            <div class="results-title">${t.examResults}</div>
+            <div id="final-score-display" class="results-score"></div>
+            <textarea id="results-text" class="results-textarea" readonly></textarea>
+            <button class="btn-copy" onclick="copyResults()">${t.copyResults}</button>
+            <button class="btn" style="width: 100%;" onclick="closeResults()">${t.close}</button>
+        </div>
+    </div>
+
     <div id="toast-container"></div>
     <script>
         const colors = ${JSON.stringify(colors)}; let activeEl = null; let mode = "";
         const menu = document.getElementById('menu-common');
         const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
+        
+        let exMode = 'practise';
+        let examScore = 0;
+        let answeredItems = 0;
+        const totalItems = document.querySelectorAll('.hover-word, .g-label').length;
+
+        function setMode(m) {
+            if (answeredItems > 0) {
+                if(!confirm("${t.resetWarn}")) return;
+                location.reload();
+            }
+            exMode = m;
+            const bp = document.getElementById('btn-practise');
+            const be = document.getElementById('btn-exam');
+            
+            bp.style.background = m === 'practise' ? 'white' : 'transparent';
+            bp.style.boxShadow = m === 'practise' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none';
+            bp.style.color = m === 'practise' ? '#111827' : '#475569';
+            
+            be.style.background = m === 'exam' ? 'white' : 'transparent';
+            be.style.boxShadow = m === 'exam' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none';
+            be.style.color = m === 'exam' ? '#111827' : '#475569';
+        }
         
         document.querySelectorAll('.hover-word, .g-label').forEach(el => {
             el.onclick = (e) => {
@@ -1618,23 +1694,43 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             btn.onclick = (e) => {
                 const sel = btn.dataset.val; 
                 const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans;
-                if(sel === correct) {
-                    solve(activeEl, correct, mode);
-                    showToast("${t.correct}", false);
-                } else { 
-                    let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1;
-                    activeEl.dataset.mistakes = mistakes;
-                    if(mistakes >= 2) {
-                           showToast("${t.incorrect}" + correct, true);
-                           solve(activeEl, correct, mode);
-                    } else {
-                           showToast("${t.tryAgain}", true);
+                
+                if (exMode === 'practise') {
+                    if(sel === correct) {
+                        solve(activeEl, correct, mode);
+                        showToast("${t.correct}", false);
+                        answeredItems++;
+                    } else { 
+                        let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1;
+                        activeEl.dataset.mistakes = mistakes;
+                        if(mistakes >= 2) {
+                               showToast("${t.incorrect}" + correct, true);
+                               solve(activeEl, correct, mode);
+                               answeredItems++;
+                        } else {
+                               showToast("${t.tryAgain}", true);
+                        }
                     }
+                } else {
+                    if(sel === correct) {
+                        solve(activeEl, correct, mode);
+                        showToast("${t.correct}", false);
+                        examScore++;
+                    } else {
+                        showToast("${t.incorrect}" + correct, true);
+                        solve(activeEl, correct, mode);
+                        if(mode === "word") {
+                            activeEl.style.border = "2px solid #ef4444";
+                        } else {
+                            activeEl.parentElement.style.borderColor = "#ef4444";
+                        }
+                    }
+                    answeredItems++;
                 }
+                
                 menu.style.display = "none"; 
                 check();
                 
-                // Focus Logic Fix
                 if (activeEl && !activeEl.dataset.done) {
                     activeEl.focus();
                 } else if (activeEl && activeEl.dataset.done) {
@@ -1691,7 +1787,30 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
                     const b = document.getElementById('t-container-' + i); if(b) b.style.display = 'block';
                 }
             }); 
+            
+            if (answeredItems === totalItems && totalItems > 0 && exMode === 'exam') {
+                setTimeout(() => {
+                    const pct = Math.round((examScore / totalItems) * 100);
+                    document.getElementById('final-score-display').textContent = examScore + " / " + totalItems + " (" + pct + "%)";
+                    document.getElementById('results-text').value = "Exercise: ${pageTitle.replace(/["'`]/g, "")}\\nDate: " + new Date().toLocaleDateString() + "\\nScore: " + examScore + " / " + totalItems + " (" + pct + "%)";
+                    document.getElementById('results-modal').style.display = 'flex';
+                }, 500);
+            }
         }
+
+        function copyResults() {
+            const copyText = document.getElementById("results-text");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                showToast("${t.copied}", false);
+            });
+        }
+
+        function closeResults() {
+            document.getElementById('results-modal').style.display = 'none';
+        }
+
         function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
         document.addEventListener('mousedown', (e) => { if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; });
     <\/script></body></html>`;
