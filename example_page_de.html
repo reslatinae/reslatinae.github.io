@@ -41,6 +41,15 @@
         #toast-container.error { background-color: #7f1d1d; border: 1px solid #ef4444; }
         #toast-container.success { background-color: #064e3b; border: 1px solid #10b981; }
 
+        #results-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.8); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .results-content { background: white; padding: 40px; border-radius: 12px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .results-title { font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 16px; }
+        .results-score { font-size: 3rem; font-weight: 800; color: #3b82f6; margin-bottom: 24px; }
+        .results-textarea { width: 100%; height: 80px; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; resize: none; margin-bottom: 20px; font-family: monospace; font-size: 0.95rem; background: #f9fafb; color: #374151; outline: none; }
+        .results-textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .btn-copy { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; width: 100%; margin-bottom: 12px; }
+        .btn-copy:hover { background: #059669; }
+
         body.pattern-mode .hover-word[data-done="true"] {
             background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.4) 5px, rgba(255,255,255,0.4) 10px);
             border: 2px solid #111827 !important;
@@ -62,6 +71,12 @@
         body.high-contrast .g-label { background: #000; color: #fff; border-color: #fff; }
         body.high-contrast .punct { color: #fff; }
         body.high-contrast textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
+        body.high-contrast #btn-practise[style*="background: white"] { background: #333 !important; color: #fff !important; }
+        body.high-contrast #btn-exam[style*="background: white"] { background: #333 !important; color: #fff !important; }
+        body.high-contrast .mode-toggle-bg { background: #1e1e1e !important; border: 1px solid #555; }
+        body.high-contrast #results-modal .results-content { background: #1e1e1e; color: #fff; border: 1px solid #555; }
+        body.high-contrast #results-modal .results-title { color: #fff; }
+        body.high-contrast #results-modal .results-textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
         
         @media (max-width: 768px) {
             body { margin: 15px; }
@@ -72,7 +87,7 @@
             .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-radius: 8px; }
             .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f3f4f6; }
         }
-        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; } .ex-img { display: none !important; } }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal { display: none !important; } }
     </style>
 </head>
 <body>
@@ -83,6 +98,12 @@
     </div>
 
     <div class="exercise-wrapper">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div class="mode-toggle-bg" style="display: inline-flex; background: #e2e8f0; border-radius: 8px; padding: 4px;">
+                <button id="btn-practise" onclick="setMode('practise')" style="background: white; border: none; padding: 6px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #111827; font-size: 0.9rem;">Übungsmodus</button>
+                <button id="btn-exam" onclick="setMode('exam')" style="background: transparent; border: none; padding: 6px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; color: #475569; font-size: 0.9rem;">Prüfungsmodus</button>
+            </div>
+        </div>
         <div id="exercise">
             <h2>Caesar, De Bello Gallico 1.1</h2>
             <div class="sentence-container">
@@ -137,6 +158,7 @@
     
     <div id="menu-common" class="radio-menu">
         <button type="button" class="menu-btn" data-val="Subjekt">Subjekt</button>
+        <button type="button" class="menu-btn" data-val="Verb">Verb</button>
         <button type="button" class="menu-btn" data-val="Akkusativobjekt">Akkusativobjekt</button>
         <button type="button" class="menu-btn" data-val="Dativobjekt">Dativobjekt</button>
         <button type="button" class="menu-btn" data-val="Genitivobjekt">Genitivobjekt</button>
@@ -145,14 +167,25 @@
         <button type="button" class="menu-btn" data-val="Prädikativum">Prädikativum</button>
         <button type="button" class="menu-btn" data-val="Präpositionale Bestimmung">Präpositionale Bestimmung</button>
         <button type="button" class="menu-btn" data-val="Adverb">Adverb</button>
-        <button type="button" class="menu-btn" data-val="Verb">Verb</button>
         <button type="button" class="menu-btn" data-val="Infinitiv">Infinitiv</button>
+        <button type="button" class="menu-btn" data-val="AcI">AcI</button>
         <button type="button" class="menu-btn" data-val="Partizipialkonstruktion">Partizipialkonstruktion</button>
         <button type="button" class="menu-btn" data-val="Relativsatz">Relativsatz</button>
         <button type="button" class="menu-btn" data-val="Nebensatz">Nebensatz</button>
-        <button type="button" class="menu-btn" data-val="AcI">AcI</button>
+        <button type="button" class="menu-btn" data-val="Subjunktion">Subjunktion</button>
         <button type="button" class="menu-btn" data-val="Sonstiges">Sonstiges</button>
     </div>
+    
+    <div id="results-modal">
+        <div class="results-content">
+            <div class="results-title">Prüfungsergebnisse</div>
+            <div id="final-score-display" class="results-score"></div>
+            <textarea id="results-text" class="results-textarea" readonly></textarea>
+            <button class="btn-copy" onclick="copyResults()">Ergebnisse kopieren</button>
+            <button class="btn" style="width: 100%;" onclick="closeResults()">Schließen</button>
+        </div>
+    </div>
+
     <div id="toast-container"></div>
     
     <script>
@@ -179,6 +212,29 @@
         const menu = document.getElementById('menu-common');
         const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
         
+        let exMode = 'practise';
+        let examScore = 0;
+        let answeredItems = 0;
+        const totalItems = document.querySelectorAll('.hover-word, .g-label').length;
+
+        function setMode(m) {
+            if (answeredItems > 0) {
+                if(!confirm("Ein Moduswechsel lädt die Seite neu und setzt deinen Fortschritt zurück. Fortfahren?")) return;
+                location.reload();
+            }
+            exMode = m;
+            const bp = document.getElementById('btn-practise');
+            const be = document.getElementById('btn-exam');
+            
+            bp.style.background = m === 'practise' ? 'white' : 'transparent';
+            bp.style.boxShadow = m === 'practise' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none';
+            bp.style.color = m === 'practise' ? '#111827' : '#475569';
+            
+            be.style.background = m === 'exam' ? 'white' : 'transparent';
+            be.style.boxShadow = m === 'exam' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none';
+            be.style.color = m === 'exam' ? '#111827' : '#475569';
+        }
+        
         document.querySelectorAll('.hover-word, .g-label').forEach(el => {
             el.onclick = (e) => {
                 e.stopPropagation();
@@ -201,23 +257,43 @@
             btn.onclick = (e) => {
                 const sel = btn.dataset.val; 
                 const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans;
-                if(sel === correct) {
-                    solve(activeEl, correct, mode);
-                    showToast("Richtig!", false);
-                } else { 
-                    let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1;
-                    activeEl.dataset.mistakes = mistakes;
-                    if(mistakes >= 2) {
-                           showToast("Falsch. Die richtige Antwort ist: " + correct, true);
-                           solve(activeEl, correct, mode);
-                    } else {
-                           showToast("Falsches Label, versuch es nochmal!", true);
+                
+                if (exMode === 'practise') {
+                    if(sel === correct) {
+                        solve(activeEl, correct, mode);
+                        showToast("Richtig!", false);
+                        answeredItems++;
+                    } else { 
+                        let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1;
+                        activeEl.dataset.mistakes = mistakes;
+                        if(mistakes >= 2) {
+                               showToast("Falsch. Die richtige Antwort ist: " + correct, true);
+                               solve(activeEl, correct, mode);
+                               answeredItems++;
+                        } else {
+                               showToast("Falsches Label, versuch es nochmal!", true);
+                        }
                     }
+                } else {
+                    if(sel === correct) {
+                        solve(activeEl, correct, mode);
+                        showToast("Richtig!", false);
+                        examScore++;
+                    } else {
+                        showToast("Falsch. Die richtige Antwort ist: " + correct, true);
+                        solve(activeEl, correct, mode);
+                        if(mode === "word") {
+                            activeEl.style.border = "2px solid #ef4444";
+                        } else {
+                            activeEl.parentElement.style.borderColor = "#ef4444";
+                        }
+                    }
+                    answeredItems++;
                 }
+                
                 menu.style.display = "none"; 
                 check();
                 
-                // Focus Logic Fix
                 if (activeEl && !activeEl.dataset.done) {
                     activeEl.focus();
                 } else if (activeEl && activeEl.dataset.done) {
@@ -248,14 +324,14 @@
                 }
             };
         });
-
+        
         function showToast(msg, isError) {
             const x = document.getElementById("toast-container");
             x.textContent = msg;
             x.className = isError ? "show error" : "show success";
             setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
         }
-        
+
         function togglePatterns() { document.body.classList.toggle('pattern-mode'); }
         function toggleContrast() { document.body.classList.toggle('high-contrast'); }
 
@@ -277,8 +353,31 @@
                     const b = document.getElementById('t-container-' + i); if(b) b.style.display = 'block';
                 }
             }); 
+            
+            if (answeredItems === totalItems && totalItems > 0 && exMode === 'exam') {
+                setTimeout(() => {
+                    const pct = Math.round((examScore / totalItems) * 100);
+                    document.getElementById('final-score-display').textContent = examScore + " / " + totalItems + " (" + pct + "%)";
+                    document.getElementById('results-text').value = "Übung: Beispielanalyse: Caesar, Catullus & Vergil\nDatum: " + new Date().toLocaleDateString() + "\nPunktzahl: " + examScore + " / " + totalItems + " (" + pct + "%)";
+                    document.getElementById('results-modal').style.display = 'flex';
+                }, 500);
+            }
         }
-        function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
+
+        function copyResults() {
+            const copyText = document.getElementById("results-text");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                showToast("Kopiert!", false);
+            });
+        }
+
+        function closeResults() {
+            document.getElementById('results-modal').style.display = 'none';
+        }
+
+        function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latein_uebung.html'; a.click(); }
         document.addEventListener('mousedown', (e) => { if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; });
     </script>
 </body>
