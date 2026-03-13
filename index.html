@@ -60,13 +60,21 @@
         .p-btn.active { border-color: #111827; box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1); }
         
         #tagging-area { 
-            padding: 40px 30px 30px 30px; 
-            border: 1px solid var(--border-color); 
+            padding: 20px 0; 
             min-height: 400px; 
-            background: #fff; 
             border-radius: 6px; 
             display: block; 
             line-height: 1.6; 
+        }
+
+        .editor-sentence-box {
+            padding: 30px 20px 20px 20px;
+            margin-bottom: 24px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            line-height: 1.6;
         }
         
         .tag-word { 
@@ -242,7 +250,7 @@
             .palette { position: relative; top: 0; padding: 16px; overflow-x: auto; }
             .palette-grid { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px; }
             .p-btn { white-space: nowrap; padding: 10px 14px; } 
-            #tagging-area { padding: 40px 20px 20px 20px; line-height: 1.6; } 
+            .editor-sentence-box { padding: 20px 10px 10px 10px; }
             .tag-word { font-size: 1rem; padding: 4px 6px; margin: var(--dynamic-margin-top, 24px) 1px 24px 1px; }
             .punct-span { margin: var(--dynamic-margin-top, 24px) 1px 24px 1px; }
             .tag-word::after { font-size: 0.55rem; top: 32px; }
@@ -654,8 +662,9 @@ function setLanguage(lang) {
             activeFunc = newList[idxActive];
         }
 
-        const wordSpans = document.querySelectorAll('.tag-word');
+        const wordSpans = document.querySelectorAll('#tagging-area span.tag-word, #tagging-area span.punct-span');
         wordSpans.forEach(span => {
+            if (span.classList.contains('punct-span')) return;
             const currentF = span.dataset.func;
             const idx = oldList.indexOf(currentF);
             if(idx !== -1) {
@@ -681,7 +690,7 @@ function setLanguage(lang) {
     functions = [...PRESETS[lang][currentLevel]];
     
     if(document.getElementById('editor-screen').style.display === 'block') {
-        document.querySelectorAll('.tag-word').forEach(span => {
+        document.querySelectorAll('#tagging-area span.tag-word').forEach(span => {
             let f = span.dataset.func;
             if(f && f !== 'Punct' && !functions.includes(f)) functions.push(f);
         });
@@ -704,7 +713,7 @@ function changeLevel(level) {
     functions = [...PRESETS[currentLang][level]];
     
     if (document.getElementById('editor-screen').style.display === 'block') {
-        document.querySelectorAll('.tag-word').forEach(span => {
+        document.querySelectorAll('#tagging-area span.tag-word').forEach(span => {
             let f = span.dataset.func;
             if(f && f !== 'Punct' && !functions.includes(f)) {
                 functions.push(f);
@@ -726,8 +735,12 @@ let activeFunc = 'Other', groupMode = false, splitMode = false, startIdx = null,
 let pendingGroupStart = null, pendingGroupEnd = null, editingGroupIndex = null;
 let historyStack = [];
 
+let swipeStartIdx = null;
+let swipeCurrentIdx = null;
+let isSwiping = false;
+
 function saveState() {
-    const currentWords = Array.from(document.getElementById('tagging-area').children).map(node => {
+    const currentWords = Array.from(document.querySelectorAll('#tagging-area span.tag-word, #tagging-area span.punct-span')).map(node => {
         const isPunct = node.classList.contains('punct-span');
         return { 
             w: getWordText(node), 
@@ -750,12 +763,17 @@ function undo() {
     currentGroups = lastState.groups;
     restoreEditorState(lastState.words);
     startIdx = null; 
-    document.querySelectorAll('.tag-word').forEach(s => s.style.outline = "none");
+    document.querySelectorAll('#tagging-area span.tag-word').forEach(s => s.style.outline = "none");
 }
 
 function restoreEditorState(words) {
     const area = document.getElementById('tagging-area');
     area.innerHTML = '';
+    
+    let currentSentenceBox = document.createElement('div');
+    currentSentenceBox.className = 'editor-sentence-box';
+    area.appendChild(currentSentenceBox);
+
     words.forEach((item, i) => {
         const span = document.createElement('span');
         const isPunct = item.f === 'Punct';
@@ -789,7 +807,16 @@ function restoreEditorState(words) {
             span.dataset.func = 'Punct'; 
             span.ondblclick = function(e) { handleWordDoubleClick(this, e); };
         }
-        area.appendChild(span);
+        
+        currentSentenceBox.appendChild(span);
+
+        if (isPunct && sentenceEnders.some(char => item.w.includes(char))) {
+            if (i < words.length - 1) { 
+                currentSentenceBox = document.createElement('div');
+                currentSentenceBox.className = 'editor-sentence-box';
+                area.appendChild(currentSentenceBox);
+            }
+        }
     });
     updateGroupUI();
 }
@@ -811,9 +838,9 @@ function handleWordDoubleClick(el, e) {
 function triggerAutoSave() {
     if(document.getElementById('editor-screen').style.display === 'block' || document.getElementById('entertext').value.length > 5) {
         let currentWords = [];
-        const taggingArea = document.getElementById('tagging-area');
-        if(taggingArea.children.length > 0) {
-             currentWords = Array.from(taggingArea.children).map((node) => {
+        const nodes = document.querySelectorAll('#tagging-area span.tag-word, #tagging-area span.punct-span');
+        if(nodes.length > 0) {
+             currentWords = Array.from(nodes).map((node) => {
                 const isPunct = node.classList.contains('punct-span');
                 return { 
                     w: getWordText(node), 
@@ -862,6 +889,81 @@ window.addEventListener('DOMContentLoaded', () => {
         } catch(e) { console.error("Autosave Error", e); }
     }
     setInterval(triggerAutoSave, 10000);
+    
+    // Swipe to select implementation
+    const taggingArea = document.getElementById('tagging-area');
+
+    taggingArea.addEventListener('touchstart', (e) => {
+        if (!groupMode) return;
+        const word = e.target.closest('.tag-word');
+        if (word) {
+            swipeStartIdx = parseInt(word.dataset.idx);
+            swipeCurrentIdx = swipeStartIdx;
+            isSwiping = false;
+        }
+    }, {passive: true});
+
+    taggingArea.addEventListener('touchmove', (e) => {
+        if (!groupMode || swipeStartIdx === null) return;
+        isSwiping = true;
+        if (e.cancelable) e.preventDefault(); // Stop scrolling while drawing
+        
+        const touch = e.touches[0];
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
+        
+        if (el && el.classList.contains('tag-word')) {
+            const domIdx = parseInt(el.dataset.idx);
+            if (domIdx !== swipeCurrentIdx) {
+                swipeCurrentIdx = domIdx;
+                
+                // Clear previous dashed highlights
+                document.querySelectorAll('#tagging-area span.tag-word').forEach(s => {
+                    if (startIdx !== null && parseInt(s.dataset.idx) === startIdx) {
+                        s.style.outline = "2px solid #8b5cf6";
+                    } else {
+                        s.style.outline = "none";
+                    }
+                });
+                
+                // Add new dashed highlights for the swipe range
+                const min = Math.min(swipeStartIdx, swipeCurrentIdx);
+                const max = Math.max(swipeStartIdx, swipeCurrentIdx);
+                for(let i = min; i <= max; i++) {
+                    const wEl = document.getElementById(`word-${i}`);
+                    if(wEl && !wEl.classList.contains('punct-span')) {
+                        wEl.style.outline = "2px dashed #8b5cf6";
+                        wEl.style.outlineOffset = "2px";
+                    }
+                }
+            }
+        }
+    }, {passive: false});
+
+    taggingArea.addEventListener('touchend', (e) => {
+        if (!groupMode || swipeStartIdx === null) return;
+        
+        if (isSwiping && swipeCurrentIdx !== null && swipeCurrentIdx !== swipeStartIdx) {
+            if (e.cancelable) e.preventDefault(); 
+            pendingGroupStart = Math.min(swipeStartIdx, swipeCurrentIdx);
+            pendingGroupEnd = Math.max(swipeStartIdx, swipeCurrentIdx);
+            
+            document.querySelectorAll('#tagging-area span.tag-word').forEach(s => s.style.outline = "none");
+            startIdx = null; 
+            openGroupModal();
+        } else if (isSwiping) {
+            document.querySelectorAll('#tagging-area span.tag-word').forEach(s => {
+                if (startIdx !== null && parseInt(s.dataset.idx) === startIdx) {
+                    s.style.outline = "2px solid #8b5cf6";
+                } else {
+                    s.style.outline = "none";
+                }
+            });
+        }
+        
+        swipeStartIdx = null;
+        swipeCurrentIdx = null;
+        isSwiping = false;
+    });
 });
 
 function restoreAutoSave(data) {
@@ -897,7 +999,7 @@ function addCustomLabel() {
 }
 
 function saveProject() {
-    const domWords = Array.from(document.getElementById('tagging-area').children).map((node) => {
+    const domWords = Array.from(document.querySelectorAll('#tagging-area span.tag-word, #tagging-area span.punct-span')).map((node) => {
         const isPunct = node.classList.contains('punct-span');
         return { 
             w: getWordText(node), 
@@ -1118,7 +1220,7 @@ function handleWordClick(el) {
         const text = getWordText(el);
         
         if (text.includes(' ')) {
-            let currentWords = Array.from(document.getElementById('tagging-area').children).map((node) => {
+            let currentWords = Array.from(document.querySelectorAll('#tagging-area span.tag-word, #tagging-area span.punct-span')).map((node) => {
                 const isPunct = node.classList.contains('punct-span');
                 return { 
                     w: getWordText(node), 
@@ -1153,14 +1255,14 @@ function handleWordClick(el) {
     } 
     else if(groupMode) {
         if(startIdx === null) { 
-            startIdx = domIdx; el.style.outline = "2px solid #8b5cf6"; outlineOffset = "2px";
+            startIdx = domIdx; el.style.outline = "2px solid #8b5cf6"; el.style.outlineOffset = "2px";
         } 
         else {
             pendingGroupStart = Math.min(startIdx, domIdx);
             pendingGroupEnd = Math.max(startIdx, domIdx);
             openGroupModal();
             startIdx = null;
-            document.querySelectorAll('.tag-word').forEach(s => s.style.outline = "none");
+            document.querySelectorAll('#tagging-area span.tag-word').forEach(s => s.style.outline = "none");
         }
     } else { 
         if (el.dataset.func !== activeFunc) {
@@ -1258,7 +1360,7 @@ function adjustGroupStart(groupIndex, delta) {
 function adjustGroupEnd(groupIndex, delta) {
     let g = currentGroups[groupIndex];
     let newEnd = g.end + delta;
-    const maxIdx = document.getElementById('tagging-area').children.length - 1;
+    const maxIdx = document.querySelectorAll('#tagging-area span.tag-word, #tagging-area span.punct-span').length - 1;
     
     while(newEnd >= g.start && newEnd <= maxIdx) {
         let el = document.getElementById(`word-${newEnd}`);
@@ -1396,7 +1498,7 @@ function toggleSplitMode() { splitMode = !splitMode; groupMode = false; activeFu
 function toggleGroupMode() { groupMode = !groupMode; splitMode = false; activeFunc = getOtherLabel(); updatePalette(); updateButtonStates(); }
 
 function exportToStudent() {
-    const nodes = Array.from(document.getElementById('tagging-area').children);
+    const nodes = Array.from(document.querySelectorAll('#tagging-area span.tag-word, #tagging-area span.punct-span'));
     let tempTokens = nodes.map(node => {
         const isPunct = node.classList.contains('punct-span');
         return { 
@@ -1469,14 +1571,14 @@ function exportToStudent() {
     const imgUrl = document.getElementById('pageimage').value;
     const teacherNotes = document.getElementById('teachernotes').value;
     
-    const blob = new Blob([generateStudentHTML(merged, updatedGroups, titleInput, functions, imgUrl, teacherNotes, currentLang)], {type: 'text/html'});
+    const blob = new Blob([generateStudentHTML(merged, updatedGroups, titleInput, functions, imgUrl, teacherNotes, currentLang, ABBREVIATIONS[currentLang])], {type: 'text/html'});
     const a = document.createElement('a'); 
     a.href = URL.createObjectURL(blob); 
     a.download = filename; 
     a.click();
 }
 
-function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lang) {
+function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lang, abbrevs) {
     const filteredLabels = allLabels.filter(l => l !== "Main clause" && l !== "Hauptsatz");
     
     const studentTexts = {
@@ -1567,13 +1669,13 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         .exercise-wrapper { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; line-height: 4.2; }
         .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
         .hover-word:focus-visible, .g-label:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
-        .s-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom:none; border-radius: 6px 6px 0 0; padding: 20px 6px 6px 6px; margin: 0 4px; vertical-align: bottom; }
+        .s-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom:none; border-radius: 6px 6px 0 0; padding: 20px 6px 6px 6px; margin: 0 4px; vertical-align: bottom; transition: all 0.2s; }
         .g-label { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; background: white; border: 1px solid #94a3b8; border-radius: 4px; padding: 3px 8px; white-space: nowrap; color: #475569; text-transform: uppercase; cursor: pointer; }
         .punct { font-size: 1.15rem; margin: 0 2px; vertical-align: baseline; display:inline-block; font-weight: 500; }
         .trans-box { margin: 24px 0 50px; line-height: 1.5; }
         textarea { width: 100%; height: 80px; font-size: 1.1rem; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
         textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; margin-top: 8px; width: 150px; text-align: center; color: #059669; pointer-events: none; }
+        .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; margin-top: 8px; white-space: nowrap; text-align: center; color: #059669; pointer-events: none; }
         
         .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #e5e7eb; padding: 4px 0; z-index: 1000; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 85vh; overflow-y: auto; min-width: 150px; line-height: 1.2; }
         .menu-btn { display: block; width: 100%; text-align: left; border: none; background: transparent; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #374151; transition: background-color 0.1s; font-family: inherit; }
@@ -1648,6 +1750,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     <div id="toast-container"></div>
     <script>
         const colors = ${JSON.stringify(colors)}; let activeEl = null; let mode = "";
+        const abbreviations = ${JSON.stringify(abbrevs)};
         const menu = document.getElementById('menu-common');
         const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
         
@@ -1772,16 +1875,30 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         }
         function togglePatterns() { document.body.classList.toggle('pattern-mode'); }
         function toggleContrast() { document.body.classList.toggle('high-contrast'); }
+        
         function solve(el, ans, m) {
             if(m === "word") {
                 const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
                 el.style.backgroundColor = colors[ans]; el.dataset.done = "true";
                 el.removeAttribute('tabindex');
+                
+                // Prevent overlapping by using abbreviations
+                if (s.offsetWidth > el.offsetWidth + 8) {
+                    s.textContent = abbreviations[ans] || ans.substring(0, 4) + '.';
+                    s.title = ans; // Tooltip to show full text
+                }
             } else { 
                 el.textContent = ans; el.dataset.done = "true"; el.style.background = "#f0fdf4"; 
                 el.removeAttribute('tabindex');
+                
+                // Check for group overlap
+                if (el.offsetWidth > el.parentElement.offsetWidth) {
+                    el.textContent = abbreviations[ans] || ans.substring(0, 4) + '.';
+                    el.title = ans; // Tooltip to show full text
+                }
             }
         }
+        
         function check() { 
             document.querySelectorAll('.sentence-container').forEach((s, i) => { 
                 const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')];
