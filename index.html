@@ -95,6 +95,16 @@
             transition: margin-top 0.3s ease;
         }
         
+        /* Hint indicator for words in editor */
+        .tag-word[data-hint]::before {
+            content: '💡';
+            position: absolute;
+            top: -12px;
+            right: -8px;
+            font-size: 0.7rem;
+            pointer-events: none;
+        }
+
         .punct-span { 
             display: inline-block; 
             margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; 
@@ -241,6 +251,7 @@
         .modal-input { width: 100%; padding: 12px; margin-bottom: 24px; font-size: 1rem; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 6px; outline: none; }
         .modal-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         .modal-actions { display: flex; justify-content: flex-end; gap: 12px; }
+        .modal-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #4b5563; }
 
         @media (max-width: 768px) {
             body { margin: 10px; padding: 0; }
@@ -376,12 +387,34 @@
     <div id="group-modal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-title" id="modal-title-text">Name this Syntactic Group:</div>
+            
+            <label class="modal-label" id="lbl-group-name">Group Name:</label>
             <input type="text" id="group-name-input" class="modal-input" list="label-suggestions" placeholder="Type to search...">
             <datalist id="label-suggestions"></datalist>
             
+            <label class="modal-label" id="lbl-group-hint">Hint (optional):</label>
+            <input type="text" id="group-hint-input" class="modal-input" placeholder="E.g. Look out for the ablative...">
+
             <div class="modal-actions">
                 <button class="btn-action" style="background:#64748b;" onclick="closeGroupModal()" id="btn-cancel">Cancel</button>
                 <button class="btn-action" style="background:var(--primary-color);" onclick="saveGroupFromModal()" id="btn-save-group">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="word-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title" id="word-modal-title">Edit Word</div>
+            
+            <label class="modal-label" id="lbl-word-text">Word Text:</label>
+            <input type="text" id="word-text-input" class="modal-input">
+            
+            <label class="modal-label" id="lbl-word-hint">Hint (optional):</label>
+            <input type="text" id="word-hint-input" class="modal-input" placeholder="E.g. Derived from...">
+
+            <div class="modal-actions">
+                <button class="btn-action" style="background:#64748b;" onclick="closeWordModal()" id="btn-word-cancel">Cancel</button>
+                <button class="btn-action" style="background:var(--primary-color);" onclick="saveWordFromModal()" id="btn-word-save">Save</button>
             </div>
         </div>
     </div>
@@ -441,8 +474,11 @@ const LANG = {
         optInt: "Intermediate",
         optAdv: "Advanced (All)",
         editH3: "Step 2: Editing Instruction",
-        editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups using the ◀ and ▶ arrows on their labels. Double-click any word to correct typos. Use 'Undo' to revert your last action. At the end, hit 'Export Student Page'.",
-        editWordPrompt: "Edit word text:",
+        editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups using the ◀ and ▶ arrows on their labels. Double-click any word to correct typos or add helpful hints (💡). You can also add hints to groups when drawing a bracket. Use 'Undo' to revert your last action. At the end, hit 'Export Student Page'.",
+        wordModalTitle: "Edit Word & Hint",
+        wordTextLabel: "Word Text:",
+        hintLabel: "Hint (optional):",
+        groupHintLabel: "Group Hint (optional):",
         phLabel: "New Label",
         btnUndo: "↶ Undo",
         btnSplit: "Manual Split",
@@ -452,7 +488,7 @@ const LANG = {
         btnLoadWork: "📂 Load Work",
         modalTitle: "Name this Syntactic Group:",
         btnCancel: "Cancel",
-        btnSaveGroup: "Save Group",
+        btnSaveGroup: "Save",
         modeTag: "Mode: Tagging",
         modeSplit: "Mode: Manual Split",
         modeBracket: "Mode: Drawing Bracket"
@@ -478,8 +514,11 @@ const LANG = {
         optInt: "Fortgeschritten",
         optAdv: "Profi (Alle)",
         editH3: "Schritt 2: Bearbeitung",
-        editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter mit gleicher Funktion verschmelzen automatisch, es sei denn, Sie nutzen 'Manuell trennen'. Im Modus 'Manuell trennen' können Sie auch auf Mehrwortgruppen klicken, um diese wieder zu trennen. Um größere Gruppen zu erstellen, klicken Sie auf 'Klammer zeichnen', wählen Sie Start- und Endwort und benennen die Gruppe. Sie können auf den Namen einer Gruppe klicken, um ihn zu ändern. Sie können die Grenzen bestehender Gruppen mit den Pfeilen ◀ und ▶ an ihren Labels anpassen. Ein Doppelklick auf ein Wort ermöglicht die Korrektur von Tippfehlern. Nutzen Sie 'Rückgängig' bei Fehlern. Klicken Sie am Ende auf 'Schülerseite exportieren'.",
-        editWordPrompt: "Worttext bearbeiten:",
+        editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter mit gleicher Funktion verschmelzen automatisch, es sei denn, Sie nutzen 'Manuell trennen'. Im Modus 'Manuell trennen' können Sie auch auf Mehrwortgruppen klicken, um diese wieder zu trennen. Um größere Gruppen zu erstellen, klicken Sie auf 'Klammer zeichnen', wählen Sie Start- und Endwort und benennen die Gruppe. Sie können auf den Namen einer Gruppe klicken, um ihn zu ändern. Sie können die Grenzen bestehender Gruppen mit den Pfeilen ◀ und ▶ an ihren Labels anpassen. Ein Doppelklick auf ein Wort ermöglicht die Korrektur von Tippfehlern und das Hinzufügen von Hilfestellungen (💡). Auch beim Zeichnen einer Klammer können Hinweise für Gruppen hinzugefügt werden. Nutzen Sie 'Rückgängig' bei Fehlern. Klicken Sie am Ende auf 'Schülerseite exportieren'.",
+        wordModalTitle: "Wort & Hinweis bearbeiten",
+        wordTextLabel: "Worttext:",
+        hintLabel: "Hinweis (optional):",
+        groupHintLabel: "Gruppen-Hinweis (optional):",
         phLabel: "Neues Label",
         btnUndo: "↶ Rückgängig",
         btnSplit: "Manuell trennen",
@@ -645,9 +684,18 @@ function setLanguage(lang) {
     document.getElementById('btn-export').textContent = txt.btnExport;
     document.getElementById('btn-save-work').textContent = txt.btnSaveWork;
     document.getElementById('btn-load-work').textContent = txt.btnLoadWork;
+    
+    // Modal Texts
     document.getElementById('modal-title-text').textContent = txt.modalTitle;
+    document.getElementById('lbl-group-hint').textContent = txt.groupHintLabel;
     document.getElementById('btn-cancel').textContent = txt.btnCancel;
     document.getElementById('btn-save-group').textContent = txt.btnSaveGroup;
+    
+    document.getElementById('word-modal-title').textContent = txt.wordModalTitle;
+    document.getElementById('lbl-word-text').textContent = txt.wordTextLabel;
+    document.getElementById('lbl-word-hint').textContent = txt.hintLabel;
+    document.getElementById('btn-word-cancel').textContent = txt.btnCancel;
+    document.getElementById('btn-word-save').textContent = txt.btnSaveGroup;
 
     const exampleLink = document.getElementById('link-example');
     if(lang === 'de') exampleLink.href = "example_page_de.html";
@@ -733,6 +781,7 @@ const sentenceEnders = ['.', '!', '?', '·'];
 
 let activeFunc = 'Other', groupMode = false, splitMode = false, startIdx = null, currentGroups = [];
 let pendingGroupStart = null, pendingGroupEnd = null, editingGroupIndex = null;
+let editingWordNode = null;
 let historyStack = [];
 
 let swipeStartIdx = null;
@@ -746,7 +795,8 @@ function saveState() {
             w: getWordText(node), 
             f: isPunct ? 'Punct' : (node.dataset.func || getOtherLabel()),
             isSplit: node.classList.contains('split-right'),
-            idx: node.dataset.idx
+            idx: node.dataset.idx,
+            h: node.dataset.hint || ""
         };
     });
     const groupsCopy = JSON.parse(JSON.stringify(currentGroups));
@@ -800,12 +850,37 @@ function restoreEditorState(words) {
             const shortLabel = ABBREVIATIONS[currentLang][func] || (func.length > 6 ? func.substring(0,5)+"." : func);
             span.dataset.short = shortLabel;
 
+            if(item.h) span.dataset.hint = item.h;
+
             span.style.backgroundColor = colors[func];
-            span.onclick = function() { handleWordClick(this); };
-            span.ondblclick = function(e) { handleWordDoubleClick(this, e); };
+            
+            // Re-engineered click logic to prevent single-click taking action on a double-click
+            span.onclick = function(e) { 
+                const el = this;
+                if (el.clickTimer) clearTimeout(el.clickTimer);
+                el.clickTimer = setTimeout(() => {
+                    handleWordClick(el);
+                    el.clickTimer = null;
+                }, 350); 
+            };
+            span.ondblclick = function(e) { 
+                const el = this;
+                if (el.clickTimer) {
+                    clearTimeout(el.clickTimer);
+                    el.clickTimer = null;
+                }
+                handleWordDoubleClick(el, e); 
+            };
         } else { 
             span.dataset.func = 'Punct'; 
-            span.ondblclick = function(e) { handleWordDoubleClick(this, e); };
+            span.ondblclick = function(e) { 
+                const el = this;
+                if (el.clickTimer) {
+                    clearTimeout(el.clickTimer);
+                    el.clickTimer = null;
+                }
+                handleWordDoubleClick(el, e); 
+            };
         }
         
         currentSentenceBox.appendChild(span);
@@ -823,16 +898,38 @@ function restoreEditorState(words) {
 
 function handleWordDoubleClick(el, e) {
     e.stopPropagation();
-    const currentText = getWordText(el);
-    const newText = prompt(LANG[currentLang].editWordPrompt, currentText);
-    if (newText !== null && newText.trim() !== "") {
+    editingWordNode = el;
+    document.getElementById('word-text-input').value = getWordText(el);
+    document.getElementById('word-hint-input').value = el.dataset.hint || "";
+    document.getElementById('word-modal').style.display = 'flex';
+    document.getElementById('word-text-input').focus();
+}
+
+function closeWordModal() {
+    document.getElementById('word-modal').style.display = 'none';
+    editingWordNode = null;
+}
+
+function saveWordFromModal() {
+    if (!editingWordNode) return;
+    const newText = document.getElementById('word-text-input').value.trim();
+    const newHint = document.getElementById('word-hint-input').value.trim();
+    
+    if (newText) {
         saveState();
-        Array.from(el.childNodes).forEach(n => {
+        Array.from(editingWordNode.childNodes).forEach(n => {
             if(n.nodeType === Node.TEXT_NODE) n.textContent = '';
         });
-        el.insertBefore(document.createTextNode(newText.trim()), el.firstChild);
+        editingWordNode.insertBefore(document.createTextNode(newText), editingWordNode.firstChild);
+        
+        if(newHint) {
+            editingWordNode.dataset.hint = newHint;
+        } else {
+            delete editingWordNode.dataset.hint;
+        }
         triggerAutoSave();
     }
+    closeWordModal();
 }
 
 function triggerAutoSave() {
@@ -845,7 +942,8 @@ function triggerAutoSave() {
                 return { 
                     w: getWordText(node), 
                     f: isPunct ? 'Punct' : (node.dataset.func || getOtherLabel()),
-                    isSplit: node.classList.contains('split-right')
+                    isSplit: node.classList.contains('split-right'),
+                    h: node.dataset.hint || ""
                 };
             });
         }
@@ -1004,7 +1102,8 @@ function saveProject() {
         return { 
             w: getWordText(node), 
             f: isPunct ? 'Punct' : (node.dataset.func || getOtherLabel()),
-            isSplit: node.classList.contains('split-right')
+            isSplit: node.classList.contains('split-right'),
+            h: node.dataset.hint || ""
         };
     });
     const projectData = { 
@@ -1225,7 +1324,8 @@ function handleWordClick(el) {
                 return { 
                     w: getWordText(node), 
                     f: isPunct ? 'Punct' : (node.dataset.func || getOtherLabel()),
-                    isSplit: node.classList.contains('split-right')
+                    isSplit: node.classList.contains('split-right'),
+                    h: node.dataset.hint || ""
                 };
             });
             
@@ -1235,7 +1335,8 @@ function handleWordClick(el) {
             const newItems = parts.map((p, i) => ({
                 w: p,
                 f: getOtherLabel(), 
-                isSplit: i === parts.length - 1 ? currentWords[domIdx].isSplit : false
+                isSplit: i === parts.length - 1 ? currentWords[domIdx].isSplit : false,
+                h: currentWords[domIdx].h
             }));
             
             currentWords.splice(domIdx, 1, ...newItems);
@@ -1279,11 +1380,13 @@ function openGroupModal() {
     const modal = document.getElementById('group-modal');
     const datalist = document.getElementById('label-suggestions');
     const input = document.getElementById('group-name-input');
+    const hintInput = document.getElementById('group-hint-input');
     datalist.innerHTML = '';
     functions.forEach(f => {
         const opt = document.createElement('option'); opt.value = f; datalist.appendChild(opt);
     });
     input.value = ''; 
+    hintInput.value = '';
     modal.style.display = 'flex'; 
     input.focus();
 }
@@ -1293,11 +1396,13 @@ function editGroupLabel(index) {
     const modal = document.getElementById('group-modal');
     const datalist = document.getElementById('label-suggestions');
     const input = document.getElementById('group-name-input');
+    const hintInput = document.getElementById('group-hint-input');
     datalist.innerHTML = '';
     functions.forEach(f => {
         const opt = document.createElement('option'); opt.value = f; datalist.appendChild(opt);
     });
     input.value = currentGroups[index].label;
+    hintInput.value = currentGroups[index].hint || "";
     modal.style.display = 'flex';
     input.focus();
 }
@@ -1311,6 +1416,8 @@ function closeGroupModal() {
 
 function saveGroupFromModal() {
     const label = document.getElementById('group-name-input').value.trim();
+    const hint = document.getElementById('group-hint-input').value.trim();
+    
     if(label) {
         saveState(); 
         
@@ -1323,8 +1430,12 @@ function saveGroupFromModal() {
 
         if(editingGroupIndex !== null) {
             currentGroups[editingGroupIndex].label = label;
+            if(hint) currentGroups[editingGroupIndex].hint = hint;
+            else delete currentGroups[editingGroupIndex].hint;
         } else if(pendingGroupStart !== null) {
-            currentGroups.push({ start: pendingGroupStart, end: pendingGroupEnd, label: label });
+            let newGroup = { start: pendingGroupStart, end: pendingGroupEnd, label: label };
+            if(hint) newGroup.hint = hint;
+            currentGroups.push(newGroup);
         }
         
         updateGroupUI();
@@ -1335,6 +1446,7 @@ function saveGroupFromModal() {
 
 document.getElementById('group-name-input').addEventListener("keypress", function(event) { if (event.key === "Enter") saveGroupFromModal(); });
 document.getElementById('group-name-input').addEventListener("keyup", function(event) { if (event.key === "Escape") closeGroupModal(); });
+document.getElementById('group-hint-input').addEventListener("keypress", function(event) { if (event.key === "Enter") saveGroupFromModal(); });
 
 function adjustGroupStart(groupIndex, delta) {
     let g = currentGroups[groupIndex];
@@ -1449,6 +1561,7 @@ function updateGroupUI() {
                 badge.style.background = groupColor;
                 
                 let labelHTML = `<span class="clickable-label" title="Rename group" onclick="event.stopPropagation(); editGroupLabel(${g.originalIndex})">${g.label}</span>`;
+                if(g.hint) labelHTML += ' <span style="font-size:0.7rem;">💡</span>';
                 
                 if (actualStart === actualEnd) {
                     badge.innerHTML = `
@@ -1505,7 +1618,8 @@ function exportToStudent() {
             w: getWordText(node), 
             f: isPunct ? 'Punct' : node.dataset.func,
             isSplit: node.classList.contains('split-right'),
-            idx: parseInt(node.dataset.idx)
+            idx: parseInt(node.dataset.idx),
+            hint: node.dataset.hint || ""
         };
     });
 
@@ -1551,9 +1665,12 @@ function exportToStudent() {
         if (canMerge) {
             current.w += (['.', ',', ';', ':', '!', '?'].includes(token.w) ? '' : ' ') + token.w; 
             current.originalIndices.push(token.idx);
+            if(token.hint) {
+                current.hint = current.hint ? current.hint + " | " + token.hint : token.hint;
+            }
         } else {
             if (current) merged.push(current);
-            current = { w: token.w, f: token.f, originalIndices: [token.idx], activeGroups: token.activeGroups };
+            current = { w: token.w, f: token.f, originalIndices: [token.idx], activeGroups: token.activeGroups, hint: token.hint };
         }
     });
     if (current) merged.push(current);
@@ -1562,7 +1679,7 @@ function exportToStudent() {
         const newStart = merged.findIndex(m => m.originalIndices.includes(g.start));
         let newEnd = merged.findIndex(m => m.originalIndices.includes(g.end));
         if(newEnd === -1) newEnd = newStart; 
-        return { ...g, start: newStart, end: newEnd, label: g.label };
+        return { ...g, start: newStart, end: newEnd, label: g.label, hint: g.hint };
     });
 
     const defaultTitle = currentLang === 'en' ? 'Interactive Syntax Explorer' : 'Interaktives Syntax-Training';
@@ -1583,7 +1700,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     
     const studentTexts = {
         en: {
-            instr: "This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words—or navigate to them using the Tab and Enter keys—to select their syntactical function.<br><br>Once you have correctly analyzed every word group in a sentence, a textbox will appear into which you can write your translation.",
+            instr: "This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words—or navigate to them using the Tab and Enter keys—to select their syntactical function. If you see a light bulb icon (💡), click on it for a helpful hint!<br><br>Once you have correctly analyzed every word group in a sentence, a textbox will appear into which you can write your translation.",
             note: "Note:",
             togglePat: "Toggle Patterns",
             toggleCon: "High Contrast",
@@ -1603,7 +1720,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             close: "Close"
         },
         de: {
-            instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen.<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.",
+            instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen. Wenn du ein Glühbirnen-Symbol (💡) siehst, klicke darauf, um einen hilfreichen Tipp zu erhalten!<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.",
             note: "Hinweis:",
             togglePat: "Muster umschalten",
             toggleCon: "Hoher Kontrast",
@@ -1657,6 +1774,8 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         body.high-contrast #results-modal .results-content { background: #1e1e1e; color: #fff; border: 1px solid #555; }
         body.high-contrast #results-modal .results-title { color: #fff; }
         body.high-contrast #results-modal .results-textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
+        body.high-contrast .tooltip-text { background-color: #fff; color: #000; border: 1px solid #ccc; }
+        body.high-contrast .tooltip-text::after { border-color: #fff transparent transparent transparent; }
     `;
 
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${pageTitle}</title><style>
@@ -1670,13 +1789,19 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
         .hover-word:focus-visible, .g-label:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
         .s-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom:none; border-radius: 6px 6px 0 0; padding: 20px 6px 6px 6px; margin: 0 4px; vertical-align: bottom; transition: all 0.2s; }
-        .g-label { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; background: white; border: 1px solid #94a3b8; border-radius: 4px; padding: 3px 8px; white-space: nowrap; color: #475569; text-transform: uppercase; cursor: pointer; }
+        .g-label { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; background: white; border: 1px solid #94a3b8; border-radius: 4px; padding: 3px 8px; white-space: nowrap; color: #475569; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 2px; }
         .punct { font-size: 1.15rem; margin: 0 2px; vertical-align: baseline; display:inline-block; font-weight: 500; }
         .trans-box { margin: 24px 0 50px; line-height: 1.5; }
         textarea { width: 100%; height: 80px; font-size: 1.1rem; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
         textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; margin-top: 8px; white-space: nowrap; text-align: center; color: #059669; pointer-events: none; }
         
+        .hint-icon { position: absolute; top: -12px; right: -8px; font-size: 0.75rem; cursor: pointer; text-decoration: none; filter: grayscale(0.2); transition: filter 0.2s; z-index: 20; }
+        .hint-icon:hover { filter: grayscale(0); }
+        .tooltip-text { visibility: hidden; width: max-content; max-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; position: absolute; z-index: 1000; bottom: 150%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.85rem; font-weight: normal; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none; white-space: normal; line-height: 1.4; text-transform: none; }
+        .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #1f2937 transparent transparent transparent; }
+        .hint-icon.show-tooltip .tooltip-text { visibility: visible; opacity: 1; }
+
         .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #e5e7eb; padding: 4px 0; z-index: 1000; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 85vh; overflow-y: auto; min-width: 150px; line-height: 1.2; }
         .menu-btn { display: block; width: 100%; text-align: left; border: none; background: transparent; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #374151; transition: background-color 0.1s; font-family: inherit; }
         .menu-btn:hover, .menu-btn:focus-visible { background-color: #f3f4f6; color: #111827; outline: none; }
@@ -1716,7 +1841,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     </style></head><body>
     <h1>${pageTitle}</h1>
     <div class="instruction-box">${t.instr}</div>
-    ${notes ? `<div class="teacher-note"><span style="font-weight: 500;">${t.note}</span> ${notes.replace(/\n/g, '<br>')}</div>` : ''}
+    ${notes ? `<div class="teacher-note"><span style="font-weight: 500;">${t.note}</span> ${notes.replace(/\\n/g, '<br>')}</div>` : ''}
     <div class="exercise-wrapper">
         <div style="text-align: center; margin-bottom: 24px;">
             <div class="mode-toggle-bg" style="display: inline-flex; background: #e2e8f0; border-radius: 8px; padding: 4px;">
@@ -1931,7 +2056,11 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         }
 
         function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
-        document.addEventListener('mousedown', (e) => { if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; });
+        
+        document.addEventListener('mousedown', (e) => { 
+            if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; 
+            if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
+        });
     <\/script></body></html>`;
 }
 
@@ -1947,11 +2076,18 @@ function generateExerciseHTML(words, groups, placeholder) {
         let isPunct = word.f === 'Punct' || isFakeWord;
         let nextWord = words[idx + 1];
         let nextIsPunct = nextWord && (!/[a-zA-Z\u00C0-\u017F]/.test(nextWord.w) || nextWord.f === 'Punct');
-        let content = isPunct ? `<span class="punct">${word.w}</span>` : `<span class="hover-word" tabindex="0" data-ans="${word.f}">${word.w}</span>`;
+        
+        let safeWordHint = word.hint ? word.hint.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;') : '';
+        let hintHtml = word.hint ? `<span class="hint-icon" title="Hint" onclick="event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');">💡<span class="tooltip-text">${safeWordHint}</span></span>` : '';
+        
+        let content = isPunct ? `<span class="punct">${word.w}</span>` : `<span class="hover-word" tabindex="0" data-ans="${word.f}">${word.w}${hintHtml}</span>`;
+        
         let openDivs = "", closeDivs = "";
 
         groups.forEach(g => {
-            if(idx === g.start) openDivs += `<div class="s-group" data-ans="${g.label}"><span class="g-label" tabindex="0">?</span>`;
+            let safeGroupHint = g.hint ? g.hint.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;') : '';
+            let gHintHtml = g.hint ? `<span class="hint-icon" title="Hint" onclick="event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');">💡<span class="tooltip-text">${safeGroupHint}</span></span>` : '';
+            if(idx === g.start) openDivs += `<div class="s-group" data-ans="${g.label}"><span class="g-label" tabindex="0">?${gHintHtml}</span>`;
             if(idx === g.end) closeDivs += `</div>`;
         });
         let spacing = nextIsPunct ? "" : " ";
