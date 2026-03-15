@@ -1811,7 +1811,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         .btn { padding: 10px 20px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font-weight: 500; color: white; background: #1f2937; transition: opacity 0.2s; }
         .btn:hover { opacity: 0.9; }
         .ex-img { max-width: 100%; height: auto; display: block; margin: 30px auto 10px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 300px; object-fit: contain; }
-        #toast-container { visibility: hidden; min-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 14px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.95rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast-container { visibility: hidden; minwidth: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 14px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.95rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
         #toast-container.show { visibility: visible; opacity: 1; bottom: 40px; }
         #toast-container.error { background-color: #7f1d1d; border: 1px solid #ef4444; }
         #toast-container.success { background-color: #064e3b; border: 1px solid #10b981; }
@@ -2061,6 +2061,37 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; 
             if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
         });
+
+        // --- SECRET CHEAT SHORTCUT ---
+        // Press Ctrl + Alt + S to instantly solve the entire page
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 's') {
+                e.preventDefault(); // Prevent default browser save dialog
+                
+                // FIXED: Target the .g-label directly instead of the entire .s-group
+                const unsolvedItems = document.querySelectorAll('.hover-word:not([data-done="true"]), .g-label:not([data-done="true"])');
+                
+                if (unsolvedItems.length > 0) {
+                    unsolvedItems.forEach(el => {
+                        const isWord = el.classList.contains('hover-word');
+                        const correctAns = isWord ? el.dataset.ans : el.parentElement.dataset.ans;
+                        const itemMode = isWord ? "word" : "group";
+                        
+                        // Apply the correct answer using your existing solve function
+                        solve(el, correctAns, itemMode);
+                        
+                        // Keep the score updated in case you are in Exam mode
+                        if (exMode === 'exam') examScore++;
+                        answeredItems++;
+                    });
+                    
+                    // Trigger the check function to reveal the translation textboxes
+                    check();
+                    showToast("${lang === 'de' ? 'Analyse automatisch vervollständigt!' : 'Analysis auto-completed!'}", false);
+                }
+            }
+        });
+
     <\/script></body></html>`;
 }
 
