@@ -854,7 +854,6 @@ function restoreEditorState(words) {
 
             span.style.backgroundColor = colors[func];
             
-            // Re-engineered click logic to prevent single-click taking action on a double-click
             span.onclick = function(e) { 
                 const el = this;
                 if (el.clickTimer) clearTimeout(el.clickTimer);
@@ -1004,7 +1003,7 @@ window.addEventListener('DOMContentLoaded', () => {
     taggingArea.addEventListener('touchmove', (e) => {
         if (!groupMode || swipeStartIdx === null) return;
         isSwiping = true;
-        if (e.cancelable) e.preventDefault(); // Stop scrolling while drawing
+        if (e.cancelable) e.preventDefault(); 
         
         const touch = e.touches[0];
         const el = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -1242,6 +1241,17 @@ function importAI() {
         rawGroups.forEach(g => {
             let newStart = mergeResult.map[g.start] !== undefined ? mergeResult.map[g.start] : g.start;
             let newEnd = mergeResult.map[g.end] !== undefined ? mergeResult.map[g.end] : g.end;
+            
+            // --- NEW FIX: Prevent AI groups from crossing sentence boundaries ---
+            // If the AI accidentally spans a group over a period/exclamation mark, we truncate it here.
+            for (let i = newStart; i < newEnd; i++) {
+                let token = mergeResult.welded[i];
+                if (token && token.f === 'Punct' && sentenceEnders.some(char => token.w.includes(char))) {
+                    newEnd = i - 1; // Clamp the end index just before the punctuation
+                    break;
+                }
+            }
+            // ------------------------------------------------------------------
             
             while(newStart <= newEnd && mergeResult.welded[newStart] && mergeResult.welded[newStart].f === 'Punct') newStart++;
             while(newEnd >= newStart && mergeResult.welded[newEnd] && mergeResult.welded[newEnd].f === 'Punct') newEnd--;
