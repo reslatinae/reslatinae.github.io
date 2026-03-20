@@ -58,13 +58,25 @@
         .palette-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
         .p-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: all 0.15s ease-in-out; color: #111827 !important; }
         .p-btn.active { border-color: #111827; box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1); }
+        .p-btn u { text-decoration: underline; text-underline-offset: 2px; font-weight: 700; }
         
+        .zoom-controls { display: flex; gap: 6px; align-items: center; background: #f3f4f6; padding: 4px 8px; border-radius: 6px; border: 1px solid #e5e7eb; }
+        .z-btn { background: white; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.9rem; font-weight: bold; color: #374151; transition: background 0.1s; }
+        .z-btn:hover { background: #e5e7eb; }
+
+        #tagging-container-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: #fafafa;
+            padding: 20px;
+            min-height: 400px;
+        }
+
         #tagging-area { 
-            padding: 20px 0; 
-            min-height: 400px; 
-            border-radius: 6px; 
             display: block; 
             line-height: 1.6; 
+            transition: transform 0.2s ease-in-out;
         }
 
         .editor-sentence-box {
@@ -95,7 +107,10 @@
             transition: margin-top 0.3s ease;
         }
         
-        /* Hint indicator for words in editor */
+        .tag-word:hover {
+            filter: brightness(0.95);
+        }
+
         .tag-word[data-hint]::before {
             content: '💡';
             position: absolute;
@@ -124,25 +139,24 @@
 
         .split-right { border-right: 3px dashed #ef4444 !important; margin-right: 12px !important; }
         
-        /* Tiered Bracket CSS System */
         .group-bracket {
             position: absolute;
             left: -2px; 
             right: -2px; 
-            border-top-width: 3px;
+            border-top-width: 4px;
             border-top-style: solid;
             pointer-events: none;
             z-index: 5;
             border-radius: 6px;
         }
         .bracket-start {
-            border-left-width: 4px;
+            border-left-width: 5px;
             border-left-style: solid;
             border-top-left-radius: 6px;
             border-bottom-left-radius: 6px;
         }
         .bracket-end {
-            border-right-width: 4px;
+            border-right-width: 5px;
             border-right-style: solid;
             border-top-right-radius: 6px;
             border-bottom-right-radius: 6px;
@@ -341,7 +355,7 @@
         <div class="instruction-box">
             <h3 id="edit-h3">Step 2: Editing Instruction</h3>
             <div style="margin-bottom:0;" id="edit-body">
-                Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups using the ◀ and ▶ arrows on their labels. Double-click any word to correct typos. Use 'Undo' to revert your last action. At the end, hit 'Export Student Page'.
+                Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups using the ◀ and ▶ arrows on their labels. Double-click any word to correct typos. Shortcuts: Press the underlined letter to select a label (and instantly apply it to a hovered word), 'S' for Split, 'G' for Bracket, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.
             </div>
         </div>
 
@@ -366,9 +380,9 @@
             <div class="palette-grid" id="label-palette"></div>
             
             <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
-                <button class="btn-action" id="undo-btn" style="background:#f59e0b; flex:0.5;" onclick="undo()">↶ Undo</button>
-                <button class="btn-action" id="split-mode-btn" style="background:#ef4444; flex:1;" onclick="toggleSplitMode()">Manual Split</button>
-                <button class="btn-action" id="group-mode-btn" style="background:#8b5cf6; flex:1;" onclick="toggleGroupMode()">Draw Bracket</button>
+                <button class="btn-action" id="undo-btn" style="background:#f59e0b; flex:0.5;" onclick="undo()">↶ Undo (Ctrl+Z)</button>
+                <button class="btn-action" id="split-mode-btn" style="background:#ef4444; flex:1;" onclick="toggleSplitMode()">Manual Split (S)</button>
+                <button class="btn-action" id="group-mode-btn" style="background:#8b5cf6; flex:1;" onclick="toggleGroupMode()">Draw Bracket (G)</button>
                 <button class="btn-action" style="background:#111827; flex:1;" onclick="exportToStudent()" id="btn-export">Export Student Page</button>
             </div>
 
@@ -380,7 +394,18 @@
             </div>
         </div>
         
-        <div id="tagging-area"></div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 8px;">
+            <div style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Visual Editor</div>
+            <div class="zoom-controls">
+                <button class="z-btn" onclick="setTeacherZoom(0.1)" title="Zoom In">🔍 +</button>
+                <button class="z-btn" onclick="setTeacherZoom(-0.1)" title="Zoom Out">🔍 -</button>
+                <button class="z-btn" onclick="setTeacherZoom(0)" title="Reset Zoom">Reset</button>
+            </div>
+        </div>
+
+        <div id="tagging-container-wrapper">
+            <div id="tagging-area"></div>
+        </div>
 
     </div>
 
@@ -425,6 +450,8 @@
 // --- MULTI-LANGUAGE & PRESETS CONFIG ---
 let currentLang = 'de';
 let currentLevel = 'advanced';
+let hoveredWord = null;
+let labelShortcuts = {};
 
 function getOtherLabel() {
     return currentLang === 'de' ? 'Sonstiges' : 'Other';
@@ -474,15 +501,15 @@ const LANG = {
         optInt: "Intermediate",
         optAdv: "Advanced (All)",
         editH3: "Step 2: Editing Instruction",
-        editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups using the ◀ and ▶ arrows on their labels. Double-click any word to correct typos or add helpful hints (💡). You can also add hints to groups when drawing a bracket. Use 'Undo' to revert your last action. At the end, hit 'Export Student Page'.",
+        editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups using the ◀ and ▶ arrows on their labels. Double-click any word to correct typos or add helpful hints (💡). You can also add hints to groups when drawing a bracket. Use 'Undo' to revert your last action. Shortcuts: Press the underlined letter to select a label (and instantly apply it to a hovered word), 'S' for Split, 'G' for Bracket, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.",
         wordModalTitle: "Edit Word & Hint",
         wordTextLabel: "Word Text:",
         hintLabel: "Hint (optional):",
         groupHintLabel: "Group Hint (optional):",
         phLabel: "New Label",
-        btnUndo: "↶ Undo",
-        btnSplit: "Manual Split",
-        btnBracket: "Draw Bracket",
+        btnUndo: "↶ Undo (Ctrl+Z)",
+        btnSplit: "Manual Split (S)",
+        btnBracket: "Draw Bracket (G)",
         btnExport: "Export Student Page",
         btnSaveWork: "💾 Save Work",
         btnLoadWork: "📂 Load Work",
@@ -514,15 +541,15 @@ const LANG = {
         optInt: "Fortgeschritten",
         optAdv: "Profi (Alle)",
         editH3: "Schritt 2: Bearbeitung",
-        editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter mit gleicher Funktion verschmelzen automatisch, es sei denn, Sie nutzen 'Manuell trennen'. Im Modus 'Manuell trennen' können Sie auch auf Mehrwortgruppen klicken, um diese wieder zu trennen. Um größere Gruppen zu erstellen, klicken Sie auf 'Klammer zeichnen', wählen Sie Start- und Endwort und benennen die Gruppe. Sie können auf den Namen einer Gruppe klicken, um ihn zu ändern. Sie können die Grenzen bestehender Gruppen mit den Pfeilen ◀ und ▶ an ihren Labels anpassen. Ein Doppelklick auf ein Wort ermöglicht die Korrektur von Tippfehlern und das Hinzufügen von Hilfestellungen (💡). Auch beim Zeichnen einer Klammer können Hinweise für Gruppen hinzugefügt werden. Nutzen Sie 'Rückgängig' bei Fehlern. Klicken Sie am Ende auf 'Schülerseite exportieren'.",
+        editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter mit gleicher Funktion verschmelzen automatisch, es sei denn, Sie nutzen 'Manuell trennen'. Im Modus 'Manuell trennen' können Sie auch auf Mehrwortgruppen klicken, um diese wieder zu trennen. Um größere Gruppen zu erstellen, klicken Sie auf 'Klammer zeichnen', wählen Sie Start- und Endwort und benennen die Gruppe. Sie können auf den Namen einer Gruppe klicken, um ihn zu ändern. Sie können die Grenzen bestehender Gruppen mit den Pfeilen ◀ und ▶ an ihren Labels anpassen. Ein Doppelklick auf ein Wort ermöglicht die Korrektur von Tippfehlern und das Hinzufügen von Hilfestellungen (💡). Auch beim Zeichnen einer Klammer können Hinweise für Gruppen hinzugefügt werden. Shortcuts: Drücken Sie den unterstrichenen Buchstaben für ein Label (wird sofort auf das fokussierte Wort angewendet), 'S' für Trennen, 'G' für Klammer, Strg+Z für Rückgängig. Klicken Sie am Ende auf 'Schülerseite exportieren'.",
         wordModalTitle: "Wort & Hinweis bearbeiten",
         wordTextLabel: "Worttext:",
         hintLabel: "Hinweis (optional):",
         groupHintLabel: "Gruppen-Hinweis (optional):",
         phLabel: "Neues Label",
-        btnUndo: "↶ Rückgängig",
-        btnSplit: "Manuell trennen",
-        btnBracket: "Klammer zeichnen",
+        btnUndo: "↶ Rückgängig (Strg+Z)",
+        btnSplit: "Manuell trennen (S)",
+        btnBracket: "Klammer zeichnen (G)",
         btnExport: "Schülerseite exportieren",
         btnSaveWork: "💾 Speichern",
         btnLoadWork: "📂 Laden",
@@ -535,50 +562,84 @@ const LANG = {
     }
 };
 
-// --- SEMANTIC COLOR SCHEME ---
+const SAFE_COLORS = [
+    '#ffd480', '#bef264', '#fca5a5', '#bde0f5', '#ebbcd4', 
+    '#93c5fd', '#e9d5ff', '#cbd5e1', '#99f6e4', '#bfdbfe', 
+    '#d8b4fe', '#ffedd5'
+];
+
 const SEMANTIC_COLORS = {
-    'Subject': '#86efac', 
-    'Subjekt': '#86efac',
-    'Accusative object': '#93c5fd', 
-    'Akkusativobjekt': '#93c5fd',
-    'Dative object': '#a5b4fc', 
-    'Dativobjekt': '#a5b4fc',
-    'Genitive object': '#d8b4fe', 
-    'Genitivobjekt': '#d8b4fe',
-    'Verb': '#fca5a5', 
-    'Prädikat': '#fca5a5',
-    'Infinitive': '#f0abfc', 
-    'Infinitiv': '#f0abfc',
-    'Adverb': '#fbcfe8', 
-    'Ablative': '#fdba74', 
-    'Ablativ': '#fdba74',
-    'Ablative absolute': '#fcd34d', 
-    'Ablativus absolutus': '#fcd34d',
-    'Prepositional phrase': '#fef08a', 
-    'Präpositionale Bestimmung': '#fef08a',
-    'Predicative': '#5eead4', 
-    'Prädikativum': '#5eead4',
-    'Relative clause': '#60a5fa', 
-    'Relativsatz': '#60a5fa',
-    'Subordinate clause': '#a78bfa', 
-    'Nebensatz': '#a78bfa',
-    'Subjunction': '#bae6fd',
-    'Subjunktion': '#bae6fd',
-    'Accusative with infinitive': '#818cf8', 
-    'AcI': '#818cf8',
-    'Participial phrase': '#c084fc', 
-    'Partizipialkonstruktion': '#c084fc',
-    'Other': '#e5e7eb', 
-    'Sonstiges': '#e5e7eb'
+    'Subject': '#bef264', 'Subjekt': '#bef264',    
+    'Verb': '#fca5a5', 'Prädikat': '#fca5a5',   
+    'Accusative object': '#bde0f5', 'Akkusativobjekt': '#bde0f5',
+    'Dative object': '#ffd480', 'Dativobjekt': '#ffd480',
+    'Genitive object': '#ebbcd4', 'Genitivobjekt': '#ebbcd4',
+    'Ablative': '#93c5fd', 'Ablativ': '#93c5fd',
+    'Ablative absolute': '#bfdbfe', 'Ablativus absolutus': '#bfdbfe', 
+    'Prepositional phrase': '#e9d5ff', 'Präpositionale Bestimmung': '#e9d5ff',
+    'Adverb': '#fef08a', 
+    'Infinitive': '#fbcfe8', 'Infinitiv': '#fbcfe8',
+    'Predicative': '#c4b5fd', 'Prädikativum': '#c4b5fd',
+    'Subjunction': '#85e6c7', 'Subjunktion': '#85e6c7', 
+    'Participial phrase': '#f9a8d4', 'Partizipialkonstruktion': '#f9a8d4',
+    'Subordinate clause': '#cbd5e1', 'Nebensatz': '#cbd5e1',         
+    'Relative clause': '#99f6e4', 'Relativsatz': '#99f6e4',       
+    'Accusative with infinitive': '#d8b4fe', 'AcI': '#d8b4fe',               
+    'Other': '#e5e7eb', 'Sonstiges': '#e5e7eb'
 };
 
 let functions = [];
 let colors = {}; 
+let tZoom = 1;
 
 function initGlobalColors() {
     colors = { ...SEMANTIC_COLORS };
     PRESETS.en.advanced.forEach((f) => { if(!colors[f]) colors[f] = '#e5e7eb'; });
     PRESETS.de.advanced.forEach((f) => { if(!colors[f]) colors[f] = '#e5e7eb'; });
+}
+
+function updateShortcuts() {
+    labelShortcuts = {};
+    let used = new Set(['s', 'g', 'z']); 
+    functions.forEach(f => {
+        let assigned = false;
+        for (let i = 0; i < f.length; i++) {
+            let char = f[i].toLowerCase();
+            if (/[a-z]/.test(char) && !used.has(char)) {
+                labelShortcuts[f] = char;
+                used.add(char);
+                assigned = true;
+                break;
+            }
+        }
+        // Fallback if all letters are taken
+        if (!assigned) {
+            for (let code = 97; code <= 122; code++) {
+                let char = String.fromCharCode(code);
+                if (!used.has(char)) {
+                    labelShortcuts[f] = char;
+                    used.add(char);
+                    break;
+                }
+            }
+        }
+    });
+}
+
+function setTeacherZoom(delta) {
+    if (delta === 0) {
+        tZoom = 1;
+    } else {
+        tZoom = Math.max(0.5, Math.min(2.5, tZoom + delta));
+    }
+    const area = document.getElementById('tagging-area');
+    if ('zoom' in area.style) {
+        area.style.zoom = tZoom;
+    } else {
+        area.style.transform = `scale(${tZoom})`;
+        area.style.transformOrigin = "top left";
+        area.style.width = `${100 / tZoom}%`;
+    }
 }
 
 function getWordText(node) {
@@ -685,7 +746,6 @@ function setLanguage(lang) {
     document.getElementById('btn-save-work').textContent = txt.btnSaveWork;
     document.getElementById('btn-load-work').textContent = txt.btnLoadWork;
     
-    // Modal Texts
     document.getElementById('modal-title-text').textContent = txt.modalTitle;
     document.getElementById('lbl-group-hint').textContent = txt.groupHintLabel;
     document.getElementById('btn-cancel').textContent = txt.btnCancel;
@@ -839,11 +899,11 @@ function restoreEditorState(words) {
             if(func === "Main clause" || func === "Hauptsatz") func = getOtherLabel();
             
             if(!colors[func]) {
-                 colors[func] = `hsl(${Math.floor(Math.random() * 360)}, 70%, 85%)`;
+                 colors[func] = SAFE_COLORS[Math.floor(Math.random() * SAFE_COLORS.length)];
             }
             if(!functions.includes(func)) {
                  functions.push(func);
-                 renderPalette();
+                 renderPalette(); // This will auto-update shortcuts
             }
             span.dataset.func = func;
             
@@ -854,6 +914,9 @@ function restoreEditorState(words) {
 
             span.style.backgroundColor = colors[func];
             
+            span.onmouseenter = function() { hoveredWord = this; };
+            span.onmouseleave = function() { if(hoveredWord === this) hoveredWord = null; };
+
             span.onclick = function(e) { 
                 const el = this;
                 if (el.clickTimer) clearTimeout(el.clickTimer);
@@ -968,6 +1031,52 @@ function triggerAutoSave() {
     }
 }
 
+// --- GLOBAL KEYBOARD SHORTCUTS ---
+document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    
+    // Undo
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        undo();
+        return;
+    }
+    
+    // Escape to cancel modes
+    if (e.key === 'Escape') {
+        if (document.getElementById('group-modal').style.display === 'flex' || document.getElementById('word-modal').style.display === 'flex') return;
+        groupMode = false; splitMode = false;
+        startIdx = null; pendingGroupStart = null; pendingGroupEnd = null;
+        document.querySelectorAll('#tagging-area span.tag-word').forEach(s => s.style.outline = "none");
+        updatePalette(); updateButtonStates();
+        return;
+    }
+
+    if (document.getElementById('editor-screen').style.display !== 'block') return;
+
+    // Letter Shortcuts
+    if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
+        if (e.ctrlKey || e.metaKey || e.altKey) return; 
+        
+        let key = e.key.toLowerCase();
+        
+        if (key === 's') { e.preventDefault(); toggleSplitMode(); return; }
+        if (key === 'g') { e.preventDefault(); toggleGroupMode(); return; }
+        
+        let matchedLabel = Object.keys(labelShortcuts).find(k => labelShortcuts[k] === key);
+        if (matchedLabel) {
+            e.preventDefault();
+            activeFunc = matchedLabel;
+            groupMode = false; splitMode = false;
+            updatePalette(); updateButtonStates();
+            
+            if (hoveredWord && !hoveredWord.classList.contains('punct-span')) {
+                handleWordClick(hoveredWord);
+            }
+        }
+    }
+});
+
 window.addEventListener('DOMContentLoaded', () => {
     initGlobalColors();
     setLanguage('de'); 
@@ -987,7 +1096,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     setInterval(triggerAutoSave, 10000);
     
-    // Swipe to select implementation
     const taggingArea = document.getElementById('tagging-area');
 
     taggingArea.addEventListener('touchstart', (e) => {
@@ -1013,7 +1121,6 @@ window.addEventListener('DOMContentLoaded', () => {
             if (domIdx !== swipeCurrentIdx) {
                 swipeCurrentIdx = domIdx;
                 
-                // Clear previous dashed highlights
                 document.querySelectorAll('#tagging-area span.tag-word').forEach(s => {
                     if (startIdx !== null && parseInt(s.dataset.idx) === startIdx) {
                         s.style.outline = "2px solid #8b5cf6";
@@ -1022,7 +1129,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     }
                 });
                 
-                // Add new dashed highlights for the swipe range
                 const min = Math.min(swipeStartIdx, swipeCurrentIdx);
                 const max = Math.max(swipeStartIdx, swipeCurrentIdx);
                 for(let i = min; i <= max; i++) {
@@ -1088,7 +1194,7 @@ function addCustomLabel() {
     if(!name) return;
     if(functions.includes(name)) { alert("Label already exists!"); return; }
     functions.push(name);
-    const randomColor = `hsl(${Math.floor(Math.random() * 360)}, 70%, 85%)`;
+    const randomColor = SAFE_COLORS[Math.floor(Math.random() * SAFE_COLORS.length)];
     colors[name] = randomColor;
     ABBREVIATIONS[currentLang][name] = name.substring(0,4) + '.';
     renderPalette();
@@ -1242,16 +1348,13 @@ function importAI() {
             let newStart = mergeResult.map[g.start] !== undefined ? mergeResult.map[g.start] : g.start;
             let newEnd = mergeResult.map[g.end] !== undefined ? mergeResult.map[g.end] : g.end;
             
-            // --- NEW FIX: Prevent AI groups from crossing sentence boundaries ---
-            // If the AI accidentally spans a group over a period/exclamation mark, we truncate it here.
             for (let i = newStart; i < newEnd; i++) {
                 let token = mergeResult.welded[i];
                 if (token && token.f === 'Punct' && sentenceEnders.some(char => token.w.includes(char))) {
-                    newEnd = i - 1; // Clamp the end index just before the punctuation
+                    newEnd = i - 1; 
                     break;
                 }
             }
-            // ------------------------------------------------------------------
             
             while(newStart <= newEnd && mergeResult.welded[newStart] && mergeResult.welded[newStart].f === 'Punct') newStart++;
             while(newEnd >= newStart && mergeResult.welded[newEnd] && mergeResult.welded[newEnd].f === 'Punct') newEnd--;
@@ -1287,12 +1390,29 @@ function initEditor(words) {
 }
 
 function renderPalette() {
+    updateShortcuts();
     const p = document.getElementById('label-palette');
     p.innerHTML = '';
-    functions.forEach(f => {
+    
+    functions.forEach((f) => {
         const b = document.createElement('button');
         b.className = 'p-btn' + (f === activeFunc ? ' active' : '');
-        b.style.backgroundColor = colors[f]; b.textContent = f;
+        b.style.backgroundColor = colors[f]; 
+        b.dataset.func = f; 
+        
+        let shortcut = labelShortcuts[f];
+        let innerHTML = f;
+        
+        if (shortcut) {
+            let idx = f.toLowerCase().indexOf(shortcut);
+            if (idx !== -1) {
+                innerHTML = f.substring(0, idx) + '<u>' + f[idx] + '</u>' + f.substring(idx + 1);
+            } else {
+                innerHTML = `[<u>${shortcut.toUpperCase()}</u>] ${f}`;
+            }
+        }
+        
+        b.innerHTML = innerHTML;
         b.onclick = () => { activeFunc = f; groupMode = splitMode = false; updatePalette(); updateButtonStates(); };
         p.appendChild(b);
     });
@@ -1300,7 +1420,9 @@ function renderPalette() {
 }
 
 function updatePalette() {
-    document.querySelectorAll('.p-btn').forEach(b => b.classList.toggle('active', b.textContent === activeFunc));
+    document.querySelectorAll('.p-btn').forEach((b) => {
+        b.classList.toggle('active', b.dataset.func === activeFunc);
+    });
     updateStatus();
 }
 
@@ -1433,9 +1555,9 @@ function saveGroupFromModal() {
         
         if(!functions.includes(label)) {
             functions.push(label);
-            if(!colors[label]) colors[label] = `hsl(${Math.floor(Math.random() * 360)}, 70%, 85%)`;
+            if(!colors[label]) colors[label] = SAFE_COLORS[Math.floor(Math.random() * SAFE_COLORS.length)];
             ABBREVIATIONS[currentLang][label] = label.substring(0,4) + '.';
-            renderPalette();
+            renderPalette(); // Regenerates shortcuts if new custom label added
         }
 
         if(editingGroupIndex !== null) {
@@ -1527,11 +1649,11 @@ function updateGroupUI() {
 
     let maxTier = Math.max(-1, ...sortedGroups.map(g => g.tier));
     
-    let requiredMargin = maxTier >= 0 ? 60 + (maxTier * 32) : 24;
+    let requiredMargin = maxTier >= 0 ? 65 + (maxTier * 38) : 24;
     document.getElementById('tagging-area').style.setProperty('--dynamic-margin-top', requiredMargin + 'px');
 
     sortedGroups.forEach(g => {
-        let tierOffset = 26 + (g.tier * 32); 
+        let tierOffset = 28 + (g.tier * 38); 
         let groupColor = colors[g.label] || '#8b5cf6';
         
         let actualStart = g.start;
@@ -1559,7 +1681,7 @@ function updateGroupUI() {
             bracket.style.top = `-${tierOffset}px`;
             bracket.style.bottom = `-4px`;
             bracket.style.borderTopColor = groupColor;
-            bracket.style.backgroundColor = groupColor + '26';
+            bracket.style.backgroundColor = groupColor + '30';
             
             if(j === actualStart) {
                 bracket.classList.add('bracket-start');
@@ -1796,6 +1918,14 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; color: #334155; }
         .teacher-note { background: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 1rem; color: #1f2937; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .exercise-wrapper { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; line-height: 4.2; }
+        
+        .zoom-controls { display: flex; gap: 6px; align-items: center; justify-content: flex-end; margin-bottom: 16px; }
+        .z-btn { background: white; border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 0.9rem; font-weight: bold; color: #374151; transition: background 0.1s; }
+        .z-btn:hover { background: #e5e7eb; }
+        
+        #exercise-container-wrapper { overflow-x: auto; padding-top: 30px; padding-bottom: 15px; margin-top: 10px; }
+        #exercise { transition: transform 0.2s ease-in-out; }
+
         .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
         .hover-word:focus-visible, .g-label:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
         .s-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom:none; border-radius: 6px 6px 0 0; padding: 20px 6px 6px 6px; margin: 0 4px; vertical-align: bottom; transition: all 0.2s; }
@@ -1847,7 +1977,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-radius: 8px; }
             .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f3f4f6; }
         }
-        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal { display: none !important; } }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal { display: none !important; } }
     </style></head><body>
     <h1>${pageTitle}</h1>
     <div class="instruction-box">${t.instr}</div>
@@ -1859,7 +1989,16 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
                 <button id="btn-exam" onclick="setMode('exam')" style="background: transparent; border: none; padding: 6px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; color: #475569; font-size: 0.9rem;">${t.examMode}</button>
             </div>
         </div>
-        <div id="exercise">${generateExerciseHTML(words, groups, t.transPlaceholder)}</div>
+        
+        <div class="zoom-controls">
+            <button class="z-btn" onclick="setStudentZoom(0.1)" title="Zoom In">🔍 +</button>
+            <button class="z-btn" onclick="setStudentZoom(-0.1)" title="Zoom Out">🔍 -</button>
+            <button class="z-btn" onclick="setStudentZoom(0)" title="Reset Zoom">Reset</button>
+        </div>
+
+        <div id="exercise-container-wrapper">
+            <div id="exercise">${generateExerciseHTML(words, groups, t.transPlaceholder)}</div>
+        </div>
     </div>
     ${imgUrl ? `<img src="${imgUrl}" class="ex-img" alt="Exercise Image">` : ''}
     <div class="footer-toolbar">
@@ -1892,7 +2031,24 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         let exMode = 'practise';
         let examScore = 0;
         let answeredItems = 0;
+        let sZoom = 1;
         const totalItems = document.querySelectorAll('.hover-word, .g-label').length;
+
+        function setStudentZoom(delta) {
+            if (delta === 0) {
+                sZoom = 1;
+            } else {
+                sZoom = Math.max(0.5, Math.min(2.5, sZoom + delta));
+            }
+            const area = document.getElementById('exercise');
+            if ('zoom' in area.style) {
+                area.style.zoom = sZoom;
+            } else {
+                area.style.transform = \`scale(\${sZoom})\`;
+                area.style.transformOrigin = "top left";
+                area.style.width = \`\${100 / sZoom}%\`;
+            }
+        }
 
         function setMode(m) {
             if (answeredItems > 0) {
