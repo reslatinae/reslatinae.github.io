@@ -2072,36 +2072,6 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
         });
 
-        // --- SECRET CHEAT SHORTCUT ---
-        // Press Ctrl + Alt + S to instantly solve the entire page
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 's') {
-                e.preventDefault(); // Prevent default browser save dialog
-                
-                // FIXED: Target the .g-label directly instead of the entire .s-group
-                const unsolvedItems = document.querySelectorAll('.hover-word:not([data-done="true"]), .g-label:not([data-done="true"])');
-                
-                if (unsolvedItems.length > 0) {
-                    unsolvedItems.forEach(el => {
-                        const isWord = el.classList.contains('hover-word');
-                        const correctAns = isWord ? el.dataset.ans : el.parentElement.dataset.ans;
-                        const itemMode = isWord ? "word" : "group";
-                        
-                        // Apply the correct answer using your existing solve function
-                        solve(el, correctAns, itemMode);
-                        
-                        // Keep the score updated in case you are in Exam mode
-                        if (exMode === 'exam') examScore++;
-                        answeredItems++;
-                    });
-                    
-                    // Trigger the check function to reveal the translation textboxes
-                    check();
-                    showToast("${lang === 'de' ? 'Analyse automatisch vervollständigt!' : 'Analysis auto-completed!'}", false);
-                }
-            }
-        });
-
     <\/script></body></html>`;
 }
 
