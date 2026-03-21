@@ -216,6 +216,8 @@
             user-select: none;
         }
         .badge-adj:hover { background: rgba(255,255,255,0.6); color: #111827; }
+        .badge-adj[draggable="true"] { cursor: grab; }
+        .badge-adj[draggable="true"]:active { cursor: grabbing; }
 
         .badge-del {
             cursor: pointer;
@@ -299,7 +301,7 @@
         body.high-contrast .z-btn:hover { background: #444; }
         body.high-contrast .subtle-btn, body.high-contrast .lang-btn { background: #333; color: #fff; border-color: #555; }
         body.high-contrast .subtle-btn:hover, body.high-contrast .lang-btn:hover { background: #444; color: #fff; }
-        body.high-contrast .bracket-badge, body.high-contrast .bracket-end-controls { border: 1px solid #fff; }
+        body.high-contrast .bracket-badge, body.high-contrast .bracket-end-controls { border: 1px solid #fff !important; }
 
         @media (max-width: 768px) {
             body { margin: 10px; padding: 0; }
@@ -389,7 +391,7 @@
         <div class="instruction-box">
             <h3 id="edit-h3">Step 2: Editing Instruction</h3>
             <div style="margin-bottom:0;" id="edit-body">
-                Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups using the ◀ and ▶ arrows on their labels. Double-click any word to correct typos, add helpful hints (💡), or delete it entirely. You can also add hints to groups when drawing a bracket. Use 'Undo' to revert your last action. Shortcuts: Press the underlined letter to select a label (and instantly apply it to a hovered word), 'S' for Split, 'G' for Bracket, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.
+                Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word (or simply Shift-Click two words), then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups by clicking the ◀ and ▶ arrows on their labels, or by Dragging and Dropping the arrows directly onto a word to quickly resize them. Double-click any word to correct typos, add helpful hints (💡, supports **bold** and *italics*), or delete it entirely. You can also add hints to groups when drawing a bracket. Use 'Undo' to revert your last action. Shortcuts: Press the underlined letter to select a label (and instantly apply it to a hovered word), 'S' for Split, 'G' for Bracket, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.
             </div>
         </div>
 
@@ -496,6 +498,10 @@ let currentLevel = 'advanced';
 let hoveredWord = null;
 let hoveredGroupIndex = null;
 let labelShortcuts = {};
+let lastClickedIdx = null;
+
+// Global info for drag and drop boundary resizing
+window.dragInfo = null;
 
 // Global Mouse tracking to handle both individual words and syntactical group badges reliably
 document.addEventListener('mouseover', (e) => {
@@ -554,7 +560,7 @@ const LANG = {
         optInt: "Intermediate",
         optAdv: "Advanced (All)",
         editH3: "Step 2: Editing Instruction",
-        editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word, then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups using the ◀ and ▶ arrows on their labels. Double-click any word to correct typos, add helpful hints (💡), or delete it entirely. You can also add hints to groups when drawing a bracket. Use 'Undo' to revert your last action. Shortcuts: Press the underlined letter to select a label (and instantly apply it to a hovered word), 'S' for Split, 'G' for Bracket, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.",
+        editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word (or simply Shift-Click two words), then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups by clicking the ◀ and ▶ arrows on their labels, or by Dragging and Dropping the arrows directly onto a word to quickly resize them. Double-click any word to correct typos, add helpful hints (💡, supports **bold** and *italics*), or delete it entirely. You can also add hints to groups when drawing a bracket. Use 'Undo' to revert your last action. Shortcuts: Press the underlined letter to select a label (and instantly apply it to a hovered word), 'S' for Split, 'G' for Bracket, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.",
         wordModalTitle: "Edit Word & Hint",
         wordTextLabel: "Word Text:",
         hintLabel: "Hint (optional):",
@@ -598,7 +604,7 @@ const LANG = {
         optInt: "Fortgeschritten",
         optAdv: "Profi (Alle)",
         editH3: "Schritt 2: Bearbeitung",
-        editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter mit gleicher Funktion verschmelzen automatisch, es sei denn, Sie nutzen 'Manuell trennen'. Im Modus 'Manuell trennen' können Sie auch auf Mehrwortgruppen klicken, um diese wieder zu trennen. Um größere Gruppen zu erstellen, klicken Sie auf 'Klammer zeichnen', wählen Sie Start- und Endwort und benennen die Gruppe. Sie können auf den Namen einer Gruppe klicken, um ihn zu ändern. Sie können die Grenzen bestehender Gruppen mit den Pfeilen ◀ und ▶ an ihren Labels anpassen. Ein Doppelklick auf ein Wort ermöglicht die Korrektur von Tippfehlern, das Hinzufügen von Hilfestellungen (💡) oder das Löschen des Wortes. Auch beim Zeichnen einer Klammer können Hinweise für Gruppen hinzugefügt werden. Shortcuts: Drücken Sie den unterstrichenen Buchstaben für ein Label (wird sofort auf das fokussierte Wort angewendet), 'S' für Trennen, 'G' für Klammer, Strg+Z für Rückgängig. Klicken Sie am Ende auf 'Schülerseite exportieren'.",
+        editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter mit gleicher Funktion verschmelzen automatisch, es sei denn, Sie nutzen 'Manuell trennen'. Im Modus 'Manuell trennen' können Sie auch auf Mehrwortgruppen klicken, um diese wieder zu trennen. Um größere Gruppen zu erstellen, klicken Sie auf 'Klammer zeichnen', wählen Sie Start- und Endwort (oder Shift-Klick auf zwei Wörter) und benennen die Gruppe. Sie können auf den Namen einer Gruppe klicken, um ihn zu ändern. Sie können die Grenzen bestehender Gruppen mit den Pfeilen ◀ und ▶ an ihren Labels anpassen, oder die Pfeile per Drag & Drop direkt auf ein Wort ziehen, um die Gruppe schnell zu vergrößern oder zu verkleinern. Ein Doppelklick auf ein Wort ermöglicht die Korrektur von Tippfehlern, das Hinzufügen von Hilfestellungen (💡, unterstützt **fett** und *kursiv*) oder das Löschen des Wortes. Auch beim Zeichnen einer Klammer können Hinweise für Gruppen hinzugefügt werden. Shortcuts: Drücken Sie den unterstrichenen Buchstaben für ein Label (wird sofort auf das fokussierte Wort angewendet), 'S' für Trennen, 'G' für Klammer, Strg+Z für Rückgängig. Klicken Sie am Ende auf 'Schülerseite exportieren'.",
         wordModalTitle: "Wort & Hinweis bearbeiten",
         wordTextLabel: "Worttext:",
         hintLabel: "Hinweis (optional):",
@@ -645,7 +651,7 @@ const SEMANTIC_COLORS = {
     'Participial phrase': '#f9a8d4', 'Partizipialkonstruktion': '#f9a8d4',
     'Subordinate clause': '#cbd5e1', 'Nebensatz': '#cbd5e1',         
     'Relative clause': '#99f6e4', 'Relativsatz': '#99f6e4',        
-    'Accusative with infinitive': '#d8b4fe', 'AcI': '#d8b4fe',               
+    'Accusative with infinitive': '#d8b4fe', 'AcI': '#d8b4fe',                
     'Other': '#e5e7eb', 'Sonstiges': '#e5e7eb'
 };
 
@@ -981,9 +987,10 @@ function restoreEditorState(words) {
 
             span.onclick = function(e) { 
                 const el = this;
+                const shiftPressed = e.shiftKey;
                 if (el.clickTimer) clearTimeout(el.clickTimer);
                 el.clickTimer = setTimeout(() => {
-                    handleWordClick(el);
+                    handleWordClick(el, shiftPressed);
                     el.clickTimer = null;
                 }, 350); 
             };
@@ -1007,6 +1014,27 @@ function restoreEditorState(words) {
             };
         }
         
+        // Drag and Drop logic for dropping boundaries
+        span.ondragover = function(e) {
+            if (window.dragInfo) {
+                e.preventDefault();
+                this.style.outline = "2px dashed #8b5cf6";
+                this.style.outlineOffset = "2px";
+            }
+        };
+        span.ondragleave = function(e) {
+            if (window.dragInfo) {
+                this.style.outline = "none";
+            }
+        };
+        span.ondrop = function(e) {
+            if (window.dragInfo) {
+                e.preventDefault();
+                this.style.outline = "none";
+                handleBoundaryDrop(window.dragInfo.groupIndex, window.dragInfo.type, parseInt(this.dataset.idx));
+            }
+        };
+
         currentSentenceBox.appendChild(span);
 
         if (isPunct && sentenceEnders.some(char => item.w.includes(char))) {
@@ -1018,6 +1046,52 @@ function restoreEditorState(words) {
         }
     });
     updateGroupUI();
+}
+
+function handleBoundaryDrop(gIndex, type, targetIdx) {
+    let g = currentGroups[gIndex];
+    if (!g) return;
+
+    // Snap to nearest non-punct word if dropped on punctuation
+    let el = document.getElementById(`word-${targetIdx}`);
+    if (el && el.classList.contains('punct-span')) {
+        let searchDir = type === 'start' ? 1 : -1;
+        let current = targetIdx;
+        let maxIdx = document.querySelectorAll('#tagging-area span.tag-word, #tagging-area span.punct-span').length - 1;
+        let found = false;
+        
+        while(current >= 0 && current <= maxIdx) {
+            let testEl = document.getElementById(`word-${current}`);
+            if (testEl && !testEl.classList.contains('punct-span')) {
+                targetIdx = current;
+                found = true;
+                break;
+            }
+            current += searchDir;
+        }
+        
+        if (!found) {
+            current = targetIdx;
+            searchDir = searchDir * -1;
+            while(current >= 0 && current <= maxIdx) {
+                let testEl = document.getElementById(`word-${current}`);
+                if (testEl && !testEl.classList.contains('punct-span')) {
+                    targetIdx = current;
+                    break;
+                }
+                current += searchDir;
+            }
+        }
+    }
+
+    saveState();
+    if (type === 'start') {
+        g.start = Math.min(targetIdx, g.end);
+    } else {
+        g.end = Math.max(targetIdx, g.start);
+    }
+    updateGroupUI();
+    triggerAutoSave();
 }
 
 function handleWordDoubleClick(el, e) {
@@ -1161,7 +1235,7 @@ document.addEventListener('keydown', function(e) {
             if (hoveredGroupIndex === null && hoveredWord && !hoveredWord.classList.contains('punct-span')) {
                 let prevMode = splitMode;
                 splitMode = true; // force true to perform split
-                handleWordClick(hoveredWord);
+                handleWordClick(hoveredWord, false);
                 splitMode = prevMode; // reset to previous so they don't get stuck
                 updateButtonStates();
             } else {
@@ -1175,10 +1249,10 @@ document.addEventListener('keydown', function(e) {
             if (hoveredGroupIndex === null && hoveredWord && !hoveredWord.classList.contains('punct-span')) {
                 if (!groupMode) {
                     groupMode = true;
-                    handleWordClick(hoveredWord);
+                    handleWordClick(hoveredWord, false);
                     updateButtonStates();
                 } else {
-                    handleWordClick(hoveredWord);
+                    handleWordClick(hoveredWord, false);
                     groupMode = false;
                     updateButtonStates();
                 }
@@ -1202,7 +1276,7 @@ document.addEventListener('keydown', function(e) {
                 updateGroupUI();
                 triggerAutoSave();
             } else if (hoveredWord && !hoveredWord.classList.contains('punct-span')) {
-                handleWordClick(hoveredWord);
+                handleWordClick(hoveredWord, false);
             }
         }
     }
@@ -1574,8 +1648,19 @@ function updateButtonStates() {
     updateStatus();
 }
 
-function handleWordClick(el) {
+function handleWordClick(el, shiftPressed = false) {
     const domIdx = parseInt(el.dataset.idx);
+
+    // Fast Group Creation via Shift-Click
+    if (shiftPressed && lastClickedIdx !== null && !splitMode && !groupMode) {
+        pendingGroupStart = Math.min(lastClickedIdx, domIdx);
+        pendingGroupEnd = Math.max(lastClickedIdx, domIdx);
+        openGroupModal();
+        lastClickedIdx = domIdx; // Keep memory of this word to chain another shift-click if desired
+        return;
+    }
+    
+    lastClickedIdx = domIdx;
     
     if(splitMode) { 
         saveState(); 
@@ -1803,6 +1888,10 @@ function updateGroupUI() {
         }
 
         if (actualStart > actualEnd) return; 
+
+        // Define Drag & Drop handlers for the boundary arrows
+        let startDrag = `draggable="true" ondragstart="window.dragInfo={groupIndex:${g.originalIndex}, type:'start'}; event.dataTransfer.setData('text/plain','');" ondragend="window.dragInfo=null;"`;
+        let endDrag = `draggable="true" ondragstart="window.dragInfo={groupIndex:${g.originalIndex}, type:'end'}; event.dataTransfer.setData('text/plain','');" ondragend="window.dragInfo=null;"`;
         
         for(let j = actualStart; j <= actualEnd; j++) {
             let el = document.getElementById(`word-${j}`);
@@ -1830,15 +1919,15 @@ function updateGroupUI() {
                 
                 if (actualStart === actualEnd) {
                     badge.innerHTML = `
-                        <span class="badge-adj" title="Expand left" onclick="event.stopPropagation(); adjustGroupStart(${g.originalIndex}, -1)">◀</span>
+                        <span class="badge-adj" title="Drag to resize, or click to expand left" ${startDrag} onclick="event.stopPropagation(); adjustGroupStart(${g.originalIndex}, -1)">◀</span>
                         ${labelHTML}
-                        <span class="badge-adj" title="Expand right" onclick="event.stopPropagation(); adjustGroupEnd(${g.originalIndex}, 1)">▶</span>
+                        <span class="badge-adj" title="Drag to resize, or click to expand right" ${endDrag} onclick="event.stopPropagation(); adjustGroupEnd(${g.originalIndex}, 1)">▶</span>
                         <span class="badge-del" style="margin-left:4px;" title="Remove group" onclick="event.stopPropagation(); removeGroup(${g.originalIndex})">✖</span>
                     `;
                 } else {
                     badge.innerHTML = `
-                        <span class="badge-adj" title="Expand left" onclick="event.stopPropagation(); adjustGroupStart(${g.originalIndex}, -1)">◀</span>
-                        <span class="badge-adj" title="Shrink right" onclick="event.stopPropagation(); adjustGroupStart(${g.originalIndex}, 1)">▶</span>
+                        <span class="badge-adj" title="Drag to resize start, or click to expand left" ${startDrag} onclick="event.stopPropagation(); adjustGroupStart(${g.originalIndex}, -1)">◀</span>
+                        <span class="badge-adj" title="Drag to resize start, or click to shrink right" ${startDrag} onclick="event.stopPropagation(); adjustGroupStart(${g.originalIndex}, 1)">▶</span>
                         ${labelHTML}
                         <span class="badge-del" title="Remove group" onclick="event.stopPropagation(); removeGroup(${g.originalIndex})">✖</span>
                     `;
@@ -1856,8 +1945,8 @@ function updateGroupUI() {
                     endControls.className = 'bracket-end-controls';
                     endControls.style.background = groupColor;
                     endControls.innerHTML = `
-                        <span class="badge-adj" title="Shrink left" onclick="event.stopPropagation(); adjustGroupEnd(${g.originalIndex}, -1)">◀</span>
-                        <span class="badge-adj" title="Expand right" onclick="event.stopPropagation(); adjustGroupEnd(${g.originalIndex}, 1)">▶</span>
+                        <span class="badge-adj" title="Drag to resize end, or click to shrink left" ${endDrag} onclick="event.stopPropagation(); adjustGroupEnd(${g.originalIndex}, -1)">◀</span>
+                        <span class="badge-adj" title="Drag to resize end, or click to expand right" ${endDrag} onclick="event.stopPropagation(); adjustGroupEnd(${g.originalIndex}, 1)">▶</span>
                     `;
                     bracket.appendChild(endControls);
                 }
@@ -1965,6 +2054,17 @@ function exportToStudent() {
     a.click();
 }
 
+function parseSimpleMarkdown(text) {
+    if (!text) return '';
+    // Safely escape HTML characters first
+    let safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    // Parse bold
+    safeText = safeText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Parse italics
+    safeText = safeText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    return safeText;
+}
+
 function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lang, allAbbrevs, allPresets) {
     const filteredLabels = allLabels.filter(l => l !== "Main clause" && l !== "Hauptsatz");
     
@@ -1980,7 +2080,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     
     const studentTexts = {
         en: {
-            instr: "This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words—or navigate to them using the Tab and Enter keys—to select their syntactical function. If you see a light bulb icon (💡), click on it for a helpful hint!<br><br>Once you have correctly analyzed every word group in a sentence, a textbox will appear into which you can write your translation.",
+            instr: "This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words—or navigate to them using the Tab and Enter keys—to select their syntactical function. You can also hover over a word and press the underlined letter on your keyboard to instantly select a function. If you see a light bulb icon (💡), click on it for a helpful hint!<br><br>Once you have correctly analyzed every word group in a sentence, a textbox will appear into which you can write your translation.",
             note: "Note:",
             togglePat: "Toggle Patterns",
             toggleCon: "High Contrast",
@@ -2000,7 +2100,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             close: "Close"
         },
         de: {
-            instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen. Wenn du ein Glühbirnen-Symbol (💡) siehst, klicke darauf, um einen hilfreichen Tipp zu erhalten!<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.",
+            instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen. Du kannst auch mit der Maus über ein Wort oder eine Gruppe fahren und den unterstrichenen Buchstaben auf deiner Tastatur drücken, um eine Funktion schnell auszuwählen. Wenn du ein Glühbirnen-Symbol (💡) siehst, klicke darauf, um einen hilfreichen Tipp zu erhalten!<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.",
             note: "Hinweis:",
             togglePat: "Muster umschalten",
             toggleCon: "Hoher Kontrast",
@@ -2045,9 +2145,9 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         body.high-contrast .instruction-box { background-color: #332b00; border-color: #665500; color: #ffeb3b; }
         body.high-contrast .teacher-note { background: #1e1e1e !important; border: 1px solid #444 !important; color: #e5e7eb !important; }
         body.high-contrast .hover-word { background-color: #333; color: #fff; border-bottom: 2px solid #555; }
-        body.high-contrast .hover-word[data-done="true"] { border: 2px solid #fff !important; color: #000; font-weight: 600; }
+        body.high-contrast .hover-word[data-done="true"] { border: 2px solid #fff !important; color: #000 !important; font-weight: 600; }
         body.high-contrast .s-group { border-color: #fff !important; }
-        body.high-contrast .g-label { background: #000; color: #fff; border-color: #fff; }
+        body.high-contrast .g-label { background: #000 !important; color: #fff !important; border-color: #fff !important; }
         body.high-contrast .punct { color: #fff; }
         body.high-contrast textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
         body.high-contrast #btn-practise[style*="background: white"] { background: #333 !important; color: #fff !important; }
@@ -2213,7 +2313,90 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         
         const menu = document.getElementById('menu-common');
         const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
+        let hideMenuTimeout;
         
+        // --- STUDENT KEYBOARD SHORTCUTS INJECTION ---
+        let labelShortcuts = {};
+        let hoveredStudentEl = null;
+
+        function updateStudentShortcuts() {
+            labelShortcuts = {};
+            let used = new Set(['s', 'g', 'z']); // Match teacher reservations here!
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                let f = btn.dataset.val;
+                let assigned = false;
+                for (let i = 0; i < f.length; i++) {
+                    let char = f[i].toLowerCase();
+                    if (/[a-z]/.test(char) && !used.has(char)) {
+                        labelShortcuts[f] = char;
+                        used.add(char);
+                        assigned = true;
+                        break;
+                    }
+                }
+                if (!assigned) {
+                    for (let code = 97; code <= 122; code++) {
+                        let char = String.fromCharCode(code);
+                        if (!used.has(char)) {
+                            labelShortcuts[f] = char;
+                            used.add(char);
+                            break;
+                        }
+                    }
+                }
+                let shortcut = labelShortcuts[f];
+                let innerHTML = f;
+                if (shortcut) {
+                    let idx = f.toLowerCase().indexOf(shortcut);
+                    if (idx !== -1) {
+                        innerHTML = f.substring(0, idx) + '<u>' + f[idx] + '</u>' + f.substring(idx + 1);
+                    } else {
+                        innerHTML = '[<u>' + shortcut.toUpperCase() + '</u>] ' + f;
+                    }
+                }
+                btn.innerHTML = innerHTML;
+            });
+        }
+        updateStudentShortcuts();
+
+        document.addEventListener('mouseover', (e) => { 
+            const el = e.target.closest('.hover-word, .g-label');
+            if (el && el.dataset.done !== "true") {
+                hoveredStudentEl = el;
+            } else {
+                hoveredStudentEl = null;
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            
+            let targetEl = hoveredStudentEl;
+            // Support keyboard navigation via Tab key
+            if (!targetEl && document.activeElement && (document.activeElement.classList.contains('hover-word') || document.activeElement.classList.contains('g-label'))) {
+                targetEl = document.activeElement;
+            }
+
+            if (!targetEl || targetEl.dataset.done === "true") return;
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            if (e.key.length !== 1 || !/[a-zA-Z]/.test(e.key)) return;
+
+            let key = e.key.toLowerCase();
+            let matchedLabel = Object.keys(labelShortcuts).find(k => labelShortcuts[k] === key);
+
+            if (matchedLabel) {
+                e.preventDefault();
+                const btn = Array.from(document.querySelectorAll('.menu-btn')).find(b => b.dataset.val === matchedLabel);
+                if (btn) {
+                    activeEl = targetEl;
+                    mode = activeEl.classList.contains('hover-word') ? "word" : "group";
+                    btn.click();
+                    hoveredStudentEl = null; // Clean up after successful choice
+                }
+            }
+        });
+        // --------------------------------------------
+
         let exMode = 'practise';
         let examScore = 0;
         let answeredItems = 0;
@@ -2298,6 +2481,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
                     }
                 }
             });
+            updateStudentShortcuts(); // Re-calculate shortcuts to match new language labels
         }
 
         function setStudentZoom(delta) {
@@ -2335,16 +2519,48 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             be.style.color = m === 'exam' ? '#111827' : '#475569';
         }
         
+        // Ensure menu stays open if hovered directly
+        menu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
+        menu.addEventListener('mouseleave', () => {
+            hideMenuTimeout = setTimeout(() => {
+                menu.style.display = "none";
+            }, 150);
+        });
+
         document.querySelectorAll('.hover-word, .g-label').forEach(el => {
+            // Support click (especially good for mobile)
             el.onclick = (e) => {
                 e.stopPropagation();
                 if(el.dataset.done) return;
                 activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
-                if(window.innerWidth > 768) { menu.style.top=e.pageY+"px"; menu.style.left=e.pageX+"px"; }
+                if(window.innerWidth > 768) { 
+                    const rect = el.getBoundingClientRect();
+                    menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; 
+                    menu.style.left = (rect.left + window.scrollX) + "px"; 
+                }
                 menu.style.display="block"; 
                 menuBtns[0].focus();
             };
             
+            // New hover logic
+            el.onmouseenter = (e) => {
+                clearTimeout(hideMenuTimeout);
+                if(el.dataset.done === "true") return;
+                activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
+                if(window.innerWidth > 768) { 
+                    const rect = el.getBoundingClientRect();
+                    menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; 
+                    menu.style.left = (rect.left + window.scrollX) + "px"; 
+                }
+                menu.style.display="block";
+            };
+
+            el.onmouseleave = (e) => {
+                hideMenuTimeout = setTimeout(() => {
+                    menu.style.display = "none";
+                }, 150);
+            };
+
             el.onkeydown = (e) => {
                 if(e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -2518,7 +2734,7 @@ function generateExerciseHTML(words, groups, placeholder) {
         let nextWord = words[idx + 1];
         let nextIsPunct = nextWord && (!/[a-zA-Z\u00C0-\u017F]/.test(nextWord.w) || nextWord.f === 'Punct');
         
-        let safeWordHint = word.hint ? word.hint.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;') : '';
+        let safeWordHint = parseSimpleMarkdown(word.hint);
         let hintHtml = word.hint ? `<span class="hint-icon" title="Hint" onclick="event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');">💡<span class="tooltip-text">${safeWordHint}</span></span>` : '';
         
         let content = isPunct ? `<span class="punct">${word.w}</span>` : `<span class="hover-word" tabindex="0" data-ans="${word.f}">${word.w}${hintHtml}</span>`;
@@ -2526,7 +2742,7 @@ function generateExerciseHTML(words, groups, placeholder) {
         let openDivs = "", closeDivs = "";
 
         groups.forEach(g => {
-            let safeGroupHint = g.hint ? g.hint.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;') : '';
+            let safeGroupHint = parseSimpleMarkdown(g.hint);
             let gHintHtml = g.hint ? `<span class="hint-icon" title="Hint" onclick="event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');">💡<span class="tooltip-text">${safeGroupHint}</span></span>` : '';
             if(idx === g.start) openDivs += `<div class="s-group" data-ans="${g.label}"><span class="g-label" tabindex="0"><span class="g-text">?</span>${gHintHtml}</span>`;
             if(idx === g.end) closeDivs += `</div>`;
