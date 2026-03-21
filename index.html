@@ -391,7 +391,7 @@
         <div class="instruction-box">
             <h3 id="edit-h3">Step 2: Editing Instruction</h3>
             <div style="margin-bottom:0;" id="edit-body">
-                Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word (or simply Shift-Click two words), then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups by clicking the ◀ and ▶ arrows on their labels, or by Dragging and Dropping the arrows directly onto a word to quickly resize them. Double-click any word to correct typos, add helpful hints (💡, supports **bold** and *italics*), or delete it entirely. You can also add hints to groups when drawing a bracket. Use 'Undo' to revert your last action. Shortcuts: Press the underlined letter to select a label (and instantly apply it to a hovered word), 'S' for Split, 'G' for Bracket, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.
+                Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word (or simply Shift-Click two words), then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups by clicking the ◀ and ▶ arrows on their labels, or by Dragging and Dropping the arrows directly onto a word to quickly resize them. Double-click any word to correct typos, add helpful hints (💡, supports **bold** and *italics*), or delete it entirely. You can also add hints to groups when drawing a bracket. Use 'Undo' to revert your last action. Shortcuts: Press the underlined letter to select a label (and instantly apply it to a hovered word), 'X' for Split, 'B' for Bracket, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.
             </div>
         </div>
 
@@ -422,8 +422,8 @@
             
             <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
                 <button class="btn-action" id="undo-btn" style="background:#f59e0b; flex:0.5;" onclick="undo()">↶ Undo (Ctrl+Z)</button>
-                <button class="btn-action" id="split-mode-btn" style="background:#ef4444; flex:1;" onclick="toggleSplitMode()">Manual Split (S)</button>
-                <button class="btn-action" id="group-mode-btn" style="background:#8b5cf6; flex:1;" onclick="toggleGroupMode()">Draw Bracket (G)</button>
+                <button class="btn-action" id="split-mode-btn" style="background:#ef4444; flex:1;" onclick="toggleSplitMode()">Manual Split (X)</button>
+                <button class="btn-action" id="group-mode-btn" style="background:#8b5cf6; flex:1;" onclick="toggleGroupMode()">Draw Bracket (B)</button>
                 <button class="btn-action" style="background:#111827; flex:1;" onclick="exportToStudent()" id="btn-export">Export Student Page</button>
             </div>
 
@@ -560,15 +560,15 @@ const LANG = {
         optInt: "Intermediate",
         optAdv: "Advanced (All)",
         editH3: "Step 2: Editing Instruction",
-        editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word (or simply Shift-Click two words), then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups by clicking the ◀ and ▶ arrows on their labels, or by Dragging and Dropping the arrows directly onto a word to quickly resize them. Double-click any word to correct typos, add helpful hints (💡, supports **bold** and *italics*), or delete it entirely. You can also add hints to groups when drawing a bracket. Use 'Undo' to revert your last action. Shortcuts: Press the underlined letter to select a label (and instantly apply it to a hovered word), 'S' for Split, 'G' for Bracket, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.",
+        editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split' and click the first word to keep them separate. In 'Manual Split' mode, you can also click on multi-word chunks to separate them. To create larger syntactic groups, click 'Draw Bracket', click the start and end word (or simply Shift-Click two words), then type to select a label. You can click on a group's label to rename it. You can adjust the boundaries of existing groups by clicking the ◀ and ▶ arrows on their labels, or by Dragging and Dropping the arrows directly onto a word to quickly resize them. Double-click any word to correct typos, add helpful hints (💡, supports **bold** and *italics*), or delete it entirely. You can also add hints to groups when drawing a bracket. Use 'Undo' to revert your last action. Shortcuts: Press the underlined letter to select a label (and instantly apply it to a hovered word), 'X' for Split, 'B' for Bracket, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.",
         wordModalTitle: "Edit Word & Hint",
         wordTextLabel: "Word Text:",
         hintLabel: "Hint (optional):",
         groupHintLabel: "Group Hint (optional):",
         phLabel: "New Label",
         btnUndo: "↶ Undo (Ctrl+Z)",
-        btnSplit: "Manual Split (S)",
-        btnBracket: "Draw Bracket (G)",
+        btnSplit: "Manual Split (X)",
+        btnBracket: "Draw Bracket (B)",
         btnExport: "Export Student Page",
         btnSaveWork: "💾 Save Work",
         btnLoadWork: "📂 Load Work",
@@ -604,15 +604,15 @@ const LANG = {
         optInt: "Fortgeschritten",
         optAdv: "Profi (Alle)",
         editH3: "Schritt 2: Bearbeitung",
-        editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter mit gleicher Funktion verschmelzen automatisch, es sei denn, Sie nutzen 'Manuell trennen'. Im Modus 'Manuell trennen' können Sie auch auf Mehrwortgruppen klicken, um diese wieder zu trennen. Um größere Gruppen zu erstellen, klicken Sie auf 'Klammer zeichnen', wählen Sie Start- und Endwort (oder Shift-Klick auf zwei Wörter) und benennen die Gruppe. Sie können auf den Namen einer Gruppe klicken, um ihn zu ändern. Sie können die Grenzen bestehender Gruppen mit den Pfeilen ◀ und ▶ an ihren Labels anpassen, oder die Pfeile per Drag & Drop direkt auf ein Wort ziehen, um die Gruppe schnell zu vergrößern oder zu verkleinern. Ein Doppelklick auf ein Wort ermöglicht die Korrektur von Tippfehlern, das Hinzufügen von Hilfestellungen (💡, unterstützt **fett** und *kursiv*) oder das Löschen des Wortes. Auch beim Zeichnen einer Klammer können Hinweise für Gruppen hinzugefügt werden. Shortcuts: Drücken Sie den unterstrichenen Buchstaben für ein Label (wird sofort auf das fokussierte Wort angewendet), 'S' für Trennen, 'G' für Klammer, Strg+Z für Rückgängig. Klicken Sie am Ende auf 'Schülerseite exportieren'.",
+        editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter mit gleicher Funktion verschmelzen automatisch, es sei denn, Sie nutzen 'Manuell trennen'. Im Modus 'Manuell trennen' können Sie auch auf Mehrwortgruppen klicken, um diese wieder zu trennen. Um größere Gruppen zu erstellen, klicken Sie auf 'Klammer zeichnen', wählen Sie Start- und Endwort (oder Shift-Klick auf zwei Wörter) und benennen die Gruppe. Sie können auf den Namen einer Gruppe klicken, um ihn zu ändern. Sie können die Grenzen bestehender Gruppen mit den Pfeilen ◀ und ▶ an ihren Labels anpassen, oder die Pfeile per Drag & Drop direkt auf ein Wort ziehen, um die Gruppe schnell zu vergrößern oder zu verkleinern. Ein Doppelklick auf ein Wort ermöglicht die Korrektur von Tippfehlern, das Hinzufügen von Hilfestellungen (💡, unterstützt **fett** und *kursiv*) oder das Löschen des Wortes. Auch beim Zeichnen einer Klammer können Hinweise für Gruppen hinzugefügt werden. Shortcuts: Drücken Sie den unterstrichenen Buchstaben für ein Label (wird sofort auf das fokussierte Wort angewendet), 'X' für Trennen, 'B' für Klammer, Strg+Z für Rückgängig. Klicken Sie am Ende auf 'Schülerseite exportieren'.",
         wordModalTitle: "Wort & Hinweis bearbeiten",
         wordTextLabel: "Worttext:",
         hintLabel: "Hinweis (optional):",
         groupHintLabel: "Gruppen-Hinweis (optional):",
         phLabel: "Neues Label",
         btnUndo: "↶ Rückgängig (Strg+Z)",
-        btnSplit: "Manuell trennen (S)",
-        btnBracket: "Klammer zeichnen (G)",
+        btnSplit: "Manuell trennen (X)",
+        btnBracket: "Klammer zeichnen (B)",
         btnExport: "Schülerseite exportieren",
         btnSaveWork: "💾 Speichern",
         btnLoadWork: "📂 Laden",
@@ -665,9 +665,22 @@ function initGlobalColors() {
     PRESETS.de.advanced.forEach((f) => { if(!colors[f]) colors[f] = '#e5e7eb'; });
 }
 
+function getUnusedSafeColor() {
+    const usedColors = Object.values(colors).map(c => c.toLowerCase());
+    const availableColors = SAFE_COLORS.filter(c => !usedColors.includes(c.toLowerCase()));
+    
+    // Pick randomly from the available unused colors
+    if (availableColors.length > 0) {
+        return availableColors[Math.floor(Math.random() * availableColors.length)];
+    }
+    
+    // Fallback if all SAFE_COLORS are currently in use
+    return SAFE_COLORS[Math.floor(Math.random() * SAFE_COLORS.length)];
+}
+
 function updateShortcuts() {
     labelShortcuts = {};
-    let used = new Set(['s', 'g', 'z']); 
+    let used = new Set(['x', 'b', 'z']); 
     functions.forEach(f => {
         let assigned = false;
         for (let i = 0; i < f.length; i++) {
@@ -970,7 +983,7 @@ function restoreEditorState(words) {
             if(func === "Main clause" || func === "Hauptsatz") func = getOtherLabel();
             
             if(!colors[func]) {
-                 colors[func] = SAFE_COLORS[Math.floor(Math.random() * SAFE_COLORS.length)];
+                 colors[func] = getUnusedSafeColor();
             }
             if(!functions.includes(func)) {
                  functions.push(func);
@@ -1229,8 +1242,8 @@ document.addEventListener('keydown', function(e) {
         
         let key = e.key.toLowerCase();
         
-        // S and G shortcuts: Automatically apply to hovered word OR toggle mode
-        if (key === 's') { 
+        // X and B shortcuts: Automatically apply to hovered word OR toggle mode
+        if (key === 'x') { 
             e.preventDefault(); 
             if (hoveredGroupIndex === null && hoveredWord && !hoveredWord.classList.contains('punct-span')) {
                 let prevMode = splitMode;
@@ -1244,7 +1257,7 @@ document.addEventListener('keydown', function(e) {
             return; 
         }
         
-        if (key === 'g') { 
+        if (key === 'b') { 
             e.preventDefault(); 
             if (hoveredGroupIndex === null && hoveredWord && !hoveredWord.classList.contains('punct-span')) {
                 if (!groupMode) {
@@ -1399,8 +1412,8 @@ function addCustomLabel() {
     if(!name) return;
     if(functions.includes(name)) { alert("Label already exists!"); return; }
     functions.push(name);
-    const randomColor = SAFE_COLORS[Math.floor(Math.random() * SAFE_COLORS.length)];
-    colors[name] = randomColor;
+    const newColor = getUnusedSafeColor();
+    colors[name] = newColor;
     ABBREVIATIONS[currentLang][name] = name.substring(0,4) + '.';
     renderPalette();
     input.value = ''; 
@@ -1771,7 +1784,7 @@ function saveGroupFromModal() {
         
         if(!functions.includes(label)) {
             functions.push(label);
-            if(!colors[label]) colors[label] = SAFE_COLORS[Math.floor(Math.random() * SAFE_COLORS.length)];
+            if(!colors[label]) colors[label] = getUnusedSafeColor();
             ABBREVIATIONS[currentLang][label] = label.substring(0,4) + '.';
             renderPalette(); 
         }
@@ -2321,7 +2334,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
 
         function updateStudentShortcuts() {
             labelShortcuts = {};
-            let used = new Set(['s', 'g', 'z']); // Match teacher reservations here!
+            let used = new Set(['x', 'b', 'z']); // Match teacher reservations here!
             document.querySelectorAll('.menu-btn').forEach(btn => {
                 let f = btn.dataset.val;
                 let assigned = false;
