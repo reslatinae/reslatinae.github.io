@@ -182,7 +182,7 @@
             <button class="btn-action" style="background:#10b981;" id="btn-import">2. Import</button>
             <span style="margin: 0 16px; font-weight:600; color:#64748b; font-size: 0.9rem;" id="or-text">OR</span>
             <label class="btn-action" style="background:#64748b; cursor: pointer; display:inline-block;">
-                <span id="btn-load">Load Saved Project</span> <input type="file" style="display:none" id="file-load-setup">
+                <span id="btn-load">Load Saved Project</span> <input type="file" style="display:none" accept=".json" id="file-load-setup">
             </label>
         </div>
         <button class="btn-action" style="background:#1f2937; width:100%;" id="btn-manual">Start Manual Creation</button>
@@ -235,7 +235,7 @@
             <div class="project-mini-row">
                 <button class="subtle-btn" id="btn-save-work">💾 Save Work</button>
                 <label class="subtle-btn">
-                    <span id="btn-load-work">📂 Load Work</span> <input type="file" style="display:none" id="file-load-editor">
+                    <span id="btn-load-work">📂 Load Work</span> <input type="file" accept=".json" style="display:none" id="file-load-editor">
                 </label>
             </div>
         </div>
@@ -458,6 +458,7 @@ const StorageManager = {
         const projectData = { 
             lang: AppState.lang, level: AppState.level,
             title: document.getElementById('pagetitle').value, image: document.getElementById('pageimage').value,
+            text: document.getElementById('entertext').value, // FIX: Saving the original text to prevent loss
             notes: document.getElementById('teachernotes').value, 
             words: AppState.words, groups: AppState.groups, 
             customFunctions: AppState.functions, customColors: AppState.colors
@@ -471,28 +472,54 @@ const StorageManager = {
         if(!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            try { this.restoreData(JSON.parse(e.target.result)); } 
-            catch(err) { console.error(err); alert("Error loading file."); }
+            try { 
+                this.restoreData(JSON.parse(e.target.result)); 
+            } 
+            catch(err) { 
+                console.error("Restore Error:", err); 
+                alert("Error loading file. The JSON format might be incorrect or corrupted."); 
+            }
         };
         reader.readAsText(file);
     },
 
     restoreData(data) {
-        if(data.lang) changeLanguage(data.lang);
-        if(data.level) { changeLevel(data.level); } else { changeLevel('advanced'); }
-        if(data.title) document.getElementById('pagetitle').value = data.title;
-        if(data.image) document.getElementById('pageimage').value = data.image;
-        if(data.text) document.getElementById('entertext').value = data.text;
-        if(data.notes) document.getElementById('teachernotes').value = data.notes;
-        if(data.customFunctions || data.funcs) AppState.functions = data.customFunctions || data.funcs;
-        if(data.customColors || data.cols) Object.assign(AppState.colors, data.customColors || data.cols);
-        if(data.groups) AppState.groups = data.groups;
+        // Robust fallback for language
+        let safeLang = data.lang;
+        if (!safeLang || !CONFIG.LANG_TEXT[safeLang]) safeLang = 'de';
+        changeLanguage(safeLang);
         
-        if(data.words && data.words.length > 0) {
-            AppState.words = data.words;
+        // Robust fallback for level
+        let safeLevel = data.level;
+        if (!safeLevel || !CONFIG.PRESETS[safeLang][safeLevel]) safeLevel = 'advanced';
+        changeLevel(safeLevel);
+
+        // Safe scalar assignments
+        document.getElementById('pagetitle').value = data.title || "";
+        document.getElementById('pageimage').value = data.image || "";
+        document.getElementById('entertext').value = data.text || "";
+        document.getElementById('teachernotes').value = data.notes || "";
+        
+        // Setup state overrides
+        AppState.functions = data.customFunctions || data.funcs || [...CONFIG.PRESETS[safeLang][safeLevel]];
+        if(data.customColors || data.cols) Object.assign(AppState.colors, data.customColors || data.cols);
+        AppState.groups = data.groups || [];
+        AppState.history = []; // Clear history to prevent undoing into another universe
+        
+        // Robust word processing (handles older JSON structures safely)
+        const loadWords = data.words || data.tokens || [];
+        if(Array.isArray(loadWords) && loadWords.length > 0) {
+            AppState.words = loadWords.map(w => ({
+                ...w,
+                w: w.w || w.word || w.text || "",
+                f: w.f || w.func || w.function || CONFIG.PUNCT
+            }));
             showScreen('editor');
             renderEditor();
             renderPalette();
+        } else {
+            console.warn("No words found in the parsed data", data);
+            alert("This file loaded, but it doesn't contain any saved words to display.");
         }
     }
 };
@@ -723,7 +750,9 @@ function renderEditor() {
 
         currentSentenceBox.appendChild(span);
 
-        const defaultBreak = isPunct && CONFIG.SENTENCE_ENDERS.some(char => item.w.includes(char));
+        // Safe fallback in case w string is completely missing
+        const wordText = item.w || "";
+        const defaultBreak = isPunct && CONFIG.SENTENCE_ENDERS.some(char => wordText.includes(char));
         let shouldBreak = defaultBreak;
         if (item.b === 1) shouldBreak = true;
         if (item.b === -1) shouldBreak = false;
@@ -846,8 +875,15 @@ function initEventListeners() {
     
     document.getElementById('btn-copy-ai').addEventListener('click', copyAIPrompt);
     document.getElementById('btn-import').addEventListener('click', importAI);
-    document.getElementById('file-load-setup').addEventListener('change', (e) => StorageManager.importProject(e.target));
-    document.getElementById('file-load-editor').addEventListener('change', (e) => StorageManager.importProject(e.target));
+    
+    // FIX applied here: e.target.files[0] ensures the file object is correctly passed, and value is reset.
+    document.getElementById('file-load-setup').addEventListener('change', (e) => {
+        if(e.target.files.length > 0) { StorageManager.importProject(e.target.files[0]); e.target.value = ''; }
+    });
+    document.getElementById('file-load-editor').addEventListener('change', (e) => {
+        if(e.target.files.length > 0) { StorageManager.importProject(e.target.files[0]); e.target.value = ''; }
+    });
+    
     document.getElementById('btn-manual').addEventListener('click', startManual);
     document.getElementById('btn-show-credits').addEventListener('click', () => showScreen('credits'));
     document.getElementById('btn-hide-credits').addEventListener('click', () => showScreen('setup'));
@@ -1112,8 +1148,10 @@ function handleWordClick(el, shiftPressed = false) {
     if (AppState.mode === 'linebreak') {
         AppState.saveToHistory();
         let currentB = AppState.words[domIdx].b || 0;
+        
+        const wordText = AppState.words[domIdx].w || "";
         const isPunct = AppState.words[domIdx].f === CONFIG.PUNCT;
-        const defaultBreak = isPunct && CONFIG.SENTENCE_ENDERS.some(char => AppState.words[domIdx].w.includes(char));
+        const defaultBreak = isPunct && CONFIG.SENTENCE_ENDERS.some(char => wordText.includes(char));
         
         if (currentB === 1) AppState.words[domIdx].b = -1;
         else if (currentB === -1) AppState.words[domIdx].b = 0;
@@ -1133,7 +1171,7 @@ function handleWordClick(el, shiftPressed = false) {
     
     if(AppState.mode === 'split') { 
         AppState.saveToHistory(); 
-        const text = AppState.words[domIdx].w;
+        const text = AppState.words[domIdx].w || "";
         
         if (text.includes(' ')) {
             const parts = text.split(/\s+/);
@@ -1186,7 +1224,7 @@ function handleWordDoubleClick(el, e) {
     e.stopPropagation();
     AppState.ui.editingWordNode = el;
     const domIdx = parseInt(el.dataset.idx);
-    document.getElementById('word-text-input').value = AppState.words[domIdx].w;
+    document.getElementById('word-text-input').value = AppState.words[domIdx].w || "";
     document.getElementById('word-hint-input').value = AppState.words[domIdx].h || "";
     document.getElementById('word-modal').style.display = 'flex';
     document.getElementById('word-text-input').focus();
