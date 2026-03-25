@@ -1795,7 +1795,7 @@ function check() {
         setTimeout(() => {
             const pct = Math.round((examScore / totalItems) * 100);
             document.getElementById('final-score-display').textContent = examScore + " / " + totalItems + " (" + pct + "%)";
-            document.getElementById('results-text').value = "Exercise: " + (titleInput || t.docTitle).replace(/["'\`]/g, "") + "\\nDate: " + new Date().toLocaleDateString() + "\\nScore: " + examScore + " / " + totalItems + " (" + pct + "%)";
+            document.getElementById('results-text').value = t.resExercise + (titleInput || t.docTitle).replace(/["'\`]/g, "") + "\\n" + t.resDate + new Date().toLocaleDateString() + "\\n" + t.resScore + examScore + " / " + totalItems + " (" + pct + "%)";
             document.getElementById('results-modal').style.display = 'flex';
         }, 500);
     }
@@ -1941,7 +1941,8 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             practiseMode: "Practise Mode", examMode: "Exam Mode",
             resetWarn: "Changing the mode will reload the page and reset your progress. Continue?",
             examResults: "Exam Results", copyResults: "Copy to Clipboard", copied: "Copied!", close: "Close",
-            saveWarning: "⚠️ Note: Your progress is saved locally in this web browser. You must open this file on this exact same device and browser to resume your work later. Clearing your browser data will delete your progress. Do you want to save now?"
+            saveWarning: "⚠️ Note: Your progress is saved locally in this web browser. You must open this file on this exact same device and browser to resume your work later. Clearing your browser data will delete your progress. Do you want to save now?",
+            resExercise: "Exercise: ", resDate: "Date: ", resScore: "Score: "
         },
         de: {
             instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen. Du kannst auch mit der Maus über ein Wort oder eine Gruppe fahren und den unterstrichenen Buchstaben auf deiner Tastatur drücken, um eine Funktion schnell auszuwählen. Wenn du ein Glühbirnen-Symbol (💡) siehst, klicke darauf, um einen hilfreichen Tipp zu erhalten!<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.",
@@ -1953,7 +1954,8 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             practiseMode: "Übungsmodus", examMode: "Prüfungsmodus",
             resetWarn: "Ein Moduswechsel lädt die Seite neu und setzt deinen Fortschritt zurück. Fortfahren?",
             examResults: "Prüfungsergebnisse", copyResults: "Ergebnisse kopieren", copied: "Kopiert!", close: "Schließen",
-            saveWarning: "⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?"
+            saveWarning: "⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?",
+            resExercise: "Übung: ", resDate: "Datum: ", resScore: "Ergebnis: "
         }
     };
 
