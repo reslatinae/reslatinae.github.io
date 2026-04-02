@@ -291,6 +291,22 @@
 
 <script>
 // ==========================================
+// 0. GLOBALS & HELPER FUNCTIONS
+// ==========================================
+function escapeHTML(str) {
+    if (str == null) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function parseSimpleMarkdown(text) {
+    if (!text) return '';
+    let safeText = escapeHTML(text);
+    safeText = safeText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); 
+    safeText = safeText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    return safeText;
+}
+
+// ==========================================
 // 1. CONFIGURATION (Constants & Setup)
 // ==========================================
 const CONFIG = {
@@ -458,7 +474,7 @@ const StorageManager = {
         const projectData = { 
             lang: AppState.lang, level: AppState.level,
             title: document.getElementById('pagetitle').value, image: document.getElementById('pageimage').value,
-            text: document.getElementById('entertext').value, // FIX: Saving the original text to prevent loss
+            text: document.getElementById('entertext').value,
             notes: document.getElementById('teachernotes').value, 
             words: AppState.words, groups: AppState.groups, 
             customFunctions: AppState.functions, customColors: AppState.colors
@@ -484,29 +500,24 @@ const StorageManager = {
     },
 
     restoreData(data) {
-        // Robust fallback for language
         let safeLang = data.lang;
         if (!safeLang || !CONFIG.LANG_TEXT[safeLang]) safeLang = 'de';
         changeLanguage(safeLang);
         
-        // Robust fallback for level
         let safeLevel = data.level;
         if (!safeLevel || !CONFIG.PRESETS[safeLang][safeLevel]) safeLevel = 'advanced';
         changeLevel(safeLevel);
 
-        // Safe scalar assignments
         document.getElementById('pagetitle').value = data.title || "";
         document.getElementById('pageimage').value = data.image || "";
         document.getElementById('entertext').value = data.text || "";
         document.getElementById('teachernotes').value = data.notes || "";
         
-        // Setup state overrides
         AppState.functions = data.customFunctions || data.funcs || [...CONFIG.PRESETS[safeLang][safeLevel]];
         if(data.customColors || data.cols) Object.assign(AppState.colors, data.customColors || data.cols);
         AppState.groups = data.groups || [];
-        AppState.history = []; // Clear history to prevent undoing into another universe
+        AppState.history = []; 
         
-        // Robust word processing (handles older JSON structures safely)
         const loadWords = data.words || data.tokens || [];
         if(Array.isArray(loadWords) && loadWords.length > 0) {
             AppState.words = loadWords.map(w => ({
@@ -598,7 +609,6 @@ function changeLanguage(lang) {
     document.getElementById('edit-h3').textContent = txt.editH3; document.getElementById('edit-body').innerHTML = txt.editBody;
     document.getElementById('new-label-input').placeholder = txt.phLabel;
     
-    // Set dynamic placeholders for hints and search boxes
     document.getElementById('word-hint-input').placeholder = txt.phWordHint;
     document.getElementById('group-hint-input').placeholder = txt.phGroupHint;
     document.getElementById('group-name-input').placeholder = txt.phGroupSearch;
@@ -694,11 +704,12 @@ function renderPalette() {
         b.className = 'p-btn' + (f === AppState.activeFunc && AppState.mode === 'tagging' ? ' active' : '');
         b.style.backgroundColor = AppState.colors[f]; b.dataset.func = f; 
         
-        let shortcut = AppState.ui.labelShortcuts[f]; let innerHTML = f;
+        let safeF = escapeHTML(f);
+        let shortcut = AppState.ui.labelShortcuts[f]; let innerHTML = safeF;
         if (shortcut) {
-            let idx = f.toLowerCase().indexOf(shortcut);
-            if (idx !== -1) { innerHTML = f.substring(0, idx) + '<u>' + f[idx] + '</u>' + f.substring(idx + 1); } 
-            else { innerHTML = `[<u>${shortcut.toUpperCase()}</u>] ${f}`; }
+            let idx = safeF.toLowerCase().indexOf(shortcut);
+            if (idx !== -1) { innerHTML = safeF.substring(0, idx) + '<u>' + safeF[idx] + '</u>' + safeF.substring(idx + 1); } 
+            else { innerHTML = `[<u>${shortcut.toUpperCase()}</u>] ${safeF}`; }
         }
         b.innerHTML = innerHTML;
         b.addEventListener('click', () => { AppState.activeFunc = f; setMode('tagging'); });
@@ -750,7 +761,6 @@ function renderEditor() {
 
         currentSentenceBox.appendChild(span);
 
-        // Safe fallback in case w string is completely missing
         const wordText = item.w || "";
         const defaultBreak = isPunct && CONFIG.SENTENCE_ENDERS.some(char => wordText.includes(char));
         let shouldBreak = defaultBreak;
@@ -834,7 +844,9 @@ function updateGroupUI() {
                 
                 let badge = document.createElement('div');
                 badge.className = 'bracket-badge'; badge.dataset.groupIndex = g.originalIndex; badge.style.background = groupColor;
-                let labelHTML = `<span class="clickable-label" title="Rename group" data-action="rename-group" data-idx="${g.originalIndex}">${g.label}</span>`;
+                
+                let safeLabel = escapeHTML(g.label);
+                let labelHTML = `<span class="clickable-label" title="Rename group" data-action="rename-group" data-idx="${g.originalIndex}">${safeLabel}</span>`;
                 if(g.hint) labelHTML += ' <span style="font-size:0.7rem;">💡</span>';
                 
                 let startDrag = `draggable="true" data-drag-type="start" data-group-idx="${g.originalIndex}"`;
@@ -866,7 +878,6 @@ function updateGroupUI() {
 // 5. EVENT HANDLERS & DELEGATION
 // ==========================================
 function initEventListeners() {
-    // Setup Screen
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', (e) => changeLanguage(e.target.dataset.lang));
     });
@@ -876,7 +887,6 @@ function initEventListeners() {
     document.getElementById('btn-copy-ai').addEventListener('click', copyAIPrompt);
     document.getElementById('btn-import').addEventListener('click', importAI);
     
-    // FIX applied here: e.target.files[0] ensures the file object is correctly passed, and value is reset.
     document.getElementById('file-load-setup').addEventListener('change', (e) => {
         if(e.target.files.length > 0) { StorageManager.importProject(e.target.files[0]); e.target.value = ''; }
     });
@@ -888,7 +898,6 @@ function initEventListeners() {
     document.getElementById('btn-show-credits').addEventListener('click', () => showScreen('credits'));
     document.getElementById('btn-hide-credits').addEventListener('click', () => showScreen('setup'));
     
-    // Editor Toolbar
     document.getElementById('btn-add-label').addEventListener('click', addCustomLabel);
     document.getElementById('undo-btn').addEventListener('click', () => AppState.undo() && renderEditor());
     document.getElementById('split-mode-btn').addEventListener('click', () => setMode(AppState.mode === 'split' ? 'tagging' : 'split'));
@@ -897,14 +906,12 @@ function initEventListeners() {
     document.getElementById('btn-export').addEventListener('click', exportToStudent);
     document.getElementById('btn-save-work').addEventListener('click', () => StorageManager.exportProject());
 
-    // Zoom Controls
     document.getElementById('btn-toggle-pattern').addEventListener('click', () => document.body.classList.toggle('pattern-mode'));
     document.getElementById('btn-toggle-contrast').addEventListener('click', () => document.body.classList.toggle('high-contrast'));
     document.getElementById('btn-zoom-in').addEventListener('click', () => setTeacherZoom(0.1));
     document.getElementById('btn-zoom-out').addEventListener('click', () => setTeacherZoom(-0.1));
     document.getElementById('btn-zoom-reset').addEventListener('click', () => setTeacherZoom(0));
 
-    // Modals
     document.getElementById('btn-cancel-group').addEventListener('click', closeGroupModal);
     document.getElementById('btn-save-group').addEventListener('click', saveGroupFromModal);
     document.getElementById('btn-cancel-word').addEventListener('click', closeWordModal);
@@ -915,7 +922,6 @@ function initEventListeners() {
     document.getElementById('group-name-input').addEventListener('keyup', (e) => { if (e.key === 'Escape') closeGroupModal(); });
     document.getElementById('group-hint-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') saveGroupFromModal(); });
 
-    // --- EVENT DELEGATION FOR TAGGING AREA ---
     const taggingArea = document.getElementById('tagging-area');
 
     taggingArea.addEventListener('mouseover', (e) => {
@@ -926,7 +932,6 @@ function initEventListeners() {
     });
 
     taggingArea.addEventListener('click', (e) => {
-        // Group interactions
         const btn = e.target.closest('[data-action]');
         if (btn) {
             e.stopPropagation();
@@ -939,7 +944,6 @@ function initEventListeners() {
             return;
         }
 
-        // Word interactions
         const el = e.target.closest('.tag-word, .punct-span');
         if (!el) return;
         const shiftPressed = e.shiftKey;
@@ -954,7 +958,6 @@ function initEventListeners() {
         handleWordDoubleClick(el, e);
     });
 
-    // Drag and Drop (Groups)
     taggingArea.addEventListener('dragstart', (e) => {
         const dragEl = e.target.closest('[draggable="true"]');
         if (dragEl) {
@@ -989,7 +992,6 @@ function initEventListeners() {
         }
     });
 
-    // Mobile Swipe for Groups
     taggingArea.addEventListener('touchstart', (e) => {
         if (AppState.mode !== 'group') return;
         const word = e.target.closest('.tag-word');
@@ -1039,7 +1041,6 @@ function initEventListeners() {
         AppState.touch.swipeStartIdx = null; AppState.touch.swipeCurrentIdx = null; AppState.touch.isSwiping = false;
     });
 
-    // Global Keydown
     document.addEventListener('keydown', function(e) {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); AppState.undo() && renderEditor(); return; }
@@ -1214,7 +1215,7 @@ function handleWordClick(el, shiftPressed = false) {
         if (AppState.words[domIdx].f !== AppState.activeFunc) {
             AppState.saveToHistory(); 
             AppState.words[domIdx].f = AppState.activeFunc; 
-            updateWordVisuals(domIdx); // Smart DOM Update
+            updateWordVisuals(domIdx);
             StorageManager.triggerAutoSave();
         }
     }
@@ -1270,7 +1271,7 @@ function openGroupModal() {
     const modal = document.getElementById('group-modal'); const datalist = document.getElementById('label-suggestions');
     const input = document.getElementById('group-name-input'); const hintInput = document.getElementById('group-hint-input');
     datalist.innerHTML = '';
-    AppState.functions.forEach(f => { const opt = document.createElement('option'); opt.value = f; datalist.appendChild(opt); });
+    AppState.functions.forEach(f => { const opt = document.createElement('option'); opt.value = escapeHTML(f); datalist.appendChild(opt); });
     input.value = ''; hintInput.value = ''; modal.style.display = 'flex'; input.focus();
 }
 
@@ -1279,7 +1280,7 @@ function editGroupLabel(index) {
     const modal = document.getElementById('group-modal'); const datalist = document.getElementById('label-suggestions');
     const input = document.getElementById('group-name-input'); const hintInput = document.getElementById('group-hint-input');
     datalist.innerHTML = '';
-    AppState.functions.forEach(f => { const opt = document.createElement('option'); opt.value = f; datalist.appendChild(opt); });
+    AppState.functions.forEach(f => { const opt = document.createElement('option'); opt.value = escapeHTML(f); datalist.appendChild(opt); });
     input.value = AppState.groups[index].label; hintInput.value = AppState.groups[index].hint || "";
     modal.style.display = 'flex'; input.focus();
 }
@@ -1362,8 +1363,12 @@ function fallbackCopyTextToClipboard(text) {
 
 function copyAIPrompt() {
     const txtEl = document.getElementById('entertext');
-    txtEl.value = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
-    const txt = txtEl.value;
+    let sanitizedText = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
+    // Important fix to prevent JSON breaking inside AI prompt instructions
+    sanitizedText = sanitizedText.replace(/"/g, "'");
+    txtEl.value = sanitizedText; // Show the sanitized text in the editor
+    
+    const txt = sanitizedText;
     const exObj = AppState.functions[1] || 'Accusative object'; 
     
     const promptText = AppState.lang === 'de' 
@@ -1481,8 +1486,12 @@ function importAI() {
 
 function startManual() {
     const txtEl = document.getElementById('entertext');
-    txtEl.value = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
-    const rawInput = txtEl.value;
+    let sanitizedText = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
+    // Prevent double quote parsing bugs during manual input too
+    sanitizedText = sanitizedText.replace(/"/g, "'");
+    txtEl.value = sanitizedText;
+
+    const rawInput = sanitizedText;
     const tokens = rawInput.match(/[a-zA-Z\u00C0-\u017F-]+|[^a-zA-Z\u00C0-\u017F\s]+/gi);
     if (!tokens) return;
     initEditor(processTokens(tokens));
@@ -1952,13 +1961,6 @@ function exportToStudent() {
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
 }
 
-function parseSimpleMarkdown(text) {
-    if (!text) return '';
-    let safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    safeText = safeText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); safeText = safeText.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    return safeText;
-}
-
 function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lang, allAbbrevs, allPresets, exerciseId) {
     const filteredLabels = allLabels.filter(l => l !== CONFIG.MAIN_CLAUSE_EN && l !== CONFIG.MAIN_CLAUSE_DE);
     const labelMap = { en: {}, de: {} };
@@ -1999,14 +2001,17 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
 
     const t = studentTexts[lang]; const pageTitle = title ? title : t.docTitle;
     const bodyContent = generateExerciseHTML(words, groups, t.transPlaceholder);
+    
+    const safeTitle = escapeHTML(pageTitle);
+    const safeNotes = notes ? escapeHTML(notes).replace(/\n/g, '<br>') : '';
 
     return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>${pageTitle}</title>
+    <title>${safeTitle}</title>
     <style>${STUDENT_PAGE_CSS}</style></head>
     <body>
-        <h1>${pageTitle}</h1>
+        <h1>${safeTitle}</h1>
         <div class="instruction-box">${t.instr}</div>
-        ${notes ? `<div class="teacher-note"><span style="font-weight: 500;">${t.note}</span> ${notes.replace(/\\n/g, '<br>')}</div>` : ''}
+        ${safeNotes ? `<div class="teacher-note"><span style="font-weight: 500;">${t.note}</span> ${safeNotes}</div>` : ''}
         <div class="exercise-wrapper">
             <div style="text-align: center; margin-bottom: 24px;">
                 <div class="mode-toggle-bg" style="display: inline-flex; background: #e2e8f0; border-radius: 8px; padding: 4px;">
@@ -2030,7 +2035,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
                 <div id="exercise">${bodyContent}</div>
             </div>
         </div>
-        ${imgUrl ? `<img src="${imgUrl}" class="ex-img" alt="Exercise Image">` : ''}
+        ${imgUrl ? `<img src="${escapeHTML(imgUrl)}" class="ex-img" alt="Exercise Image">` : ''}
         
         <div class="footer-toolbar">
             <button class="btn" onclick="saveStudentProgress()" id="btn-save-progress">${t.btnSaveProg}</button>
@@ -2039,7 +2044,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             <button class="btn" onclick="downloadPage()">${t.download}</button>
         </div>
         <div id="menu-common" class="radio-menu">
-            ${filteredLabels.map(l => `<button type="button" class="menu-btn" data-val="${l}">${l}</button>`).join('')}
+            ${filteredLabels.map(l => `<button type="button" class="menu-btn" data-val="${escapeHTML(l)}">${escapeHTML(l)}</button>`).join('')}
         </div>
         <div id="results-modal">
             <div class="results-content">
@@ -2074,13 +2079,16 @@ function generateExerciseHTML(words, groups, placeholder) {
         let safeWordHint = parseSimpleMarkdown(word.hint);
         let hintHtml = word.hint ? `<span class="hint-icon" title="Hint" onclick="event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');">💡<span class="tooltip-text">${safeWordHint}</span></span>` : '';
         
-        let content = isPunct ? `<span class="punct">${word.w}</span>` : `<span class="hover-word" tabindex="0" data-ans="${word.f}">${word.w}${hintHtml}</span>`;
+        let safeWord = escapeHTML(word.w);
+        let safeFunc = escapeHTML(word.f);
+        let content = isPunct ? `<span class="punct">${safeWord}</span>` : `<span class="hover-word" tabindex="0" data-ans="${safeFunc}">${safeWord}${hintHtml}</span>`;
         let openDivs = "", closeDivs = "";
 
         groups.forEach(g => {
             let safeGroupHint = parseSimpleMarkdown(g.hint);
             let gHintHtml = g.hint ? `<span class="hint-icon" title="Hint" onclick="event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');">💡<span class="tooltip-text">${safeGroupHint}</span></span>` : '';
-            if(idx === g.start) openDivs += `<div class="s-group" data-ans="${g.label}"><span class="g-label" tabindex="0"><span class="g-text">?</span>${gHintHtml}</span>`;
+            let safeLabel = escapeHTML(g.label);
+            if(idx === g.start) openDivs += `<div class="s-group" data-ans="${safeLabel}"><span class="g-label" tabindex="0"><span class="g-text">?</span>${gHintHtml}</span>`;
             if(idx === g.end) closeDivs += `</div>`;
         });
         let spacing = nextIsPunct ? "" : " ";
@@ -2098,13 +2106,13 @@ function generateExerciseHTML(words, groups, placeholder) {
         if (word.b === 1) shouldBreak = true; if (word.b === -1) shouldBreak = false;
 
         if (shouldBreak) {
-            html += `<div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="${placeholder}"></textarea></div></div>`;
+            html += `<div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="${escapeHTML(placeholder)}"></textarea></div></div>`;
             sIdx++; containerOpen = false;
             if (idx < words.length - 1) { html += `<div class="sentence-container">`; containerOpen = true; }
         }
     });
     
-    if (containerOpen) html += `<div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="${placeholder}"></textarea></div></div>`;
+    if (containerOpen) html += `<div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="${escapeHTML(placeholder)}"></textarea></div></div>`;
     return html;
 }
 </script>
