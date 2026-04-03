@@ -1250,21 +1250,23 @@ function saveWordFromModal() {
 }
 
 function deleteWordFromModal() {
-    if (!AppState.ui.editingWordNode) return;
-    if (!confirm(CONFIG.LANG_TEXT[AppState.lang].confirmDelete)) return;
-    
-    AppState.saveToHistory();
-    const targetIdx = parseInt(AppState.ui.editingWordNode.dataset.idx);
-    AppState.words.splice(targetIdx, 1);
-    
-    AppState.groups = AppState.groups.map(g => {
-        let newStart = g.start; let newEnd = g.end;
-        if (g.start > targetIdx) newStart--;
-        if (g.end >= targetIdx) newEnd--;
-        return { ...g, start: newStart, end: newEnd };
-    }).filter(g => g.start <= g.end); 
-    
-    renderEditor(); StorageManager.triggerAutoSave(); closeWordModal();
+    if (!AppState.ui.editingWordNode) return;
+    
+    // The confirmation pop-up has been removed!
+    // if (!confirm(CONFIG.LANG_TEXT[AppState.lang].confirmDelete)) return;
+    
+    AppState.saveToHistory();
+    const targetIdx = parseInt(AppState.ui.editingWordNode.dataset.idx);
+    AppState.words.splice(targetIdx, 1);
+    
+    AppState.groups = AppState.groups.map(g => {
+        let newStart = g.start; let newEnd = g.end;
+        if (g.start > targetIdx) newStart--;
+        if (g.end >= targetIdx) newEnd--;
+        return { ...g, start: newStart, end: newEnd };
+    }).filter(g => g.start <= g.end); 
+    
+    renderEditor(); StorageManager.triggerAutoSave(); closeWordModal();
 }
 
 function openGroupModal() {
@@ -1371,11 +1373,10 @@ function copyAIPrompt() {
     const txt = sanitizedText;
     const exObj = AppState.functions[1] || 'Accusative object'; 
     
-    const promptText = AppState.lang === 'de' 
-    ? `Analysiere die lateinische Syntax von: "${txt}".\n1. STRIKTE REGEL: Behalte die EXAKTE Wortreihenfolge bei. Lass KEINE Wörter und KEINE Satzzeichen aus (insbesondere nicht den Schlusspunkt!).\n2. PHRASEN: Benachbarte Wörter einer Phrase erhalten die gleiche Funktion.\n3. HYPERBATON: Getrennte Phrasen erhalten die gleiche Funktion, bleiben aber an ihrem Platz.\n4. INTERPUNKTION: Jedes Satzzeichen (inkl. Schlusspunkt) wird als eigenes Token mit "f": "${CONFIG.PUNCT}" ausgegeben.\n5. GRUPPEN: Identifiziere echte mehrteilige Sätze/Phrasen (z.B. Nebensatz, AcI, Partizipialkonstruktion), falls sie in den erlaubten Labels stehen. Gib sie im Array "groups" mit 0-basierten Start- und End-Indizes an. Beispiel: "groups": [{"start": 2, "end": 5, "label": "Nebensatz"}]. Wenn es keine gibt, lass das Array leer.\n6. Antworte mit JSON: { "words": [{"w": "Arma", "f": "${exObj}"}, ...], "groups": [] }\nVerwende ausschließlich diese Labels: ${AppState.functions.join(', ')}.`
-    : `Analyze Latin syntax of: "${txt}". \n1. STRICT RULE: Maintain the EXACT word order. Do NOT omit any words or punctuation marks (especially the final full stop!).\n2. PHRASES: Adjacent phrase words get same function. \n3. HYPERBATON: Split phrases get same function but kept in place.\n4. PUNCTUATION: Include EVERY punctuation mark (including the final full stop) as a separate token "f": "${CONFIG.PUNCT}".\n5. GROUPS: Identify true multi-word clauses (e.g., Subordinate clause, Accusative with infinitive, Participial phrase) if they exist in the allowed labels. Output them in the "groups" array with 0-based start and end indices. Example: "groups": [{"start": 2, "end": 5, "label": "Subordinate clause"}]. If there are none, leave the array empty.\n6. Return JSON: { "words": [{"w": "Arma", "f": "${exObj}"}, ...], "groups": [] } \nUse ONLY these Labels: ${AppState.functions.join(', ')}.`;
-
-    if (navigator.clipboard && window.isSecureContext) {
+    const promptText = AppState.lang === 'de' 
+    ? `Analysiere die lateinische Syntax von: "${txt}".\n1. KEINE ÜBERSETZUNG: Analysiere direkt die lateinische Morphologie und Syntax (Kasus, Kongruenz, Verbvalenz). Übersetze den Satz NICHT im Hintergrund und analysiere auf keinen Fall die deutsche Übersetzung!\n2. STRIKTE REGEL: Behalte die EXAKTE Wortreihenfolge bei. Lass KEINE Wörter und KEINE Satzzeichen aus (insbesondere nicht den Schlusspunkt!).\n3. PHRASEN: Benachbarte Wörter einer Phrase erhalten die gleiche Funktion.\n4. KOORDINATION: Wenn eine Konjunktion (z.B. 'et', 'aut', '-que') Wörter mit derselben syntaktischen Funktion verbindet (z.B. zwei Adverbien oder zwei Subjekte), gib der Konjunktion und den Wörtern EXAKT DASSELBE Label, damit sie verschmelzen.\n5. HYPERBATON: Getrennte Phrasen erhalten die gleiche Funktion, bleiben aber an ihrem Platz.\n6. INTERPUNKTION: Jedes Satzzeichen (inkl. Schlusspunkt) wird als eigenes Token mit "f": "${CONFIG.PUNCT}" ausgegeben.\n7. GRUPPEN & NEBENSÄTZE: Identifiziere mehrteilige Konstruktionen (z.B. Nebensatz, AcI, Partizipialkonstruktion). WICHTIG: Wenn du eine 'Subjunktion' oder ein Relativpronomen identifizierst, MUSST du zwingend eine entsprechende Gruppe erstellen. Der "end"-Index schließt den Satz logisch ab (meist beim finiten Verb/Satzzeichen) und zerschneidet keine Phrasen.\n8. BEISPIEL: Für "Aurum sumptum a Clodia, venenum quaesitum quod Clodiae daretur." antworte exakt so: {"words": [{"w":"Aurum","f":"Subjekt"},{"w":"sumptum","f":"Prädikat"},{"w":"a Clodia","f":"Präpositionale Bestimmung"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subjekt"},{"w":"quaesitum","f":"Prädikat"},{"w":"quod","f":"Subjekt"},{"w":"Clodiae","f":"Dativobjekt"},{"w":"daretur","f":"Prädikat"},{"w":".","f":"Punct"}], "groups": [{"start": 6, "end": 9, "label": "Relativsatz"}]}\n9. WICHTIG: Antworte AUSSCHLIESSLICH mit gültigem JSON. Keine Kommentare, keine abschließenden Kommas (trailing commas) vor Klammern! Format: { "words": [{"w": "Wort", "f": "Label"}, ...], "groups": [] }\nVerwende ausschließlich diese Labels: ${AppState.functions.join(', ')}.`
+    : `Analyze Latin syntax of: "${txt}". \n1. NO TRANSLATION: Analyze the Latin morphology and syntax directly (cases, agreement, verb valency). Do NOT translate the sentence in the background and do not analyze the syntax of an English translation!\n2. STRICT RULE: Maintain the EXACT word order. Do NOT omit any words or punctuation marks (especially the final full stop!).\n3. PHRASES: Adjacent phrase words get same function. \n4. COORDINATION: If a conjunction connects words with the same syntactical function, give the conjunction and the words the EXACT SAME label so they merge. \n5. HYPERBATON: Split phrases get same function but kept in place.\n6. PUNCTUATION: Include EVERY punctuation mark as a separate token "f": "${CONFIG.PUNCT}".\n7. GROUPS & CLAUSES: Identify true multi-word clauses. IMPORTANT: If you tag a word as a 'Subjunction' or relative pronoun, you MUST create a corresponding group in the "groups" array. The "end" index logically closes the clause and NEVER cuts a phrase in half.\n8. EXAMPLE: For "Aurum sumptum a Clodia, venenum quaesitum quod Clodiae daretur." answer exactly like this: {"words": [{"w":"Aurum","f":"Subject"},{"w":"sumptum","f":"Verb"},{"w":"a Clodia","f":"Prepositional phrase"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subject"},{"w":"quaesitum","f":"Verb"},{"w":"quod","f":"Subject"},{"w":"Clodiae","f":"Dative object"},{"w":"daretur","f":"Verb"},{"w":".","f":"Punct"}], "groups": [{"start": 6, "end": 9, "label": "Relative clause"}]}\n9. IMPORTANT: Return ONLY valid JSON. No comments, no trailing commas before brackets! Format: { "words": [{"w": "Word", "f": "Label"}, ...], "groups": [] } \nUse ONLY these Labels: ${AppState.functions.join(', ')}.`;
+	if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(promptText).then(() => alert(CONFIG.LANG_TEXT[AppState.lang].promptSuccess)).catch(() => fallbackCopyTextToClipboard(promptText));
     } else { fallbackCopyTextToClipboard(promptText); }
 }
@@ -1448,40 +1449,91 @@ function normalizeLabel(label) {
 }
 
 function importAI() {
-    try {
-        const raw = document.getElementById('ai-json').value;
-        const cleanJson = raw.replace(/```json/g, '').replace(/```/g, '');
-        const d = JSON.parse(cleanJson);
-        
-        let rawGroups = (d.groups || []).filter(g => g.label && g.label.toLowerCase() !== CONFIG.MAIN_CLAUSE_EN.toLowerCase() && g.label.toLowerCase() !== CONFIG.MAIN_CLAUSE_DE.toLowerCase() && g.start != null && g.end != null && g.start <= g.end);
-        rawGroups.forEach(g => { g.label = normalizeLabel(g.label); });
+    try {
+        const raw = document.getElementById('ai-json').value;
+        
+        // 1. Strip markdown ticks
+        let cleanJson = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+        
+        // 2. SMARTER EXTRACTION: Look for the outermost JSON object that actually contains the "words" array
+        const jsonMatch = cleanJson.match(/\{[\s\S]*"words"[\s\S]*\}/);
+        if (jsonMatch) {
+            cleanJson = jsonMatch[0];
+        } else {
+            alert("Could not find a valid JSON object containing 'words'. Please check the AI's output.");
+            return;
+        }
 
-        d.words.forEach(w => {
-            w.w = w.w.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
-            if (!/[a-zA-Z\u00C0-\u017F]/.test(w.w)) w.f = CONFIG.PUNCT;
-            else if (w.f.toLowerCase() === CONFIG.MAIN_CLAUSE_EN.toLowerCase() || w.f.toLowerCase() === CONFIG.MAIN_CLAUSE_DE.toLowerCase()) w.f = AppState.getOtherLabel();
-            else w.f = normalizeLabel(w.f);
-            w.b = w.b || 0;
-        });
-        
-        const mergeResult = applyPrepositionMerging(d.words);
-        AppState.groups = [];
-        rawGroups.forEach(g => {
-            let newStart = mergeResult.map[g.start] !== undefined ? mergeResult.map[g.start] : g.start;
-            let newEnd = mergeResult.map[g.end] !== undefined ? mergeResult.map[g.end] : g.end;
-            for (let i = newStart; i < newEnd; i++) {
-                let token = mergeResult.welded[i];
-                if (token && token.f === CONFIG.PUNCT && CONFIG.SENTENCE_ENDERS.some(char => token.w.includes(char))) { newEnd = i - 1; break; }
-            }
-            while(newStart <= newEnd && mergeResult.welded[newStart] && mergeResult.welded[newStart].f === CONFIG.PUNCT) newStart++;
-            while(newEnd >= newStart && mergeResult.welded[newEnd] && mergeResult.welded[newEnd].f === CONFIG.PUNCT) newEnd--;
-            
-            if (newStart <= newEnd && newStart >= 0 && newEnd < mergeResult.welded.length) {
-                AppState.groups.push({ start: newStart, end: newEnd, label: g.label });
-            }
-        });
-        initEditor(mergeResult.welded);
-    } catch(e) { console.error(e); alert("JSON error. Check console."); }
+        // 3. AUTO-HEAL: Remove trailing commas before closing brackets/braces (common AI mistake)
+        cleanJson = cleanJson.replace(/,\s*([\]}])/g, '$1');
+
+        // 4. Safely attempt to parse the JSON
+        let d;
+        try {
+            d = JSON.parse(cleanJson);
+        } catch (parseErr) {
+            console.error("JSON Parsing failed. The AI provided invalid JSON syntax:", cleanJson);
+            alert("The AI generated invalid JSON (e.g., unescaped quotes). Check the browser console (F12) to see exactly where the AI messed up.");
+            return;
+        }
+
+        // 5. Structural safety check
+        if (!d || !Array.isArray(d.words)) {
+            alert("The AI's response is missing the 'words' array. Please generate the prompt again.");
+            return;
+        }
+        
+        let rawGroups = (d.groups || []).filter(g => g.label && g.label.toLowerCase() !== CONFIG.MAIN_CLAUSE_EN.toLowerCase() && g.label.toLowerCase() !== CONFIG.MAIN_CLAUSE_DE.toLowerCase() && g.start != null && g.end != null && g.start <= g.end);
+        
+        // INTERCEPT GROUPS: Force to 'Other/Sonstiges' if not in allowed list
+        rawGroups.forEach(g => { 
+            let norm = normalizeLabel(g.label);
+            g.label = AppState.functions.includes(norm) ? norm : AppState.getOtherLabel();
+        });
+
+        d.words.forEach(w => {
+            // Safety fallbacks in case the AI omitted keys for a specific word
+            w.w = w.w || ""; 
+            let func = w.f || ""; 
+
+            w.w = w.w.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
+            
+            if (!/[a-zA-Z\u00C0-\u017F]/.test(w.w)) {
+                w.f = CONFIG.PUNCT;
+            }
+            else if (func.toLowerCase() === CONFIG.MAIN_CLAUSE_EN.toLowerCase() || func.toLowerCase() === CONFIG.MAIN_CLAUSE_DE.toLowerCase()) {
+                w.f = AppState.getOtherLabel();
+            }
+            else {
+                // INTERCEPT WORDS: Force to 'Other/Sonstiges' if not in allowed list
+                let norm = normalizeLabel(func);
+                w.f = AppState.functions.includes(norm) ? norm : AppState.getOtherLabel();
+            }
+            w.b = w.b || 0;
+        });
+        
+        const mergeResult = applyPrepositionMerging(d.words);
+        AppState.groups = [];
+        rawGroups.forEach(g => {
+            let newStart = mergeResult.map[g.start] !== undefined ? mergeResult.map[g.start] : g.start;
+            let newEnd = mergeResult.map[g.end] !== undefined ? mergeResult.map[g.end] : g.end;
+            for (let i = newStart; i < newEnd; i++) {
+                let token = mergeResult.welded[i];
+                if (token && token.f === CONFIG.PUNCT && CONFIG.SENTENCE_ENDERS.some(char => token.w.includes(char))) { newEnd = i - 1; break; }
+            }
+            while(newStart <= newEnd && mergeResult.welded[newStart] && mergeResult.welded[newStart].f === CONFIG.PUNCT) newStart++;
+            while(newEnd >= newStart && mergeResult.welded[newEnd] && mergeResult.welded[newEnd].f === CONFIG.PUNCT) newEnd--;
+            
+            if (newStart <= newEnd && newStart >= 0 && newEnd < mergeResult.welded.length) {
+                AppState.groups.push({ start: newStart, end: newEnd, label: g.label });
+            }
+        });
+
+        initEditor(mergeResult.welded);
+    } catch(e) { 
+        console.error("Unhandled import error:", e); 
+        alert("An unexpected error occurred during import. Check the browser console (F12) for more details."); 
+    }
 }
 
 function startManual() {
