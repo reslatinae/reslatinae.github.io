@@ -197,6 +197,10 @@
     </div>
 
     <div id="editor-screen" style="display:none;">
+	<div style="margin-bottom: 20px; background: white; padding: 16px; border: 1px solid var(--border-color); border-radius: 6px; box-shadow: var(--shadow);">
+            <label id="lbl-editor-title" style="font-weight: 600; font-size: 0.9rem; color: #4b5563; display: block; margin-bottom: 8px;">Exercise Title:</label>
+            <input type="text" id="editor-pagetitle" class="setup-input" style="width: 100%; box-sizing: border-box; font-size: 1.1rem; font-weight: bold;" placeholder="Exercise Title" />
+        </div>
         <div class="instruction-box">
             <h3 id="edit-h3">Step 2: Editing Instruction</h3>
             <div style="margin-bottom:0;" id="edit-body"></div>
@@ -318,17 +322,29 @@ const CONFIG = {
     MAIN_CLAUSE_DE: 'Hauptsatz',
     SENTENCE_ENDERS: ['.', '!', '?', '·'],
     PREPOSITIONS: ["a", "ab", "ad", "ante", "apud", "circum", "contra", "cum", "de", "e", "ex", "extra", "in", "infra", "inter", "intra", "ob", "per", "post", "prae", "pro", "prope", "propter", "sine", "sub", "super", "trans", "ultra"],
-    SAFE_COLORS: ['#ffd480', '#bef264', '#fca5a5', '#bde0f5', '#ebbcd4', '#93c5fd', '#e9d5ff', '#cbd5e1', '#99f6e4', '#bfdbfe', '#d8b4fe', '#ffedd5'],
+   SAFE_COLORS: ['#fde047', '#67e8f9', '#f9a8d4', '#d8b4fe', '#93c5fd', '#fca5a5', '#86efac', '#fcd34d', '#c4b5fd', '#bfdbfe', '#fbcfe8', '#e9d5ff', '#ffedd5', '#d2b48c', '#fed7aa', '#bae6fd', '#a7f3d0', '#ddd6fe'],
     SEMANTIC_COLORS: {
-        'Subject': '#bef264', 'Subjekt': '#bef264', 'Verb': '#fca5a5', 'Prädikat': '#fca5a5', 
-        'Accusative object': '#bde0f5', 'Akkusativobjekt': '#bde0f5', 'Dative object': '#ffd480', 'Dativobjekt': '#ffd480', 
-        'Genitive object': '#ebbcd4', 'Genitivobjekt': '#ebbcd4', 'Ablative': '#93c5fd', 'Ablativ': '#93c5fd', 
-        'Ablative absolute': '#bfdbfe', 'Ablativus absolutus': '#bfdbfe', 'Prepositional phrase': '#e9d5ff', 'Präpositionale Bestimmung': '#e9d5ff', 
-        'Adverb': '#fef08a', 'Infinitive': '#fbcfe8', 'Infinitiv': '#fbcfe8', 'Predicative': '#c4b5fd', 'Prädikativum': '#c4b5fd', 
-        'Conjunction': '#ffedd5', 'Konjunktion': '#ffedd5', 'Subjunction': '#85e6c7', 'Subjunktion': '#85e6c7', 
-        'Participial phrase': '#f9a8d4', 'Partizipialkonstruktion': '#f9a8d4', 'Subordinate clause': '#cbd5e1', 'Nebensatz': '#cbd5e1', 
-        'Relative clause': '#99f6e4', 'Relativsatz': '#99f6e4', 'Accusative with infinitive': '#d8b4fe', 'AcI': '#d8b4fe', 
-        'Other': '#e5e7eb', 'Sonstiges': '#e5e7eb'
+        // --- Core Sentence Components (Highly Saturated) ---
+        'Subject': '#86efac', 'Subjekt': '#86efac', // Vivid Mint Green
+        'Verb': '#fca5a5', 'Prädikat': '#fca5a5', // Vivid Salmon Red
+        'Accusative object': '#7dd3fc', 'Akkusativobjekt': '#7dd3fc', // Vivid Sky Blue
+        'Dative object': '#fcd34d', 'Dativobjekt': '#fcd34d', // Vivid Golden Yellow
+        'Prepositional phrase': '#c4b5fd', 'Präpositionale Bestimmung': '#c4b5fd', // Vivid Purple
+        
+        // --- Secondary Elements & Clauses (Softer Pastels/Muted) ---
+        'Genitive object': '#fbcfe8', 'Genitivobjekt': '#fbcfe8', // Muted Pink
+        'Ablative': '#bfdbfe', 'Ablativ': '#bfdbfe', // Muted Blue
+        'Ablative absolute': '#e0e7ff', 'Ablativus absolutus': '#e0e7ff', // Soft Indigo
+        'Adverb': '#fef08a', // Pale Yellow
+        'Infinitive': '#ddd6fe', 'Infinitiv': '#ddd6fe', // Muted Lavender (NEW distinction)
+        'Predicative': '#e9d5ff', 'Prädikativum': '#e9d5ff', // Soft Lilac
+        'Conjunction': '#ffedd5', 'Konjunktion': '#ffedd5', // Very Pale Orange
+        'Subjunction': '#d2b48c', 'Subjunktion': '#d2b48c', // Tan/Muted Brown (NEW distinction)
+        'Participial phrase': '#fce7f3', 'Partizipialkonstruktion': '#fce7f3', // Very Soft Pink
+        'Subordinate clause': '#cbd5e1', 'Nebensatz': '#cbd5e1', // Blue-Grey
+        'Relative clause': '#d1fae5', 'Relativsatz': '#d1fae5', // Pale Mint
+        'Accusative with infinitive': '#d8b4fe', 'AcI': '#d8b4fe', // Violet
+        'Other': '#e5e7eb', 'Sonstiges': '#e5e7eb' // Neutral Grey
     },
     PRESETS: {
         en: {
@@ -499,7 +515,7 @@ const StorageManager = {
         reader.readAsText(file);
     },
 
-    restoreData(data) {
+   restoreData(data) {
         let safeLang = data.lang;
         if (!safeLang || !CONFIG.LANG_TEXT[safeLang]) safeLang = 'de';
         changeLanguage(safeLang);
@@ -509,6 +525,7 @@ const StorageManager = {
         changeLevel(safeLevel);
 
         document.getElementById('pagetitle').value = data.title || "";
+        if (document.getElementById('editor-pagetitle')) document.getElementById('editor-pagetitle').value = data.title || ""; // <--- Paced safely here!
         document.getElementById('pageimage').value = data.image || "";
         document.getElementById('entertext').value = data.text || "";
         document.getElementById('teachernotes').value = data.notes || "";
@@ -596,6 +613,12 @@ function changeLanguage(lang) {
     document.getElementById('instr-h3').textContent = txt.instrH3; document.getElementById('instr-body').innerHTML = txt.instrBody;
     document.getElementById('example-link-text').textContent = txt.exampleLink; document.getElementById('link-example').textContent = txt.linkText;
     document.getElementById('pagetitle').placeholder = txt.phTitle; document.getElementById('pageimage').placeholder = txt.phImage;
+	const editorTitleLabel = document.getElementById('lbl-editor-title');
+        const editorTitleInput = document.getElementById('editor-pagetitle');
+        if (editorTitleLabel && editorTitleInput) {
+            editorTitleLabel.textContent = lang === 'de' ? 'Übungstitel:' : 'Exercise Title:';
+            editorTitleInput.placeholder = txt.phTitle;
+        }
     document.getElementById('teachernotes').placeholder = txt.phNotes; document.getElementById('entertext').placeholder = txt.phText;
     document.getElementById('ai-json').placeholder = txt.phJson; document.getElementById('btn-copy-ai').textContent = txt.btnCopy;
     document.getElementById('btn-import').textContent = txt.btnImport; document.getElementById('or-text').textContent = txt.or;
@@ -921,6 +944,17 @@ function initEventListeners() {
     document.getElementById('group-name-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') saveGroupFromModal(); });
     document.getElementById('group-name-input').addEventListener('keyup', (e) => { if (e.key === 'Escape') closeGroupModal(); });
     document.getElementById('group-hint-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') saveGroupFromModal(); });
+	// Sync Editor Title with Setup Title
+    document.getElementById('editor-pagetitle').addEventListener('input', (e) => {
+        document.getElementById('pagetitle').value = e.target.value;
+        StorageManager.triggerAutoSave();
+    });
+    
+    // Sync Setup Title with Editor Title (in case you go back and forth)
+    document.getElementById('pagetitle').addEventListener('input', (e) => {
+        const editorTitle = document.getElementById('editor-pagetitle');
+        if(editorTitle) editorTitle.value = e.target.value;
+    });
 
     const taggingArea = document.getElementById('tagging-area');
 
@@ -1553,6 +1587,7 @@ function initEditor(words) {
     AppState.functions = [...CONFIG.PRESETS[AppState.lang][AppState.level]];
     AppState.history = [];
     AppState.words = words;
+	document.getElementById('editor-pagetitle').value = document.getElementById('pagetitle').value;
     renderEditor();
     showScreen('editor');
     renderPalette();
