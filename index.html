@@ -60,6 +60,10 @@
         .punct-span { display: inline-block; margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; padding: 2px 2px; font-size: 1.15rem; vertical-align: bottom; color: #111827; position: relative; font-weight: 500; cursor: pointer; user-select: none; border-bottom: 2px solid transparent; height: 1.6rem; line-height: 1.6rem; transition: margin-top 0.3s ease, opacity 0.2s; }
         .split-right { border-right: 3px dashed #ef4444 !important; margin-right: 12px !important; }
         
+        /* Genitive Attribute Underline Feature */
+        .attr-underline { border-bottom: 3px dashed #ec4899 !important; padding-bottom: 2px; }
+        .tag-word.attr-underline::after { content: attr(data-short) ' (GEN)'; color: #ec4899; font-weight: 800; background: #fdf2f8; border-color: #ec4899; }
+
         .group-bracket { position: absolute; left: -2px; right: -2px; border-top-width: 4px; border-top-style: solid; pointer-events: none; z-index: 5; border-radius: 6px; }
         .bracket-start { border-left-width: 5px; border-left-style: solid; border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
         .bracket-end { border-right-width: 5px; border-right-style: solid; border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
@@ -84,6 +88,7 @@
         #split-mode-btn.active-mode { outline-color: #ef4444; background: #dc2626 !important; }
         #group-mode-btn.active-mode { outline-color: #8b5cf6; background: #7c3aed !important; }
         #linebreak-mode-btn.active-mode { outline-color: #0ea5e9; background: #0284c7 !important; }
+        #attr-mode-btn.active-mode { outline-color: #ec4899; background: #db2777 !important; }
 
         .custom-label-row { display: flex; gap: 8px; align-items: center; }
         .custom-input { flex-grow: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
@@ -129,6 +134,8 @@
         body.high-contrast .subtle-btn, body.high-contrast .lang-btn { background: #333; color: #fff; border-color: #555; }
         body.high-contrast .subtle-btn:hover, body.high-contrast .lang-btn:hover { background: #444; color: #fff; }
         body.high-contrast .bracket-badge, body.high-contrast .bracket-end-controls { border: 1px solid #fff !important; }
+        body.high-contrast .attr-underline { border-bottom-color: #f472b6 !important; }
+        body.high-contrast .tag-word.attr-underline::after { color: #f472b6; border-color: #f472b6; background: #000; }
 
         @media (max-width: 768px) {
             body { margin: 10px; padding: 0; } .container { padding: 20px; } .setup-row { flex-direction: column; gap: 12px; }
@@ -197,7 +204,7 @@
     </div>
 
     <div id="editor-screen" style="display:none;">
-	<div style="margin-bottom: 20px; background: white; padding: 16px; border: 1px solid var(--border-color); border-radius: 6px; box-shadow: var(--shadow);">
+    <div style="margin-bottom: 20px; background: white; padding: 16px; border: 1px solid var(--border-color); border-radius: 6px; box-shadow: var(--shadow);">
             <label id="lbl-editor-title" style="font-weight: 600; font-size: 0.9rem; color: #4b5563; display: block; margin-bottom: 8px;">Exercise Title:</label>
             <input type="text" id="editor-pagetitle" class="setup-input" style="width: 100%; box-sizing: border-box; font-size: 1.1rem; font-weight: bold;" placeholder="Exercise Title" />
         </div>
@@ -233,6 +240,7 @@
                 <button class="btn-action" id="split-mode-btn" style="background:#ef4444; flex:1;">Manual Split (X)</button>
                 <button class="btn-action" id="linebreak-mode-btn" style="background:#0ea5e9; flex:1;">Toggle Break (J)</button>
                 <button class="btn-action" id="group-mode-btn" style="background:#8b5cf6; flex:1;">Draw Bracket (K)</button>
+                <button class="btn-action" id="attr-mode-btn" style="background:#ec4899; flex:1;">Mark Genitive (G)</button>
                 <button class="btn-action" id="btn-export" style="background:#111827; flex:1;">Export Student Page</button>
             </div>
 
@@ -292,11 +300,526 @@
     </div>
     
     <div id="autosave-status">Autosaved</div>
+<!-- ========================================== -->
+    <!-- STUDENT PAGE TEMPLATES -->
+    <!-- ========================================== -->
+    
+    <script type="text/template" id="template-student-css">
+        :root { --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        body, button, input, textarea, select { font-family: var(--main-font); }
+        body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background-color: #f9fafb; color: #1f2937; line-height: 1.5; }
+        h1 { text-align: center; color: #111827; margin-bottom: 32px; font-weight: 600; letter-spacing: -0.025em; }
+        .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; color: #334155; }
+        .teacher-note { background: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 1rem; color: #1f2937; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .exercise-wrapper { background: #fafafa; padding: 40px; border-radius: 12px; border: 1px solid #e5e7eb; line-height: 4.2; }
+        .sentence-container { padding: 30px 20px 20px 20px; margin-bottom: 32px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .sentence-container:last-child { margin-bottom: 0; }
+        
+        .zoom-controls { display: flex; gap: 6px; align-items: center; justify-content: flex-end; margin-bottom: 16px; }
+        .z-btn { background: white; border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 0.9rem; font-weight: bold; color: #374151; transition: background 0.1s; }
+        .z-btn:hover { background: #e5e7eb; }
+        .lang-switch-inline { display: flex; gap: 6px; margin-right: auto; }
+        .lang-btn { background: #f3f4f6; border: 1px solid transparent; padding: 4px 10px; cursor: pointer; border-radius: 4px; font-size: 0.85rem; color: #4b5563; transition: all 0.2s; font-weight: 500; }
+        .lang-btn.active { background: #eff6ff; color: #3b82f6; border-color: #bfdbfe; font-weight: 600; }
+        
+        #exercise-container-wrapper { overflow-x: auto; padding-top: 30px; padding-bottom: 15px; margin-top: 10px; }
+        #exercise { transition: transform 0.2s ease-in-out; }
 
+        .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
+        .hover-word:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+        
+        /* Interactive Genitive Underline Elements */
+        .s-text { border-bottom: 3px dashed transparent; transition: border-color 0.2s, background-color 0.2s; border-radius: 2px; }
+        .s-text.marked-gen { border-bottom-color: #ec4899; }
+        .s-text.error-gen { border-bottom-color: #ef4444; background-color: #fef2f2; }
+
+        .s-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom:none; border-radius: 6px 6px 0 0; padding: 22px 6px 6px 6px; margin: 20px 4px 0 4px; vertical-align: bottom; transition: all 0.2s; z-index: 1; }
+        .s-group:hover, .s-group:focus-within { z-index: 10; }
+        
+        .g-label { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; background: white; border: 1px solid #94a3b8; border-radius: 4px; padding: 3px 8px; color: #475569; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 2px; z-index: 5; max-width: calc(100% + 40px); box-sizing: border-box; transition: max-width 0.2s, z-index 0.2s; }
+        .g-label:hover, .g-label:focus-visible { outline: 2px solid #3b82f6; max-width: max-content; z-index: 50; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .g-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
+
+        .punct { font-size: 1.15rem; margin: 0 2px; vertical-align: baseline; display:inline-block; font-weight: 500; }
+        
+        .trans-box { margin: 32px 0 10px; line-height: 1.5; border-top: 1px dashed #e5e7eb; padding-top: 24px; }
+        textarea { width: 100%; height: 80px; font-size: 1.1rem; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; margin-top: 8px; white-space: nowrap; text-align: center; color: #059669; pointer-events: none; }
+        
+        .hint-icon { position: absolute; top: -12px; right: -8px; font-size: 0.75rem; cursor: pointer; text-decoration: none; filter: grayscale(0.2); transition: filter 0.2s; z-index: 20; }
+        .hint-icon:hover { filter: grayscale(0); }
+        .tooltip-text { visibility: hidden; width: max-content; max-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; position: absolute; z-index: 1000; bottom: 150%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.85rem; font-weight: normal; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none; white-space: normal; line-height: 1.4; text-transform: none; }
+        .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #1f2937 transparent transparent transparent; }
+        .hint-icon.show-tooltip .tooltip-text { visibility: visible; opacity: 1; }
+
+        .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #e5e7eb; padding: 4px 0; z-index: 1000; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 85vh; overflow-y: auto; min-width: 150px; line-height: 1.2; }
+        .menu-btn { display: block; width: 100%; text-align: left; border: none; background: transparent; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #374151; transition: background-color 0.1s; font-family: inherit; }
+        .menu-btn:hover, .menu-btn:focus-visible { background-color: #f3f4f6; color: #111827; outline: none; }
+        .menu-btn:focus-visible { box-shadow: inset 2px 0 0 0 #3b82f6; }
+        
+        .gen-btn { color: #ec4899; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 4px; display: none; }
+
+        .footer-toolbar { margin-top: 40px; padding: 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font-weight: 500; color: white; background: #1f2937; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .ex-img { max-width: 100%; height: auto; display: block; margin: 30px auto 10px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 300px; object-fit: contain; }
+        #toast-container { visibility: hidden; min-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 14px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.95rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast-container.show { visibility: visible; opacity: 1; bottom: 40px; }
+        #toast-container.error { background-color: #7f1d1d; border: 1px solid #ef4444; }
+        #toast-container.success { background-color: #064e3b; border: 1px solid #10b981; }
+        
+        #results-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.8); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .results-content { background: white; padding: 40px; border-radius: 12px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .results-title { font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 16px; }
+        .results-score { font-size: 3rem; font-weight: 800; color: #3b82f6; margin-bottom: 24px; }
+        .results-textarea { width: 100%; height: 80px; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; resize: none; margin-bottom: 20px; font-family: monospace; font-size: 0.95rem; background: #f9fafb; color: #374151; outline: none; }
+        .results-textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .btn-copy { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; width: 100%; margin-bottom: 12px; }
+        .btn-copy:hover { background: #059669; }
+
+        body.pattern-mode .hover-word[data-done="true"] { background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.4) 5px, rgba(255,255,255,0.4) 10px); border: 2px solid #111827 !important; }
+        body.pattern-mode .hover-word[data-done="true"]:nth-child(even) { background-image: radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%); background-position: 0 0, 5px 5px; background-size: 10px 10px; }
+        body.pattern-mode .s-group { border-style: dashed !important; border-width: 2px !important; }
+
+        body.high-contrast { background-color: #121212; color: #ffffff; }
+        body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #121212; color: #fff; border: 1px solid #333; }
+        body.high-contrast .sentence-container { background-color: #1e1e1e; border: 1px solid #444; }
+        body.high-contrast .trans-box { border-top-color: #444; }
+        body.high-contrast .instruction-box { background-color: #332b00; border-color: #665500; color: #ffeb3b; }
+        body.high-contrast .teacher-note { background: #1e1e1e !important; border: 1px solid #444 !important; color: #e5e7eb !important; }
+        body.high-contrast .hover-word { background-color: #333; color: #fff; border-bottom: 2px solid #555; }
+        body.high-contrast .hover-word[data-done="true"] { border: 2px solid #fff !important; color: #000 !important; font-weight: 600; }
+        body.high-contrast .s-text.marked-gen { border-bottom-color: #f472b6 !important; }
+        body.high-contrast .s-group { border-color: #fff !important; }
+        body.high-contrast .g-label { background: #000 !important; color: #fff !important; border-color: #fff !important; }
+        body.high-contrast .punct { color: #fff; }
+        body.high-contrast textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
+        body.high-contrast #btn-practise[style*="background: white"] { background: #333 !important; color: #fff !important; }
+        body.high-contrast #btn-exam[style*="background: white"] { background: #333 !important; color: #fff !important; }
+        body.high-contrast .mode-toggle-bg { background: #1e1e1e !important; border: 1px solid #555; }
+        body.high-contrast #results-modal .results-content { background: #1e1e1e; color: #fff; border: 1px solid #555; }
+        body.high-contrast #results-modal .results-title { color: #fff; }
+        body.high-contrast #results-modal .results-textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
+        body.high-contrast .tooltip-text { background-color: #fff; color: #000; border: 1px solid #ccc; }
+        body.high-contrast .tooltip-text::after { border-color: #fff transparent transparent transparent; }
+        
+        @media (max-width: 768px) {
+            body { margin: 15px; } .exercise-wrapper { padding: 20px; line-height: 4.5; }
+            .hover-word { font-size: 1.1rem; padding: 6px 12px; } .g-label { top: -16px; font-size: 10px; padding: 2px 6px; }
+            .s-group { padding-top: 24px; margin: 20px 2px 0 2px; } .sentence-container { padding: 20px 10px 10px 10px; }
+            .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-radius: 8px; }
+            .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f3f4f6; }
+        }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal { display: none !important; } }
+    </script>
+
+    <script type="text/template" id="template-student-js">
+        let activeEl = null; let activeSubWord = null; let mode = ""; const menu = document.getElementById('menu-common'); const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
+        let hideMenuTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1;
+        const totalPhrases = document.querySelectorAll('.hover-word, .g-label').length;
+        const totalGens = document.querySelectorAll('.s-text[data-u="true"]').length;
+        const totalItems = totalPhrases + totalGens;
+
+        function updateStudentShortcuts() {
+            labelShortcuts = {}; let used = new Set(['x', 'k', 'j', 'z', 'g', 'u']); 
+            document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(btn => {
+                let f = btn.dataset.val; let assigned = false;
+                for (let i = 0; i < f.length; i++) {
+                    let char = f[i].toLowerCase();
+                    if (/[a-z]/.test(char) && !used.has(char)) { labelShortcuts[f] = char; used.add(char); assigned = true; break; }
+                }
+                if (!assigned) {
+                    for (let code = 97; code <= 122; code++) {
+                        let char = String.fromCharCode(code);
+                        if (!used.has(char)) { labelShortcuts[f] = char; used.add(char); break; }
+                    }
+                }
+                let shortcut = labelShortcuts[f]; let innerHTML = f;
+                if (shortcut) {
+                    let idx = f.toLowerCase().indexOf(shortcut);
+                    if (idx !== -1) { innerHTML = f.substring(0, idx) + '<u>' + f[idx] + '</u>' + f.substring(idx + 1); } 
+                    else { innerHTML = '[<u>' + shortcut.toUpperCase() + '</u>] ' + f; }
+                }
+                btn.innerHTML = innerHTML;
+            });
+        }
+        updateStudentShortcuts();
+
+        document.addEventListener('mouseover', (e) => { 
+            const el = e.target.closest('.hover-word, .g-label');
+            hoveredStudentEl = el ? el : null; 
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            let targetEl = hoveredStudentEl;
+            if (!targetEl && document.activeElement && (document.activeElement.classList.contains('hover-word') || document.activeElement.classList.contains('g-label'))) { targetEl = document.activeElement; }
+            if (!targetEl) return;
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            if (e.key.length !== 1 || !/[a-zA-Z]/.test(e.key)) return;
+
+            let key = e.key.toLowerCase();
+            
+            if (key === 'g' && activeSubWord) {
+                e.preventDefault();
+                document.querySelector('.gen-btn').click();
+                return;
+            }
+
+            if (targetEl.dataset.done === "true") return; 
+
+            let matchedLabel = Object.keys(labelShortcuts).find(k => labelShortcuts[k] === key);
+            if (matchedLabel) {
+                e.preventDefault();
+                const btn = Array.from(document.querySelectorAll('.menu-btn:not(.gen-btn)')).find(b => b.dataset.val === matchedLabel);
+                if (btn) { activeEl = targetEl; mode = activeEl.classList.contains('hover-word') ? "word" : "group"; btn.click(); hoveredStudentEl = null; }
+            }
+        });
+
+        function switchStudentLang(newLang) {
+            if (newLang === currentLang) return;
+            currentLang = newLang; const t = studentTexts[newLang];
+            
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.lang-btn[onclick="switchStudentLang('${newLang}')"]`).classList.add('active');
+            
+            document.querySelector('.instruction-box').innerHTML = t.instr;
+            const tn = document.querySelector('.teacher-note span'); if(tn) tn.textContent = t.note;
+            
+            document.getElementById('btn-practise').textContent = t.practiseMode; document.getElementById('btn-exam').textContent = t.examMode;
+            document.querySelector('button[onclick="togglePatterns()"]').title = t.togglePat; document.querySelector('button[onclick="toggleContrast()"]').title = t.toggleCon;
+            
+            const fBtns = document.querySelectorAll('.footer-toolbar .btn');
+            fBtns[0].textContent = t.btnSaveProg; fBtns[1].textContent = t.btnClearProg; fBtns[2].textContent = t.print; fBtns[3].textContent = t.download;
+            
+            document.querySelector('.results-title').textContent = t.examResults; document.querySelector('.btn-copy').textContent = t.copyResults;
+            document.querySelector('#results-modal .btn:not(.btn-copy)').textContent = t.close; document.querySelectorAll('textarea:not(.results-textarea)').forEach(ta => ta.placeholder = t.transPlaceholder);
+            
+            if (document.title === studentTexts.en.docTitle || document.title === studentTexts.de.docTitle) {
+                document.title = t.docTitle; document.querySelector('h1').textContent = t.docTitle;
+            }
+            
+            const map = labelMap[newLang] || {}; const translateLabel = (l) => map[l] || l;
+            
+            document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(btn => {
+                const newVal = translateLabel(btn.dataset.val); btn.dataset.val = newVal; btn.textContent = newVal;
+            });
+            
+            document.querySelectorAll('.hover-word, .s-group').forEach(el => {
+                if(el.dataset.ans) el.dataset.ans = translateLabel(el.dataset.ans);
+                let isDone = false;
+                if (el.classList.contains('hover-word')) { isDone = el.dataset.done === "true"; } 
+                else { const gLabel = el.querySelector('.g-label'); if (gLabel) isDone = gLabel.dataset.done === "true"; }
+                
+                if(isDone) {
+                    const ans = el.dataset.ans;
+                    if(el.classList.contains('hover-word')) {
+                        const s = el.querySelector('.ans-label');
+                        if(s) {
+                            s.textContent = ans;
+                            if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
+                        }
+                    } else {
+                        const tSpan = el.querySelector('.g-text'); const gLabel = el.querySelector('.g-label');
+                        if(tSpan && gLabel) {
+                            tSpan.textContent = ans;
+                            if (gLabel.offsetWidth > el.offsetWidth) { tSpan.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; gLabel.title = ans; }
+                        }
+                    }
+                }
+            });
+            updateStudentShortcuts(); 
+        }
+
+        function setStudentZoom(delta) {
+            if (delta === 0) { sZoom = 1; } else { sZoom = Math.max(0.5, Math.min(2.5, sZoom + delta)); }
+            const area = document.getElementById('exercise');
+            if ('zoom' in area.style) { area.style.zoom = sZoom; } 
+            else { area.style.transform = 'scale(' + sZoom + ')'; area.style.transformOrigin = "top left"; area.style.width = (100 / sZoom) + '%'; }
+        }
+
+        function setMode(m) {
+            if (answeredItems > 0 || document.querySelector('.marked-gen')) {
+                const t = studentTexts[currentLang];
+                if(!confirm(t.resetWarn)) return;
+                localStorage.removeItem(saveKey); location.reload();
+            }
+            exMode = m; const bp = document.getElementById('btn-practise'); const be = document.getElementById('btn-exam');
+            bp.style.background = m === 'practise' ? 'white' : 'transparent'; bp.style.boxShadow = m === 'practise' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; bp.style.color = m === 'practise' ? '#111827' : '#475569';
+            be.style.background = m === 'exam' ? 'white' : 'transparent'; be.style.boxShadow = m === 'exam' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; be.style.color = m === 'exam' ? '#111827' : '#475569';
+        }
+
+        menu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
+        menu.addEventListener('mouseleave', () => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); });
+
+        document.querySelectorAll('.hover-word, .g-label').forEach(el => {
+            el.onclick = (e) => {
+                e.stopPropagation();
+                activeSubWord = e.target.closest('.s-text');
+                const genBtn = document.querySelector('.gen-btn');
+                
+                if (activeSubWord) {
+                    genBtn.style.display = "block";
+                    const t = studentTexts[currentLang];
+                    genBtn.textContent = activeSubWord.classList.contains('marked-gen') ? t.unmarkGen : t.markGen;
+                } else {
+                    genBtn.style.display = "none";
+                }
+                
+                document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => {
+                    b.style.display = el.dataset.done === "true" ? "none" : "block";
+                });
+                
+                if (el.dataset.done === "true" && !activeSubWord) return;
+                
+                activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
+                if(window.innerWidth > 768) { 
+                    const rect = (activeSubWord || el).getBoundingClientRect();
+                    menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
+                }
+                menu.style.display="block"; 
+                if (el.dataset.done !== "true") {
+                    let firstNorm = menuBtns.find(b => !b.classList.contains('gen-btn'));
+                    if(firstNorm) firstNorm.focus();
+                } else {
+                    genBtn.focus();
+                }
+            };
+            el.onmouseenter = (e) => {
+                clearTimeout(hideMenuTimeout);
+                if(el.dataset.done === "true") return; 
+                activeEl = el; activeSubWord = null; mode = el.classList.contains('hover-word') ? "word" : "group";
+                document.querySelector('.gen-btn').style.display = "none"; 
+                document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => b.style.display = "block");
+                if(window.innerWidth > 768) { 
+                    const rect = el.getBoundingClientRect();
+                    menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
+                }
+                menu.style.display="block";
+            };
+            el.onmouseleave = (e) => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); };
+            el.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } };
+        });
+
+        menuBtns.forEach((btn, index) => {
+            btn.onclick = (e) => {
+                const t = studentTexts[currentLang];
+                
+             if (btn.classList.contains('gen-btn')) {
+                    if (!activeSubWord) return;
+                    const isCorrect = activeSubWord.dataset.u === "true";
+                    const isMarked = activeSubWord.classList.contains('marked-gen');
+                    
+                    if (exMode === 'practise') {
+                        if (!isMarked) {
+                            if (isCorrect) {
+                                activeSubWord.classList.add('marked-gen');
+                                showToast(t.correct, false);
+                            } else {
+                                const currentSubWord = activeSubWord; 
+                                currentSubWord.classList.add('error-gen');
+                                setTimeout(() => currentSubWord.classList.remove('error-gen'), 800);
+                                showToast(t.notGenitive, true);
+                            }
+                        } else {
+                            activeSubWord.classList.remove('marked-gen');
+                        }
+                    } else {
+                        activeSubWord.classList.toggle('marked-gen');
+                    }
+                    
+                    menu.style.display = "none"; 
+                    check();
+                    return;
+                }
+
+                const sel = btn.dataset.val; const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans; 
+                
+                if (exMode === 'practise') {
+                    if(sel === correct) {
+                        solve(activeEl, correct, mode); showToast(t.correct, false); answeredItems++;
+                    } else { 
+                        let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1; activeEl.dataset.mistakes = mistakes;
+                        if(mistakes >= 2) { showToast(t.incorrect + correct, true); solve(activeEl, correct, mode); answeredItems++; } 
+                        else { showToast(t.tryAgain, true); }
+                    }
+                } else {
+                    if(sel === correct) { solve(activeEl, correct, mode); examScore++; } 
+                    else {
+                        solve(activeEl, correct, mode);
+                        if(mode === "word") { activeEl.style.border = "2px solid #ef4444"; } 
+                        else { activeEl.parentElement.style.borderColor = "#ef4444"; }
+                    }
+                    answeredItems++;
+                }
+                
+                menu.style.display = "none"; check();
+                if (activeEl && !activeEl.dataset.done) { activeEl.focus(); } 
+                else if (activeEl && activeEl.dataset.done) {
+                    const allItems = Array.from(document.querySelectorAll('.hover-word, .g-label')); const currentIndex = allItems.indexOf(activeEl); let nextEl = null;
+                    for(let i = currentIndex + 1; i < allItems.length; i++) { if(allItems[i].dataset.done !== "true") { nextEl = allItems[i]; break; } }
+                    if(nextEl) nextEl.focus();
+                }
+            };
+            
+            btn.onkeydown = (e) => {
+                if (e.key === 'ArrowDown') { e.preventDefault(); menuBtns[(index + 1) % menuBtns.length].focus(); } 
+                else if (e.key === 'ArrowUp') { e.preventDefault(); menuBtns[(index - 1 + menuBtns.length) % menuBtns.length].focus(); } 
+                else if (e.key === 'Escape') { e.preventDefault(); menu.style.display = "none"; if (activeEl) activeEl.focus(); }
+            };
+        });
+
+        function showToast(msg, isError) {
+            const x = document.getElementById("toast-container"); x.textContent = msg; x.className = isError ? "show error" : "show success";
+            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+        }
+        function togglePatterns() { document.body.classList.toggle('pattern-mode'); }
+        function toggleContrast() { document.body.classList.toggle('high-contrast'); }
+
+        function solve(el, ans, m) {
+            if(m === "word") {
+                const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
+                el.style.backgroundColor = colors[ans]; el.dataset.done = "true"; el.removeAttribute('tabindex');
+                if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
+            } else { 
+                const tSpan = el.querySelector('.g-text'); if (tSpan) tSpan.textContent = ans; else el.textContent = ans; 
+                el.dataset.done = "true"; el.style.background = "#f0fdf4"; el.removeAttribute('tabindex');
+                if (el.offsetWidth > el.parentElement.offsetWidth) {
+                    if (tSpan) tSpan.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.';
+                    else el.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.';
+                    el.title = ans; 
+                }
+            }
+        }
+
+        function check() { 
+            document.querySelectorAll('.sentence-container').forEach((s, i) => { 
+                const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')];
+                const requiredGens = [...s.querySelectorAll('.s-text[data-u="true"]')];
+                
+                const allItemsDone = items.length === 0 || items.every(item => item.dataset.done === "true");
+                const allGensDone = requiredGens.every(gen => gen.classList.contains('marked-gen'));
+                
+                const translationReady = allItemsDone && (exMode === 'exam' || allGensDone);
+                
+                if(items.length > 0 && translationReady) {
+                    const b = document.getElementById('t-container-' + i); if(b) b.style.display = 'block';
+                }
+            }); 
+            
+            if (exMode === 'exam' && answeredItems === totalPhrases && totalPhrases > 0) {
+                const t = studentTexts[currentLang];
+                let genScore = 0;
+                document.querySelectorAll('.s-text[data-u="true"]').forEach(st => {
+                    if(st.classList.contains('marked-gen')) genScore++;
+                });
+                const finalScore = examScore + genScore;
+                
+                setTimeout(() => {
+                    const pct = Math.round((finalScore / totalItems) * 100);
+                    document.getElementById('final-score-display').textContent = finalScore + " / " + totalItems + " (" + pct + "%)";
+                    
+                    /* Note: The newline here is handled via raw string \n now */
+                    document.getElementById('results-text').value = t.resExercise + (titleInput || t.docTitle).replace(/["'\`]/g, "") + "\n" + t.resDate + new Date().toLocaleDateString() + "\n" + t.resScore + finalScore + " / " + totalItems + " (" + pct + "%)";                    document.getElementById('results-modal').style.display = 'flex';
+                }, 500);
+            }
+        }
+
+       function saveStudentProgress() {
+            const t = studentTexts[currentLang];
+            if(!confirm(t.saveWarning)) return;
+
+            const items = Array.from(document.querySelectorAll('.hover-word, .g-label'));
+            const state = items.map(el => ({ done: el.dataset.done === "true", ans: el.dataset.ans, mistakes: el.dataset.mistakes || 0 }));
+            
+            const subWords = Array.from(document.querySelectorAll('.s-text'));
+            const subState = subWords.map(el => el.classList.contains('marked-gen'));
+            
+            const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)')).map(ta => ta.value);
+            
+            const data = { items: state, subWords: subState, textareas: textareas, exMode: exMode, examScore: examScore, answeredItems: answeredItems };
+            
+            // --- NEW TRY/CATCH BLOCK ---
+            try {
+                localStorage.setItem(saveKey, JSON.stringify(data)); 
+                showToast(t.progSaved || "Progress saved!", false);
+            } catch (e) {
+                console.warn("Save failed", e);
+                showToast("Save failed: Check your browser privacy settings.", true);
+            }
+        }
+
+        function loadStudentProgress() {
+            // --- MOVED getItem INSIDE THE EXISTING TRY BLOCK ---
+            try {
+                const saved = localStorage.getItem(saveKey); 
+                if (!saved) return;
+                
+                const data = JSON.parse(saved); 
+                const items = Array.from(document.querySelectorAll('.hover-word, .g-label')); 
+                const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)'));
+                
+                if (data.items && data.items.length !== items.length) { console.warn("Saved progress length does not match. Ignoring."); return; }
+                exMode = data.exMode || 'practise'; setMode(exMode); examScore = data.examScore || 0; answeredItems = data.answeredItems || 0;
+                
+                data.items.forEach((state, i) => {
+                    if (items[i] && state.done) {
+                        items[i].dataset.ans = state.ans; items[i].dataset.mistakes = state.mistakes; solve(items[i], state.ans, items[i].classList.contains('hover-word') ? 'word' : 'group');
+                    } else if (items[i]) { items[i].dataset.mistakes = state.mistakes; }
+                });
+                
+                if (data.subWords) {
+                    const subWords = Array.from(document.querySelectorAll('.s-text'));
+                    data.subWords.forEach((isMarked, i) => {
+                        if (subWords[i] && isMarked) subWords[i].classList.add('marked-gen');
+                    });
+                }
+                
+                data.textareas.forEach((val, i) => { if (textareas[i]) textareas[i].value = val; }); check(); 
+            } catch (e) { 
+                console.warn("Failed to load progress or storage is blocked.", e); 
+            }
+        }
+
+        function clearStudentProgress() {
+            const msg = currentLang === 'de' ? 'Fortschritt wirklich löschen?' : 'Really clear progress?';
+            if(confirm(msg)) { 
+                // --- NEW TRY/CATCH BLOCK ---
+                try {
+                    localStorage.removeItem(saveKey); 
+                } catch(e) {
+                    console.warn("Failed to clear local storage.", e);
+                }
+                location.reload(); 
+            }
+        }
+
+        function copyResults() {
+            const t = studentTexts[currentLang]; const copyText = document.getElementById("results-text");
+            copyText.select(); copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value).then(() => { showToast(t.copied, false); });
+        }
+
+        function closeResults() { document.getElementById('results-modal').style.display = 'none'; }
+        function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
+        document.addEventListener('mousedown', (e) => { 
+            if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; 
+            if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
+        });
+    </script>
 <script>
 // ==========================================
 // 0. GLOBALS & HELPER FUNCTIONS
 // ==========================================
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
 function escapeHTML(str) {
     if (str == null) return '';
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -322,29 +845,38 @@ const CONFIG = {
     MAIN_CLAUSE_DE: 'Hauptsatz',
     SENTENCE_ENDERS: ['.', '!', '?', '·'],
     PREPOSITIONS: ["a", "ab", "ad", "ante", "apud", "circum", "contra", "cum", "de", "e", "ex", "extra", "in", "infra", "inter", "intra", "ob", "per", "post", "prae", "pro", "prope", "propter", "sine", "sub", "super", "trans", "ultra"],
-   SAFE_COLORS: ['#fde047', '#67e8f9', '#f9a8d4', '#d8b4fe', '#93c5fd', '#fca5a5', '#86efac', '#fcd34d', '#c4b5fd', '#bfdbfe', '#fbcfe8', '#e9d5ff', '#ffedd5', '#d2b48c', '#fed7aa', '#bae6fd', '#a7f3d0', '#ddd6fe'],
+  SAFE_COLORS: [
+        // The 19 actively assigned colors
+        '#4ade80', '#f87171', '#fde047', '#fdba74', '#c4b5fd', 
+        '#fbcfe8', '#f472b6', '#93c5fd', '#60a5fa', '#ffedd5', 
+        '#cbd5e1', '#fda4af', '#d6d3d1', '#f3f4f6', '#5eead4', 
+        '#818cf8', '#a7f3d0', '#c084fc', '#e5e7eb',
+        // The 3 exact leftover colors for new teacher functions
+        '#fb923c', '#34d399', '#67e8f9'
+    ],
     SEMANTIC_COLORS: {
-        // --- Core Sentence Components (Highly Saturated) ---
-        'Subject': '#86efac', 'Subjekt': '#86efac', // Vivid Mint Green
-        'Verb': '#fca5a5', 'Prädikat': '#fca5a5', // Vivid Salmon Red
-        'Accusative object': '#7dd3fc', 'Akkusativobjekt': '#7dd3fc', // Vivid Sky Blue
-        'Dative object': '#fcd34d', 'Dativobjekt': '#fcd34d', // Vivid Golden Yellow
-        'Prepositional phrase': '#c4b5fd', 'Präpositionale Bestimmung': '#c4b5fd', // Vivid Purple
+        // --- Core Sentence Components (The Force Field) ---
+        'Subject': '#4ade80', 'Subjekt': '#4ade80', // Bright Green
+        'Verb': '#f87171', 'Prädikat': '#f87171', // Bright Red
+        'Accusative object': '#fde047', 'Akkusativobjekt': '#fde047', // Bright Yellow
+        'Dative object': '#fdba74', 'Dativobjekt': '#fdba74', // Soft Orange
+        'Prepositional phrase': '#c4b5fd', 'Präpositionale Bestimmung': '#c4b5fd', // Light Violet
         
-        // --- Secondary Elements & Clauses (Softer Pastels/Muted) ---
-        'Genitive object': '#fbcfe8', 'Genitivobjekt': '#fbcfe8', // Muted Pink
-        'Ablative': '#bfdbfe', 'Ablativ': '#bfdbfe', // Muted Blue
-        'Ablative absolute': '#e0e7ff', 'Ablativus absolutus': '#e0e7ff', // Soft Indigo
-        'Adverb': '#fef08a', // Pale Yellow
-        'Infinitive': '#ddd6fe', 'Infinitiv': '#ddd6fe', // Muted Lavender (NEW distinction)
-        'Predicative': '#e9d5ff', 'Prädikativum': '#e9d5ff', // Soft Lilac
-        'Conjunction': '#ffedd5', 'Konjunktion': '#ffedd5', // Very Pale Orange
-        'Subjunction': '#d2b48c', 'Subjunktion': '#d2b48c', // Tan/Muted Brown (NEW distinction)
-        'Participial phrase': '#fce7f3', 'Partizipialkonstruktion': '#fce7f3', // Very Soft Pink
-        'Subordinate clause': '#cbd5e1', 'Nebensatz': '#cbd5e1', // Blue-Grey
-        'Relative clause': '#d1fae5', 'Relativsatz': '#d1fae5', // Pale Mint
-        'Accusative with infinitive': '#d8b4fe', 'AcI': '#d8b4fe', // Violet
-        'Other': '#e5e7eb', 'Sonstiges': '#e5e7eb' // Neutral Grey
+        // --- Secondary Elements & Clauses ---
+        'Genitive object': '#fbcfe8', 'Genitivobjekt': '#fbcfe8', // Light Pink
+        'Genitive attribute': '#f472b6', 'Genitivattribut': '#f472b6', // Deep Pink
+        'Ablative': '#93c5fd', 'Ablativ': '#93c5fd', // Soft Blue
+        'Ablative absolute': '#60a5fa', 'Ablativus absolutus': '#60a5fa', // Brighter Blue
+        'Adverb': '#ffedd5', // Pale Peach
+        'Infinitive': '#cbd5e1', 'Infinitiv': '#cbd5e1', // Slate Grey 
+        'Predicative': '#fda4af', 'Prädikativum': '#fda4af', // Rose
+        'Conjunction': '#d6d3d1', 'Konjunktion': '#d6d3d1', // Warm Grey
+        'Subjunction': '#f3f4f6', 'Subjunktion': '#f3f4f6', // Light Grey
+        'Participial phrase': '#5eead4', 'Partizipialkonstruktion': '#5eead4', // Teal
+        'Subordinate clause': '#818cf8', 'Nebensatz': '#818cf8', // Indigo (Highly distinct from Blues & Purples)
+        'Relative clause': '#a7f3d0', 'Relativsatz': '#a7f3d0', // Pale Mint
+        'Accusative with infinitive': '#c084fc', 'AcI': '#c084fc', // Bright Purple
+        'Other': '#e5e7eb', 'Sonstiges': '#e5e7eb' // Neutral Gray
     },
     PRESETS: {
         en: {
@@ -359,8 +891,8 @@ const CONFIG = {
         }
     },
     ABBREVIATIONS: {
-        en: { 'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Conjunction': 'Conj', 'Subjunction': 'Subjunc', 'Accusative with infinitive': 'Acc+Inf', 'Other': 'Other' },
-        de: { 'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Konjunktion': 'Konj', 'Subjunktion': 'Subjunk', 'AcI': 'AcI', 'Sonstiges': 'Sonst.' }
+        en: { 'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Genitive attribute': 'Gen. Attr', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Conjunction': 'Conj', 'Subjunction': 'Subjunc', 'Accusative with infinitive': 'Acc+Inf', 'Other': 'Other' },
+        de: { 'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Genitivattribut': 'Gen. Attr', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Konjunktion': 'Konj', 'Subjunktion': 'Subjunk', 'AcI': 'AcI', 'Sonstiges': 'Sonst.' }
     },
     LANG_TEXT: {
         en: {
@@ -371,12 +903,12 @@ const CONFIG = {
             btnCopy: "1. Copy AI Prompt", btnImport: "2. Import", btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
             lblLevel: "Grammar Level:", optBeg: "Beginner", optInt: "Intermediate", optAdv: "Advanced (All)",
             editH3: "Step 2: Editing Instruction",
-            editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically, unless you use 'Manual Split'. Use 'Draw Bracket' to group words. Adjust group boundaries using the arrows (◀ ▶) or by drag-and-dropping them. Double-click any word or punctuation mark to edit it, or to add a hint. To insert new punctuation, double click a word, add a space and the mark (e.g. 'word ,') and split them. Shortcuts: 'X' for Split, 'K' for Bracket, 'J' to Toggle Break, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.",
+            editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically. Use 'Manual Split' to separate. Use 'Draw Bracket' to group phrases. You can use 'Mark Genitive' to draw an underline marking a genitive attribute inside a larger phrase group! Double-click any word or punctuation to edit it or add a hint. Shortcuts: 'X' for Split, 'K' for Bracket, 'G' for Genitive Underline, 'J' to Toggle Break, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.",
             wordModalTitle: "Edit Word & Hint", wordTextLabel: "Word Text:", hintLabel: "Hint (optional):", groupHintLabel: "Group Hint (optional):",
-            phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (J)", btnBracket: "Draw Bracket (K)",
+            phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (J)", btnBracket: "Draw Bracket (K)", btnAttr: "Mark Genitive (G)",
             btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work",
             modalTitle: "Name this Syntactic Group:", btnCancel: "Cancel", btnSaveGroup: "Save", btnDelete: "Delete", confirmDelete: "Are you sure you want to delete this word?",
-            modeTag: "Mode: Tagging", modeSplit: "Mode: Manual Split", modeLineBreak: "Mode: Toggle Break", modeBracket: "Mode: Drawing Bracket",
+            modeTag: "Mode: Tagging", modeSplit: "Mode: Manual Split", modeLineBreak: "Mode: Toggle Break", modeBracket: "Mode: Drawing Bracket", modeAttr: "Mode: Mark Genitive",
             togglePat: "Toggle Patterns", toggleCon: "Toggle High Contrast", promptSuccess: "Prompt copied!", promptFail: "Copy failed!",
             phWordHint: "E.g. Derived from...", phGroupHint: "E.g. Look out for the ablative...", phGroupSearch: "Type to search..."
         },
@@ -388,12 +920,12 @@ const CONFIG = {
             btnCopy: "1. KI-Prompt kopieren", btnImport: "2. Importieren", btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
             lblLevel: "Grammatik-Level:", optBeg: "Anfänger", optInt: "Fortgeschritten", optAdv: "Profi (Alle)",
             editH3: "Schritt 2: Bearbeitung",
-            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Klammer zeichnen'. Ein Doppelklick auf ein Wort oder Satzzeichen ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Um neue Satzzeichen einzufügen, setze per Doppelklick ein Leerzeichen und das Zeichen (z.B. 'Wort ,') und trenne sie dann mit 'Manuell trennen'. Shortcuts: 'X' für Trennen, 'K' für Klammer, 'J' für Umbruch, Strg+Z für Rückgängig.",
+            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Klammer zeichnen'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer größeren Gruppe durch Unterstreichung hervorheben! Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Shortcuts: 'X' für Trennen, 'K' für Klammer, 'G' für Genitiv-Unterstreichung, 'J' für Umbruch, Strg+Z für Rückgängig.",
             wordModalTitle: "Wort & Hinweis bearbeiten", wordTextLabel: "Worttext:", hintLabel: "Hinweis (optional):", groupHintLabel: "Gruppen-Hinweis (optional):",
-            phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (J)", btnBracket: "Klammer zeichnen (K)",
+            phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (J)", btnBracket: "Klammer zeichnen (K)", btnAttr: "Genitiv markieren (G)",
             btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden",
             modalTitle: "Name der syntaktischen Gruppe:", btnCancel: "Abbrechen", btnSaveGroup: "Speichern", btnDelete: "Löschen", confirmDelete: "Möchten Sie dieses Wort wirklich löschen?",
-            modeTag: "Modus: Markieren", modeSplit: "Modus: Manuell trennen", modeLineBreak: "Modus: Umbruch umschalten", modeBracket: "Modus: Klammer zeichnen",
+            modeTag: "Modus: Markieren", modeSplit: "Modus: Manuell trennen", modeLineBreak: "Modus: Umbruch umschalten", modeBracket: "Modus: Klammer zeichnen", modeAttr: "Modus: Genitiv markieren",
             togglePat: "Muster umschalten", toggleCon: "Hoher Kontrast", promptSuccess: "Prompt kopiert!", promptFail: "Kopieren fehlgeschlagen!",
             phWordHint: "Z.B. abgeleitet von...", phGroupHint: "Z.B. Achte auf den Ablativ...", phGroupSearch: "Tippen zum Suchen..."
         }
@@ -413,26 +945,14 @@ const AppState = {
     mode: 'tagging', 
     activeFunc: 'Sonstiges',
     history: [],
-    ui: {
-        zoom: 1,
-        hoveredGroupIndex: null,
-        hoveredWord: null,
-        startIdx: null,
-        pendingGroupStart: null,
-        pendingGroupEnd: null,
-        editingGroupIndex: null,
-        editingWordNode: null,
-        lastClickedIdx: null,
-        labelShortcuts: {}
-    },
-    touch: {
-        swipeStartIdx: null,
-        swipeCurrentIdx: null,
-        isSwiping: false
-    },
+    ui: { /* ... */ },
+    touch: { /* ... */ },
     
     saveToHistory() {
-        this.history.push({ words: JSON.parse(JSON.stringify(this.words)), groups: JSON.parse(JSON.stringify(this.groups)) });
+        this.history.push({ 
+            words: JSON.parse(JSON.stringify(this.words)), 
+            groups: JSON.parse(JSON.stringify(this.groups)) 
+        });
         if (this.history.length > 50) this.history.shift();
     },
     
@@ -442,62 +962,182 @@ const AppState = {
         this.groups = lastState.groups;
         this.words = lastState.words;
         this.ui.startIdx = null;
+        
+        // Automatically trigger UI updates and save on undo
+        renderEditor();
+        StorageManager.debouncedAutoSave();
         return true;
     },
 
     getOtherLabel() {
         return this.lang === 'de' ? CONFIG.OTHER_DE : CONFIG.OTHER_EN;
-    }
+    },
+
+    // --- STRICT MUTATION METHODS ---
+
+    mutateWord(index, updates, shouldRender = true) {
+        this.saveToHistory();
+        Object.assign(this.words[index], updates);
+        
+        StorageManager.debouncedAutoSave();
+        if (shouldRender) renderEditor();
+    },
+
+    mutateGroup(index, updates, shouldRender = true) {
+        this.saveToHistory();
+        Object.assign(this.groups[index], updates);
+        
+        StorageManager.debouncedAutoSave();
+        if (shouldRender) updateGroupUI();
+    },
+
+    addGroup(groupObj) {
+        this.saveToHistory();
+        this.groups.push(groupObj);
+        
+        StorageManager.debouncedAutoSave();
+        updateGroupUI();
+    },
+
+    removeGroup(index) {
+        this.saveToHistory();
+        this.groups.splice(index, 1);
+        
+        StorageManager.debouncedAutoSave();
+        updateGroupUI();
+    },
+    
+    splitWord(index) {
+        this.saveToHistory();
+        const wordObj = this.words[index];
+        const text = wordObj.w || "";
+
+        // Case 1: The word actually contains spaces, so we split it into multiple tokens
+        if (text.includes(' ')) {
+            const parts = text.split(/\s+/);
+            const shiftAmount = parts.length - 1;
+
+            const newItems = parts.map((p, i) => {
+                const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(p);
+                return {
+                    w: p,
+                    f: hasLetters ? wordObj.f : CONFIG.PUNCT,
+                    isSplit: i === parts.length - 1 ? wordObj.isSplit : false,
+                    h: i === 0 ? wordObj.h : "",
+                    b: i === parts.length - 1 ? wordObj.b : 0,
+                    u: wordObj.u
+                };
+            });
+            
+            // Inject the new items into the words array
+            this.words.splice(index, 1, ...newItems);
+
+            // Shift all group boundaries to account for the newly inserted words
+            this.groups = this.groups.map(g => {
+                let newStart = g.start; 
+                let newEnd = g.end;
+                if (g.start > index) newStart += shiftAmount;
+                if (g.end >= index) newEnd += shiftAmount;
+                return { ...g, start: newStart, end: newEnd };
+            });
+        } 
+        // Case 2: Just a visual manual split line
+        else {
+            wordObj.isSplit = !wordObj.isSplit;
+        }
+
+        StorageManager.debouncedAutoSave();
+        renderEditor(); // This is a structural change, so we must re-render the whole editor
+    },  
+        
+    toggleLineBreak(index) {
+        let currentB = this.words[index].b || 0;
+        const wordText = this.words[index].w || "";
+        const isPunct = this.words[index].f === CONFIG.PUNCT;
+        
+        // Determine default break behavior based on punctuation
+        const defaultBreak = isPunct && CONFIG.SENTENCE_ENDERS.some(char => wordText.includes(char));
+        
+        let newB;
+        if (currentB === 1) newB = -1;       // Force break -> Suppress break
+        else if (currentB === -1) newB = 0;  // Suppress break -> Default
+        else newB = defaultBreak ? -1 : 1;   // Default -> Toggle opposite
+
+        this.mutateWord(index, { b: newB });
+    },  
 };
 
 // ==========================================
 // 3. STORAGE MANAGER
 // ==========================================
 const StorageManager = {
+
+    debouncedAutoSave: debounce(function() {
+        this.triggerAutoSave();
+    }, 1500), // Saves 1.5 seconds AFTER the user stops making changes
+
     triggerAutoSave() {
-        const textVal = document.getElementById('entertext').value;
-        if(document.getElementById('editor-screen').style.display === 'block' || textVal.length > 5) {
+        const textVal = DOM.enterText.value;
+        if(DOM.editorScreen.style.display === 'block' || textVal.length > 5) {
             const saveData = {
                 lang: AppState.lang, level: AppState.level,
-                title: document.getElementById('pagetitle').value, image: document.getElementById('pageimage').value,
-                text: textVal, notes: document.getElementById('teachernotes').value,
+                title: DOM.pageTitle.value, image: DOM.pageImage.value,
+                text: textVal, notes: DOM.teacherNotes.value,
                 groups: AppState.groups, funcs: AppState.functions, cols: AppState.colors, words: AppState.words,
                 timestamp: new Date().getTime()
             };
-            localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(saveData));
             
-            const status = document.getElementById('autosave-status');
-            status.style.opacity = '1';
-            setTimeout(() => { status.style.opacity = '0'; }, 2000);
+            // --- NEW TRY/CATCH BLOCK ---
+            try {
+                localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(saveData));
+                
+                const status = DOM.autosaveStatus;
+                status.textContent = 'Autosaved';
+                status.style.color = '#6b7280'; // Default gray
+                status.style.opacity = '1';
+                setTimeout(() => { status.style.opacity = '0'; }, 2000);
+            } catch (e) {
+                console.warn("Autosave failed: LocalStorage may be full or blocked by browser settings.", e);
+                const status = DOM.autosaveStatus;
+                status.textContent = 'Autosave Failed (Storage Blocked)';
+                status.style.color = '#ef4444'; // Red error color
+                status.style.opacity = '1';
+                setTimeout(() => { status.style.opacity = '0'; }, 3000);
+            }
         }
     },
 
     checkAutoSaveOnLoad() {
-        const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
-        if(saved) {
-            try {
-                const data = JSON.parse(saved);
-                if(new Date().getTime() - data.timestamp < 24 * 60 * 60 * 1000) {
-                    if(confirm("Found an unsaved project from " + new Date(data.timestamp).toLocaleTimeString() + ". Restore it?")) {
-                        this.restoreData(data);
+        // --- NEW TRY/CATCH BLOCK ---
+        try {
+            const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
+            if(saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if(new Date().getTime() - data.timestamp < 24 * 60 * 60 * 1000) {
+                        if(confirm("Found an unsaved project from " + new Date(data.timestamp).toLocaleTimeString() + ". Restore it?")) {
+                            this.restoreData(data);
+                        }
                     }
-                }
-            } catch(e) { console.error("Autosave Error", e); }
+                } catch(e) { console.error("Autosave Parse Error", e); }
+            }
+        } catch(e) {
+            console.warn("Could not check autosave: LocalStorage may be blocked.", e);
         }
     },
 
     exportProject() {
         const projectData = { 
             lang: AppState.lang, level: AppState.level,
-            title: document.getElementById('pagetitle').value, image: document.getElementById('pageimage').value,
-            text: document.getElementById('entertext').value,
-            notes: document.getElementById('teachernotes').value, 
+            title: DOM.pageTitle.value, image: DOM.pageImage.value,
+            text: DOM.enterText.value,
+            notes: DOM.teacherNotes.value, 
             words: AppState.words, groups: AppState.groups, 
             customFunctions: AppState.functions, customColors: AppState.colors
         };
         const blob = new Blob([JSON.stringify(projectData, null, 2)], {type: "application/json"});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); 
-        a.download = (projectData.title || "latin_project") + ".json"; a.click();
+        a.download = (projectData.title || "latin_project").replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".json"; a.click();
     },
 
     importProject(file) {
@@ -524,11 +1164,11 @@ const StorageManager = {
         if (!safeLevel || !CONFIG.PRESETS[safeLang][safeLevel]) safeLevel = 'advanced';
         changeLevel(safeLevel);
 
-        document.getElementById('pagetitle').value = data.title || "";
-        if (document.getElementById('editor-pagetitle')) document.getElementById('editor-pagetitle').value = data.title || ""; // <--- Paced safely here!
-        document.getElementById('pageimage').value = data.image || "";
-        document.getElementById('entertext').value = data.text || "";
-        document.getElementById('teachernotes').value = data.notes || "";
+        DOM.pageTitle.value = data.title || "";
+        if (DOM.editorPageTitle) DOM.editorPageTitle.value = data.title || "";
+        DOM.pageImage.value = data.image || "";
+        DOM.enterText.value = data.text || "";
+        DOM.teacherNotes.value = data.notes || "";
         
         AppState.functions = data.customFunctions || data.funcs || [...CONFIG.PRESETS[safeLang][safeLevel]];
         if(data.customColors || data.cols) Object.assign(AppState.colors, data.customColors || data.cols);
@@ -540,7 +1180,8 @@ const StorageManager = {
             AppState.words = loadWords.map(w => ({
                 ...w,
                 w: w.w || w.word || w.text || "",
-                f: w.f || w.func || w.function || CONFIG.PUNCT
+                f: w.f || w.func || w.function || CONFIG.PUNCT,
+                u: !!w.u
             }));
             showScreen('editor');
             renderEditor();
@@ -553,10 +1194,108 @@ const StorageManager = {
 };
 
 // ==========================================
+// 3.5 DOM CACHE
+// ==========================================
+const DOM = {};
+
+function cacheDOM() {
+    // Screens
+    DOM.setupScreen = document.getElementById('setup-screen');
+    DOM.editorScreen = document.getElementById('editor-screen');
+    DOM.creditsScreen = document.getElementById('credits-screen');
+
+    // Editor Areas
+    DOM.taggingArea = document.getElementById('tagging-area');
+    DOM.labelPalette = document.getElementById('label-palette');
+    DOM.modeStatus = document.getElementById('mode-status');
+    DOM.autosaveStatus = document.getElementById('autosave-status');
+
+    // Inputs & Setup
+    DOM.pageTitle = document.getElementById('pagetitle');
+    DOM.editorPageTitle = document.getElementById('editor-pagetitle');
+    DOM.pageImage = document.getElementById('pageimage');
+    DOM.enterText = document.getElementById('entertext');
+    DOM.teacherNotes = document.getElementById('teachernotes');
+    DOM.grammarLevelSetup = document.getElementById('grammar-level-setup');
+    DOM.grammarLevelEditor = document.getElementById('grammar-level-editor');
+    DOM.aiJson = document.getElementById('ai-json');
+    DOM.newLabelInput = document.getElementById('new-label-input');
+    DOM.fileLoadSetup = document.getElementById('file-load-setup');
+    DOM.fileLoadEditor = document.getElementById('file-load-editor');
+
+    // Modals
+    DOM.wordModal = document.getElementById('word-modal');
+    DOM.wordTextInput = document.getElementById('word-text-input');
+    DOM.wordHintInput = document.getElementById('word-hint-input');
+    DOM.groupModal = document.getElementById('group-modal');
+    DOM.groupNameInput = document.getElementById('group-name-input');
+    DOM.groupHintInput = document.getElementById('group-hint-input');
+    DOM.labelSuggestions = document.getElementById('label-suggestions');
+
+    // Action Buttons (Toolbar)
+    DOM.undoBtn = document.getElementById('undo-btn');
+    DOM.splitModeBtn = document.getElementById('split-mode-btn');
+    DOM.linebreakModeBtn = document.getElementById('linebreak-mode-btn');
+    DOM.groupModeBtn = document.getElementById('group-mode-btn');
+    DOM.attrModeBtn = document.getElementById('attr-mode-btn');
+    
+    DOM.btnCopyAi = document.getElementById('btn-copy-ai');
+    DOM.btnImport = document.getElementById('btn-import');
+    DOM.btnLoad = document.getElementById('btn-load');
+    DOM.btnManual = document.getElementById('btn-manual');
+    DOM.btnShowCredits = document.getElementById('btn-show-credits');
+    DOM.btnHideCredits = document.getElementById('btn-hide-credits');
+    DOM.btnAddLabel = document.getElementById('btn-add-label');
+    DOM.btnExport = document.getElementById('btn-export');
+    DOM.btnSaveWork = document.getElementById('btn-save-work');
+    DOM.btnLoadWork = document.getElementById('btn-load-work');
+    DOM.btnTogglePattern = document.getElementById('btn-toggle-pattern');
+    DOM.btnToggleContrast = document.getElementById('btn-toggle-contrast');
+    DOM.btnZoomIn = document.getElementById('btn-zoom-in');
+    DOM.btnZoomOut = document.getElementById('btn-zoom-out');
+    DOM.btnZoomReset = document.getElementById('btn-zoom-reset');
+
+    DOM.btnCancelGroup = document.getElementById('btn-cancel-group');
+    DOM.btnSaveGroup = document.getElementById('btn-save-group');
+    DOM.btnCancelWord = document.getElementById('btn-cancel-word');
+    DOM.btnSaveWord = document.getElementById('btn-save-word');
+    DOM.btnDeleteWord = document.getElementById('btn-delete-word');
+
+    // Text & Labels (for language switching)
+    DOM.appHeading = document.getElementById('app-heading');
+    DOM.pageTitleTag = document.getElementById('page-title');
+    DOM.instrH3 = document.getElementById('instr-h3');
+    DOM.instrBody = document.getElementById('instr-body');
+    DOM.exampleLinkText = document.getElementById('example-link-text');
+    DOM.linkExample = document.getElementById('link-example');
+    DOM.orText = document.getElementById('or-text');
+    DOM.lblLevel = document.getElementById('lbl-level');
+    DOM.optBeg = document.getElementById('opt-beg');
+    DOM.optInt = document.getElementById('opt-int');
+    DOM.optAdv = document.getElementById('opt-adv');
+    DOM.optBegEd = document.getElementById('opt-beg-ed');
+    DOM.optIntEd = document.getElementById('opt-int-ed');
+    DOM.optAdvEd = document.getElementById('opt-adv-ed');
+    DOM.editH3 = document.getElementById('edit-h3');
+    DOM.editBody = document.getElementById('edit-body');
+    DOM.lblEditorTitle = document.getElementById('lbl-editor-title');
+    DOM.modalTitleText = document.getElementById('modal-title-text');
+    DOM.lblGroupHint = document.getElementById('lbl-group-hint');
+    DOM.wordModalTitle = document.getElementById('word-modal-title');
+    DOM.lblWordText = document.getElementById('lbl-word-text');
+    DOM.lblWordHint = document.getElementById('lbl-word-hint');
+    
+    // Templates
+    DOM.templateStudentCss = document.getElementById('template-student-css');
+    DOM.templateStudentJs = document.getElementById('template-student-js');
+}
+
+// ==========================================
 // 4. CORE LOGIC & RENDERING
 // ==========================================
 
 function initApp() {
+    cacheDOM();
     CONFIG.PRESETS.en.advanced.forEach((f) => { if(!AppState.colors[f]) AppState.colors[f] = '#e5e7eb'; });
     CONFIG.PRESETS.de.advanced.forEach((f) => { if(!AppState.colors[f]) AppState.colors[f] = '#e5e7eb'; });
     
@@ -565,8 +1304,7 @@ function initApp() {
     AppState.activeFunc = AppState.getOtherLabel();
 
     initEventListeners();
-    StorageManager.checkAutoSaveOnLoad();
-    setInterval(() => StorageManager.triggerAutoSave(), 10000);
+    StorageManager.checkAutoSaveOnLoad();    
 }
 
 function getUnusedSafeColor() {
@@ -576,9 +1314,23 @@ function getUnusedSafeColor() {
     return CONFIG.SAFE_COLORS[Math.floor(Math.random() * CONFIG.SAFE_COLORS.length)];
 }
 
+function setTeacherZoom(delta) {
+    if (delta === 0) { AppState.ui.zoom = 1; } 
+    else { AppState.ui.zoom = Math.max(0.5, Math.min(2.0, AppState.ui.zoom + delta)); }
+    
+    const area = DOM.taggingArea;
+    if ('zoom' in area.style) { 
+        area.style.zoom = AppState.ui.zoom; 
+    } else { 
+        area.style.transform = 'scale(' + AppState.ui.zoom + ')'; 
+        area.style.transformOrigin = "top left"; 
+        area.style.width = (100 / AppState.ui.zoom) + '%'; 
+    }
+}
+
 function updateShortcuts() {
     AppState.ui.labelShortcuts = {};
-    let used = new Set(['x', 'k', 'j', 'z']); 
+    let used = new Set(['x', 'k', 'j', 'z', 'g', 'u']); 
     AppState.functions.forEach(f => {
         let assigned = false;
         for (let i = 0; i < f.length; i++) {
@@ -595,10 +1347,12 @@ function updateShortcuts() {
 }
 
 function showScreen(screen) {
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('credits-screen').style.display = 'none';
-    document.getElementById('editor-screen').style.display = 'none';
-    document.getElementById(`${screen}-screen`).style.display = 'block';
+    DOM.setupScreen.style.display = 'none';
+    DOM.creditsScreen.style.display = 'none';
+    DOM.editorScreen.style.display = 'none';
+    if (screen === 'setup') DOM.setupScreen.style.display = 'block';
+    if (screen === 'editor') DOM.editorScreen.style.display = 'block';
+    if (screen === 'credits') DOM.creditsScreen.style.display = 'block';
 }
 
 function changeLanguage(lang) {
@@ -609,47 +1363,69 @@ function changeLanguage(lang) {
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll(`.lang-btn[data-lang="${lang}"]`).forEach(b => b.classList.add('active'));
 
-    document.getElementById('app-heading').textContent = txt.heading; document.getElementById('page-title').textContent = txt.heading;
-    document.getElementById('instr-h3').textContent = txt.instrH3; document.getElementById('instr-body').innerHTML = txt.instrBody;
-    document.getElementById('example-link-text').textContent = txt.exampleLink; document.getElementById('link-example').textContent = txt.linkText;
-    document.getElementById('pagetitle').placeholder = txt.phTitle; document.getElementById('pageimage').placeholder = txt.phImage;
-	const editorTitleLabel = document.getElementById('lbl-editor-title');
-        const editorTitleInput = document.getElementById('editor-pagetitle');
-        if (editorTitleLabel && editorTitleInput) {
-            editorTitleLabel.textContent = lang === 'de' ? 'Übungstitel:' : 'Exercise Title:';
-            editorTitleInput.placeholder = txt.phTitle;
-        }
-    document.getElementById('teachernotes').placeholder = txt.phNotes; document.getElementById('entertext').placeholder = txt.phText;
-    document.getElementById('ai-json').placeholder = txt.phJson; document.getElementById('btn-copy-ai').textContent = txt.btnCopy;
-    document.getElementById('btn-import').textContent = txt.btnImport; document.getElementById('or-text').textContent = txt.or;
-    document.getElementById('btn-load').textContent = txt.btnLoad; document.getElementById('btn-manual').textContent = txt.btnManual;
+    DOM.appHeading.textContent = txt.heading; 
+    DOM.pageTitleTag.textContent = txt.heading;
+    DOM.instrH3.textContent = txt.instrH3; 
+    DOM.instrBody.innerHTML = txt.instrBody;
+    DOM.exampleLinkText.textContent = txt.exampleLink; 
+    DOM.linkExample.textContent = txt.linkText;
+    DOM.pageTitle.placeholder = txt.phTitle; 
+    DOM.pageImage.placeholder = txt.phImage;
     
-    document.getElementById('lbl-level').textContent = txt.lblLevel; document.getElementById('opt-beg').textContent = txt.optBeg;
-    document.getElementById('opt-int').textContent = txt.optInt; document.getElementById('opt-adv').textContent = txt.optAdv;
-    document.getElementById('opt-beg-ed').textContent = txt.optBeg; document.getElementById('opt-int-ed').textContent = txt.optInt;
-    document.getElementById('opt-adv-ed').textContent = txt.optAdv;
+    if (DOM.lblEditorTitle && DOM.editorPageTitle) {
+        DOM.lblEditorTitle.textContent = lang === 'de' ? 'Übungstitel:' : 'Exercise Title:';
+        DOM.editorPageTitle.placeholder = txt.phTitle;
+    }
     
-    document.getElementById('edit-h3').textContent = txt.editH3; document.getElementById('edit-body').innerHTML = txt.editBody;
-    document.getElementById('new-label-input').placeholder = txt.phLabel;
+    DOM.teacherNotes.placeholder = txt.phNotes; 
+    DOM.enterText.placeholder = txt.phText;
+    DOM.aiJson.placeholder = txt.phJson; 
+    DOM.btnCopyAi.textContent = txt.btnCopy;
+    DOM.btnImport.textContent = txt.btnImport; 
+    DOM.orText.textContent = txt.or;
+    DOM.btnLoad.textContent = txt.btnLoad; 
+    DOM.btnManual.textContent = txt.btnManual;
     
-    document.getElementById('word-hint-input').placeholder = txt.phWordHint;
-    document.getElementById('group-hint-input').placeholder = txt.phGroupHint;
-    document.getElementById('group-name-input').placeholder = txt.phGroupSearch;
+    DOM.lblLevel.textContent = txt.lblLevel; 
+    DOM.optBeg.textContent = txt.optBeg;
+    DOM.optInt.textContent = txt.optInt; 
+    DOM.optAdv.textContent = txt.optAdv;
+    DOM.optBegEd.textContent = txt.optBeg; 
+    DOM.optIntEd.textContent = txt.optInt;
+    DOM.optAdvEd.textContent = txt.optAdv;
     
-    document.getElementById('undo-btn').textContent = txt.btnUndo; document.getElementById('split-mode-btn').textContent = txt.btnSplit;
-    document.getElementById('linebreak-mode-btn').textContent = txt.btnLineBreak; document.getElementById('group-mode-btn').textContent = txt.btnBracket;
-    document.getElementById('btn-export').textContent = txt.btnExport; document.getElementById('btn-save-work').textContent = txt.btnSaveWork;
-    document.getElementById('btn-load-work').textContent = txt.btnLoadWork; document.getElementById('btn-toggle-pattern').title = txt.togglePat;
-    document.getElementById('btn-toggle-contrast').title = txt.toggleCon; document.getElementById('modal-title-text').textContent = txt.modalTitle;
-    document.getElementById('lbl-group-hint').textContent = txt.groupHintLabel; document.getElementById('btn-cancel-group').textContent = txt.btnCancel;
-    document.getElementById('btn-save-group').textContent = txt.btnSaveGroup; document.getElementById('word-modal-title').textContent = txt.wordModalTitle;
-    document.getElementById('lbl-word-text').textContent = txt.wordTextLabel; document.getElementById('lbl-word-hint').textContent = txt.hintLabel;
-    document.getElementById('btn-cancel-word').textContent = txt.btnCancel; document.getElementById('btn-save-word').textContent = txt.btnSaveGroup;
-    document.getElementById('btn-delete-word').textContent = txt.btnDelete;
+    DOM.editH3.textContent = txt.editH3; 
+    DOM.editBody.innerHTML = txt.editBody;
+    DOM.newLabelInput.placeholder = txt.phLabel;
+    
+    DOM.wordHintInput.placeholder = txt.phWordHint;
+    DOM.groupHintInput.placeholder = txt.phGroupHint;
+    DOM.groupNameInput.placeholder = txt.phGroupSearch;
+    
+    DOM.undoBtn.textContent = txt.btnUndo; 
+    DOM.splitModeBtn.textContent = txt.btnSplit;
+    DOM.linebreakModeBtn.textContent = txt.btnLineBreak; 
+    DOM.groupModeBtn.textContent = txt.btnBracket;
+    DOM.attrModeBtn.textContent = txt.btnAttr;
+    DOM.btnExport.textContent = txt.btnExport; 
+    DOM.btnSaveWork.textContent = txt.btnSaveWork;
+    DOM.btnLoadWork.textContent = txt.btnLoadWork; 
+    DOM.btnTogglePattern.title = txt.togglePat;
+    DOM.btnToggleContrast.title = txt.toggleCon; 
+    DOM.modalTitleText.textContent = txt.modalTitle;
+    DOM.lblGroupHint.textContent = txt.groupHintLabel; 
+    DOM.btnCancelGroup.textContent = txt.btnCancel;
+    DOM.btnSaveGroup.textContent = txt.btnSaveGroup; 
+    DOM.wordModalTitle.textContent = txt.wordModalTitle;
+    DOM.lblWordText.textContent = txt.wordTextLabel; 
+    DOM.lblWordHint.textContent = txt.hintLabel;
+    DOM.btnCancelWord.textContent = txt.btnCancel; 
+    DOM.btnSaveWord.textContent = txt.btnSaveGroup;
+    DOM.btnDeleteWord.textContent = txt.btnDelete;
 
-    document.getElementById('link-example').href = lang === 'de' ? "example_page_de.html" : "example_page.html";
+    DOM.linkExample.href = lang === 'de' ? "example_page_de.html" : "example_page.html";
 
-    if(document.getElementById('editor-screen').style.display === 'block') {
+    if(DOM.editorScreen.style.display === 'block') {
         const oldList = CONFIG.PRESETS[oldLang].advanced; 
         const newList = CONFIG.PRESETS[lang].advanced;
         
@@ -671,7 +1447,7 @@ function changeLanguage(lang) {
 
     AppState.functions = [...CONFIG.PRESETS[lang][AppState.level]];
     
-    if(document.getElementById('editor-screen').style.display === 'block') {
+    if(DOM.editorScreen.style.display === 'block') {
         AppState.words.forEach(w => { if(w.f && w.f !== CONFIG.PUNCT && !AppState.functions.includes(w.f)) AppState.functions.push(w.f); });
         AppState.groups.forEach(g => { if(g.label && !AppState.functions.includes(g.label)) AppState.functions.push(g.label); });
         renderPalette(); updateStatus();
@@ -680,12 +1456,12 @@ function changeLanguage(lang) {
 
 function changeLevel(level) {
     AppState.level = level;
-    document.getElementById('grammar-level-setup').value = level;
-    document.getElementById('grammar-level-editor').value = level;
+    DOM.grammarLevelSetup.value = level;
+    DOM.grammarLevelEditor.value = level;
     
     AppState.functions = [...CONFIG.PRESETS[AppState.lang][level]];
     
-    if (document.getElementById('editor-screen').style.display === 'block') {
+    if (DOM.editorScreen.style.display === 'block') {
         AppState.words.forEach(w => { if(w.f && w.f !== CONFIG.PUNCT && !AppState.functions.includes(w.f)) { AppState.functions.push(w.f); } });
         AppState.groups.forEach(g => { if(g.label && !AppState.functions.includes(g.label)) { AppState.functions.push(g.label); } });
         renderPalette();
@@ -697,9 +1473,10 @@ function setMode(newMode) {
     if (newMode !== 'tagging') {
         AppState.activeFunc = AppState.getOtherLabel();
     }
-    document.getElementById('split-mode-btn').classList.toggle('active-mode', AppState.mode === 'split');
-    document.getElementById('group-mode-btn').classList.toggle('active-mode', AppState.mode === 'group');
-    document.getElementById('linebreak-mode-btn').classList.toggle('active-mode', AppState.mode === 'linebreak');
+    DOM.splitModeBtn.classList.toggle('active-mode', AppState.mode === 'split');
+    DOM.groupModeBtn.classList.toggle('active-mode', AppState.mode === 'group');
+    DOM.linebreakModeBtn.classList.toggle('active-mode', AppState.mode === 'linebreak');
+    DOM.attrModeBtn.classList.toggle('active-mode', AppState.mode === 'attr');
     
     document.querySelectorAll('.p-btn').forEach((b) => {
         b.classList.toggle('active', AppState.mode === 'tagging' && b.dataset.func === AppState.activeFunc);
@@ -713,13 +1490,14 @@ function updateStatus() {
     if (AppState.mode === 'split') modeText = txt.modeSplit; 
     else if (AppState.mode === 'group') modeText = txt.modeBracket; 
     else if (AppState.mode === 'linebreak') modeText = txt.modeLineBreak; 
+    else if (AppState.mode === 'attr') modeText = txt.modeAttr; 
     else modeText = txt.modeTag + ` (${AppState.activeFunc})`;
-    document.getElementById('mode-status').textContent = modeText;
+    DOM.modeStatus.textContent = modeText;
 }
 
 function renderPalette() {
     updateShortcuts();
-    const p = document.getElementById('label-palette'); 
+    const p = DOM.labelPalette; 
     p.innerHTML = '';
     
     AppState.functions.forEach((f) => {
@@ -742,7 +1520,7 @@ function renderPalette() {
 }
 
 function renderEditor() {
-    const area = document.getElementById('tagging-area');
+    const area = DOM.taggingArea;
     area.innerHTML = '';
     
     let currentSentenceBox = document.createElement('div');
@@ -755,6 +1533,8 @@ function renderEditor() {
         span.textContent = item.w;
         span.className = isPunct ? 'punct-span' : 'tag-word';
         if (item.isSplit) span.classList.add('split-right');
+        if (item.u && !isPunct) span.classList.add('attr-underline');
+        
         span.dataset.idx = i;
         span.id = `word-${i}`; 
 
@@ -812,6 +1592,9 @@ function updateWordVisuals(idx) {
     const shortLabel = CONFIG.ABBREVIATIONS[AppState.lang][func] || (func.length > 6 ? func.substring(0,5)+"." : func);
     span.dataset.short = shortLabel;
     span.style.backgroundColor = AppState.colors[func];
+    
+    if (item.u) span.classList.add('attr-underline');
+    else span.classList.remove('attr-underline');
 }
 
 function updateGroupUI() {
@@ -833,7 +1616,7 @@ function updateGroupUI() {
 
     let maxTier = Math.max(-1, ...sortedGroups.map(g => g.tier));
     let requiredMargin = maxTier >= 0 ? 65 + (maxTier * 38) : 24;
-    document.getElementById('tagging-area').style.setProperty('--dynamic-margin-top', requiredMargin + 'px');
+    DOM.taggingArea.style.setProperty('--dynamic-margin-top', requiredMargin + 'px');
 
     sortedGroups.forEach(g => {
         let tierOffset = 28 + (g.tier * 38); let groupColor = AppState.colors[g.label] || '#8b5cf6';
@@ -904,59 +1687,58 @@ function initEventListeners() {
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', (e) => changeLanguage(e.target.dataset.lang));
     });
-    document.getElementById('grammar-level-setup').addEventListener('change', (e) => changeLevel(e.target.value));
-    document.getElementById('grammar-level-editor').addEventListener('change', (e) => changeLevel(e.target.value));
+    DOM.grammarLevelSetup.addEventListener('change', (e) => changeLevel(e.target.value));
+    DOM.grammarLevelEditor.addEventListener('change', (e) => changeLevel(e.target.value));
     
-    document.getElementById('btn-copy-ai').addEventListener('click', copyAIPrompt);
-    document.getElementById('btn-import').addEventListener('click', importAI);
+    DOM.btnCopyAi.addEventListener('click', copyAIPrompt);
+    DOM.btnImport.addEventListener('click', importAI);
     
-    document.getElementById('file-load-setup').addEventListener('change', (e) => {
+    DOM.fileLoadSetup.addEventListener('change', (e) => {
         if(e.target.files.length > 0) { StorageManager.importProject(e.target.files[0]); e.target.value = ''; }
     });
-    document.getElementById('file-load-editor').addEventListener('change', (e) => {
+    DOM.fileLoadEditor.addEventListener('change', (e) => {
         if(e.target.files.length > 0) { StorageManager.importProject(e.target.files[0]); e.target.value = ''; }
     });
     
-    document.getElementById('btn-manual').addEventListener('click', startManual);
-    document.getElementById('btn-show-credits').addEventListener('click', () => showScreen('credits'));
-    document.getElementById('btn-hide-credits').addEventListener('click', () => showScreen('setup'));
+    DOM.btnManual.addEventListener('click', startManual);
+    DOM.btnShowCredits.addEventListener('click', () => showScreen('credits'));
+    DOM.btnHideCredits.addEventListener('click', () => showScreen('setup'));
     
-    document.getElementById('btn-add-label').addEventListener('click', addCustomLabel);
-    document.getElementById('undo-btn').addEventListener('click', () => AppState.undo() && renderEditor());
-    document.getElementById('split-mode-btn').addEventListener('click', () => setMode(AppState.mode === 'split' ? 'tagging' : 'split'));
-    document.getElementById('linebreak-mode-btn').addEventListener('click', () => setMode(AppState.mode === 'linebreak' ? 'tagging' : 'linebreak'));
-    document.getElementById('group-mode-btn').addEventListener('click', () => setMode(AppState.mode === 'group' ? 'tagging' : 'group'));
-    document.getElementById('btn-export').addEventListener('click', exportToStudent);
-    document.getElementById('btn-save-work').addEventListener('click', () => StorageManager.exportProject());
+    DOM.btnAddLabel.addEventListener('click', addCustomLabel);
+    DOM.undoBtn.addEventListener('click', () => AppState.undo() && renderEditor());
+    DOM.splitModeBtn.addEventListener('click', () => setMode(AppState.mode === 'split' ? 'tagging' : 'split'));
+    DOM.linebreakModeBtn.addEventListener('click', () => setMode(AppState.mode === 'linebreak' ? 'tagging' : 'linebreak'));
+    DOM.groupModeBtn.addEventListener('click', () => setMode(AppState.mode === 'group' ? 'tagging' : 'group'));
+    DOM.attrModeBtn.addEventListener('click', () => setMode(AppState.mode === 'attr' ? 'tagging' : 'attr'));
+    DOM.btnExport.addEventListener('click', exportToStudent);
+    DOM.btnSaveWork.addEventListener('click', () => StorageManager.exportProject());
 
-    document.getElementById('btn-toggle-pattern').addEventListener('click', () => document.body.classList.toggle('pattern-mode'));
-    document.getElementById('btn-toggle-contrast').addEventListener('click', () => document.body.classList.toggle('high-contrast'));
-    document.getElementById('btn-zoom-in').addEventListener('click', () => setTeacherZoom(0.1));
-    document.getElementById('btn-zoom-out').addEventListener('click', () => setTeacherZoom(-0.1));
-    document.getElementById('btn-zoom-reset').addEventListener('click', () => setTeacherZoom(0));
+    DOM.btnTogglePattern.addEventListener('click', () => document.body.classList.toggle('pattern-mode'));
+    DOM.btnToggleContrast.addEventListener('click', () => document.body.classList.toggle('high-contrast'));
+    DOM.btnZoomIn.addEventListener('click', () => setTeacherZoom(0.1));
+    DOM.btnZoomOut.addEventListener('click', () => setTeacherZoom(-0.1));
+    DOM.btnZoomReset.addEventListener('click', () => setTeacherZoom(0));
 
-    document.getElementById('btn-cancel-group').addEventListener('click', closeGroupModal);
-    document.getElementById('btn-save-group').addEventListener('click', saveGroupFromModal);
-    document.getElementById('btn-cancel-word').addEventListener('click', closeWordModal);
-    document.getElementById('btn-save-word').addEventListener('click', saveWordFromModal);
-    document.getElementById('btn-delete-word').addEventListener('click', deleteWordFromModal);
+    DOM.btnCancelGroup.addEventListener('click', closeGroupModal);
+    DOM.btnSaveGroup.addEventListener('click', saveGroupFromModal);
+    DOM.btnCancelWord.addEventListener('click', closeWordModal);
+    DOM.btnSaveWord.addEventListener('click', saveWordFromModal);
+    DOM.btnDeleteWord.addEventListener('click', deleteWordFromModal);
     
-    document.getElementById('group-name-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') saveGroupFromModal(); });
-    document.getElementById('group-name-input').addEventListener('keyup', (e) => { if (e.key === 'Escape') closeGroupModal(); });
-    document.getElementById('group-hint-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') saveGroupFromModal(); });
-	// Sync Editor Title with Setup Title
-    document.getElementById('editor-pagetitle').addEventListener('input', (e) => {
-        document.getElementById('pagetitle').value = e.target.value;
+    DOM.groupNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveGroupFromModal(); });
+    DOM.groupNameInput.addEventListener('keyup', (e) => { if (e.key === 'Escape') closeGroupModal(); });
+    DOM.groupHintInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveGroupFromModal(); });
+    
+    DOM.editorPageTitle.addEventListener('input', (e) => {
+        DOM.pageTitle.value = e.target.value;
         StorageManager.triggerAutoSave();
     });
     
-    // Sync Setup Title with Editor Title (in case you go back and forth)
-    document.getElementById('pagetitle').addEventListener('input', (e) => {
-        const editorTitle = document.getElementById('editor-pagetitle');
-        if(editorTitle) editorTitle.value = e.target.value;
+    DOM.pageTitle.addEventListener('input', (e) => {
+        if(DOM.editorPageTitle) DOM.editorPageTitle.value = e.target.value;
     });
 
-    const taggingArea = document.getElementById('tagging-area');
+    const taggingArea = DOM.taggingArea;
 
     taggingArea.addEventListener('mouseover', (e) => {
         const badge = e.target.closest('.bracket-badge');
@@ -1080,14 +1862,14 @@ function initEventListeners() {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); AppState.undo() && renderEditor(); return; }
         
         if (e.key === 'Escape') {
-            if (document.getElementById('group-modal').style.display === 'flex' || document.getElementById('word-modal').style.display === 'flex') return;
+            if (DOM.groupModal.style.display === 'flex' || DOM.wordModal.style.display === 'flex') return;
             setMode('tagging');
             AppState.ui.startIdx = null; AppState.ui.pendingGroupStart = null; AppState.ui.pendingGroupEnd = null;
             document.querySelectorAll('#tagging-area span.tag-word').forEach(s => s.style.outline = "none");
             return;
         }
 
-        if (document.getElementById('editor-screen').style.display !== 'block') return;
+        if (DOM.editorScreen.style.display !== 'block') return;
 
         if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
             if (e.ctrlKey || e.metaKey || e.altKey) return; 
@@ -1115,6 +1897,13 @@ function initEventListeners() {
                 if (hgi === null && hw) {
                     let prevMode = AppState.mode; setMode('linebreak'); handleWordClick(hw, false); setMode(prevMode);
                 } else { setMode(AppState.mode === 'linebreak' ? 'tagging' : 'linebreak'); }
+                return;
+            }
+            if (key === 'g') {
+                e.preventDefault();
+                if (hgi === null && hw && !hw.classList.contains('punct-span')) {
+                    let prevMode = AppState.mode; setMode('attr'); handleWordClick(hw, false); setMode(prevMode);
+                } else { setMode(AppState.mode === 'attr' ? 'tagging' : 'attr'); }
                 return;
             }
             
@@ -1180,61 +1969,16 @@ function handleBoundaryDrop(gIndex, type, targetIdx) {
 function handleWordClick(el, shiftPressed = false) {
     const domIdx = parseInt(el.dataset.idx);
 
-    if (AppState.mode === 'linebreak') {
-        AppState.saveToHistory();
-        let currentB = AppState.words[domIdx].b || 0;
-        
-        const wordText = AppState.words[domIdx].w || "";
-        const isPunct = AppState.words[domIdx].f === CONFIG.PUNCT;
-        const defaultBreak = isPunct && CONFIG.SENTENCE_ENDERS.some(char => wordText.includes(char));
-        
-        if (currentB === 1) AppState.words[domIdx].b = -1;
-        else if (currentB === -1) AppState.words[domIdx].b = 0;
-        else AppState.words[domIdx].b = defaultBreak ? -1 : 1;
-        renderEditor(); StorageManager.triggerAutoSave(); return;
-    }
-
-    if (AppState.words[domIdx].f === CONFIG.PUNCT) return;
-
-    if (shiftPressed && AppState.ui.lastClickedIdx !== null && AppState.mode === 'tagging') {
-        AppState.ui.pendingGroupStart = Math.min(AppState.ui.lastClickedIdx, domIdx);
-        AppState.ui.pendingGroupEnd = Math.max(AppState.ui.lastClickedIdx, domIdx);
-        openGroupModal(); AppState.ui.lastClickedIdx = domIdx; return;
+   if (AppState.mode === 'linebreak') {
+        AppState.toggleLineBreak(domIdx);
+        return;
     }
     
     AppState.ui.lastClickedIdx = domIdx;
     
     if(AppState.mode === 'split') { 
-        AppState.saveToHistory(); 
-        const text = AppState.words[domIdx].w || "";
-        
-        if (text.includes(' ')) {
-            const parts = text.split(/\s+/);
-            const shiftAmount = parts.length - 1;
-            
-            const newItems = parts.map((p, i) => {
-                const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(p);
-                return {
-                    w: p, 
-                    f: hasLetters ? AppState.words[domIdx].f : CONFIG.PUNCT, 
-                    isSplit: i === parts.length - 1 ? AppState.words[domIdx].isSplit : false,
-                    h: i === 0 ? AppState.words[domIdx].h : "", 
-                    b: i === parts.length - 1 ? AppState.words[domIdx].b : 0
-                };
-            });
-            AppState.words.splice(domIdx, 1, ...newItems);
-            
-            AppState.groups = AppState.groups.map(g => {
-                let newStart = g.start; let newEnd = g.end;
-                if (g.start > domIdx) newStart += shiftAmount;
-                if (g.end >= domIdx) newEnd += shiftAmount;
-                return { ...g, start: newStart, end: newEnd };
-            });
-            renderEditor();
-        } else {
-            AppState.words[domIdx].isSplit = !AppState.words[domIdx].isSplit;
-            renderEditor(); 
-        }
+        // 👇 Look how clean this is now!
+        AppState.splitWord(domIdx);
     } 
     else if(AppState.mode === 'group') {
         if(AppState.ui.startIdx === null) { 
@@ -1245,12 +1989,16 @@ function handleWordClick(el, shiftPressed = false) {
             openGroupModal(); AppState.ui.startIdx = null; 
             document.querySelectorAll('#tagging-area span.tag-word').forEach(s => s.style.outline = "none");
         }
-    } else { 
+    } 
+   else if(AppState.mode === 'attr') {
+        AppState.mutateWord(domIdx, { u: !AppState.words[domIdx].u });
+    }
+    else { 
         if (AppState.words[domIdx].f !== AppState.activeFunc) {
-            AppState.saveToHistory(); 
-            AppState.words[domIdx].f = AppState.activeFunc; 
+            // We pass false for shouldRender here because updateWordVisuals 
+            // is faster than re-rendering the whole editor for a simple color change.
+            AppState.mutateWord(domIdx, { f: AppState.activeFunc }, false);
             updateWordVisuals(domIdx);
-            StorageManager.triggerAutoSave();
         }
     }
 }
@@ -1259,76 +2007,92 @@ function handleWordDoubleClick(el, e) {
     e.stopPropagation();
     AppState.ui.editingWordNode = el;
     const domIdx = parseInt(el.dataset.idx);
-    document.getElementById('word-text-input').value = AppState.words[domIdx].w || "";
-    document.getElementById('word-hint-input').value = AppState.words[domIdx].h || "";
-    document.getElementById('word-modal').style.display = 'flex';
-    document.getElementById('word-text-input').focus();
+    DOM.wordTextInput.value = AppState.words[domIdx].w || "";
+    DOM.wordHintInput.value = AppState.words[domIdx].h || "";
+    DOM.wordModal.style.display = 'flex';
+    DOM.wordTextInput.focus();
 }
 
-function closeWordModal() { document.getElementById('word-modal').style.display = 'none'; AppState.ui.editingWordNode = null; }
+function closeWordModal() { 
+    DOM.wordModal.style.display = 'none'; 
+    AppState.ui.editingWordNode = null; 
+}
 
 function saveWordFromModal() {
-    if (!AppState.ui.editingWordNode) return;
-    const targetIdx = parseInt(AppState.ui.editingWordNode.dataset.idx);
-    const newText = document.getElementById('word-text-input').value.trim();
-    const newHint = document.getElementById('word-hint-input').value.trim();
-    
-    if (newText) {
-        AppState.saveToHistory();
-        AppState.words[targetIdx].w = newText;
-        AppState.words[targetIdx].h = newHint || "";
-        renderEditor(); 
-        StorageManager.triggerAutoSave();
+    if (AppState.ui.editingWordNode) {
+        const domIdx = parseInt(AppState.ui.editingWordNode.dataset.idx);
+        const newText = DOM.wordTextInput.value.trim();
+        const newHint = DOM.wordHintInput.value.trim();
+        
+        if (newText) {
+            AppState.mutateWord(domIdx, { w: newText, h: newHint });
+        }
     }
     closeWordModal();
 }
 
 function deleteWordFromModal() {
-    if (!AppState.ui.editingWordNode) return;
-    
-    // The confirmation pop-up has been removed!
-    // if (!confirm(CONFIG.LANG_TEXT[AppState.lang].confirmDelete)) return;
-    
-    AppState.saveToHistory();
-    const targetIdx = parseInt(AppState.ui.editingWordNode.dataset.idx);
-    AppState.words.splice(targetIdx, 1);
-    
-    AppState.groups = AppState.groups.map(g => {
-        let newStart = g.start; let newEnd = g.end;
-        if (g.start > targetIdx) newStart--;
-        if (g.end >= targetIdx) newEnd--;
-        return { ...g, start: newStart, end: newEnd };
-    }).filter(g => g.start <= g.end); 
-    
-    renderEditor(); StorageManager.triggerAutoSave(); closeWordModal();
+    if (AppState.ui.editingWordNode) {
+        const domIdx = parseInt(AppState.ui.editingWordNode.dataset.idx);
+        const t = CONFIG.LANG_TEXT[AppState.lang];
+        
+        if (confirm(t.confirmDelete)) {
+            AppState.saveToHistory();
+            
+            // Remove the word
+            AppState.words.splice(domIdx, 1);
+            
+            // Shift group boundaries backward to account for the missing word
+            AppState.groups = AppState.groups.map(g => {
+                let newStart = g.start > domIdx ? g.start - 1 : g.start;
+                let newEnd = g.end >= domIdx ? g.end - 1 : g.end;
+                return { ...g, start: newStart, end: newEnd };
+            }).filter(g => g.start <= g.end && g.end >= 0);
+            
+            StorageManager.debouncedAutoSave();
+            renderEditor();
+            closeWordModal();
+        }
+    }
 }
 
 function openGroupModal() {
-    const modal = document.getElementById('group-modal'); const datalist = document.getElementById('label-suggestions');
-    const input = document.getElementById('group-name-input'); const hintInput = document.getElementById('group-hint-input');
-    datalist.innerHTML = '';
-    AppState.functions.forEach(f => { const opt = document.createElement('option'); opt.value = escapeHTML(f); datalist.appendChild(opt); });
-    input.value = ''; hintInput.value = ''; modal.style.display = 'flex'; input.focus();
+    DOM.labelSuggestions.innerHTML = '';
+    AppState.functions.forEach(f => { 
+        const opt = document.createElement('option'); 
+        opt.value = escapeHTML(f); 
+        DOM.labelSuggestions.appendChild(opt); 
+    });
+    DOM.groupNameInput.value = ''; 
+    DOM.groupHintInput.value = ''; 
+    DOM.groupModal.style.display = 'flex'; 
+    DOM.groupNameInput.focus();
 }
 
 function editGroupLabel(index) {
     AppState.ui.editingGroupIndex = index;
-    const modal = document.getElementById('group-modal'); const datalist = document.getElementById('label-suggestions');
-    const input = document.getElementById('group-name-input'); const hintInput = document.getElementById('group-hint-input');
-    datalist.innerHTML = '';
-    AppState.functions.forEach(f => { const opt = document.createElement('option'); opt.value = escapeHTML(f); datalist.appendChild(opt); });
-    input.value = AppState.groups[index].label; hintInput.value = AppState.groups[index].hint || "";
-    modal.style.display = 'flex'; input.focus();
+    DOM.labelSuggestions.innerHTML = '';
+    AppState.functions.forEach(f => { 
+        const opt = document.createElement('option'); 
+        opt.value = escapeHTML(f); 
+        DOM.labelSuggestions.appendChild(opt); 
+    });
+    DOM.groupNameInput.value = AppState.groups[index].label; 
+    DOM.groupHintInput.value = AppState.groups[index].hint || "";
+    DOM.groupModal.style.display = 'flex'; 
+    DOM.groupNameInput.focus();
 }
 
 function closeGroupModal() { 
-    document.getElementById('group-modal').style.display = 'none'; 
-    AppState.ui.editingGroupIndex = null; AppState.ui.pendingGroupStart = null; AppState.ui.pendingGroupEnd = null; 
+    DOM.groupModal.style.display = 'none'; 
+    AppState.ui.editingGroupIndex = null; 
+    AppState.ui.pendingGroupStart = null; 
+    AppState.ui.pendingGroupEnd = null; 
 }
 
 function saveGroupFromModal() {
-    const label = document.getElementById('group-name-input').value.trim();
-    const hint = document.getElementById('group-hint-input').value.trim();
+    const label = DOM.groupNameInput.value.trim();
+    const hint = DOM.groupHintInput.value.trim();
     
     if(label) {
         AppState.saveToHistory(); 
@@ -1341,14 +2105,17 @@ function saveGroupFromModal() {
             if(hint) AppState.groups[AppState.ui.editingGroupIndex].hint = hint; else delete AppState.groups[AppState.ui.editingGroupIndex].hint;
         } else if(AppState.ui.pendingGroupStart !== null) {
             let newGroup = { start: AppState.ui.pendingGroupStart, end: AppState.ui.pendingGroupEnd, label: label };
-            if(hint) newGroup.hint = hint; AppState.groups.push(newGroup);
+            if(hint) newGroup.hint = hint; 
+            AppState.addGroup(newGroup); // This automatically saves and updates the UI!
         }
         updateGroupUI(); StorageManager.triggerAutoSave();
     }
     closeGroupModal();
 }
 
-function removeGroup(index) { AppState.saveToHistory(); AppState.groups.splice(index, 1); updateGroupUI(); }
+function removeGroup(index) { 
+    AppState.removeGroup(index); 
+}
 
 function adjustGroupStart(groupIndex, delta) {
     let g = AppState.groups[groupIndex]; let newStart = g.start + delta;
@@ -1373,7 +2140,7 @@ function adjustGroupEnd(groupIndex, delta) {
 }
 
 function addCustomLabel() {
-    const input = document.getElementById('new-label-input'); const name = input.value.trim();
+    const input = DOM.newLabelInput; const name = input.value.trim();
     if(!name) return;
     if(AppState.functions.includes(name)) { alert("Label already exists!"); return; }
     AppState.functions.push(name); AppState.colors[name] = getUnusedSafeColor();
@@ -1385,34 +2152,76 @@ function addCustomLabel() {
 // 7. IMPORT / EXPORT / PARSING LOGIC
 // ==========================================
 
-function fallbackCopyTextToClipboard(text) {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    textArea.style.top = "0"; textArea.style.left = "0"; textArea.style.position = "fixed";
-    document.body.appendChild(textArea);
-    textArea.focus(); textArea.select();
-    try {
-        document.execCommand('copy'); alert(CONFIG.LANG_TEXT[AppState.lang].promptSuccess);
-    } catch (err) { alert(CONFIG.LANG_TEXT[AppState.lang].promptFail); }
-    document.body.removeChild(textArea);
-}
-
 function copyAIPrompt() {
-    const txtEl = document.getElementById('entertext');
+    const btn = DOM.btnCopyAi;
+    const originalText = btn.textContent;
+    
+    const txtEl = DOM.enterText;
     let sanitizedText = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
-    // Important fix to prevent JSON breaking inside AI prompt instructions
     sanitizedText = sanitizedText.replace(/"/g, "'");
-    txtEl.value = sanitizedText; // Show the sanitized text in the editor
+    txtEl.value = sanitizedText;
     
     const txt = sanitizedText;
-    const exObj = AppState.functions[1] || 'Accusative object'; 
     
-    const promptText = AppState.lang === 'de' 
-    ? `Analysiere die lateinische Syntax von: "${txt}".\n1. KEINE ÜBERSETZUNG: Analysiere direkt die lateinische Morphologie und Syntax (Kasus, Kongruenz, Verbvalenz). Übersetze den Satz NICHT im Hintergrund und analysiere auf keinen Fall die deutsche Übersetzung!\n2. STRIKTE REGEL: Behalte die EXAKTE Wortreihenfolge bei. Lass KEINE Wörter und KEINE Satzzeichen aus (insbesondere nicht den Schlusspunkt!).\n3. PHRASEN: Benachbarte Wörter einer Phrase erhalten die gleiche Funktion.\n4. KOORDINATION: Wenn eine Konjunktion (z.B. 'et', 'aut', '-que') Wörter mit derselben syntaktischen Funktion verbindet (z.B. zwei Adverbien oder zwei Subjekte), gib der Konjunktion und den Wörtern EXAKT DASSELBE Label, damit sie verschmelzen.\n5. HYPERBATON: Getrennte Phrasen erhalten die gleiche Funktion, bleiben aber an ihrem Platz.\n6. INTERPUNKTION: Jedes Satzzeichen (inkl. Schlusspunkt) wird als eigenes Token mit "f": "${CONFIG.PUNCT}" ausgegeben.\n7. GRUPPEN & NEBENSÄTZE: Identifiziere mehrteilige Konstruktionen (z.B. Nebensatz, AcI, Partizipialkonstruktion). WICHTIG: Wenn du eine 'Subjunktion' oder ein Relativpronomen identifizierst, MUSST du zwingend eine entsprechende Gruppe erstellen. Der "end"-Index schließt den Satz logisch ab (meist beim finiten Verb/Satzzeichen) und zerschneidet keine Phrasen.\n8. BEISPIEL: Für "Aurum sumptum a Clodia, venenum quaesitum quod Clodiae daretur." antworte exakt so: {"words": [{"w":"Aurum","f":"Subjekt"},{"w":"sumptum","f":"Prädikat"},{"w":"a Clodia","f":"Präpositionale Bestimmung"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subjekt"},{"w":"quaesitum","f":"Prädikat"},{"w":"quod","f":"Subjekt"},{"w":"Clodiae","f":"Dativobjekt"},{"w":"daretur","f":"Prädikat"},{"w":".","f":"Punct"}], "groups": [{"start": 6, "end": 9, "label": "Relativsatz"}]}\n9. WICHTIG: Antworte AUSSCHLIESSLICH mit gültigem JSON. Keine Kommentare, keine abschließenden Kommas (trailing commas) vor Klammern! Format: { "words": [{"w": "Wort", "f": "Label"}, ...], "groups": [] }\nVerwende ausschließlich diese Labels: ${AppState.functions.join(', ')}.`
-    : `Analyze Latin syntax of: "${txt}". \n1. NO TRANSLATION: Analyze the Latin morphology and syntax directly (cases, agreement, verb valency). Do NOT translate the sentence in the background and do not analyze the syntax of an English translation!\n2. STRICT RULE: Maintain the EXACT word order. Do NOT omit any words or punctuation marks (especially the final full stop!).\n3. PHRASES: Adjacent phrase words get same function. \n4. COORDINATION: If a conjunction connects words with the same syntactical function, give the conjunction and the words the EXACT SAME label so they merge. \n5. HYPERBATON: Split phrases get same function but kept in place.\n6. PUNCTUATION: Include EVERY punctuation mark as a separate token "f": "${CONFIG.PUNCT}".\n7. GROUPS & CLAUSES: Identify true multi-word clauses. IMPORTANT: If you tag a word as a 'Subjunction' or relative pronoun, you MUST create a corresponding group in the "groups" array. The "end" index logically closes the clause and NEVER cuts a phrase in half.\n8. EXAMPLE: For "Aurum sumptum a Clodia, venenum quaesitum quod Clodiae daretur." answer exactly like this: {"words": [{"w":"Aurum","f":"Subject"},{"w":"sumptum","f":"Verb"},{"w":"a Clodia","f":"Prepositional phrase"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subject"},{"w":"quaesitum","f":"Verb"},{"w":"quod","f":"Subject"},{"w":"Clodiae","f":"Dative object"},{"w":"daretur","f":"Verb"},{"w":".","f":"Punct"}], "groups": [{"start": 6, "end": 9, "label": "Relative clause"}]}\n9. IMPORTANT: Return ONLY valid JSON. No comments, no trailing commas before brackets! Format: { "words": [{"w": "Word", "f": "Label"}, ...], "groups": [] } \nUse ONLY these Labels: ${AppState.functions.join(', ')}.`;
-	if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(promptText).then(() => alert(CONFIG.LANG_TEXT[AppState.lang].promptSuccess)).catch(() => fallbackCopyTextToClipboard(promptText));
-    } else { fallbackCopyTextToClipboard(promptText); }
+    const promptText = AppState.lang === 'de' 
+    ? `Analysiere die lateinische Syntax von: "${txt}".
+1. KEINE ÜBERSETZUNG: Analysiere direkt die lateinische Morphologie und Syntax (Kasus, Kongruenz, Verbvalenz). Übersetze den Satz NICHT im Hintergrund und analysiere auf keinen Fall die deutsche Übersetzung!
+2. STRIKTE REGEL: Behalte die EXAKTE Wortreihenfolge bei. Lass KEINE Wörter und KEINE Satzzeichen aus (insbesondere nicht den Schlusspunkt!).
+3. PHRASEN: Benachbarte Wörter einer Phrase erhalten die gleiche Funktion.
+4. KOORDINATION: Wenn eine Konjunktion (z.B. 'et', 'aut', '-que') Wörter mit derselben syntaktischen Funktion verbindet (z.B. zwei Adverbien oder zwei Subjekte), gib der Konjunktion und den Wörtern EXAKT DASSELBE Label, damit sie verschmelzen.
+5. HYPERBATON: Getrennte Phrasen erhalten die gleiche Funktion, bleiben aber an ihrem Platz.
+6. INTERPUNKTION: Jedes Satzzeichen (inkl. Schlusspunkt) wird als eigenes Token mit "f": "${CONFIG.PUNCT}" ausgegeben.
+7. GRUPPEN & NEBENSÄTZE: Identifiziere mehrteilige Konstruktionen (z.B. Nebensatz, AcI, Partizipialkonstruktion). WICHTIG: Wenn du eine 'Subjunktion' oder ein Relativpronomen identifizierst, MUSST du zwingend eine entsprechende Gruppe erstellen. Der "end"-Index schließt den Satz logisch ab (meist beim finiten Verb/Satzzeichen) und zerschneidet keine Phrasen.
+8. GENITIVATTRIBUTE: Adjektive und Genitivattribute werden mit ihrem Bezugswort zusammengefasst (sie erhalten also EXAKT DASSELBE Label, z.B. beide "Subjekt"). Damit das Genitivattribut trotzdem erkennbar bleibt, füge ZWINGEND dem JSON-Objekt des Genitivattributs die Eigenschaft "u": true hinzu. Erstelle KEINE "groups" Klammer für Genitivattribute!
+9. BEISPIEL: Für "Aurum sumptum a Clodia, venenum quaesitum quod Clodiae daretur." antworte exakt so: {"words": [{"w":"Aurum","f":"Subjekt"},{"w":"sumptum","f":"Prädikat"},{"w":"a Clodia","f":"Präpositionale Bestimmung"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subjekt"},{"w":"quaesitum","f":"Prädikat"},{"w":"quod","f":"Subjekt"},{"w":"Clodiae","f":"Dativobjekt","u":true},{"w":"daretur","f":"Prädikat"},{"w":".","f":"Punct"}], "groups": [{"start": 6, "end": 9, "label": "Relativsatz"}]}
+10. WICHTIG: Antworte AUSSCHLIESSLICH mit gültigem JSON. Keine Kommentare, keine abschließenden Kommas (trailing commas) vor Klammern! Format: { "words": [{"w": "Wort", "f": "Label", "u": true}], "groups": [] }
+Verwende ausschließlich diese Labels: ${AppState.functions.join(', ')}.`
+    : `Analyze Latin syntax of: "${txt}". 
+1. NO TRANSLATION: Analyze the Latin morphology and syntax directly (cases, agreement, verb valency). Do NOT translate the sentence in the background and do not analyze the syntax of an English translation!
+2. STRICT RULE: Maintain the EXACT word order. Do NOT omit any words or punctuation marks (especially the final full stop!).
+3. PHRASES: Adjacent phrase words get same function. 
+4. COORDINATION: If a conjunction connects words with the same syntactical function, give the conjunction and the words the EXACT SAME label so they merge. 
+5. HYPERBATON: Split phrases get same function but kept in place.
+6. PUNCTUATION: Include EVERY punctuation mark as a separate token "f": "${CONFIG.PUNCT}".
+7. GROUPS & CLAUSES: Identify true multi-word clauses. IMPORTANT: If you tag a word as a 'Subjunction' or relative pronoun, you MUST create a corresponding group in the "groups" array. The "end" index logically closes the clause and NEVER cuts a phrase in half.
+8. GENITIVE ATTRIBUTES: Adjectives and genitive attributes are grouped with the words they modify (give them the EXACT SAME label, e.g., both "Subject"). To distinguish the genitive attribute, you MUST add the property "u": true to the JSON object of the genitive word. Do NOT create a "groups" bracket for genitive attributes!
+9. EXAMPLE: For "Aurum sumptum a Clodia, venenum quaesitum quod Clodiae daretur." answer exactly like this: {"words": [{"w":"Aurum","f":"Subject"},{"w":"sumptum","f":"Verb"},{"w":"a Clodia","f":"Prepositional phrase"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subject"},{"w":"quaesitum","f":"Verb"},{"w":"quod","f":"Subject"},{"w":"Clodiae","f":"Dative object","u":true},{"w":"daretur","f":"Verb"},{"w":".","f":"Punct"}], "groups": [{"start": 6, "end": 9, "label": "Relative clause"}]}
+10. IMPORTANT: Return ONLY valid JSON. No comments, no trailing commas before brackets! Format: { "words": [{"w": "Word", "f": "Label", "u": true}], "groups": [] } 
+Use ONLY these Labels: ${AppState.functions.join(', ')}.`;
+
+    const showStatus = (isSuccess) => {
+        btn.textContent = isSuccess ? "✅ " + CONFIG.LANG_TEXT[AppState.lang].promptSuccess : "❌ " + CONFIG.LANG_TEXT[AppState.lang].promptFail;
+        btn.style.backgroundColor = isSuccess ? "#10b981" : "#ef4444";
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.backgroundColor = "var(--primary-color)";
+        }, 2000);
+    };
+
+    const synchronousFallback = () => {
+        const textArea = document.createElement("textarea");
+        textArea.value = promptText;
+        textArea.style.position = "fixed"; // Prevents scrolling
+        textArea.style.opacity = "0";      // Hides it visually
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            const success = document.execCommand('copy');
+            showStatus(success);
+        } catch (err) {
+            showStatus(false);
+        }
+        document.body.removeChild(textArea);
+    };
+
+    // Safely attempt the modern approach first, catching local-file security blocks
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(promptText)
+            .then(() => showStatus(true))
+            .catch(() => synchronousFallback());
+    } else {
+        synchronousFallback();
+    }
 }
 
 function applyPrepositionMerging(tokens) {
@@ -1423,7 +2232,7 @@ function applyPrepositionMerging(tokens) {
         if(CONFIG.PREPOSITIONS.includes(pureWord) && i+1 < tokens.length) {
             let nextW = tokens[i+1];
             if(nextW.f !== CONFIG.PUNCT) {
-                welded.push({ w: curr.w + " " + nextW.w.replace(/^-/, ''), f: prepLabel, b: curr.b || 0 });
+                welded.push({ w: curr.w + " " + nextW.w.replace(/^-/, ''), f: prepLabel, b: curr.b || 0, u: curr.u || nextW.u, h: curr.h || nextW.h, isSplit: nextW.isSplit });
                 map[i+1] = welded.length - 1; i++; 
             } else { welded.push(curr); }
         } else { welded.push(curr); }
@@ -1435,9 +2244,9 @@ function processTokens(rawTokens) {
     let temp = [];
     rawTokens.forEach(t => {
         const isEnclitic = /^-?(que|ne|ve)$/i.test(t); const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(t);
-        if (!hasLetters) { temp.push({ w: t, f: CONFIG.PUNCT, b: 0 }); }
+        if (!hasLetters) { temp.push({ w: t, f: CONFIG.PUNCT, b: 0, u: false }); }
         else if (isEnclitic && temp.length > 0 && /[a-zA-Z]/.test(temp[temp.length-1].w)) { temp[temp.length-1].w += t.replace(/^-/, ''); }
-        else { temp.push({ w: t, f: AppState.getOtherLabel(), b: 0 }); }
+        else { temp.push({ w: t, f: AppState.getOtherLabel(), b: 0, u: false }); }
     });
     return applyPrepositionMerging(temp).welded;
 }
@@ -1454,6 +2263,7 @@ function normalizeLabel(label) {
     if (AppState.lang === 'de') {
         if(lower.includes('dative') || lower === 'dativ') return 'Dativobjekt';
         if(lower.includes('accusative') || lower === 'akkusativ') return 'Akkusativobjekt';
+        if(lower.includes('genitivattribut') || lower.includes('genitive attr')) return 'Genitivattribut';
         if(lower.includes('genitive') || lower === 'genitiv') return 'Genitivobjekt';
         if(lower.includes('prepositional')) return 'Präpositionale Bestimmung';
         if(lower.includes('ablative abs')) return 'Ablativus absolutus';
@@ -1468,6 +2278,7 @@ function normalizeLabel(label) {
     } else {
         if(lower.includes('dativ')) return 'Dative object';
         if(lower.includes('akkusativ')) return 'Accusative object';
+        if(lower.includes('genitivattribut') || lower.includes('genitive attr')) return 'Genitive attribute';
         if(lower.includes('genitiv')) return 'Genitive object';
         if(lower.includes('präpositional')) return 'Prepositional phrase';
         if(lower.includes('ablativus abs')) return 'Ablative absolute';
@@ -1483,97 +2294,104 @@ function normalizeLabel(label) {
 }
 
 function importAI() {
-    try {
-        const raw = document.getElementById('ai-json').value;
-        
-        // 1. Strip markdown ticks
-        let cleanJson = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
-        
-        // 2. SMARTER EXTRACTION: Look for the outermost JSON object that actually contains the "words" array
-        const jsonMatch = cleanJson.match(/\{[\s\S]*"words"[\s\S]*\}/);
-        if (jsonMatch) {
-            cleanJson = jsonMatch[0];
-        } else {
-            alert("Could not find a valid JSON object containing 'words'. Please check the AI's output.");
-            return;
-        }
+    try {
+        const raw = DOM.aiJson.value;
+        
+        let cleanJson = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+        const jsonMatch = cleanJson.match(/\{[\s\S]*"words"[\s\S]*\}/);
+        if (jsonMatch) {
+            cleanJson = jsonMatch[0];
+        } else {
+            alert("Could not find a valid JSON object containing 'words'. Please check the AI's output.");
+            return;
+        }
 
-        // 3. AUTO-HEAL: Remove trailing commas before closing brackets/braces (common AI mistake)
-        cleanJson = cleanJson.replace(/,\s*([\]}])/g, '$1');
+        cleanJson = cleanJson.replace(/,\s*([\]}])/g, '$1');
 
-        // 4. Safely attempt to parse the JSON
-        let d;
-        try {
-            d = JSON.parse(cleanJson);
-        } catch (parseErr) {
-            console.error("JSON Parsing failed. The AI provided invalid JSON syntax:", cleanJson);
-            alert("The AI generated invalid JSON (e.g., unescaped quotes). Check the browser console (F12) to see exactly where the AI messed up.");
-            return;
-        }
+        let d;
+        try {
+            d = JSON.parse(cleanJson);
+        } catch (parseErr) {
+            console.error("JSON Parsing failed.", cleanJson);
+            alert("The AI generated invalid JSON (e.g., unescaped quotes). Check the browser console (F12) to see exactly where the AI messed up.");
+            return;
+        }
 
-        // 5. Structural safety check
-        if (!d || !Array.isArray(d.words)) {
-            alert("The AI's response is missing the 'words' array. Please generate the prompt again.");
-            return;
-        }
-        
-        let rawGroups = (d.groups || []).filter(g => g.label && g.label.toLowerCase() !== CONFIG.MAIN_CLAUSE_EN.toLowerCase() && g.label.toLowerCase() !== CONFIG.MAIN_CLAUSE_DE.toLowerCase() && g.start != null && g.end != null && g.start <= g.end);
-        
-        // INTERCEPT GROUPS: Force to 'Other/Sonstiges' if not in allowed list
-        rawGroups.forEach(g => { 
-            let norm = normalizeLabel(g.label);
-            g.label = AppState.functions.includes(norm) ? norm : AppState.getOtherLabel();
-        });
+        if (!d || !Array.isArray(d.words)) {
+            alert("The AI's response is missing the 'words' array. Please generate the prompt again.");
+            return;
+        }
+        
+        let rawGroups = (d.groups || []).filter(g => g.label && g.label.toLowerCase() !== CONFIG.MAIN_CLAUSE_EN.toLowerCase() && g.label.toLowerCase() !== CONFIG.MAIN_CLAUSE_DE.toLowerCase() && g.start != null && g.end != null && g.start <= g.end);
+        
+        rawGroups.forEach(g => { 
+            let norm = normalizeLabel(g.label);
+            g.label = AppState.functions.includes(norm) ? norm : AppState.getOtherLabel();
+        });
 
-        d.words.forEach(w => {
-            // Safety fallbacks in case the AI omitted keys for a specific word
-            w.w = w.w || ""; 
-            let func = w.f || ""; 
+        d.words.forEach(w => {
+            w.w = w.w || ""; 
+            let func = w.f || ""; 
 
-            w.w = w.w.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
-            
-            if (!/[a-zA-Z\u00C0-\u017F]/.test(w.w)) {
-                w.f = CONFIG.PUNCT;
-            }
-            else if (func.toLowerCase() === CONFIG.MAIN_CLAUSE_EN.toLowerCase() || func.toLowerCase() === CONFIG.MAIN_CLAUSE_DE.toLowerCase()) {
-                w.f = AppState.getOtherLabel();
-            }
-            else {
-                // INTERCEPT WORDS: Force to 'Other/Sonstiges' if not in allowed list
-                let norm = normalizeLabel(func);
-                w.f = AppState.functions.includes(norm) ? norm : AppState.getOtherLabel();
-            }
-            w.b = w.b || 0;
-        });
-        
-        const mergeResult = applyPrepositionMerging(d.words);
-        AppState.groups = [];
-        rawGroups.forEach(g => {
-            let newStart = mergeResult.map[g.start] !== undefined ? mergeResult.map[g.start] : g.start;
-            let newEnd = mergeResult.map[g.end] !== undefined ? mergeResult.map[g.end] : g.end;
-            for (let i = newStart; i < newEnd; i++) {
-                let token = mergeResult.welded[i];
-                if (token && token.f === CONFIG.PUNCT && CONFIG.SENTENCE_ENDERS.some(char => token.w.includes(char))) { newEnd = i - 1; break; }
-            }
-            while(newStart <= newEnd && mergeResult.welded[newStart] && mergeResult.welded[newStart].f === CONFIG.PUNCT) newStart++;
-            while(newEnd >= newStart && mergeResult.welded[newEnd] && mergeResult.welded[newEnd].f === CONFIG.PUNCT) newEnd--;
-            
-            if (newStart <= newEnd && newStart >= 0 && newEnd < mergeResult.welded.length) {
-                AppState.groups.push({ start: newStart, end: newEnd, label: g.label });
-            }
-        });
+            w.w = w.w.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
+            
+            if (!/[a-zA-Z\u00C0-\u017F]/.test(w.w)) {
+                w.f = CONFIG.PUNCT;
+                w.u = false;
+            }
+            else if (func.toLowerCase() === CONFIG.MAIN_CLAUSE_EN.toLowerCase() || func.toLowerCase() === CONFIG.MAIN_CLAUSE_DE.toLowerCase()) {
+                w.f = AppState.getOtherLabel();
+            }
+            else {
+                let norm = normalizeLabel(func);
+                w.f = AppState.functions.includes(norm) ? norm : AppState.getOtherLabel();
+            }
+            w.b = w.b || 0;
+            w.u = !!w.u;
+        });
+        
+        const mergeResult = applyPrepositionMerging(d.words);
+        AppState.groups = [];
+        rawGroups.forEach(g => {
+            let newStart = mergeResult.map[g.start] !== undefined ? mergeResult.map[g.start] : g.start;
+            let newEnd = mergeResult.map[g.end] !== undefined ? mergeResult.map[g.end] : g.end;
+            for (let i = newStart; i < newEnd; i++) {
+                let token = mergeResult.welded[i];
+                if (token && token.f === CONFIG.PUNCT && CONFIG.SENTENCE_ENDERS.some(char => token.w.includes(char))) { newEnd = i - 1; break; }
+            }
+            while(newStart <= newEnd && mergeResult.welded[newStart] && mergeResult.welded[newStart].f === CONFIG.PUNCT) newStart++;
+            while(newEnd >= newStart && mergeResult.welded[newEnd] && mergeResult.welded[newEnd].f === CONFIG.PUNCT) newEnd--;
+            
+            if (newStart <= newEnd && newStart >= 0 && newEnd < mergeResult.welded.length) {
+                AppState.groups.push({ start: newStart, end: newEnd, label: g.label });
+            }
+        });
 
-        initEditor(mergeResult.welded);
-    } catch(e) { 
-        console.error("Unhandled import error:", e); 
-        alert("An unexpected error occurred during import. Check the browser console (F12) for more details."); 
-    }
+        initEditor(mergeResult.welded);
+    } catch(e) { 
+        console.error("Unhandled import error:", e); 
+        alert("An unexpected error occurred during import. Check the browser console (F12) for more details."); 
+    }	
+	function validateAIInput(parsedData) {
+    if (!parsedData || typeof parsedData !== 'object') throw new Error("Root must be an object.");
+    if (!Array.isArray(parsedData.words)) throw new Error("Missing or invalid 'words' array.");
+    
+    parsedData.words.forEach((word, index) => {
+        if (typeof word.w !== 'string') throw new Error(`Word at index ${index} is missing text (w).`);
+        if (typeof word.f !== 'string') throw new Error(`Word at index ${index} is missing a function label (f).`);
+    });
+
+    if (parsedData.groups && !Array.isArray(parsedData.groups)) {
+        throw new Error("'groups' must be an array if provided.");
+    }
+    
+    return true; // Passes validation
+}	
 }
 
 function startManual() {
-    const txtEl = document.getElementById('entertext');
+    const txtEl = DOM.enterText;
     let sanitizedText = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
-    // Prevent double quote parsing bugs during manual input too
     sanitizedText = sanitizedText.replace(/"/g, "'");
     txtEl.value = sanitizedText;
 
@@ -1587,7 +2405,7 @@ function initEditor(words) {
     AppState.functions = [...CONFIG.PRESETS[AppState.lang][AppState.level]];
     AppState.history = [];
     AppState.words = words;
-	document.getElementById('editor-pagetitle').value = document.getElementById('pagetitle').value;
+    DOM.editorPageTitle.value = DOM.pageTitle.value;
     renderEditor();
     showScreen('editor');
     renderPalette();
@@ -1596,392 +2414,15 @@ function initEditor(words) {
 window.addEventListener('DOMContentLoaded', initApp);
 
 // ==========================================
+// ==========================================
 // 8. STUDENT EXPORT GENERATION
 // ==========================================
 
-const STUDENT_PAGE_CSS = `
-    :root { --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body, button, input, textarea, select { font-family: var(--main-font); }
-    body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background-color: #f9fafb; color: #1f2937; line-height: 1.5; }
-    h1 { text-align: center; color: #111827; margin-bottom: 32px; font-weight: 600; letter-spacing: -0.025em; }
-    .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; color: #334155; }
-    .teacher-note { background: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 1rem; color: #1f2937; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-    .exercise-wrapper { background: #fafafa; padding: 40px; border-radius: 12px; border: 1px solid #e5e7eb; line-height: 4.2; }
-    .sentence-container { padding: 30px 20px 20px 20px; margin-bottom: 32px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .sentence-container:last-child { margin-bottom: 0; }
-    
-    .zoom-controls { display: flex; gap: 6px; align-items: center; justify-content: flex-end; margin-bottom: 16px; }
-    .z-btn { background: white; border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 0.9rem; font-weight: bold; color: #374151; transition: background 0.1s; }
-    .z-btn:hover { background: #e5e7eb; }
-    .lang-switch-inline { display: flex; gap: 6px; margin-right: auto; }
-    .lang-btn { background: #f3f4f6; border: 1px solid transparent; padding: 4px 10px; cursor: pointer; border-radius: 4px; font-size: 0.85rem; color: #4b5563; transition: all 0.2s; font-weight: 500; }
-    .lang-btn.active { background: #eff6ff; color: #3b82f6; border-color: #bfdbfe; font-weight: 600; }
-    
-    #exercise-container-wrapper { overflow-x: auto; padding-top: 30px; padding-bottom: 15px; margin-top: 10px; }
-    #exercise { transition: transform 0.2s ease-in-out; }
-
-    .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
-    .hover-word:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
-    
-    .s-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom:none; border-radius: 6px 6px 0 0; padding: 22px 6px 6px 6px; margin: 20px 4px 0 4px; vertical-align: bottom; transition: all 0.2s; z-index: 1; }
-    .s-group:hover, .s-group:focus-within { z-index: 10; }
-    
-    .g-label { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; background: white; border: 1px solid #94a3b8; border-radius: 4px; padding: 3px 8px; color: #475569; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 2px; z-index: 5; max-width: calc(100% + 40px); box-sizing: border-box; transition: max-width 0.2s, z-index 0.2s; }
-    .g-label:hover, .g-label:focus-visible { outline: 2px solid #3b82f6; max-width: max-content; z-index: 50; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-    .g-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
-
-    .punct { font-size: 1.15rem; margin: 0 2px; vertical-align: baseline; display:inline-block; font-weight: 500; }
-    
-    .trans-box { margin: 32px 0 10px; line-height: 1.5; border-top: 1px dashed #e5e7eb; padding-top: 24px; }
-    textarea { width: 100%; height: 80px; font-size: 1.1rem; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
-    textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-    .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; margin-top: 8px; white-space: nowrap; text-align: center; color: #059669; pointer-events: none; }
-    
-    .hint-icon { position: absolute; top: -12px; right: -8px; font-size: 0.75rem; cursor: pointer; text-decoration: none; filter: grayscale(0.2); transition: filter 0.2s; z-index: 20; }
-    .hint-icon:hover { filter: grayscale(0); }
-    .tooltip-text { visibility: hidden; width: max-content; max-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; position: absolute; z-index: 1000; bottom: 150%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.85rem; font-weight: normal; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none; white-space: normal; line-height: 1.4; text-transform: none; }
-    .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #1f2937 transparent transparent transparent; }
-    .hint-icon.show-tooltip .tooltip-text { visibility: visible; opacity: 1; }
-
-    .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #e5e7eb; padding: 4px 0; z-index: 1000; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 85vh; overflow-y: auto; min-width: 150px; line-height: 1.2; }
-    .menu-btn { display: block; width: 100%; text-align: left; border: none; background: transparent; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #374151; transition: background-color 0.1s; font-family: inherit; }
-    .menu-btn:hover, .menu-btn:focus-visible { background-color: #f3f4f6; color: #111827; outline: none; }
-    .menu-btn:focus-visible { box-shadow: inset 2px 0 0 0 #3b82f6; }
-    
-    .footer-toolbar { margin-top: 40px; padding: 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
-    .btn { padding: 10px 20px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font-weight: 500; color: white; background: #1f2937; transition: opacity 0.2s; }
-    .btn:hover { opacity: 0.9; }
-    .ex-img { max-width: 100%; height: auto; display: block; margin: 30px auto 10px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 300px; object-fit: contain; }
-    #toast-container { visibility: hidden; min-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 14px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.95rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
-    #toast-container.show { visibility: visible; opacity: 1; bottom: 40px; }
-    #toast-container.error { background-color: #7f1d1d; border: 1px solid #ef4444; }
-    #toast-container.success { background-color: #064e3b; border: 1px solid #10b981; }
-    
-    #results-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.8); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-    .results-content { background: white; padding: 40px; border-radius: 12px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-    .results-title { font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 16px; }
-    .results-score { font-size: 3rem; font-weight: 800; color: #3b82f6; margin-bottom: 24px; }
-    .results-textarea { width: 100%; height: 80px; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; resize: none; margin-bottom: 20px; font-family: monospace; font-size: 0.95rem; background: #f9fafb; color: #374151; outline: none; }
-    .results-textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-    .btn-copy { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; width: 100%; margin-bottom: 12px; }
-    .btn-copy:hover { background: #059669; }
-
-    body.pattern-mode .hover-word[data-done="true"] { background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.4) 5px, rgba(255,255,255,0.4) 10px); border: 2px solid #111827 !important; }
-    body.pattern-mode .hover-word[data-done="true"]:nth-child(even) { background-image: radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%); background-position: 0 0, 5px 5px; background-size: 10px 10px; }
-    body.pattern-mode .s-group { border-style: dashed !important; border-width: 2px !important; }
-
-    body.high-contrast { background-color: #121212; color: #ffffff; }
-    body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #121212; color: #fff; border: 1px solid #333; }
-    body.high-contrast .sentence-container { background-color: #1e1e1e; border: 1px solid #444; }
-    body.high-contrast .trans-box { border-top-color: #444; }
-    body.high-contrast .instruction-box { background-color: #332b00; border-color: #665500; color: #ffeb3b; }
-    body.high-contrast .teacher-note { background: #1e1e1e !important; border: 1px solid #444 !important; color: #e5e7eb !important; }
-    body.high-contrast .hover-word { background-color: #333; color: #fff; border-bottom: 2px solid #555; }
-    body.high-contrast .hover-word[data-done="true"] { border: 2px solid #fff !important; color: #000 !important; font-weight: 600; }
-    body.high-contrast .s-group { border-color: #fff !important; }
-    body.high-contrast .g-label { background: #000 !important; color: #fff !important; border-color: #fff !important; }
-    body.high-contrast .punct { color: #fff; }
-    body.high-contrast textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
-    body.high-contrast #btn-practise[style*="background: white"] { background: #333 !important; color: #fff !important; }
-    body.high-contrast #btn-exam[style*="background: white"] { background: #333 !important; color: #fff !important; }
-    body.high-contrast .mode-toggle-bg { background: #1e1e1e !important; border: 1px solid #555; }
-    body.high-contrast #results-modal .results-content { background: #1e1e1e; color: #fff; border: 1px solid #555; }
-    body.high-contrast #results-modal .results-title { color: #fff; }
-    body.high-contrast #results-modal .results-textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
-    body.high-contrast .tooltip-text { background-color: #fff; color: #000; border: 1px solid #ccc; }
-    body.high-contrast .tooltip-text::after { border-color: #fff transparent transparent transparent; }
-    
-    @media (max-width: 768px) {
-        body { margin: 15px; } .exercise-wrapper { padding: 20px; line-height: 4.5; }
-        .hover-word { font-size: 1.1rem; padding: 6px 12px; } .g-label { top: -16px; font-size: 10px; padding: 2px 6px; }
-        .s-group { padding-top: 24px; margin: 20px 2px 0 2px; } .sentence-container { padding: 20px 10px 10px 10px; }
-        .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-radius: 8px; }
-        .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f3f4f6; }
-    }
-    @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal { display: none !important; } }
-`;
-
-const STUDENT_PAGE_JS = `
-let activeEl = null; let mode = ""; const menu = document.getElementById('menu-common'); const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
-let hideMenuTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1;
-const totalItems = document.querySelectorAll('.hover-word, .g-label').length;
-
-function updateStudentShortcuts() {
-    labelShortcuts = {}; let used = new Set(['x', 'k', 'j', 'z']); 
-    document.querySelectorAll('.menu-btn').forEach(btn => {
-        let f = btn.dataset.val; let assigned = false;
-        for (let i = 0; i < f.length; i++) {
-            let char = f[i].toLowerCase();
-            if (/[a-z]/.test(char) && !used.has(char)) { labelShortcuts[f] = char; used.add(char); assigned = true; break; }
-        }
-        if (!assigned) {
-            for (let code = 97; code <= 122; code++) {
-                let char = String.fromCharCode(code);
-                if (!used.has(char)) { labelShortcuts[f] = char; used.add(char); break; }
-            }
-        }
-        let shortcut = labelShortcuts[f]; let innerHTML = f;
-        if (shortcut) {
-            let idx = f.toLowerCase().indexOf(shortcut);
-            if (idx !== -1) { innerHTML = f.substring(0, idx) + '<u>' + f[idx] + '</u>' + f.substring(idx + 1); } 
-            else { innerHTML = '[<u>' + shortcut.toUpperCase() + '</u>] ' + f; }
-        }
-        btn.innerHTML = innerHTML;
-    });
-}
-updateStudentShortcuts();
-
-document.addEventListener('mouseover', (e) => { 
-    const el = e.target.closest('.hover-word, .g-label');
-    hoveredStudentEl = (el && el.dataset.done !== "true") ? el : null;
-});
-
-document.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    let targetEl = hoveredStudentEl;
-    if (!targetEl && document.activeElement && (document.activeElement.classList.contains('hover-word') || document.activeElement.classList.contains('g-label'))) { targetEl = document.activeElement; }
-    if (!targetEl || targetEl.dataset.done === "true") return;
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.key.length !== 1 || !/[a-zA-Z]/.test(e.key)) return;
-
-    let key = e.key.toLowerCase();
-    let matchedLabel = Object.keys(labelShortcuts).find(k => labelShortcuts[k] === key);
-
-    if (matchedLabel) {
-        e.preventDefault();
-        const btn = Array.from(document.querySelectorAll('.menu-btn')).find(b => b.dataset.val === matchedLabel);
-        if (btn) { activeEl = targetEl; mode = activeEl.classList.contains('hover-word') ? "word" : "group"; btn.click(); hoveredStudentEl = null; }
-    }
-});
-
-function switchStudentLang(newLang) {
-    if (newLang === currentLang) return;
-    currentLang = newLang; const t = studentTexts[newLang];
-    
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector('.lang-btn[onclick="switchStudentLang(\\'' + newLang + '\\')"]').classList.add('active');
-    
-    document.querySelector('.instruction-box').innerHTML = t.instr;
-    const tn = document.querySelector('.teacher-note span'); if(tn) tn.textContent = t.note;
-    
-    document.getElementById('btn-practise').textContent = t.practiseMode; document.getElementById('btn-exam').textContent = t.examMode;
-    document.querySelector('button[onclick="togglePatterns()"]').title = t.togglePat; document.querySelector('button[onclick="toggleContrast()"]').title = t.toggleCon;
-    
-    const fBtns = document.querySelectorAll('.footer-toolbar .btn');
-    fBtns[0].textContent = t.btnSaveProg; fBtns[1].textContent = t.btnClearProg; fBtns[2].textContent = t.print; fBtns[3].textContent = t.download;
-    
-    document.querySelector('.results-title').textContent = t.examResults; document.querySelector('.btn-copy').textContent = t.copyResults;
-    document.querySelector('#results-modal .btn:not(.btn-copy)').textContent = t.close; document.querySelectorAll('textarea:not(.results-textarea)').forEach(ta => ta.placeholder = t.transPlaceholder);
-    
-    if (document.title === studentTexts.en.docTitle || document.title === studentTexts.de.docTitle) {
-        document.title = t.docTitle; document.querySelector('h1').textContent = t.docTitle;
-    }
-    
-    const map = labelMap[newLang] || {}; const translateLabel = (l) => map[l] || l;
-    
-    document.querySelectorAll('.menu-btn').forEach(btn => {
-        const newVal = translateLabel(btn.dataset.val); btn.dataset.val = newVal; btn.textContent = newVal;
-    });
-    
-    document.querySelectorAll('.hover-word, .s-group').forEach(el => {
-        if(el.dataset.ans) el.dataset.ans = translateLabel(el.dataset.ans);
-        let isDone = false;
-        if (el.classList.contains('hover-word')) { isDone = el.dataset.done === "true"; } 
-        else { const gLabel = el.querySelector('.g-label'); if (gLabel) isDone = gLabel.dataset.done === "true"; }
-        
-        if(isDone) {
-            const ans = el.dataset.ans;
-            if(el.classList.contains('hover-word')) {
-                const s = el.querySelector('.ans-label');
-                if(s) {
-                    s.textContent = ans;
-                    if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
-                }
-            } else {
-                const tSpan = el.querySelector('.g-text'); const gLabel = el.querySelector('.g-label');
-                if(tSpan && gLabel) {
-                    tSpan.textContent = ans;
-                    if (gLabel.offsetWidth > el.offsetWidth) { tSpan.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; gLabel.title = ans; }
-                }
-            }
-        }
-    });
-    updateStudentShortcuts(); 
-}
-
-function setStudentZoom(delta) {
-    if (delta === 0) { sZoom = 1; } else { sZoom = Math.max(0.5, Math.min(2.5, sZoom + delta)); }
-    const area = document.getElementById('exercise');
-    if ('zoom' in area.style) { area.style.zoom = sZoom; } 
-    else { area.style.transform = 'scale(' + sZoom + ')'; area.style.transformOrigin = "top left"; area.style.width = (100 / sZoom) + '%'; }
-}
-
-function setMode(m) {
-    if (answeredItems > 0) {
-        const t = studentTexts[currentLang];
-        if(!confirm(t.resetWarn)) return;
-        localStorage.removeItem(saveKey); location.reload();
-    }
-    exMode = m; const bp = document.getElementById('btn-practise'); const be = document.getElementById('btn-exam');
-    bp.style.background = m === 'practise' ? 'white' : 'transparent'; bp.style.boxShadow = m === 'practise' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; bp.style.color = m === 'practise' ? '#111827' : '#475569';
-    be.style.background = m === 'exam' ? 'white' : 'transparent'; be.style.boxShadow = m === 'exam' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; be.style.color = m === 'exam' ? '#111827' : '#475569';
-}
-
-menu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
-menu.addEventListener('mouseleave', () => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); });
-
-document.querySelectorAll('.hover-word, .g-label').forEach(el => {
-    el.onclick = (e) => {
-        e.stopPropagation();
-        if(el.dataset.done) return;
-        activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
-        if(window.innerWidth > 768) { 
-            const rect = el.getBoundingClientRect();
-            menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
-        }
-        menu.style.display="block"; menuBtns[0].focus();
-    };
-    el.onmouseenter = (e) => {
-        clearTimeout(hideMenuTimeout);
-        if(el.dataset.done === "true") return;
-        activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
-        if(window.innerWidth > 768) { 
-            const rect = el.getBoundingClientRect();
-            menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
-        }
-        menu.style.display="block";
-    };
-    el.onmouseleave = (e) => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); };
-    el.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } };
-});
-
-menuBtns.forEach((btn, index) => {
-    btn.onclick = (e) => {
-        const sel = btn.dataset.val; const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans; const t = studentTexts[currentLang];
-        
-        if (exMode === 'practise') {
-            if(sel === correct) {
-                solve(activeEl, correct, mode); showToast(t.correct, false); answeredItems++;
-            } else { 
-                let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1; activeEl.dataset.mistakes = mistakes;
-                if(mistakes >= 2) { showToast(t.incorrect + correct, true); solve(activeEl, correct, mode); answeredItems++; } 
-                else { showToast(t.tryAgain, true); }
-            }
-        } else {
-            if(sel === correct) { solve(activeEl, correct, mode); showToast(t.correct, false); examScore++; } 
-            else {
-                showToast(t.incorrect + correct, true); solve(activeEl, correct, mode);
-                if(mode === "word") { activeEl.style.border = "2px solid #ef4444"; } 
-                else { activeEl.parentElement.style.borderColor = "#ef4444"; }
-            }
-            answeredItems++;
-        }
-        
-        menu.style.display = "none"; check();
-        if (activeEl && !activeEl.dataset.done) { activeEl.focus(); } 
-        else if (activeEl && activeEl.dataset.done) {
-            const allItems = Array.from(document.querySelectorAll('.hover-word, .g-label')); const currentIndex = allItems.indexOf(activeEl); let nextEl = null;
-            for(let i = currentIndex + 1; i < allItems.length; i++) { if(allItems[i].dataset.done !== "true") { nextEl = allItems[i]; break; } }
-            if(nextEl) nextEl.focus();
-        }
-    };
-    
-    btn.onkeydown = (e) => {
-        if (e.key === 'ArrowDown') { e.preventDefault(); menuBtns[(index + 1) % menuBtns.length].focus(); } 
-        else if (e.key === 'ArrowUp') { e.preventDefault(); menuBtns[(index - 1 + menuBtns.length) % menuBtns.length].focus(); } 
-        else if (e.key === 'Escape') { e.preventDefault(); menu.style.display = "none"; if (activeEl) activeEl.focus(); }
-    };
-});
-
-function showToast(msg, isError) {
-    const x = document.getElementById("toast-container"); x.textContent = msg; x.className = isError ? "show error" : "show success";
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-}
-function togglePatterns() { document.body.classList.toggle('pattern-mode'); }
-function toggleContrast() { document.body.classList.toggle('high-contrast'); }
-
-function solve(el, ans, m) {
-    if(m === "word") {
-        const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
-        el.style.backgroundColor = colors[ans]; el.dataset.done = "true"; el.removeAttribute('tabindex');
-        if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
-    } else { 
-        const tSpan = el.querySelector('.g-text'); if (tSpan) tSpan.textContent = ans; else el.textContent = ans; 
-        el.dataset.done = "true"; el.style.background = "#f0fdf4"; el.removeAttribute('tabindex');
-        if (el.offsetWidth > el.parentElement.offsetWidth) {
-            if (tSpan) tSpan.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.';
-            else el.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.';
-            el.title = ans; 
-        }
-    }
-}
-
-function check() { 
-    document.querySelectorAll('.sentence-container').forEach((s, i) => { 
-        const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')];
-        if(items.length > 0 && items.every(item => item.dataset.done === "true")) {
-            const b = document.getElementById('t-container-' + i); if(b) b.style.display = 'block';
-        }
-    }); 
-    
-    if (answeredItems === totalItems && totalItems > 0 && exMode === 'exam') {
-        const t = studentTexts[currentLang];
-        setTimeout(() => {
-            const pct = Math.round((examScore / totalItems) * 100);
-            document.getElementById('final-score-display').textContent = examScore + " / " + totalItems + " (" + pct + "%)";
-            document.getElementById('results-text').value = t.resExercise + (titleInput || t.docTitle).replace(/["'\`]/g, "") + "\\n" + t.resDate + new Date().toLocaleDateString() + "\\n" + t.resScore + examScore + " / " + totalItems + " (" + pct + "%)";
-            document.getElementById('results-modal').style.display = 'flex';
-        }, 500);
-    }
-}
-
-function saveStudentProgress() {
-    const t = studentTexts[currentLang];
-    if(!confirm(t.saveWarning)) return;
-
-    const items = Array.from(document.querySelectorAll('.hover-word, .g-label'));
-    const state = items.map(el => ({ done: el.dataset.done === "true", ans: el.dataset.ans, mistakes: el.dataset.mistakes || 0 }));
-    const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)')).map(ta => ta.value);
-    const data = { items: state, textareas: textareas, exMode: exMode, examScore: examScore, answeredItems: answeredItems };
-    localStorage.setItem(saveKey, JSON.stringify(data)); showToast(t.progSaved || "Progress saved!", false);
-}
-
-function loadStudentProgress() {
-    const saved = localStorage.getItem(saveKey); if (!saved) return;
-    try {
-        const data = JSON.parse(saved); const items = Array.from(document.querySelectorAll('.hover-word, .g-label')); const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)'));
-        if (data.items && data.items.length !== items.length) { console.warn("Saved progress length does not match. Ignoring."); return; }
-        exMode = data.exMode || 'practise'; setMode(exMode); examScore = data.examScore || 0; answeredItems = data.answeredItems || 0;
-        data.items.forEach((state, i) => {
-            if (items[i] && state.done) {
-                items[i].dataset.ans = state.ans; items[i].dataset.mistakes = state.mistakes; solve(items[i], state.ans, items[i].classList.contains('hover-word') ? 'word' : 'group');
-            } else if (items[i]) { items[i].dataset.mistakes = state.mistakes; }
-        });
-        data.textareas.forEach((val, i) => { if (textareas[i]) textareas[i].value = val; }); check(); 
-    } catch (e) { console.error("Failed to load progress", e); }
-}
-
-function clearStudentProgress() {
-    const msg = currentLang === 'de' ? 'Fortschritt wirklich löschen?' : 'Really clear progress?';
-    if(confirm(msg)) { localStorage.removeItem(saveKey); location.reload(); }
-}
-document.addEventListener('DOMContentLoaded', loadStudentProgress);
-
-function copyResults() {
-    const t = studentTexts[currentLang]; const copyText = document.getElementById("results-text");
-    copyText.select(); copyText.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(copyText.value).then(() => { showToast(t.copied, false); });
-}
-
-function closeResults() { document.getElementById('results-modal').style.display = 'none'; }
-function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
-document.addEventListener('mousedown', (e) => { 
-    if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; 
-    if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
-});
-`;
-
 function exportToStudent() {
+    // Dynamic fetching of the templates from cache directly upon export
+    const STUDENT_PAGE_CSS = DOM.templateStudentCss.textContent;
+    const STUDENT_PAGE_JS = DOM.templateStudentJs.textContent;
+
     let tempTokens = JSON.parse(JSON.stringify(AppState.words));
 
     tempTokens.forEach((token, index) => {
@@ -2018,13 +2459,24 @@ function exportToStudent() {
         const canMerge = current && current.f === token.f && isMergeableType && !splitExists && sameGroups && !hasBreak;
         
         if (canMerge) {
-            current.w += (['.', ',', ';', ':', '!', '?'].includes(token.w) ? '' : ' ') + token.w; 
+            current.segments.push({
+                w: token.w,
+                u: token.u,
+                space: (['.', ',', ';', ':', '!', '?'].includes(token.w) ? '' : ' ')
+            });
             current.originalIndices.push(token.idx);
             if(token.h) current.hint = current.hint ? current.hint + " | " + token.h : token.h;
             current.b = token.b; 
         } else {
             if (current) merged.push(current);
-            current = { w: token.w, f: token.f, originalIndices: [token.idx], activeGroups: token.activeGroups, hint: token.h, b: token.b };
+            current = { 
+                f: token.f, 
+                originalIndices: [token.idx], 
+                activeGroups: token.activeGroups, 
+                hint: token.h, 
+                b: token.b,
+                segments: [{ w: token.w, u: token.u, space: '' }]
+            };
         }
     });
     if (current) merged.push(current);
@@ -2039,16 +2491,16 @@ function exportToStudent() {
     });
 
     const defaultTitle = AppState.lang === 'en' ? 'Interactive Syntax Explorer' : 'Interaktives Syntax-Training';
-    const titleInput = document.getElementById('pagetitle').value || defaultTitle;
+    const titleInput = DOM.pageTitle.value || defaultTitle;
     const filename = titleInput.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".html";
-    const imgUrl = document.getElementById('pageimage').value; const teacherNotes = document.getElementById('teachernotes').value;
+    const imgUrl = DOM.pageImage.value; const teacherNotes = DOM.teacherNotes.value;
     const exerciseId = Date.now().toString(36); 
     
-    const blob = new Blob([generateStudentHTML(merged, updatedGroups, titleInput, AppState.functions, imgUrl, teacherNotes, AppState.lang, CONFIG.ABBREVIATIONS, CONFIG.PRESETS, exerciseId)], {type: 'text/html'});
+    const blob = new Blob([generateStudentHTML(merged, updatedGroups, titleInput, AppState.functions, imgUrl, teacherNotes, AppState.lang, CONFIG.ABBREVIATIONS, CONFIG.PRESETS, exerciseId, STUDENT_PAGE_CSS, STUDENT_PAGE_JS)], {type: 'text/html'});
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
 }
 
-function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lang, allAbbrevs, allPresets, exerciseId) {
+function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lang, allAbbrevs, allPresets, exerciseId, STUDENT_PAGE_CSS, STUDENT_PAGE_JS) {
     const filteredLabels = allLabels.filter(l => l !== CONFIG.MAIN_CLAUSE_EN && l !== CONFIG.MAIN_CLAUSE_DE);
     const labelMap = { en: {}, de: {} };
     allPresets.en.advanced.forEach((enLabel, idx) => {
@@ -2059,7 +2511,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     
     const studentTexts = {
         en: {
-            instr: "This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words—or navigate to them using the Tab and Enter keys—to select their syntactical function. You can also hover over a word and press the underlined letter on your keyboard to instantly select a function. If you see a light bulb icon (💡), click on it for a helpful hint!<br><br>Once you have correctly analyzed every word group in a sentence, a textbox will appear into which you can write your translation.",
+            instr: "This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words to select their syntactical function. <br><br><strong>Important:</strong> You must also locate hidden Genitive Attributes! Click directly on a genitive word inside a phrase box and use the <strong>🖍️ Mark Genitive</strong> tool to reveal it. Once you have correctly analyzed every phrase and found all genitives, a textbox will appear into which you can write your translation.",
             note: "Note:", togglePat: "Toggle Patterns", toggleCon: "High Contrast", print: "Print Analysis",
             download: "Download HTML", btnSaveProg: "💾 Save Progress", btnClearProg: "🗑️ Clear Progress",
             progSaved: "Progress saved!", progCleared: "Progress cleared!", correct: "Correct!",
@@ -2069,10 +2521,11 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             resetWarn: "Changing the mode will reload the page and reset your progress. Continue?",
             examResults: "Exam Results", copyResults: "Copy to Clipboard", copied: "Copied!", close: "Close",
             saveWarning: "⚠️ Note: Your progress is saved locally in this web browser. You must open this file on this exact same device and browser to resume your work later. Clearing your browser data will delete your progress. Do you want to save now?",
-            resExercise: "Exercise: ", resDate: "Date: ", resScore: "Score: "
+            resExercise: "Exercise: ", resDate: "Date: ", resScore: "Score: ",
+            markGen: "🖍️ Mark Genitive (G)", unmarkGen: "❌ Unmark Genitive (G)", notGenitive: "Not a genitive attribute!"
         },
         de: {
-            instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen. Du kannst auch mit der Maus über ein Wort oder eine Gruppe fahren und den unterstrichenen Buchstaben auf deiner Tastatur drücken, um eine Funktion schnell auszuwählen. Wenn du ein Glühbirnen-Symbol (💡) siehst, klicke darauf, um einen hilfreichen Tipp zu erhalten!<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.",
+            instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen. <br><br><strong>Wichtig:</strong> Du musst auch versteckte Genitivattribute aufspüren! Klicke dazu direkt auf das Genitivattribut innerhalb eines Wortblocks und nutze das <strong>🖍️ Genitiv markieren</strong> Werkzeug, um es hervorzuheben. Sobald du jede Wortgruppe korrekt analysiert und alle Genitive gefunden hast, erscheint ein Textfeld für deine Übersetzung.",
             note: "Hinweis:", togglePat: "Muster umschalten", toggleCon: "Hoher Kontrast", print: "Drucken",
             download: "HTML herunterladen", btnSaveProg: "💾 Fortschritt speichern", btnClearProg: "🗑️ Fortschritt löschen",
             progSaved: "Fortschritt gespeichert!", progCleared: "Fortschritt gelöscht!", correct: "Richtig!",
@@ -2082,12 +2535,13 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             resetWarn: "Ein Moduswechsel lädt die Seite neu und setzt deinen Fortschritt zurück. Fortfahren?",
             examResults: "Prüfungsergebnisse", copyResults: "Ergebnisse kopieren", copied: "Kopiert!", close: "Schließen",
             saveWarning: "⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?",
-            resExercise: "Übung: ", resDate: "Datum: ", resScore: "Ergebnis: "
+            resExercise: "Übung: ", resDate: "Datum: ", resScore: "Ergebnis: ",
+            markGen: "🖍️ Genitiv markieren (G)", unmarkGen: "❌ Markierung aufheben (G)", notGenitive: "Kein Genitivattribut!"
         }
     };
 
     const t = studentTexts[lang]; const pageTitle = title ? title : t.docTitle;
-    const bodyContent = generateExerciseHTML(words, groups, t.transPlaceholder);
+    const bodyContent = generateExerciseHTML(words, groups, t.transPlaceholder, lang);
     
     const safeTitle = escapeHTML(pageTitle);
     const safeNotes = notes ? escapeHTML(notes).replace(/\n/g, '<br>') : '';
@@ -2131,6 +2585,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             <button class="btn" onclick="downloadPage()">${t.download}</button>
         </div>
         <div id="menu-common" class="radio-menu">
+            <button type="button" class="menu-btn gen-btn" data-action="toggle-gen">🖍️ Mark Genitive (G)</button>
             ${filteredLabels.map(l => `<button type="button" class="menu-btn" data-val="${escapeHTML(l)}">${escapeHTML(l)}</button>`).join('')}
         </div>
         <div id="results-modal">
@@ -2154,53 +2609,106 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     </body></html>`;
 }
 
-function generateExerciseHTML(words, groups, placeholder) {
-    let sIdx = 0, html = '<div class="sentence-container">';
-    const sentenceEnders = ['.', '!', '?', '·']; let pendingClosers = ""; let containerOpen = true;
+function generateExerciseHTML(words, groups, placeholder, lang) {
+    let sIdx = 0;
+    let containerOpen = true;
+    const sentenceEnders = ['.', '!', '?', '·'];
+    let pendingClosers = "";
+    
+    // We use an array to collect our HTML chunks, which is faster and cleaner
+    // than constantly concatenating a massive string.
+    let htmlParts = ['<div class="sentence-container">'];
 
     words.forEach((word, idx) => {
-        const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(word.w); let isFakeWord = !hasLetters; 
-        let isPunct = word.f === CONFIG.PUNCT || isFakeWord;
-        let nextWord = words[idx + 1]; let nextIsPunct = nextWord && (!/[a-zA-Z\u00C0-\u017F]/.test(nextWord.w) || nextWord.f === CONFIG.PUNCT);
+        const isPunct = word.f === CONFIG.PUNCT;
+        const nextWord = words[idx + 1];
+        const nextIsPunct = nextWord && (!/[a-zA-Z\u00C0-\u017F]/.test(nextWord.segments ? nextWord.segments[0].w : "") || nextWord.f === CONFIG.PUNCT);
         
-        let safeWordHint = parseSimpleMarkdown(word.hint);
-        let hintHtml = word.hint ? `<span class="hint-icon" title="Hint" onclick="event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');">💡<span class="tooltip-text">${safeWordHint}</span></span>` : '';
+        const safeWordHint = parseSimpleMarkdown(word.hint);
         
-        let safeWord = escapeHTML(word.w);
-        let safeFunc = escapeHTML(word.f);
-        let content = isPunct ? `<span class="punct">${safeWord}</span>` : `<span class="hover-word" tabindex="0" data-ans="${safeFunc}">${safeWord}${hintHtml}</span>`;
-        let openDivs = "", closeDivs = "";
+        // Template literals allow multi-line strings and easy variable injection
+        const hintHtml = word.hint 
+            ? `<span class="hint-icon" title="Hint" onclick="event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');">
+                 💡<span class="tooltip-text">${safeWordHint}</span>
+               </span>` 
+            : '';
+
+        // Using .map() and .join('') for the segments instead of manual loops
+        const safeWordHtml = word.segments 
+            ? word.segments.map(seg => `${seg.space ? ' ' : ''}<span class="s-text" data-u="${seg.u ? 'true' : 'false'}">${escapeHTML(seg.w)}</span>`).join('')
+            : `<span class="s-text" data-u="false">${escapeHTML(word.w || "")}</span>`;
+
+        const safeFunc = escapeHTML(word.f);
+        const content = isPunct 
+            ? `<span class="punct">${safeWordHtml}</span>` 
+            : `<span class="hover-word" tabindex="0" data-ans="${safeFunc}">${safeWordHtml}${hintHtml}</span>`;
+
+        let openDivs = "";
+        let closeDivs = "";
 
         groups.forEach(g => {
-            let safeGroupHint = parseSimpleMarkdown(g.hint);
-            let gHintHtml = g.hint ? `<span class="hint-icon" title="Hint" onclick="event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');">💡<span class="tooltip-text">${safeGroupHint}</span></span>` : '';
-            let safeLabel = escapeHTML(g.label);
-            if(idx === g.start) openDivs += `<div class="s-group" data-ans="${safeLabel}"><span class="g-label" tabindex="0"><span class="g-text">?</span>${gHintHtml}</span>`;
-            if(idx === g.end) closeDivs += `</div>`;
+            const safeGroupHint = parseSimpleMarkdown(g.hint);
+            const gHintHtml = g.hint 
+                ? `<span class="hint-icon" title="Hint">💡<span class="tooltip-text">${safeGroupHint}</span></span>` 
+                : '';
+            const safeLabel = escapeHTML(g.label);
+            
+            if (idx === g.start) {
+                openDivs += `<div class="s-group" data-ans="${safeLabel}"><span class="g-label" tabindex="0"><span class="g-text">?</span>${gHintHtml}</span>`;
+            }
+            if (idx === g.end) {
+                closeDivs += `</div>`;
+            }
         });
-        let spacing = nextIsPunct ? "" : " ";
 
+        const spacing = nextIsPunct ? "" : " ";
+
+        // Push the assembled pieces into our array
         if (isPunct) {
-            html += openDivs + content + pendingClosers + closeDivs + spacing; pendingClosers = ""; 
+            htmlParts.push(`${openDivs}${content}${pendingClosers}${closeDivs}${spacing}`);
+            pendingClosers = ""; 
         } else {
-            html += openDivs + content;
-            if (closeDivs && nextIsPunct) pendingClosers = closeDivs; else html += closeDivs;
-            html += spacing;
+            htmlParts.push(`${openDivs}${content}`);
+            if (closeDivs && nextIsPunct) {
+                pendingClosers = closeDivs;
+            } else {
+                htmlParts.push(closeDivs);
+            }
+            htmlParts.push(spacing);
         }
 
-        const defaultBreak = isPunct && sentenceEnders.some(end => word.w.includes(end));
-        let shouldBreak = defaultBreak;
-        if (word.b === 1) shouldBreak = true; if (word.b === -1) shouldBreak = false;
+        // Translation box logic
+        const defaultBreak = isPunct && word.segments && sentenceEnders.some(end => word.segments[0].w.includes(end));
+        const shouldBreak = word.b === 1 || (defaultBreak && word.b !== -1);
 
         if (shouldBreak) {
-            html += `<div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="${escapeHTML(placeholder)}"></textarea></div></div>`;
-            sIdx++; containerOpen = false;
-            if (idx < words.length - 1) { html += `<div class="sentence-container">`; containerOpen = true; }
+            htmlParts.push(`
+                <div id="t-container-${sIdx}" class="trans-box" style="display:none;">
+                    <textarea placeholder="${escapeHTML(placeholder)}"></textarea>
+                </div>
+            </div>`); // Closes the sentence-container
+            
+            sIdx++;
+            containerOpen = false;
+            
+            if (idx < words.length - 1) {
+                htmlParts.push(`<div class="sentence-container">`);
+                containerOpen = true;
+            }
         }
     });
     
-    if (containerOpen) html += `<div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="${escapeHTML(placeholder)}"></textarea></div></div>`;
-    return html;
+    // Close up the final container if it was left open
+    if (containerOpen) {
+        htmlParts.push(`
+            <div id="t-container-${sIdx}" class="trans-box" style="display:none;">
+                <textarea placeholder="${escapeHTML(placeholder)}"></textarea>
+            </div>
+        </div>`);
+    }
+
+    // Finally, glue the array together into one solid HTML string
+    return htmlParts.join('');
 }
 </script>
 </body>
