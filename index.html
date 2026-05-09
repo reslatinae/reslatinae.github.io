@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title id="page-title">Latin Syntax Studio</title>
+    <title id="page-title" data-ref="pageTitleTag">Latin Syntax Studio</title>
     <style>
         :root { 
             --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -151,103 +151,103 @@
 </head>
 <body>
 
-    <h1 id="app-heading">Latin Syntax Studio</h1>
+    <h1 id="app-heading" data-ref="appHeading">Latin Syntax Studio</h1>
 
-    <div id="setup-screen" class="container">
+    <div id="setup-screen" class="container" data-ref="setupScreen">
         <div class="lang-switch">
             <button class="lang-btn" id="btn-setup-lang-en" data-lang="en">EN</button>
             <button class="lang-btn active" id="btn-setup-lang-de" data-lang="de">DE</button>
         </div>
 
         <div class="instruction-box">        
-            <h3 id="instr-h3">Step 1: Setup Instruction</h3>
-            <div id="instr-body"></div>
+            <h3 id="instr-h3" data-ref="instrH3">Step 1: Setup Instruction</h3>
+            <div id="instr-body" data-ref="instrBody"></div>
             <div style="margin-top:16px; font-style:italic;">
-                <span id="example-link-text">Want to see what the final result looks like?</span> <a href="example_page_de.html" target="_blank" id="link-example">View Example</a>
+                <span id="example-link-text" data-ref="exampleLinkText">Want to see what the final result looks like?</span> <a href="example_page_de.html" target="_blank" id="link-example" data-ref="linkExample">View Example</a>
             </div>
         </div>
         
         <div class="setup-row">
-            <input type="text" id="pagetitle" class="setup-input" placeholder="Exercise Title" style="flex: 2;"/>
-            <input type="text" id="pageimage" class="setup-input" placeholder="Optional: Image URL" style="flex: 1;"/>
+            <input type="text" id="pagetitle" class="setup-input" data-ref="pageTitle" placeholder="Exercise Title" style="flex: 2;"/>
+            <input type="text" id="pageimage" class="setup-input" data-ref="pageImage" placeholder="Optional: Image URL" style="flex: 1;"/>
         </div>
-        <textarea id="teachernotes" rows="3" style="width:100%; box-sizing:border-box; margin-bottom:20px;" placeholder="Optional: Context / Teacher Notes"></textarea>
-        <textarea id="entertext" rows="6" style="width:100%; box-sizing: border-box;" placeholder="Paste Latin text here..."></textarea>
+        <textarea id="teachernotes" data-ref="teacherNotes" rows="3" style="width:100%; box-sizing:border-box; margin-bottom:20px;" placeholder="Optional: Context / Teacher Notes"></textarea>
+        <textarea id="entertext" data-ref="enterText" rows="6" style="width:100%; box-sizing: border-box;" placeholder="Paste Latin text here..."></textarea>
         
         <div style="background:#f8fafc; padding:24px; border-radius:8px; margin:24px 0; border:1px solid #e2e8f0;">
             <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
-                <label id="lbl-level" style="font-weight: 600; color: #0f172a;">Grammar Level:</label>
-                <select id="grammar-level-setup" class="setup-input" style="width: auto; padding: 8px 12px; background-color: #fff;">
-                    <option value="beginner" id="opt-beg">Beginner</option>
-                    <option value="intermediate" id="opt-int">Intermediate</option>
-                    <option value="advanced" id="opt-adv" selected>Advanced (All)</option>
+                <label id="lbl-level" data-ref="lblLevel" style="font-weight: 600; color: #0f172a;">Grammar Level:</label>
+                <select id="grammar-level-setup" class="setup-input" data-ref="grammarLevelSetup" style="width: auto; padding: 8px 12px; background-color: #fff;">
+                    <option value="beginner" id="opt-beg" data-ref="optBeg">Beginner</option>
+                    <option value="intermediate" id="opt-int" data-ref="optInt">Intermediate</option>
+                    <option value="advanced" id="opt-adv" data-ref="optAdv" selected>Advanced (All)</option>
                 </select>
             </div>
 
-            <button class="btn-action" style="background:var(--primary-color);" id="btn-copy-ai">1. Copy AI Prompt</button>
-            <textarea id="ai-json" rows="2" style="width:100%; margin: 16px 0; padding:12px; border:1px solid #d1d5db; border-radius:6px; box-sizing: border-box;" placeholder="Paste JSON here..."></textarea>
-            <button class="btn-action" style="background:#10b981;" id="btn-import">2. Import</button>
-            <span style="margin: 0 16px; font-weight:600; color:#64748b; font-size: 0.9rem;" id="or-text">OR</span>
+            <button class="btn-action" style="background:var(--primary-color);" id="btn-copy-ai" data-ref="btnCopyAi">1. Copy AI Prompt</button>
+            <textarea id="ai-json" data-ref="aiJson" rows="2" style="width:100%; margin: 16px 0; padding:12px; border:1px solid #d1d5db; border-radius:6px; box-sizing: border-box;" placeholder="Paste JSON here..."></textarea>
+            <button class="btn-action" style="background:#10b981;" id="btn-import" data-ref="btnImport">2. Import</button>
+            <span style="margin: 0 16px; font-weight:600; color:#64748b; font-size: 0.9rem;" id="or-text" data-ref="orText">OR</span>
             <label class="btn-action" style="background:#64748b; cursor: pointer; display:inline-block;">
-                <span id="btn-load">Load Saved Project</span> <input type="file" style="display:none" accept=".json" id="file-load-setup">
+                <span id="btn-load" data-ref="btnLoad">Load Saved Project</span> <input type="file" style="display:none" accept=".json" id="file-load-setup" data-ref="fileLoadSetup">
             </label>
         </div>
-        <button class="btn-action" style="background:#1f2937; width:100%;" id="btn-manual">Start Manual Creation</button>
+        <button class="btn-action" style="background:#1f2937; width:100%;" id="btn-manual" data-ref="btnManual">Start Manual Creation</button>
 
-        <div class="credits-link"><a id="btn-show-credits">Credits</a></div>
+        <div class="credits-link"><a id="btn-show-credits" data-ref="btnShowCredits">Credits</a></div>
     </div>
 
-    <div id="credits-screen" class="container" style="display:none; text-align:center; padding: 50px;">
+    <div id="credits-screen" class="container" data-ref="creditsScreen" style="display:none; text-align:center; padding: 50px;">
         <h2 style="margin-top:0; color: #111827;">Credentials</h2>
         <p style="font-size:1.1rem; line-height: 1.6; color: #4b5563; margin: 30px 0;">This tool was created by Anke Walter. I gratefully acknowledge the help of J. L., ChatGPT und Gemini.</p>
-        <button class="btn-action" style="background:#64748b;" id="btn-hide-credits">Back</button>
+        <button class="btn-action" style="background:#64748b;" id="btn-hide-credits" data-ref="btnHideCredits">Back</button>
     </div>
 
-    <div id="editor-screen" style="display:none;">
+    <div id="editor-screen" data-ref="editorScreen" style="display:none;">
     <div style="margin-bottom: 20px; background: white; padding: 16px; border: 1px solid var(--border-color); border-radius: 6px; box-shadow: var(--shadow);">
-            <label id="lbl-editor-title" style="font-weight: 600; font-size: 0.9rem; color: #4b5563; display: block; margin-bottom: 8px;">Exercise Title:</label>
-            <input type="text" id="editor-pagetitle" class="setup-input" style="width: 100%; box-sizing: border-box; font-size: 1.1rem; font-weight: bold;" placeholder="Exercise Title" />
+            <label id="lbl-editor-title" data-ref="lblEditorTitle" style="font-weight: 600; font-size: 0.9rem; color: #4b5563; display: block; margin-bottom: 8px;">Exercise Title:</label>
+            <input type="text" id="editor-pagetitle" class="setup-input" data-ref="editorPageTitle" style="width: 100%; box-sizing: border-box; font-size: 1.1rem; font-weight: bold;" placeholder="Exercise Title" />
         </div>
         <div class="instruction-box">
-            <h3 id="edit-h3">Step 2: Editing Instruction</h3>
-            <div style="margin-bottom:0;" id="edit-body"></div>
+            <h3 id="edit-h3" data-ref="editH3">Step 2: Editing Instruction</h3>
+            <div style="margin-bottom:0;" id="edit-body" data-ref="editBody"></div>
         </div>
 
         <div class="palette">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 12px; margin-bottom:16px;">
-                 <div id="mode-status" style="font-weight:600; color:var(--primary-color); font-size:1rem;">Mode: Tagging</div>
+                 <div id="mode-status" data-ref="modeStatus" style="font-weight:600; color:var(--primary-color); font-size:1rem;">Mode: Tagging</div>
                  <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                     <div class="lang-switch-inline" style="margin-right: 8px;">
                         <button class="lang-btn" id="btn-editor-lang-en" data-lang="en">EN</button>
                         <button class="lang-btn active" id="btn-editor-lang-de" data-lang="de">DE</button>
                     </div>
-                    <select id="grammar-level-editor" class="setup-input" style="padding: 6px 10px; font-size: 0.85rem; height: 35px;">
-                        <option value="beginner" id="opt-beg-ed">Beginner</option>
-                        <option value="intermediate" id="opt-int-ed">Intermediate</option>
-                        <option value="advanced" id="opt-adv-ed" selected>Advanced (All)</option>
+                    <select id="grammar-level-editor" class="setup-input" data-ref="grammarLevelEditor" style="padding: 6px 10px; font-size: 0.85rem; height: 35px;">
+                        <option value="beginner" id="opt-beg-ed" data-ref="optBegEd">Beginner</option>
+                        <option value="intermediate" id="opt-int-ed" data-ref="optIntEd">Intermediate</option>
+                        <option value="advanced" id="opt-adv-ed" data-ref="optAdvEd" selected>Advanced (All)</option>
                     </select>
                     <div class="custom-label-row" style="margin:0; padding:0; border:none;">
-                        <input type="text" id="new-label-input" class="custom-input" placeholder="New Label" style="width:120px; height: 35px; box-sizing: border-box;">
-                        <button class="add-btn" id="btn-add-label" style="height: 35px; display: flex; align-items: center; justify-content: center;">+</button>
+                        <input type="text" id="new-label-input" class="custom-input" data-ref="newLabelInput" placeholder="New Label" style="width:120px; height: 35px; box-sizing: border-box;">
+                        <button class="add-btn" id="btn-add-label" data-ref="btnAddLabel" style="height: 35px; display: flex; align-items: center; justify-content: center;">+</button>
                     </div>
                 </div>
             </div>
 
-            <div class="palette-grid" id="label-palette"></div>
+            <div class="palette-grid" id="label-palette" data-ref="labelPalette"></div>
             
             <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
-                <button class="btn-action" id="undo-btn" style="background:#f59e0b; flex:0.5;">↶ Undo (Ctrl+Z)</button>
-                <button class="btn-action" id="split-mode-btn" style="background:#ef4444; flex:1;">Manual Split (X)</button>
-                <button class="btn-action" id="linebreak-mode-btn" style="background:#0ea5e9; flex:1;">Toggle Break (J)</button>
-                <button class="btn-action" id="group-mode-btn" style="background:#8b5cf6; flex:1;">Draw Bracket (K)</button>
-                <button class="btn-action" id="attr-mode-btn" style="background:#ec4899; flex:1;">Mark Genitive (G)</button>
-                <button class="btn-action" id="btn-export" style="background:#111827; flex:1;">Export Student Page</button>
+                <button class="btn-action" id="undo-btn" data-ref="undoBtn" style="background:#f59e0b; flex:0.5;">↶ Undo (Ctrl+Z)</button>
+                <button class="btn-action" id="split-mode-btn" data-ref="splitModeBtn" style="background:#ef4444; flex:1;">Manual Split (X)</button>
+                <button class="btn-action" id="linebreak-mode-btn" data-ref="linebreakModeBtn" style="background:#0ea5e9; flex:1;">Toggle Break (J)</button>
+                <button class="btn-action" id="group-mode-btn" data-ref="groupModeBtn" style="background:#8b5cf6; flex:1;">Draw Bracket (K)</button>
+                <button class="btn-action" id="attr-mode-btn" data-ref="attrModeBtn" style="background:#ec4899; flex:1;">Mark Genitive (G)</button>
+                <button class="btn-action" id="btn-export" data-ref="btnExport" style="background:#111827; flex:1;">Export Student Page</button>
             </div>
 
             <div class="project-mini-row">
-                <button class="subtle-btn" id="btn-save-work">💾 Save Work</button>
+                <button class="subtle-btn" id="btn-save-work" data-ref="btnSaveWork">💾 Save Work</button>
                 <label class="subtle-btn">
-                    <span id="btn-load-work">📂 Load Work</span> <input type="file" accept=".json" style="display:none" id="file-load-editor">
+                    <span id="btn-load-work" data-ref="btnLoadWork">📂 Load Work</span> <input type="file" accept=".json" style="display:none" id="file-load-editor" data-ref="fileLoadEditor">
                 </label>
             </div>
         </div>
@@ -255,56 +255,56 @@
         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 8px;">
             <div style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Visual Editor</div>
             <div class="zoom-controls">
-                <button class="z-btn" id="btn-toggle-pattern" title="Toggle Patterns">🏁</button>
-                <button class="z-btn" id="btn-toggle-contrast" title="Toggle High Contrast">🌗</button>
+                <button class="z-btn" id="btn-toggle-pattern" data-ref="btnTogglePattern" title="Toggle Patterns">🏁</button>
+                <button class="z-btn" id="btn-toggle-contrast" data-ref="btnToggleContrast" title="Toggle High Contrast">🌗</button>
                 <span style="border-left: 1px solid #d1d5db; margin: 0 4px; height: 16px;"></span>
-                <button class="z-btn" id="btn-zoom-in" title="Zoom In">🔍 +</button>
-                <button class="z-btn" id="btn-zoom-out" title="Zoom Out">🔍 -</button>
-                <button class="z-btn" id="btn-zoom-reset" title="Reset Zoom">Reset</button>
+                <button class="z-btn" id="btn-zoom-in" data-ref="btnZoomIn" title="Zoom In">🔍 +</button>
+                <button class="z-btn" id="btn-zoom-out" data-ref="btnZoomOut" title="Zoom Out">🔍 -</button>
+                <button class="z-btn" id="btn-zoom-reset" data-ref="btnZoomReset" title="Reset Zoom">Reset</button>
             </div>
         </div>
 
         <div id="tagging-container-wrapper">
-            <div id="tagging-area"></div>
+            <div id="tagging-area" data-ref="taggingArea"></div>
         </div>
     </div>
 
-    <div id="group-modal" class="modal-overlay">
+    <div id="group-modal" class="modal-overlay" data-ref="groupModal">
         <div class="modal-box">
-            <div class="modal-title" id="modal-title-text">Name this Syntactic Group:</div>
-            <label class="modal-label" id="lbl-group-name">Group Name:</label>
-            <input type="text" id="group-name-input" class="modal-input" list="label-suggestions" placeholder="Type to search...">
-            <datalist id="label-suggestions"></datalist>
-            <label class="modal-label" id="lbl-group-hint">Hint (optional):</label>
-            <input type="text" id="group-hint-input" class="modal-input" placeholder="E.g. Look out for the ablative...">
+            <div class="modal-title" id="modal-title-text" data-ref="modalTitleText">Name this Syntactic Group:</div>
+            <label class="modal-label" id="lbl-group-name" data-ref="lblGroupName">Group Name:</label>
+            <input type="text" id="group-name-input" class="modal-input" data-ref="groupNameInput" list="label-suggestions" placeholder="Type to search...">
+            <datalist id="label-suggestions" data-ref="labelSuggestions"></datalist>
+            <label class="modal-label" id="lbl-group-hint" data-ref="lblGroupHint">Hint (optional):</label>
+            <input type="text" id="group-hint-input" class="modal-input" data-ref="groupHintInput" placeholder="E.g. Look out for the ablative...">
             <div class="modal-actions">
-                <button class="btn-action" style="background:#64748b;" id="btn-cancel-group">Cancel</button>
-                <button class="btn-action" style="background:var(--primary-color);" id="btn-save-group">Save</button>
+                <button class="btn-action" style="background:#64748b;" id="btn-cancel-group" data-ref="btnCancelGroup">Cancel</button>
+                <button class="btn-action" style="background:var(--primary-color);" id="btn-save-group" data-ref="btnSaveGroup">Save</button>
             </div>
         </div>
     </div>
 
-    <div id="word-modal" class="modal-overlay">
+    <div id="word-modal" class="modal-overlay" data-ref="wordModal">
         <div class="modal-box">
-            <div class="modal-title" id="word-modal-title">Edit Word</div>
-            <label class="modal-label" id="lbl-word-text">Word Text:</label>
-            <input type="text" id="word-text-input" class="modal-input">
-            <label class="modal-label" id="lbl-word-hint">Hint (optional):</label>
-            <input type="text" id="word-hint-input" class="modal-input" placeholder="E.g. Derived from...">
+            <div class="modal-title" id="word-modal-title" data-ref="wordModalTitle">Edit Word</div>
+            <label class="modal-label" id="lbl-word-text" data-ref="lblWordText">Word Text:</label>
+            <input type="text" id="word-text-input" class="modal-input" data-ref="wordTextInput">
+            <label class="modal-label" id="lbl-word-hint" data-ref="lblWordHint">Hint (optional):</label>
+            <input type="text" id="word-hint-input" class="modal-input" data-ref="wordHintInput" placeholder="E.g. Derived from...">
             <div class="modal-actions">
-                <button class="btn-action" style="background:#ef4444; margin-right:auto;" id="btn-delete-word">Delete</button>
-                <button class="btn-action" style="background:#64748b;" id="btn-cancel-word">Cancel</button>
-                <button class="btn-action" style="background:var(--primary-color);" id="btn-save-word">Save</button>
+                <button class="btn-action" style="background:#ef4444; margin-right:auto;" id="btn-delete-word" data-ref="btnDeleteWord">Delete</button>
+                <button class="btn-action" style="background:#64748b;" id="btn-cancel-word" data-ref="btnCancelWord">Cancel</button>
+                <button class="btn-action" style="background:var(--primary-color);" id="btn-save-word" data-ref="btnSaveWord">Save</button>
             </div>
         </div>
     </div>
     
-    <div id="autosave-status">Autosaved</div>
+    <div id="autosave-status" data-ref="autosaveStatus">Autosaved</div>
 <!-- ========================================== -->
     <!-- STUDENT PAGE TEMPLATES -->
     <!-- ========================================== -->
     
-    <script type="text/template" id="template-student-css">
+    <script type="text/template" id="template-student-css" data-ref="templateStudentCss">
         :root { --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
         body, button, input, textarea, select { font-family: var(--main-font); }
         body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background-color: #f9fafb; color: #1f2937; line-height: 1.5; }
@@ -414,7 +414,7 @@
         @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal { display: none !important; } }
     </script>
 
-    <script type="text/template" id="template-student-js">
+    <script type="text/template" id="template-student-js" data-ref="templateStudentJs">
         let activeEl = null; let activeSubWord = null; let mode = ""; const menu = document.getElementById('menu-common'); const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
         let hideMenuTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1;
         const totalPhrases = document.querySelectorAll('.hover-word, .g-label').length;
@@ -1199,95 +1199,13 @@ const StorageManager = {
 const DOM = {};
 
 function cacheDOM() {
-    // Screens
-    DOM.setupScreen = document.getElementById('setup-screen');
-    DOM.editorScreen = document.getElementById('editor-screen');
-    DOM.creditsScreen = document.getElementById('credits-screen');
-
-    // Editor Areas
-    DOM.taggingArea = document.getElementById('tagging-area');
-    DOM.labelPalette = document.getElementById('label-palette');
-    DOM.modeStatus = document.getElementById('mode-status');
-    DOM.autosaveStatus = document.getElementById('autosave-status');
-
-    // Inputs & Setup
-    DOM.pageTitle = document.getElementById('pagetitle');
-    DOM.editorPageTitle = document.getElementById('editor-pagetitle');
-    DOM.pageImage = document.getElementById('pageimage');
-    DOM.enterText = document.getElementById('entertext');
-    DOM.teacherNotes = document.getElementById('teachernotes');
-    DOM.grammarLevelSetup = document.getElementById('grammar-level-setup');
-    DOM.grammarLevelEditor = document.getElementById('grammar-level-editor');
-    DOM.aiJson = document.getElementById('ai-json');
-    DOM.newLabelInput = document.getElementById('new-label-input');
-    DOM.fileLoadSetup = document.getElementById('file-load-setup');
-    DOM.fileLoadEditor = document.getElementById('file-load-editor');
-
-    // Modals
-    DOM.wordModal = document.getElementById('word-modal');
-    DOM.wordTextInput = document.getElementById('word-text-input');
-    DOM.wordHintInput = document.getElementById('word-hint-input');
-    DOM.groupModal = document.getElementById('group-modal');
-    DOM.groupNameInput = document.getElementById('group-name-input');
-    DOM.groupHintInput = document.getElementById('group-hint-input');
-    DOM.labelSuggestions = document.getElementById('label-suggestions');
-
-    // Action Buttons (Toolbar)
-    DOM.undoBtn = document.getElementById('undo-btn');
-    DOM.splitModeBtn = document.getElementById('split-mode-btn');
-    DOM.linebreakModeBtn = document.getElementById('linebreak-mode-btn');
-    DOM.groupModeBtn = document.getElementById('group-mode-btn');
-    DOM.attrModeBtn = document.getElementById('attr-mode-btn');
+    // Find every element in the HTML that has a 'data-ref' attribute
+    const elementsWithRefs = document.querySelectorAll('[data-ref]');
     
-    DOM.btnCopyAi = document.getElementById('btn-copy-ai');
-    DOM.btnImport = document.getElementById('btn-import');
-    DOM.btnLoad = document.getElementById('btn-load');
-    DOM.btnManual = document.getElementById('btn-manual');
-    DOM.btnShowCredits = document.getElementById('btn-show-credits');
-    DOM.btnHideCredits = document.getElementById('btn-hide-credits');
-    DOM.btnAddLabel = document.getElementById('btn-add-label');
-    DOM.btnExport = document.getElementById('btn-export');
-    DOM.btnSaveWork = document.getElementById('btn-save-work');
-    DOM.btnLoadWork = document.getElementById('btn-load-work');
-    DOM.btnTogglePattern = document.getElementById('btn-toggle-pattern');
-    DOM.btnToggleContrast = document.getElementById('btn-toggle-contrast');
-    DOM.btnZoomIn = document.getElementById('btn-zoom-in');
-    DOM.btnZoomOut = document.getElementById('btn-zoom-out');
-    DOM.btnZoomReset = document.getElementById('btn-zoom-reset');
-
-    DOM.btnCancelGroup = document.getElementById('btn-cancel-group');
-    DOM.btnSaveGroup = document.getElementById('btn-save-group');
-    DOM.btnCancelWord = document.getElementById('btn-cancel-word');
-    DOM.btnSaveWord = document.getElementById('btn-save-word');
-    DOM.btnDeleteWord = document.getElementById('btn-delete-word');
-
-    // Text & Labels (for language switching)
-    DOM.appHeading = document.getElementById('app-heading');
-    DOM.pageTitleTag = document.getElementById('page-title');
-    DOM.instrH3 = document.getElementById('instr-h3');
-    DOM.instrBody = document.getElementById('instr-body');
-    DOM.exampleLinkText = document.getElementById('example-link-text');
-    DOM.linkExample = document.getElementById('link-example');
-    DOM.orText = document.getElementById('or-text');
-    DOM.lblLevel = document.getElementById('lbl-level');
-    DOM.optBeg = document.getElementById('opt-beg');
-    DOM.optInt = document.getElementById('opt-int');
-    DOM.optAdv = document.getElementById('opt-adv');
-    DOM.optBegEd = document.getElementById('opt-beg-ed');
-    DOM.optIntEd = document.getElementById('opt-int-ed');
-    DOM.optAdvEd = document.getElementById('opt-adv-ed');
-    DOM.editH3 = document.getElementById('edit-h3');
-    DOM.editBody = document.getElementById('edit-body');
-    DOM.lblEditorTitle = document.getElementById('lbl-editor-title');
-    DOM.modalTitleText = document.getElementById('modal-title-text');
-    DOM.lblGroupHint = document.getElementById('lbl-group-hint');
-    DOM.wordModalTitle = document.getElementById('word-modal-title');
-    DOM.lblWordText = document.getElementById('lbl-word-text');
-    DOM.lblWordHint = document.getElementById('lbl-word-hint');
-    
-    // Templates
-    DOM.templateStudentCss = document.getElementById('template-student-css');
-    DOM.templateStudentJs = document.getElementById('template-student-js');
+    // Loop through them and dynamically map them to the DOM object
+    elementsWithRefs.forEach(el => {
+        DOM[el.dataset.ref] = el;
+    });
 }
 
 // ==========================================
