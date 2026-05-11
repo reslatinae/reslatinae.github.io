@@ -1,109 +1,117 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cicero, pro Caelio 26</title>
     <style>
-    :root { --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body, button, input, textarea, select { font-family: var(--main-font); }
-    body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background-color: #f9fafb; color: #1f2937; line-height: 1.5; }
-    h1 { text-align: center; color: #111827; margin-bottom: 32px; font-weight: 600; letter-spacing: -0.025em; }
-    .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; color: #334155; }
-    .teacher-note { background: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 1rem; color: #1f2937; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-    .exercise-wrapper { background: #fafafa; padding: 40px; border-radius: 12px; border: 1px solid #e5e7eb; line-height: 4.2; }
-    .sentence-container { padding: 30px 20px 20px 20px; margin-bottom: 32px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .sentence-container:last-child { margin-bottom: 0; }
-    
-    .zoom-controls { display: flex; gap: 6px; align-items: center; justify-content: flex-end; margin-bottom: 16px; }
-    .z-btn { background: white; border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 0.9rem; font-weight: bold; color: #374151; transition: background 0.1s; }
-    .z-btn:hover { background: #e5e7eb; }
-    .lang-switch-inline { display: flex; gap: 6px; margin-right: auto; }
-    .lang-btn { background: #f3f4f6; border: 1px solid transparent; padding: 4px 10px; cursor: pointer; border-radius: 4px; font-size: 0.85rem; color: #4b5563; transition: all 0.2s; font-weight: 500; }
-    .lang-btn.active { background: #eff6ff; color: #3b82f6; border-color: #bfdbfe; font-weight: 600; }
-    
-    #exercise-container-wrapper { overflow-x: auto; padding-top: 30px; padding-bottom: 15px; margin-top: 10px; }
-    #exercise { transition: transform 0.2s ease-in-out; }
+        :root { --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        body, button, input, textarea, select { font-family: var(--main-font); }
+        body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background-color: #f9fafb; color: #1f2937; line-height: 1.5; }
+        h1 { text-align: center; color: #111827; margin-bottom: 32px; font-weight: 600; letter-spacing: -0.025em; }
+        .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; color: #334155; }
+        .teacher-note { background: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 1rem; color: #1f2937; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .exercise-wrapper { background: #fafafa; padding: 40px; border-radius: 12px; border: 1px solid #e5e7eb; line-height: 4.2; }
+        .sentence-container { padding: 30px 20px 20px 20px; margin-bottom: 32px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .sentence-container:last-child { margin-bottom: 0; }
+        
+        .zoom-controls { display: flex; gap: 6px; align-items: center; justify-content: flex-end; margin-bottom: 16px; }
+        .z-btn { background: white; border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 0.9rem; font-weight: bold; color: #374151; transition: background 0.1s; }
+        .z-btn:hover { background: #e5e7eb; }
+        .lang-switch-inline { display: flex; gap: 6px; margin-right: auto; }
+        .lang-btn { background: #f3f4f6; border: 1px solid transparent; padding: 4px 10px; cursor: pointer; border-radius: 4px; font-size: 0.85rem; color: #4b5563; transition: all 0.2s; font-weight: 500; }
+        .lang-btn.active { background: #eff6ff; color: #3b82f6; border-color: #bfdbfe; font-weight: 600; }
+        
+        #exercise-container-wrapper { overflow-x: auto; padding-top: 30px; padding-bottom: 15px; margin-top: 10px; }
+        #exercise { transition: transform 0.2s ease-in-out; }
 
-    .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
-    .hover-word:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
-    
-    .s-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom:none; border-radius: 6px 6px 0 0; padding: 22px 6px 6px 6px; margin: 20px 4px 0 4px; vertical-align: bottom; transition: all 0.2s; z-index: 1; }
-    .s-group:hover, .s-group:focus-within { z-index: 10; }
-    
-    .g-label { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; background: white; border: 1px solid #94a3b8; border-radius: 4px; padding: 3px 8px; color: #475569; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 2px; z-index: 5; max-width: calc(100% + 40px); box-sizing: border-box; transition: max-width 0.2s, z-index 0.2s; }
-    .g-label:hover, .g-label:focus-visible { outline: 2px solid #3b82f6; max-width: max-content; z-index: 50; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-    .g-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
+        .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
+        .hover-word:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+        
+        /* Interactive Genitive Underline Elements */
+        .s-text { border-bottom: 3px dashed transparent; transition: border-color 0.2s, background-color 0.2s; border-radius: 2px; }
+        .s-text.marked-gen { border-bottom-color: #ec4899; }
+        .s-text.error-gen { border-bottom-color: #ef4444; background-color: #fef2f2; }
 
-    .punct { font-size: 1.15rem; margin: 0 2px; vertical-align: baseline; display:inline-block; font-weight: 500; }
-    
-    .trans-box { margin: 32px 0 10px; line-height: 1.5; border-top: 1px dashed #e5e7eb; padding-top: 24px; }
-    textarea { width: 100%; height: 80px; font-size: 1.1rem; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
-    textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-    .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; margin-top: 8px; white-space: nowrap; text-align: center; color: #059669; pointer-events: none; }
-    
-    .hint-icon { position: absolute; top: -12px; right: -8px; font-size: 0.75rem; cursor: pointer; text-decoration: none; filter: grayscale(0.2); transition: filter 0.2s; z-index: 20; }
-    .hint-icon:hover { filter: grayscale(0); }
-    .tooltip-text { visibility: hidden; width: max-content; max-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; position: absolute; z-index: 1000; bottom: 150%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.85rem; font-weight: normal; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none; white-space: normal; line-height: 1.4; text-transform: none; }
-    .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #1f2937 transparent transparent transparent; }
-    .hint-icon.show-tooltip .tooltip-text { visibility: visible; opacity: 1; }
+        .s-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom:none; border-radius: 6px 6px 0 0; padding: 22px 6px 6px 6px; margin: 20px 4px 0 4px; vertical-align: bottom; transition: all 0.2s; z-index: 1; }
+        .s-group:hover, .s-group:focus-within { z-index: 10; }
+        
+        .g-label { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; background: white; border: 1px solid #94a3b8; border-radius: 4px; padding: 3px 8px; color: #475569; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 2px; z-index: 5; max-width: calc(100% + 40px); box-sizing: border-box; transition: max-width 0.2s, z-index 0.2s; }
+        .g-label:hover, .g-label:focus-visible { outline: 2px solid #3b82f6; max-width: max-content; z-index: 50; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .g-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
 
-    .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #e5e7eb; padding: 4px 0; z-index: 1000; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 85vh; overflow-y: auto; min-width: 150px; line-height: 1.2; }
-    .menu-btn { display: block; width: 100%; text-align: left; border: none; background: transparent; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #374151; transition: background-color 0.1s; font-family: inherit; }
-    .menu-btn:hover, .menu-btn:focus-visible { background-color: #f3f4f6; color: #111827; outline: none; }
-    .menu-btn:focus-visible { box-shadow: inset 2px 0 0 0 #3b82f6; }
-    
-    .footer-toolbar { margin-top: 40px; padding: 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
-    .btn { padding: 10px 20px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font-weight: 500; color: white; background: #1f2937; transition: opacity 0.2s; }
-    .btn:hover { opacity: 0.9; }
-    .ex-img { max-width: 100%; height: auto; display: block; margin: 30px auto 10px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 300px; object-fit: contain; }
-    #toast-container { visibility: hidden; min-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 14px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.95rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
-    #toast-container.show { visibility: visible; opacity: 1; bottom: 40px; }
-    #toast-container.error { background-color: #7f1d1d; border: 1px solid #ef4444; }
-    #toast-container.success { background-color: #064e3b; border: 1px solid #10b981; }
-    
-    #results-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.8); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-    .results-content { background: white; padding: 40px; border-radius: 12px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-    .results-title { font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 16px; }
-    .results-score { font-size: 3rem; font-weight: 800; color: #3b82f6; margin-bottom: 24px; }
-    .results-textarea { width: 100%; height: 80px; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; resize: none; margin-bottom: 20px; font-family: monospace; font-size: 0.95rem; background: #f9fafb; color: #374151; outline: none; }
-    .results-textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-    .btn-copy { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; width: 100%; margin-bottom: 12px; }
-    .btn-copy:hover { background: #059669; }
+        .punct { font-size: 1.15rem; margin: 0 2px; vertical-align: baseline; display:inline-block; font-weight: 500; }
+        
+        .trans-box { margin: 32px 0 10px; line-height: 1.5; border-top: 1px dashed #e5e7eb; padding-top: 24px; }
+        textarea { width: 100%; height: 80px; font-size: 1.1rem; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; margin-top: 8px; white-space: nowrap; text-align: center; color: #059669; pointer-events: none; }
+        
+        .hint-icon { position: absolute; top: -12px; right: -8px; font-size: 0.75rem; cursor: pointer; text-decoration: none; filter: grayscale(0.2); transition: filter 0.2s; z-index: 20; }
+        .hint-icon:hover { filter: grayscale(0); }
+        .tooltip-text { visibility: hidden; width: max-content; max-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; position: absolute; z-index: 1000; bottom: 150%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.85rem; font-weight: normal; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none; white-space: normal; line-height: 1.4; text-transform: none; }
+        .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #1f2937 transparent transparent transparent; }
+        .hint-icon.show-tooltip .tooltip-text { visibility: visible; opacity: 1; }
 
-    body.pattern-mode .hover-word[data-done="true"] { background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.4) 5px, rgba(255,255,255,0.4) 10px); border: 2px solid #111827 !important; }
-    body.pattern-mode .hover-word[data-done="true"]:nth-child(even) { background-image: radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%); background-position: 0 0, 5px 5px; background-size: 10px 10px; }
-    body.pattern-mode .s-group { border-style: dashed !important; border-width: 2px !important; }
+        .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #e5e7eb; padding: 4px 0; z-index: 1000; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 85vh; overflow-y: auto; min-width: 150px; line-height: 1.2; }
+        .menu-btn { display: block; width: 100%; text-align: left; border: none; background: transparent; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #374151; transition: background-color 0.1s; font-family: inherit; }
+        .menu-btn:hover, .menu-btn:focus-visible { background-color: #f3f4f6; color: #111827; outline: none; }
+        .menu-btn:focus-visible { box-shadow: inset 2px 0 0 0 #3b82f6; }
+        
+        .gen-btn { color: #ec4899; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 4px; display: none; }
 
-    body.high-contrast { background-color: #121212; color: #ffffff; }
-    body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #121212; color: #fff; border: 1px solid #333; }
-    body.high-contrast .sentence-container { background-color: #1e1e1e; border: 1px solid #444; }
-    body.high-contrast .trans-box { border-top-color: #444; }
-    body.high-contrast .instruction-box { background-color: #332b00; border-color: #665500; color: #ffeb3b; }
-    body.high-contrast .teacher-note { background: #1e1e1e !important; border: 1px solid #444 !important; color: #e5e7eb !important; }
-    body.high-contrast .hover-word { background-color: #333; color: #fff; border-bottom: 2px solid #555; }
-    body.high-contrast .hover-word[data-done="true"] { border: 2px solid #fff !important; color: #000 !important; font-weight: 600; }
-    body.high-contrast .s-group { border-color: #fff !important; }
-    body.high-contrast .g-label { background: #000 !important; color: #fff !important; border-color: #fff !important; }
-    body.high-contrast .punct { color: #fff; }
-    body.high-contrast textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
-    body.high-contrast #btn-practise[style*="background: white"] { background: #333 !important; color: #fff !important; }
-    body.high-contrast #btn-exam[style*="background: white"] { background: #333 !important; color: #fff !important; }
-    body.high-contrast .mode-toggle-bg { background: #1e1e1e !important; border: 1px solid #555; }
-    body.high-contrast #results-modal .results-content { background: #1e1e1e; color: #fff; border: 1px solid #555; }
-    body.high-contrast #results-modal .results-title { color: #fff; }
-    body.high-contrast #results-modal .results-textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
-    body.high-contrast .tooltip-text { background-color: #fff; color: #000; border: 1px solid #ccc; }
-    body.high-contrast .tooltip-text::after { border-color: #fff transparent transparent transparent; }
-    
-    @media (max-width: 768px) {
-        body { margin: 15px; } .exercise-wrapper { padding: 20px; line-height: 4.5; }
-        .hover-word { font-size: 1.1rem; padding: 6px 12px; } .g-label { top: -16px; font-size: 10px; padding: 2px 6px; }
-        .s-group { padding-top: 24px; margin: 20px 2px 0 2px; } .sentence-container { padding: 20px 10px 10px 10px; }
-        .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-radius: 8px; }
-        .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f3f4f6; }
-    }
-    @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal { display: none !important; } }
-</style></head>
+        .footer-toolbar { margin-top: 40px; padding: 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font-weight: 500; color: white; background: #1f2937; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .ex-img { max-width: 100%; height: auto; display: block; margin: 30px auto 10px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 300px; object-fit: contain; }
+        #toast-container { visibility: hidden; min-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 14px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.95rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast-container.show { visibility: visible; opacity: 1; bottom: 40px; }
+        #toast-container.error { background-color: #7f1d1d; border: 1px solid #ef4444; }
+        #toast-container.success { background-color: #064e3b; border: 1px solid #10b981; }
+        
+        #results-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.8); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .results-content { background: white; padding: 40px; border-radius: 12px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .results-title { font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 16px; }
+        .results-score { font-size: 3rem; font-weight: 800; color: #3b82f6; margin-bottom: 24px; }
+        .results-textarea { width: 100%; height: 80px; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; resize: none; margin-bottom: 20px; font-family: monospace; font-size: 0.95rem; background: #f9fafb; color: #374151; outline: none; }
+        .results-textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .btn-copy { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; width: 100%; margin-bottom: 12px; }
+        .btn-copy:hover { background: #059669; }
+
+        body.pattern-mode .hover-word[data-done="true"] { background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.4) 5px, rgba(255,255,255,0.4) 10px); border: 2px solid #111827 !important; }
+        body.pattern-mode .hover-word[data-done="true"]:nth-child(even) { background-image: radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%); background-position: 0 0, 5px 5px; background-size: 10px 10px; }
+        body.pattern-mode .s-group { border-style: dashed !important; border-width: 2px !important; }
+
+        body.high-contrast { background-color: #121212; color: #ffffff; }
+        body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #121212; color: #fff; border: 1px solid #333; }
+        body.high-contrast .sentence-container { background-color: #1e1e1e; border: 1px solid #444; }
+        body.high-contrast .trans-box { border-top-color: #444; }
+        body.high-contrast .instruction-box { background-color: #332b00; border-color: #665500; color: #ffeb3b; }
+        body.high-contrast .teacher-note { background: #1e1e1e !important; border: 1px solid #444 !important; color: #e5e7eb !important; }
+        body.high-contrast .hover-word { background-color: #333; color: #fff; border-bottom: 2px solid #555; }
+        body.high-contrast .hover-word[data-done="true"] { border: 2px solid #fff !important; color: #000 !important; font-weight: 600; }
+        body.high-contrast .s-text.marked-gen { border-bottom-color: #f472b6 !important; }
+        body.high-contrast .s-group { border-color: #fff !important; }
+        body.high-contrast .g-label { background: #000 !important; color: #fff !important; border-color: #fff !important; }
+        body.high-contrast .punct { color: #fff; }
+        body.high-contrast textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
+        body.high-contrast #btn-practise[style*="background: white"] { background: #333 !important; color: #fff !important; }
+        body.high-contrast #btn-exam[style*="background: white"] { background: #333 !important; color: #fff !important; }
+        body.high-contrast .mode-toggle-bg { background: #1e1e1e !important; border: 1px solid #555; }
+        body.high-contrast #results-modal .results-content { background: #1e1e1e; color: #fff; border: 1px solid #555; }
+        body.high-contrast #results-modal .results-title { color: #fff; }
+        body.high-contrast #results-modal .results-textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
+        body.high-contrast .tooltip-text { background-color: #fff; color: #000; border: 1px solid #ccc; }
+        body.high-contrast .tooltip-text::after { border-color: #fff transparent transparent transparent; }
+        
+        @media (max-width: 768px) {
+            body { margin: 15px; } .exercise-wrapper { padding: 20px; line-height: 4.5; }
+            .hover-word { font-size: 1.1rem; padding: 6px 12px; } .g-label { top: -16px; font-size: 10px; padding: 2px 6px; }
+            .s-group { padding-top: 24px; margin: 20px 2px 0 2px; } .sentence-container { padding: 20px 10px 10px 10px; }
+            .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-radius: 8px; }
+            .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f3f4f6; }
+        }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal { display: none !important; } }
+    </style></head>
     <body>
         <h1>Cicero, pro Caelio 26</h1>
-        <div class="instruction-box">Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen. Du kannst auch mit der Maus über ein Wort oder eine Gruppe fahren und den unterstrichenen Buchstaben auf deiner Tastatur drücken, um eine Funktion schnell auszuwählen. Wenn du ein Glühbirnen-Symbol (💡) siehst, klicke darauf, um einen hilfreichen Tipp zu erhalten!<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.</div>
+        <div class="instruction-box">Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen. <br><br><strong>Wichtig:</strong> Du musst auch versteckte Genitivattribute aufspüren! Klicke dazu direkt auf das Genitivattribut innerhalb eines Wortblocks und nutze das <strong>🖍️ Genitiv markieren</strong> Werkzeug, um es hervorzuheben. Sobald du jede Wortgruppe korrekt analysiert und alle Genitive gefunden hast, erscheint ein Textfeld für deine Übersetzung.</div>
         
         <div class="exercise-wrapper">
             <div style="text-align: center; margin-bottom: 24px;">
@@ -125,7 +133,63 @@
                 <button class="z-btn" onclick="setStudentZoom(0)" title="Reset Zoom">Reset</button>
             </div>
             <div id="exercise-container-wrapper">
-                <div id="exercise"><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Subjekt">Quae</span> <span class="hover-word" tabindex="0" data-ans="Adverb">quidem</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">omnia</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Vokativ">iudices</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">perfacilem rationem</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">habent</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">reprehendendi</span><span class="punct">.</span> <div id="t-container-0" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Adverb">Cur</span> <span class="hover-word" tabindex="0" data-ans="Konjunktion">enim</span> <span class="hover-word" tabindex="0" data-ans="Adverb">potissimum</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">balneas publicas</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">constituerat</span><span class="punct">?</span> <div id="t-container-1" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">in quibus</span> <span class="hover-word" tabindex="0" data-ans="Adverb">non</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">invenio</span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjekt">quae latebra</span> <span class="hover-word" tabindex="0" data-ans="Dativobjekt">togatis hominibus</span> <span class="hover-word" tabindex="0" data-ans="Infinitiv">esse</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">posset</span><span class="punct">.</span></div> <div id="t-container-2" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Konjunktion">Nam</span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion">si</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">essent</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">in vestibulo balnearum</span><span class="punct">,</span></div> <span class="hover-word" tabindex="0" data-ans="Adverb">non</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">laterent</span><span class="punct">;</span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion">sin</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">se</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">in intimum</span> <span class="hover-word" tabindex="0" data-ans="Infinitiv">conicere</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">vellent</span><span class="punct">,</span></div> <span class="hover-word" tabindex="0" data-ans="Konjunktion">nec</span> <span class="hover-word" tabindex="0" data-ans="Adverb">satis commode</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">calceati et vestiti</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">id</span> <span class="hover-word" tabindex="0" data-ans="Infinitiv">facere</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">possent</span> <span class="hover-word" tabindex="0" data-ans="Konjunktion">et</span> <span class="hover-word" tabindex="0" data-ans="Adverb">fortasse</span> <span class="hover-word" tabindex="0" data-ans="Adverb">non</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">reciperentur</span><span class="punct">,</span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion">nisi</span> <span class="hover-word" tabindex="0" data-ans="Adverb">forte</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">mulier potens</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">quadrantaria illa permutatione</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">familiaris</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">facta erat</span> <span class="hover-word" tabindex="0" data-ans="Dativobjekt">balneatori</span><span class="punct">.</span></div> <div id="t-container-3" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Konjunktion">Atque</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">equidem</span> <span class="hover-word" tabindex="0" data-ans="Adverb">vehementer</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">exspectabam</span><span class="punct">,</span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjekt">quinam isti viri boni</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">testes huius manifesto deprehensi veneni</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">dicerentur</span><span class="punct">;</span></div> <span class="hover-word" tabindex="0" data-ans="Subjekt">nulli</span> <span class="hover-word" tabindex="0" data-ans="Konjunktion">enim</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">sunt</span> <span class="hover-word" tabindex="0" data-ans="Adverb">adhuc</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">nominati</span><span class="punct">.</span> <div id="t-container-4" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Konjunktion">Sed</span> <span class="hover-word" tabindex="0" data-ans="Adverb">non</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">dubito</span><span class="punct">,</span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion">quin</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">sint</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">pergraves</span><span class="punct">,</span> <div class="s-group" data-ans="Relativsatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjekt">qui</span> <span class="hover-word" tabindex="0" data-ans="Adverb">primum</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">sint</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">talis feminae familiares</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Adverb">deinde</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">eam provinciam</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">susceperint</span><span class="punct">,</span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion">ut</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">in balneas</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">contruderentur</span><span class="punct">,</span></div> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion">quod</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">illa</span> <span class="hover-word" tabindex="0" data-ans="Konjunktion">nisi</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">a viris honestissimis ac plenissimis dignitatis</span><span class="punct">,</span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Adverb">quam</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">velit sit</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">potens</span><span class="punct">,</span></div> <span class="hover-word" tabindex="0" data-ans="Adverb">numquam</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">impetravisset</span><span class="punct">.</span></div></div></div> <div id="t-container-5" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Konjunktion">Sed</span> <span class="hover-word" tabindex="0" data-ans="Adverb">quid</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">ego</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">de dignitate istorum testium</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">loquor</span><span class="punct">?</span> <div id="t-container-6" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">virtutem eorum diligentiamque</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">cognoscite</span><span class="punct">.</span><div id="t-container-7" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="punct">&#39;</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">In balneis</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">delituerunt</span><span class="punct">.</span><div id="t-container-8" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="punct">&#39;</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Testes egregios</span><span class="punct">!</span><div id="t-container-9" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="punct">&#39;</span> <span class="hover-word" tabindex="0" data-ans="Adverb">Dein</span> <span class="hover-word" tabindex="0" data-ans="Adverb">temere</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">prosiluerunt</span><span class="punct">.</span><div id="t-container-10" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="punct">&#39;</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Homines temperantes</span><span class="punct">!</span> <div id="t-container-11" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Adverb">Sic</span> <span class="hover-word" tabindex="0" data-ans="Konjunktion">enim</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">fingunt</span><span class="punct">,</span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion">cum</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Licinius</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">venisset</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">pyxidem</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">teneret</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">in manu</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">conaretur</span> <span class="hover-word" tabindex="0" data-ans="Infinitiv">tradere</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Adverb">nondum</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">tradidisset</span><span class="punct">,</span></div> <div class="s-group" data-ans="AcI"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Adverb">tum</span> <span class="hover-word" tabindex="0" data-ans="Adverb">repente</span> <span class="hover-word" tabindex="0" data-ans="Infinitiv">evolasse</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">istos praeclaros testes</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">sine nomine</span><span class="punct">;</span></div> <div class="s-group" data-ans="AcI"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Licinium</span> <span class="hover-word" tabindex="0" data-ans="Konjunktion">autem</span><span class="punct">,</span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion">cum</span> <span class="hover-word" tabindex="0" data-ans="Adverb">iam</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">manum</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">ad tradendam pyxidem</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">porrexisset</span><span class="punct">,</span></div> <span class="hover-word" tabindex="0" data-ans="Infinitiv">retraxisse</span> <span class="hover-word" tabindex="0" data-ans="Konjunktion">atque</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">illo repentino hominum impetu</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">se</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">in fugam</span> <span class="hover-word" tabindex="0" data-ans="Infinitiv">coniecisse</span><span class="punct">.</span></div> <div id="t-container-12" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Sonstiges">O</span> <span class="hover-word" tabindex="0" data-ans="Vokativ">magna vis veritatis</span><span class="punct">,</span> <div class="s-group" data-ans="Relativsatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjekt">quae</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">contra hominum ingenia, calliditatem, sollertiam contraque fictas omnium insidias</span> <span class="hover-word" tabindex="0" data-ans="Adverb">facile</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">se</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">per se</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">ipsa</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">defendat</span><span class="punct">!</span></div> <div id="t-container-13" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div></div>
+                <div id="exercise"><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">Quae</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">quidem</span></span> <span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">omnia</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <span class="hover-word" tabindex="0" data-ans="Vokativ"><span class="s-text" data-u="false">iudices</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">perfacilem</span> <span class="s-text" data-u="false">rationem</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">habent</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="true">reprehendendi</span></span><span class="punct"><span class="s-text" data-u="false">.</span></span> 
+                <div id="t-container-0" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">Cur</span></span> <span class="hover-word" tabindex="0" data-ans="Konjunktion"><span class="s-text" data-u="false">enim</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">potissimum</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">balneas</span> <span class="s-text" data-u="false">publicas</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">constituerat</span></span><span class="punct"><span class="s-text" data-u="false">?</span></span> 
+                <div id="t-container-1" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">in quibus</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">non</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">invenio</span></span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">quae</span> <span class="s-text" data-u="false">latebra</span></span> <span class="hover-word" tabindex="0" data-ans="Dativobjekt"><span class="s-text" data-u="false">togatis</span> <span class="s-text" data-u="false">hominibus</span></span> <span class="hover-word" tabindex="0" data-ans="Infinitiv"><span class="s-text" data-u="false">esse</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">posset</span></span><span class="punct"><span class="s-text" data-u="false">.</span></span></div> 
+                <div id="t-container-2" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Konjunktion"><span class="s-text" data-u="false">Nam</span></span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion"><span class="s-text" data-u="false">si</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">essent</span></span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">in vestibulo</span> <span class="s-text" data-u="true">balnearum</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span></div> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">non</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">laterent</span></span><span class="punct"><span class="s-text" data-u="false">;</span></span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion"><span class="s-text" data-u="false">sin</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">se</span></span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">in intimum</span></span> <span class="hover-word" tabindex="0" data-ans="Infinitiv"><span class="s-text" data-u="false">conicere</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">vellent</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span></div> <span class="hover-word" tabindex="0" data-ans="Konjunktion"><span class="s-text" data-u="false">nec</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">satis</span> <span class="s-text" data-u="false">commode</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikativum"><span class="s-text" data-u="false">calceati</span> <span class="s-text" data-u="false">et</span> <span class="s-text" data-u="false">vestiti</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">id</span></span> <span class="hover-word" tabindex="0" data-ans="Infinitiv"><span class="s-text" data-u="false">facere</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">possent</span></span> <span class="hover-word" tabindex="0" data-ans="Konjunktion"><span class="s-text" data-u="false">et</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">fortasse</span> <span class="s-text" data-u="false">non</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">reciperentur</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion"><span class="s-text" data-u="false">nisi</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">forte</span></span> <span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">mulier</span> <span class="s-text" data-u="false">potens</span></span> <span class="hover-word" tabindex="0" data-ans="Ablativ"><span class="s-text" data-u="false">quadrantaria</span> <span class="s-text" data-u="false">illa</span> <span class="s-text" data-u="false">permutatione</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikativum"><span class="s-text" data-u="false">familiaris</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">facta</span> <span class="s-text" data-u="false">erat</span></span> <span class="hover-word" tabindex="0" data-ans="Dativobjekt"><span class="s-text" data-u="false">balneatori</span></span><span class="punct"><span class="s-text" data-u="false">.</span></span></div> 
+                <div id="t-container-3" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Konjunktion"><span class="s-text" data-u="false">Atque</span></span> <span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">equidem</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">vehementer</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">exspectabam</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">quinam</span> <span class="s-text" data-u="false">isti</span> <span class="s-text" data-u="false">viri</span> <span class="s-text" data-u="false">boni</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikativum"><span class="s-text" data-u="false">testes</span> <span class="s-text" data-u="true">huius</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">manifesto</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikativum"><span class="s-text" data-u="true">deprehensi</span> <span class="s-text" data-u="true">veneni</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">dicerentur</span></span><span class="punct"><span class="s-text" data-u="false">;</span></span></div> <span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">nulli</span></span> <span class="hover-word" tabindex="0" data-ans="Konjunktion"><span class="s-text" data-u="false">enim</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">sunt</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">adhuc</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">nominati</span></span><span class="punct"><span class="s-text" data-u="false">.</span></span> 
+                <div id="t-container-4" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Konjunktion"><span class="s-text" data-u="false">Sed</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">non</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">dubito</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion"><span class="s-text" data-u="false">quin</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">sint</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikativum"><span class="s-text" data-u="false">pergraves</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <div class="s-group" data-ans="Relativsatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">qui</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">primum</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">sint</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikativum"><span class="s-text" data-u="true">talis</span> <span class="s-text" data-u="true">feminae</span> <span class="s-text" data-u="false">familiares</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">deinde</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">eam</span> <span class="s-text" data-u="false">provinciam</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">susceperint</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion"><span class="s-text" data-u="false">ut</span></span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">in balneas</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">contruderentur</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span></div></div></div> <div class="s-group" data-ans="Relativsatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">quod</span></span> <span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">illa</span></span> <span class="hover-word" tabindex="0" data-ans="Konjunktion"><span class="s-text" data-u="false">nisi</span></span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">a viris</span> <span class="s-text" data-u="false">honestissimis</span> <span class="s-text" data-u="false">ac</span> <span class="s-text" data-u="false">plenissimis</span> <span class="s-text" data-u="true">dignitatis</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">quam</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">velit</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">sit</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikativum"><span class="s-text" data-u="false">potens</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span></div> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">numquam</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">impetravisset</span></span><span class="punct"><span class="s-text" data-u="false">.</span></span></div> 
+                <div id="t-container-5" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Konjunktion"><span class="s-text" data-u="false">Sed</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">quid</span></span> <span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">ego</span></span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">de dignitate</span> <span class="s-text" data-u="true">istorum</span> <span class="s-text" data-u="true">testium</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">loquor</span></span><span class="punct"><span class="s-text" data-u="false">?</span></span> 
+                <div id="t-container-6" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">virtutem</span> <span class="s-text" data-u="true">eorum</span> <span class="s-text" data-u="false">diligentiamque</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">cognoscite</span></span><span class="punct"><span class="s-text" data-u="false">.</span></span>
+                <div id="t-container-7" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="punct"><span class="s-text" data-u="false">&#39;</span></span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">In balneis</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">delituerunt</span></span><span class="punct"><span class="s-text" data-u="false">.</span></span>
+                <div id="t-container-8" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="punct"><span class="s-text" data-u="false">&#39;</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">Testes</span> <span class="s-text" data-u="false">egregios</span></span><span class="punct"><span class="s-text" data-u="false">!</span></span>
+                <div id="t-container-9" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="punct"><span class="s-text" data-u="false">&#39;</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">Dein</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">temere</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">prosiluerunt</span></span><span class="punct"><span class="s-text" data-u="false">.</span></span>
+                <div id="t-container-10" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="punct"><span class="s-text" data-u="false">&#39;</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">Homines</span> <span class="s-text" data-u="false">temperantes</span></span><span class="punct"><span class="s-text" data-u="false">!</span></span> 
+                <div id="t-container-11" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">Sic</span></span> <span class="hover-word" tabindex="0" data-ans="Konjunktion"><span class="s-text" data-u="false">enim</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">fingunt</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <div class="s-group" data-ans="AcI"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion"><span class="s-text" data-u="false">cum</span></span> <span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">Licinius</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">venisset</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">pyxidem</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">teneret</span></span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">in manu</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">conaretur</span></span> <span class="hover-word" tabindex="0" data-ans="Infinitiv"><span class="s-text" data-u="false">tradere</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">nondum</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">tradidisset</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span></div> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">tum</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">repente</span></span> <span class="hover-word" tabindex="0" data-ans="Infinitiv"><span class="s-text" data-u="false">evolasse</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">istos</span> <span class="s-text" data-u="false">praeclaros</span> <span class="s-text" data-u="false">testes</span></span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">sine nomine</span></span><span class="punct"><span class="s-text" data-u="false">;</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">Licinium</span></span> <span class="hover-word" tabindex="0" data-ans="Konjunktion"><span class="s-text" data-u="false">autem</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion"><span class="s-text" data-u="false">cum</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">iam</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">manum</span></span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">ad tradendam</span> <span class="s-text" data-u="false">pyxidem</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">porrexisset</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span></div> <span class="hover-word" tabindex="0" data-ans="Infinitiv"><span class="s-text" data-u="false">retraxisse</span></span> <span class="hover-word" tabindex="0" data-ans="Konjunktion"><span class="s-text" data-u="false">atque</span></span> <span class="hover-word" tabindex="0" data-ans="Ablativ"><span class="s-text" data-u="false">illo</span> <span class="s-text" data-u="false">repentino</span> <span class="s-text" data-u="true">hominum</span> <span class="s-text" data-u="false">impetu</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">se</span></span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">in fugam</span></span> <span class="hover-word" tabindex="0" data-ans="Infinitiv"><span class="s-text" data-u="false">coniecisse</span></span><span class="punct"><span class="s-text" data-u="false">.</span></span></div> 
+                <div id="t-container-12" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div><div class="sentence-container"><span class="hover-word" tabindex="0" data-ans="Vokativ"><span class="s-text" data-u="false">O</span></span> <span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">magna</span> <span class="s-text" data-u="false">vis</span> <span class="s-text" data-u="true">veritatis</span></span><span class="punct"><span class="s-text" data-u="false">,</span></span> <div class="s-group" data-ans="Relativsatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjekt"><span class="s-text" data-u="false">quae</span></span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">contra</span> <span class="s-text" data-u="true">hominum</span> <span class="s-text" data-u="false">ingenia</span><span class="s-text" data-u="false">,</span> <span class="s-text" data-u="false">calliditatem</span><span class="s-text" data-u="false">,</span> <span class="s-text" data-u="false">sollertiam</span> <span class="s-text" data-u="false">contraque</span> <span class="s-text" data-u="false">fictas</span> <span class="s-text" data-u="true">omnium</span> <span class="s-text" data-u="false">insidias</span></span> <span class="hover-word" tabindex="0" data-ans="Adverb"><span class="s-text" data-u="false">facile</span></span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt"><span class="s-text" data-u="false">se</span></span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung"><span class="s-text" data-u="false">per se</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikativum"><span class="s-text" data-u="false">ipsa</span></span> <span class="hover-word" tabindex="0" data-ans="Prädikat"><span class="s-text" data-u="false">defendat</span></span><span class="punct"><span class="s-text" data-u="false">!</span></span></div> 
+                <div id="t-container-13" class="trans-box" style="display:none;">
+                    <textarea placeholder="Übersetzung eingeben..."></textarea>
+                </div>
+            </div></div>
             </div>
         </div>
         
@@ -137,7 +201,8 @@
             <button class="btn" onclick="downloadPage()">HTML herunterladen</button>
         </div>
         <div id="menu-common" class="radio-menu">
-            <button type="button" class="menu-btn" data-val="Subjekt">Subjekt</button><button type="button" class="menu-btn" data-val="Prädikat">Prädikat</button><button type="button" class="menu-btn" data-val="Akkusativobjekt">Akkusativobjekt</button><button type="button" class="menu-btn" data-val="Dativobjekt">Dativobjekt</button><button type="button" class="menu-btn" data-val="Genitivobjekt">Genitivobjekt</button><button type="button" class="menu-btn" data-val="Ablativ">Ablativ</button><button type="button" class="menu-btn" data-val="Ablativus absolutus">Ablativus absolutus</button><button type="button" class="menu-btn" data-val="Prädikativum">Prädikativum</button><button type="button" class="menu-btn" data-val="Präpositionale Bestimmung">Präpositionale Bestimmung</button><button type="button" class="menu-btn" data-val="Adverb">Adverb</button><button type="button" class="menu-btn" data-val="Infinitiv">Infinitiv</button><button type="button" class="menu-btn" data-val="AcI">AcI</button><button type="button" class="menu-btn" data-val="Partizipialkonstruktion">Partizipialkonstruktion</button><button type="button" class="menu-btn" data-val="Relativsatz">Relativsatz</button><button type="button" class="menu-btn" data-val="Nebensatz">Nebensatz</button><button type="button" class="menu-btn" data-val="Konjunktion">Konjunktion</button><button type="button" class="menu-btn" data-val="Subjunktion">Subjunktion</button><button type="button" class="menu-btn" data-val="Sonstiges">Sonstiges</button><button type="button" class="menu-btn" data-val="Vokativ">Vokativ</button>
+            <button type="button" class="menu-btn gen-btn" data-action="toggle-gen">🖍️ Mark Genitive (G)</button>
+            <button type="button" class="menu-btn" data-val="Subjekt">Subjekt</button><button type="button" class="menu-btn" data-val="Prädikat">Prädikat</button><button type="button" class="menu-btn" data-val="Akkusativobjekt">Akkusativobjekt</button><button type="button" class="menu-btn" data-val="Dativobjekt">Dativobjekt</button><button type="button" class="menu-btn" data-val="Genitivobjekt">Genitivobjekt</button><button type="button" class="menu-btn" data-val="Ablativ">Ablativ</button><button type="button" class="menu-btn" data-val="Ablativus absolutus">Ablativus absolutus</button><button type="button" class="menu-btn" data-val="Prädikativum">Prädikativum</button><button type="button" class="menu-btn" data-val="Präpositionale Bestimmung">Präpositionale Bestimmung</button><button type="button" class="menu-btn" data-val="Adverb">Adverb</button><button type="button" class="menu-btn" data-val="Infinitiv">Infinitiv</button><button type="button" class="menu-btn" data-val="AcI">AcI</button><button type="button" class="menu-btn" data-val="Partizipialkonstruktion">Partizipialkonstruktion</button><button type="button" class="menu-btn" data-val="Relativsatz">Relativsatz</button><button type="button" class="menu-btn" data-val="Nebensatz">Nebensatz</button><button type="button" class="menu-btn" data-val="Konjunktion">Konjunktion</button><button type="button" class="menu-btn" data-val="Subjunktion">Subjunktion</button><button type="button" class="menu-btn" data-val="Sonstiges">Sonstiges</button><button type="button" class="menu-btn" data-val="Vokativ">Vokativ</button><button type="button" class="menu-btn" data-val="1">1</button><button type="button" class="menu-btn" data-val="2">2</button>
         </div>
         <div id="results-modal">
             <div class="results-content">
@@ -150,289 +215,404 @@
         </div>
         <div id="toast-container"></div>
         <script>
-            const colors = {"Subject":"#86efac","Subjekt":"#86efac","Verb":"#fca5a5","Prädikat":"#fca5a5","Accusative object":"#7dd3fc","Akkusativobjekt":"#7dd3fc","Dative object":"#fcd34d","Dativobjekt":"#fcd34d","Prepositional phrase":"#c4b5fd","Präpositionale Bestimmung":"#c4b5fd","Genitive object":"#fbcfe8","Genitivobjekt":"#fbcfe8","Ablative":"#bfdbfe","Ablativ":"#bfdbfe","Ablative absolute":"#e0e7ff","Ablativus absolutus":"#e0e7ff","Adverb":"#fef08a","Infinitive":"#ddd6fe","Infinitiv":"#ddd6fe","Predicative":"#e9d5ff","Prädikativum":"#e9d5ff","Conjunction":"#ffedd5","Konjunktion":"#ffedd5","Subjunction":"#d2b48c","Subjunktion":"#d2b48c","Participial phrase":"#fce7f3","Partizipialkonstruktion":"#fce7f3","Subordinate clause":"#cbd5e1","Nebensatz":"#cbd5e1","Relative clause":"#d1fae5","Relativsatz":"#d1fae5","Accusative with infinitive":"#d8b4fe","AcI":"#d8b4fe","Other":"#e5e7eb","Sonstiges":"#e5e7eb","Vokativ":"#bae6fd"}; const abbreviations = {"en":{"Subject":"Subj","Accusative object":"Acc. Obj","Dative object":"Dat. Obj","Genitive object":"Gen. Obj","Ablative":"Abl","Ablative absolute":"Abl. Abs.","Predicative":"Pred","Prepositional phrase":"Prep. Phr","Adverb":"Adv","Verb":"Verb","Infinitive":"Inf","Participial phrase":"Part. Phr","Relative clause":"Rel. Cl","Subordinate clause":"Sub. Cl","Conjunction":"Conj","Subjunction":"Subjunc","Accusative with infinitive":"Acc+Inf","Other":"Other"},"de":{"Subjekt":"Subj","Akkusativobjekt":"Akk. Obj","Dativobjekt":"Dat. Obj","Genitivobjekt":"Gen. Obj","Ablativ":"Abl","Ablativus absolutus":"Abl. Abs.","Prädikativum":"Präd","Präpositionale Bestimmung":"Präp. Best.","Adverb":"Adv","Prädikat":"Prädikat","Infinitiv":"Inf","Partizipialkonstruktion":"Part. Konstr","Relativsatz":"Rel. Satz","Nebensatz":"Nebensatz","Konjunktion":"Konj","Subjunktion":"Subjunk","AcI":"AcI","Sonstiges":"Sonst.","Vokativ":"Voka."}}; const labelMap = {"en":{"Subjekt":"Subject","Subject":"Subject","Prädikat":"Verb","Verb":"Verb","Akkusativobjekt":"Accusative object","Accusative object":"Accusative object","Dativobjekt":"Dative object","Dative object":"Dative object","Genitivobjekt":"Genitive object","Genitive object":"Genitive object","Ablativ":"Ablative","Ablative":"Ablative","Ablativus absolutus":"Ablative absolute","Ablative absolute":"Ablative absolute","Prädikativum":"Predicative","Predicative":"Predicative","Präpositionale Bestimmung":"Prepositional phrase","Prepositional phrase":"Prepositional phrase","Adverb":"Adverb","Infinitiv":"Infinitive","Infinitive":"Infinitive","AcI":"Accusative with infinitive","Accusative with infinitive":"Accusative with infinitive","Partizipialkonstruktion":"Participial phrase","Participial phrase":"Participial phrase","Relativsatz":"Relative clause","Relative clause":"Relative clause","Nebensatz":"Subordinate clause","Subordinate clause":"Subordinate clause","Konjunktion":"Conjunction","Conjunction":"Conjunction","Subjunktion":"Subjunction","Subjunction":"Subjunction","Sonstiges":"Other","Other":"Other"},"de":{"Subject":"Subjekt","Subjekt":"Subjekt","Verb":"Prädikat","Prädikat":"Prädikat","Accusative object":"Akkusativobjekt","Akkusativobjekt":"Akkusativobjekt","Dative object":"Dativobjekt","Dativobjekt":"Dativobjekt","Genitive object":"Genitivobjekt","Genitivobjekt":"Genitivobjekt","Ablative":"Ablativ","Ablativ":"Ablativ","Ablative absolute":"Ablativus absolutus","Ablativus absolutus":"Ablativus absolutus","Predicative":"Prädikativum","Prädikativum":"Prädikativum","Prepositional phrase":"Präpositionale Bestimmung","Präpositionale Bestimmung":"Präpositionale Bestimmung","Adverb":"Adverb","Infinitive":"Infinitiv","Infinitiv":"Infinitiv","Accusative with infinitive":"AcI","AcI":"AcI","Participial phrase":"Partizipialkonstruktion","Partizipialkonstruktion":"Partizipialkonstruktion","Relative clause":"Relativsatz","Relativsatz":"Relativsatz","Subordinate clause":"Nebensatz","Nebensatz":"Nebensatz","Conjunction":"Konjunktion","Konjunktion":"Konjunktion","Subjunction":"Subjunktion","Subjunktion":"Subjunktion","Other":"Sonstiges","Sonstiges":"Sonstiges"}};
-            const studentTexts = {"en":{"instr":"This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words—or navigate to them using the Tab and Enter keys—to select their syntactical function. You can also hover over a word and press the underlined letter on your keyboard to instantly select a function. If you see a light bulb icon (💡), click on it for a helpful hint!<br><br>Once you have correctly analyzed every word group in a sentence, a textbox will appear into which you can write your translation.","note":"Note:","togglePat":"Toggle Patterns","toggleCon":"High Contrast","print":"Print Analysis","download":"Download HTML","btnSaveProg":"💾 Save Progress","btnClearProg":"🗑️ Clear Progress","progSaved":"Progress saved!","progCleared":"Progress cleared!","correct":"Correct!","incorrect":"Incorrect. The correct answer is: ","tryAgain":"Incorrect label, try again!","transPlaceholder":"Enter translation...","docTitle":"Interactive Syntax Explorer","practiseMode":"Practise Mode","examMode":"Exam Mode","resetWarn":"Changing the mode will reload the page and reset your progress. Continue?","examResults":"Exam Results","copyResults":"Copy to Clipboard","copied":"Copied!","close":"Close","saveWarning":"⚠️ Note: Your progress is saved locally in this web browser. You must open this file on this exact same device and browser to resume your work later. Clearing your browser data will delete your progress. Do you want to save now?","resExercise":"Exercise: ","resDate":"Date: ","resScore":"Score: "},"de":{"instr":"Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen. Du kannst auch mit der Maus über ein Wort oder eine Gruppe fahren und den unterstrichenen Buchstaben auf deiner Tastatur drücken, um eine Funktion schnell auszuwählen. Wenn du ein Glühbirnen-Symbol (💡) siehst, klicke darauf, um einen hilfreichen Tipp zu erhalten!<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.","note":"Hinweis:","togglePat":"Muster umschalten","toggleCon":"Hoher Kontrast","print":"Drucken","download":"HTML herunterladen","btnSaveProg":"💾 Fortschritt speichern","btnClearProg":"🗑️ Fortschritt löschen","progSaved":"Fortschritt gespeichert!","progCleared":"Fortschritt gelöscht!","correct":"Richtig!","incorrect":"Falsch. Die richtige Antwort ist: ","tryAgain":"Falsches Label, versuch es nochmal!","transPlaceholder":"Übersetzung eingeben...","docTitle":"Interaktives Syntax-Training","practiseMode":"Übungsmodus","examMode":"Prüfungsmodus","resetWarn":"Ein Moduswechsel lädt die Seite neu und setzt deinen Fortschritt zurück. Fortfahren?","examResults":"Prüfungsergebnisse","copyResults":"Ergebnisse kopieren","copied":"Kopiert!","close":"Schließen","saveWarning":"⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?","resExercise":"Übung: ","resDate":"Datum: ","resScore":"Ergebnis: "}}; let currentLang = 'de'; const titleInput = "Cicero, pro Caelio 26";
-            const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + 'morslohy';
+            const colors = {"1":"#e9c46a","2":"#a3b18a","Subject":"#4ade80","Subjekt":"#4ade80","Verb":"#fca5a5","Prädikat":"#fca5a5","Accusative object":"#fde047","Akkusativobjekt":"#fde047","Dative object":"#fdba74","Dativobjekt":"#fdba74","Prepositional phrase":"#c4b5fd","Präpositionale Bestimmung":"#c4b5fd","Genitive object":"#fbcfe8","Genitivobjekt":"#fbcfe8","Genitive attribute":"#f472b6","Genitivattribut":"#f472b6","Ablative":"#93c5fd","Ablativ":"#93c5fd","Ablative absolute":"#60a5fa","Ablativus absolutus":"#60a5fa","Adverb":"#ffedd5","Infinitive":"#e9d5ff","Infinitiv":"#e9d5ff","Predicative":"#e5989b","Prädikativum":"#e5989b","Conjunction":"#d6d3d1","Konjunktion":"#d6d3d1","Subjunction":"#f3f4f6","Subjunktion":"#f3f4f6","Participial phrase":"#5eead4","Partizipialkonstruktion":"#5eead4","Subordinate clause":"#818cf8","Nebensatz":"#818cf8","Relative clause":"#a7f3d0","Relativsatz":"#a7f3d0","Accusative with infinitive":"#c084fc","AcI":"#c084fc","Other":"#e5e7eb","Sonstiges":"#e5e7eb","Vokativ":"#b5838d"}; const abbreviations = {"en":{"Subject":"Subj","Accusative object":"Acc. Obj","Dative object":"Dat. Obj","Genitive object":"Gen. Obj","Ablative":"Abl","Ablative absolute":"Abl. Abs.","Genitive attribute":"Gen. Attr","Predicative":"Pred","Prepositional phrase":"Prep. Phr","Adverb":"Adv","Verb":"Verb","Infinitive":"Inf","Participial phrase":"Part. Phr","Relative clause":"Rel. Cl","Subordinate clause":"Sub. Cl","Conjunction":"Conj","Subjunction":"Subjunc","Accusative with infinitive":"Acc+Inf","Other":"Other"},"de":{"Subjekt":"Subj","Akkusativobjekt":"Akk. Obj","Dativobjekt":"Dat. Obj","Genitivobjekt":"Gen. Obj","Ablativ":"Abl","Ablativus absolutus":"Abl. Abs.","Genitivattribut":"Gen. Attr","Prädikativum":"Präd","Präpositionale Bestimmung":"Präp. Best.","Adverb":"Adv","Prädikat":"Prädikat","Infinitiv":"Inf","Partizipialkonstruktion":"Part. Konstr","Relativsatz":"Rel. Satz","Nebensatz":"Nebensatz","Konjunktion":"Konj","Subjunktion":"Subjunk","AcI":"AcI","Sonstiges":"Sonst."}}; const labelMap = {"en":{"Subjekt":"Subject","Subject":"Subject","Prädikat":"Verb","Verb":"Verb","Akkusativobjekt":"Accusative object","Accusative object":"Accusative object","Dativobjekt":"Dative object","Dative object":"Dative object","Genitivobjekt":"Genitive object","Genitive object":"Genitive object","Ablativ":"Ablative","Ablative":"Ablative","Ablativus absolutus":"Ablative absolute","Ablative absolute":"Ablative absolute","Prädikativum":"Predicative","Predicative":"Predicative","Präpositionale Bestimmung":"Prepositional phrase","Prepositional phrase":"Prepositional phrase","Adverb":"Adverb","Infinitiv":"Infinitive","Infinitive":"Infinitive","AcI":"Accusative with infinitive","Accusative with infinitive":"Accusative with infinitive","Partizipialkonstruktion":"Participial phrase","Participial phrase":"Participial phrase","Relativsatz":"Relative clause","Relative clause":"Relative clause","Nebensatz":"Subordinate clause","Subordinate clause":"Subordinate clause","Konjunktion":"Conjunction","Conjunction":"Conjunction","Subjunktion":"Subjunction","Subjunction":"Subjunction","Sonstiges":"Other","Other":"Other"},"de":{"Subject":"Subjekt","Subjekt":"Subjekt","Verb":"Prädikat","Prädikat":"Prädikat","Accusative object":"Akkusativobjekt","Akkusativobjekt":"Akkusativobjekt","Dative object":"Dativobjekt","Dativobjekt":"Dativobjekt","Genitive object":"Genitivobjekt","Genitivobjekt":"Genitivobjekt","Ablative":"Ablativ","Ablativ":"Ablativ","Ablative absolute":"Ablativus absolutus","Ablativus absolutus":"Ablativus absolutus","Predicative":"Prädikativum","Prädikativum":"Prädikativum","Prepositional phrase":"Präpositionale Bestimmung","Präpositionale Bestimmung":"Präpositionale Bestimmung","Adverb":"Adverb","Infinitive":"Infinitiv","Infinitiv":"Infinitiv","Accusative with infinitive":"AcI","AcI":"AcI","Participial phrase":"Partizipialkonstruktion","Partizipialkonstruktion":"Partizipialkonstruktion","Relative clause":"Relativsatz","Relativsatz":"Relativsatz","Subordinate clause":"Nebensatz","Nebensatz":"Nebensatz","Conjunction":"Konjunktion","Konjunktion":"Konjunktion","Subjunction":"Subjunktion","Subjunktion":"Subjunktion","Other":"Sonstiges","Sonstiges":"Sonstiges"}};
+            const studentTexts = {"en":{"instr":"This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words to select their syntactical function. <br><br><strong>Important:</strong> You must also locate hidden Genitive Attributes! Click directly on a genitive word inside a phrase box and use the <strong>🖍️ Mark Genitive</strong> tool to reveal it. Once you have correctly analyzed every phrase and found all genitives, a textbox will appear into which you can write your translation.","note":"Note:","togglePat":"Toggle Patterns","toggleCon":"High Contrast","print":"Print Analysis","download":"Download HTML","btnSaveProg":"💾 Save Progress","btnClearProg":"🗑️ Clear Progress","progSaved":"Progress saved!","progCleared":"Progress cleared!","correct":"Correct!","incorrect":"Incorrect. The correct answer is: ","tryAgain":"Incorrect label, try again!","transPlaceholder":"Enter translation...","docTitle":"Interactive Syntax Explorer","practiseMode":"Practise Mode","examMode":"Exam Mode","resetWarn":"Changing the mode will reload the page and reset your progress. Continue?","examResults":"Exam Results","copyResults":"Copy to Clipboard","copied":"Copied!","close":"Close","saveWarning":"⚠️ Note: Your progress is saved locally in this web browser. You must open this file on this exact same device and browser to resume your work later. Clearing your browser data will delete your progress. Do you want to save now?","resExercise":"Exercise: ","resDate":"Date: ","resScore":"Score: ","markGen":"🖍️ Mark Genitive (G)","unmarkGen":"❌ Unmark Genitive (G)","notGenitive":"Not a genitive attribute!"},"de":{"instr":"Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen. <br><br><strong>Wichtig:</strong> Du musst auch versteckte Genitivattribute aufspüren! Klicke dazu direkt auf das Genitivattribut innerhalb eines Wortblocks und nutze das <strong>🖍️ Genitiv markieren</strong> Werkzeug, um es hervorzuheben. Sobald du jede Wortgruppe korrekt analysiert und alle Genitive gefunden hast, erscheint ein Textfeld für deine Übersetzung.","note":"Hinweis:","togglePat":"Muster umschalten","toggleCon":"Hoher Kontrast","print":"Drucken","download":"HTML herunterladen","btnSaveProg":"💾 Fortschritt speichern","btnClearProg":"🗑️ Fortschritt löschen","progSaved":"Fortschritt gespeichert!","progCleared":"Fortschritt gelöscht!","correct":"Richtig!","incorrect":"Falsch. Die richtige Antwort ist: ","tryAgain":"Falsches Label, versuch es nochmal!","transPlaceholder":"Übersetzung eingeben...","docTitle":"Interaktives Syntax-Training","practiseMode":"Übungsmodus","examMode":"Prüfungsmodus","resetWarn":"Ein Moduswechsel lädt die Seite neu und setzt deinen Fortschritt zurück. Fortfahren?","examResults":"Prüfungsergebnisse","copyResults":"Ergebnisse kopieren","copied":"Kopiert!","close":"Schließen","saveWarning":"⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?","resExercise":"Übung: ","resDate":"Datum: ","resScore":"Ergebnis: ","markGen":"🖍️ Genitiv markieren (G)","unmarkGen":"❌ Markierung aufheben (G)","notGenitive":"Kein Genitivattribut!"}}; let currentLang = 'de'; const titleInput = "Cicero, pro Caelio 26";
+            const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + 'mp19j54k';
         </script>
         <script>
             
-let activeEl = null; let mode = ""; const menu = document.getElementById('menu-common'); const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
-let hideMenuTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1;
-const totalItems = document.querySelectorAll('.hover-word, .g-label').length;
+        let activeEl = null; let activeSubWord = null; let mode = ""; const menu = document.getElementById('menu-common'); const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
+        let hideMenuTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1;
+        const totalPhrases = document.querySelectorAll('.hover-word, .g-label').length;
+        const totalGens = document.querySelectorAll('.s-text[data-u="true"]').length;
+        const totalItems = totalPhrases + totalGens;
 
-function updateStudentShortcuts() {
-    labelShortcuts = {}; let used = new Set(['x', 'k', 'j', 'z']); 
-    document.querySelectorAll('.menu-btn').forEach(btn => {
-        let f = btn.dataset.val; let assigned = false;
-        for (let i = 0; i < f.length; i++) {
-            let char = f[i].toLowerCase();
-            if (/[a-z]/.test(char) && !used.has(char)) { labelShortcuts[f] = char; used.add(char); assigned = true; break; }
-        }
-        if (!assigned) {
-            for (let code = 97; code <= 122; code++) {
-                let char = String.fromCharCode(code);
-                if (!used.has(char)) { labelShortcuts[f] = char; used.add(char); break; }
-            }
-        }
-        let shortcut = labelShortcuts[f]; let innerHTML = f;
-        if (shortcut) {
-            let idx = f.toLowerCase().indexOf(shortcut);
-            if (idx !== -1) { innerHTML = f.substring(0, idx) + '<u>' + f[idx] + '</u>' + f.substring(idx + 1); } 
-            else { innerHTML = '[<u>' + shortcut.toUpperCase() + '</u>] ' + f; }
-        }
-        btn.innerHTML = innerHTML;
-    });
-}
-updateStudentShortcuts();
-
-document.addEventListener('mouseover', (e) => { 
-    const el = e.target.closest('.hover-word, .g-label');
-    hoveredStudentEl = (el && el.dataset.done !== "true") ? el : null;
-});
-
-document.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    let targetEl = hoveredStudentEl;
-    if (!targetEl && document.activeElement && (document.activeElement.classList.contains('hover-word') || document.activeElement.classList.contains('g-label'))) { targetEl = document.activeElement; }
-    if (!targetEl || targetEl.dataset.done === "true") return;
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.key.length !== 1 || !/[a-zA-Z]/.test(e.key)) return;
-
-    let key = e.key.toLowerCase();
-    let matchedLabel = Object.keys(labelShortcuts).find(k => labelShortcuts[k] === key);
-
-    if (matchedLabel) {
-        e.preventDefault();
-        const btn = Array.from(document.querySelectorAll('.menu-btn')).find(b => b.dataset.val === matchedLabel);
-        if (btn) { activeEl = targetEl; mode = activeEl.classList.contains('hover-word') ? "word" : "group"; btn.click(); hoveredStudentEl = null; }
-    }
-});
-
-function switchStudentLang(newLang) {
-    if (newLang === currentLang) return;
-    currentLang = newLang; const t = studentTexts[newLang];
-    
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector('.lang-btn[onclick="switchStudentLang(\'' + newLang + '\')"]').classList.add('active');
-    
-    document.querySelector('.instruction-box').innerHTML = t.instr;
-    const tn = document.querySelector('.teacher-note span'); if(tn) tn.textContent = t.note;
-    
-    document.getElementById('btn-practise').textContent = t.practiseMode; document.getElementById('btn-exam').textContent = t.examMode;
-    document.querySelector('button[onclick="togglePatterns()"]').title = t.togglePat; document.querySelector('button[onclick="toggleContrast()"]').title = t.toggleCon;
-    
-    const fBtns = document.querySelectorAll('.footer-toolbar .btn');
-    fBtns[0].textContent = t.btnSaveProg; fBtns[1].textContent = t.btnClearProg; fBtns[2].textContent = t.print; fBtns[3].textContent = t.download;
-    
-    document.querySelector('.results-title').textContent = t.examResults; document.querySelector('.btn-copy').textContent = t.copyResults;
-    document.querySelector('#results-modal .btn:not(.btn-copy)').textContent = t.close; document.querySelectorAll('textarea:not(.results-textarea)').forEach(ta => ta.placeholder = t.transPlaceholder);
-    
-    if (document.title === studentTexts.en.docTitle || document.title === studentTexts.de.docTitle) {
-        document.title = t.docTitle; document.querySelector('h1').textContent = t.docTitle;
-    }
-    
-    const map = labelMap[newLang] || {}; const translateLabel = (l) => map[l] || l;
-    
-    document.querySelectorAll('.menu-btn').forEach(btn => {
-        const newVal = translateLabel(btn.dataset.val); btn.dataset.val = newVal; btn.textContent = newVal;
-    });
-    
-    document.querySelectorAll('.hover-word, .s-group').forEach(el => {
-        if(el.dataset.ans) el.dataset.ans = translateLabel(el.dataset.ans);
-        let isDone = false;
-        if (el.classList.contains('hover-word')) { isDone = el.dataset.done === "true"; } 
-        else { const gLabel = el.querySelector('.g-label'); if (gLabel) isDone = gLabel.dataset.done === "true"; }
-        
-        if(isDone) {
-            const ans = el.dataset.ans;
-            if(el.classList.contains('hover-word')) {
-                const s = el.querySelector('.ans-label');
-                if(s) {
-                    s.textContent = ans;
-                    if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
+        function updateStudentShortcuts() {
+            labelShortcuts = {}; let used = new Set(['x', 'k', 'j', 'z', 'g', 'u']); 
+            document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(btn => {
+                let f = btn.dataset.val; let assigned = false;
+                for (let i = 0; i < f.length; i++) {
+                    let char = f[i].toLowerCase();
+                    if (/[a-z]/.test(char) && !used.has(char)) { labelShortcuts[f] = char; used.add(char); assigned = true; break; }
                 }
-            } else {
-                const tSpan = el.querySelector('.g-text'); const gLabel = el.querySelector('.g-label');
-                if(tSpan && gLabel) {
-                    tSpan.textContent = ans;
-                    if (gLabel.offsetWidth > el.offsetWidth) { tSpan.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; gLabel.title = ans; }
+                if (!assigned) {
+                    for (let code = 97; code <= 122; code++) {
+                        let char = String.fromCharCode(code);
+                        if (!used.has(char)) { labelShortcuts[f] = char; used.add(char); break; }
+                    }
                 }
-            }
+                let shortcut = labelShortcuts[f]; let innerHTML = f;
+                if (shortcut) {
+                    let idx = f.toLowerCase().indexOf(shortcut);
+                    if (idx !== -1) { innerHTML = f.substring(0, idx) + '<u>' + f[idx] + '</u>' + f.substring(idx + 1); } 
+                    else { innerHTML = '[<u>' + shortcut.toUpperCase() + '</u>] ' + f; }
+                }
+                btn.innerHTML = innerHTML;
+            });
         }
-    });
-    updateStudentShortcuts(); 
-}
+        updateStudentShortcuts();
 
-function setStudentZoom(delta) {
-    if (delta === 0) { sZoom = 1; } else { sZoom = Math.max(0.5, Math.min(2.5, sZoom + delta)); }
-    const area = document.getElementById('exercise');
-    if ('zoom' in area.style) { area.style.zoom = sZoom; } 
-    else { area.style.transform = 'scale(' + sZoom + ')'; area.style.transformOrigin = "top left"; area.style.width = (100 / sZoom) + '%'; }
-}
-
-function setMode(m) {
-    if (answeredItems > 0) {
-        const t = studentTexts[currentLang];
-        if(!confirm(t.resetWarn)) return;
-        localStorage.removeItem(saveKey); location.reload();
-    }
-    exMode = m; const bp = document.getElementById('btn-practise'); const be = document.getElementById('btn-exam');
-    bp.style.background = m === 'practise' ? 'white' : 'transparent'; bp.style.boxShadow = m === 'practise' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; bp.style.color = m === 'practise' ? '#111827' : '#475569';
-    be.style.background = m === 'exam' ? 'white' : 'transparent'; be.style.boxShadow = m === 'exam' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; be.style.color = m === 'exam' ? '#111827' : '#475569';
-}
-
-menu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
-menu.addEventListener('mouseleave', () => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); });
-
-document.querySelectorAll('.hover-word, .g-label').forEach(el => {
-    el.onclick = (e) => {
-        e.stopPropagation();
-        if(el.dataset.done) return;
-        activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
-        if(window.innerWidth > 768) { 
-            const rect = el.getBoundingClientRect();
-            menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
-        }
-        menu.style.display="block"; menuBtns[0].focus();
-    };
-    el.onmouseenter = (e) => {
-        clearTimeout(hideMenuTimeout);
-        if(el.dataset.done === "true") return;
-        activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
-        if(window.innerWidth > 768) { 
-            const rect = el.getBoundingClientRect();
-            menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
-        }
-        menu.style.display="block";
-    };
-    el.onmouseleave = (e) => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); };
-    el.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } };
-});
-
-menuBtns.forEach((btn, index) => {
-    btn.onclick = (e) => {
-        const sel = btn.dataset.val; const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans; const t = studentTexts[currentLang];
-        
-        if (exMode === 'practise') {
-            if(sel === correct) {
-                solve(activeEl, correct, mode); showToast(t.correct, false); answeredItems++;
-            } else { 
-                let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1; activeEl.dataset.mistakes = mistakes;
-                if(mistakes >= 2) { showToast(t.incorrect + correct, true); solve(activeEl, correct, mode); answeredItems++; } 
-                else { showToast(t.tryAgain, true); }
-            }
-        } else {
-            if(sel === correct) { solve(activeEl, correct, mode); showToast(t.correct, false); examScore++; } 
-            else {
-                showToast(t.incorrect + correct, true); solve(activeEl, correct, mode);
-                if(mode === "word") { activeEl.style.border = "2px solid #ef4444"; } 
-                else { activeEl.parentElement.style.borderColor = "#ef4444"; }
-            }
-            answeredItems++;
-        }
-        
-        menu.style.display = "none"; check();
-        if (activeEl && !activeEl.dataset.done) { activeEl.focus(); } 
-        else if (activeEl && activeEl.dataset.done) {
-            const allItems = Array.from(document.querySelectorAll('.hover-word, .g-label')); const currentIndex = allItems.indexOf(activeEl); let nextEl = null;
-            for(let i = currentIndex + 1; i < allItems.length; i++) { if(allItems[i].dataset.done !== "true") { nextEl = allItems[i]; break; } }
-            if(nextEl) nextEl.focus();
-        }
-    };
-    
-    btn.onkeydown = (e) => {
-        if (e.key === 'ArrowDown') { e.preventDefault(); menuBtns[(index + 1) % menuBtns.length].focus(); } 
-        else if (e.key === 'ArrowUp') { e.preventDefault(); menuBtns[(index - 1 + menuBtns.length) % menuBtns.length].focus(); } 
-        else if (e.key === 'Escape') { e.preventDefault(); menu.style.display = "none"; if (activeEl) activeEl.focus(); }
-    };
-});
-
-function showToast(msg, isError) {
-    const x = document.getElementById("toast-container"); x.textContent = msg; x.className = isError ? "show error" : "show success";
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-}
-function togglePatterns() { document.body.classList.toggle('pattern-mode'); }
-function toggleContrast() { document.body.classList.toggle('high-contrast'); }
-
-function solve(el, ans, m) {
-    if(m === "word") {
-        const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
-        el.style.backgroundColor = colors[ans]; el.dataset.done = "true"; el.removeAttribute('tabindex');
-        if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
-    } else { 
-        const tSpan = el.querySelector('.g-text'); if (tSpan) tSpan.textContent = ans; else el.textContent = ans; 
-        el.dataset.done = "true"; el.style.background = "#f0fdf4"; el.removeAttribute('tabindex');
-        if (el.offsetWidth > el.parentElement.offsetWidth) {
-            if (tSpan) tSpan.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.';
-            else el.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.';
-            el.title = ans; 
-        }
-    }
-}
-
-function check() { 
-    document.querySelectorAll('.sentence-container').forEach((s, i) => { 
-        const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')];
-        if(items.length > 0 && items.every(item => item.dataset.done === "true")) {
-            const b = document.getElementById('t-container-' + i); if(b) b.style.display = 'block';
-        }
-    }); 
-    
-    if (answeredItems === totalItems && totalItems > 0 && exMode === 'exam') {
-        const t = studentTexts[currentLang];
-        setTimeout(() => {
-            const pct = Math.round((examScore / totalItems) * 100);
-            document.getElementById('final-score-display').textContent = examScore + " / " + totalItems + " (" + pct + "%)";
-            document.getElementById('results-text').value = t.resExercise + (titleInput || t.docTitle).replace(/["'`]/g, "") + "\n" + t.resDate + new Date().toLocaleDateString() + "\n" + t.resScore + examScore + " / " + totalItems + " (" + pct + "%)";
-            document.getElementById('results-modal').style.display = 'flex';
-        }, 500);
-    }
-}
-
-function saveStudentProgress() {
-    const t = studentTexts[currentLang];
-    if(!confirm(t.saveWarning)) return;
-
-    const items = Array.from(document.querySelectorAll('.hover-word, .g-label'));
-    const state = items.map(el => ({ done: el.dataset.done === "true", ans: el.dataset.ans, mistakes: el.dataset.mistakes || 0 }));
-    const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)')).map(ta => ta.value);
-    const data = { items: state, textareas: textareas, exMode: exMode, examScore: examScore, answeredItems: answeredItems };
-    localStorage.setItem(saveKey, JSON.stringify(data)); showToast(t.progSaved || "Progress saved!", false);
-}
-
-function loadStudentProgress() {
-    const saved = localStorage.getItem(saveKey); if (!saved) return;
-    try {
-        const data = JSON.parse(saved); const items = Array.from(document.querySelectorAll('.hover-word, .g-label')); const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)'));
-        if (data.items && data.items.length !== items.length) { console.warn("Saved progress length does not match. Ignoring."); return; }
-        exMode = data.exMode || 'practise'; setMode(exMode); examScore = data.examScore || 0; answeredItems = data.answeredItems || 0;
-        data.items.forEach((state, i) => {
-            if (items[i] && state.done) {
-                items[i].dataset.ans = state.ans; items[i].dataset.mistakes = state.mistakes; solve(items[i], state.ans, items[i].classList.contains('hover-word') ? 'word' : 'group');
-            } else if (items[i]) { items[i].dataset.mistakes = state.mistakes; }
+        document.addEventListener('mouseover', (e) => { 
+            const el = e.target.closest('.hover-word, .g-label');
+            hoveredStudentEl = el ? el : null; 
         });
-        data.textareas.forEach((val, i) => { if (textareas[i]) textareas[i].value = val; }); check(); 
-    } catch (e) { console.error("Failed to load progress", e); }
-}
 
-function clearStudentProgress() {
-    const msg = currentLang === 'de' ? 'Fortschritt wirklich löschen?' : 'Really clear progress?';
-    if(confirm(msg)) { localStorage.removeItem(saveKey); location.reload(); }
-}
-document.addEventListener('DOMContentLoaded', loadStudentProgress);
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            let targetEl = hoveredStudentEl;
+            if (!targetEl && document.activeElement && (document.activeElement.classList.contains('hover-word') || document.activeElement.classList.contains('g-label'))) { targetEl = document.activeElement; }
+            if (!targetEl) return;
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            if (e.key.length !== 1 || !/[a-zA-Z]/.test(e.key)) return;
 
-function copyResults() {
-    const t = studentTexts[currentLang]; const copyText = document.getElementById("results-text");
-    copyText.select(); copyText.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(copyText.value).then(() => { showToast(t.copied, false); });
-}
+            let key = e.key.toLowerCase();
+            
+            if (key === 'g' && activeSubWord) {
+                e.preventDefault();
+                document.querySelector('.gen-btn').click();
+                return;
+            }
 
-function closeResults() { document.getElementById('results-modal').style.display = 'none'; }
-function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
-document.addEventListener('mousedown', (e) => { 
-    if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; 
-    if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
-});
+            if (targetEl.dataset.done === "true") return; 
 
+            let matchedLabel = Object.keys(labelShortcuts).find(k => labelShortcuts[k] === key);
+            if (matchedLabel) {
+                e.preventDefault();
+                const btn = Array.from(document.querySelectorAll('.menu-btn:not(.gen-btn)')).find(b => b.dataset.val === matchedLabel);
+                if (btn) { activeEl = targetEl; mode = activeEl.classList.contains('hover-word') ? "word" : "group"; btn.click(); hoveredStudentEl = null; }
+            }
+        });
+
+        function switchStudentLang(newLang) {
+            if (newLang === currentLang) return;
+            currentLang = newLang; const t = studentTexts[newLang];
+            
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.lang-btn[onclick="switchStudentLang('${newLang}')"]`).classList.add('active');
+            
+            document.querySelector('.instruction-box').innerHTML = t.instr;
+            const tn = document.querySelector('.teacher-note span'); if(tn) tn.textContent = t.note;
+            
+            document.getElementById('btn-practise').textContent = t.practiseMode; document.getElementById('btn-exam').textContent = t.examMode;
+            document.querySelector('button[onclick="togglePatterns()"]').title = t.togglePat; document.querySelector('button[onclick="toggleContrast()"]').title = t.toggleCon;
+            
+            const fBtns = document.querySelectorAll('.footer-toolbar .btn');
+            fBtns[0].textContent = t.btnSaveProg; fBtns[1].textContent = t.btnClearProg; fBtns[2].textContent = t.print; fBtns[3].textContent = t.download;
+            
+            document.querySelector('.results-title').textContent = t.examResults; document.querySelector('.btn-copy').textContent = t.copyResults;
+            document.querySelector('#results-modal .btn:not(.btn-copy)').textContent = t.close; document.querySelectorAll('textarea:not(.results-textarea)').forEach(ta => ta.placeholder = t.transPlaceholder);
+            
+            if (document.title === studentTexts.en.docTitle || document.title === studentTexts.de.docTitle) {
+                document.title = t.docTitle; document.querySelector('h1').textContent = t.docTitle;
+            }
+            
+            const map = labelMap[newLang] || {}; const translateLabel = (l) => map[l] || l;
+            
+            document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(btn => {
+                const newVal = translateLabel(btn.dataset.val); btn.dataset.val = newVal; btn.textContent = newVal;
+            });
+            
+            document.querySelectorAll('.hover-word, .s-group').forEach(el => {
+                if(el.dataset.ans) el.dataset.ans = translateLabel(el.dataset.ans);
+                let isDone = false;
+                if (el.classList.contains('hover-word')) { isDone = el.dataset.done === "true"; } 
+                else { const gLabel = el.querySelector('.g-label'); if (gLabel) isDone = gLabel.dataset.done === "true"; }
+                
+                if(isDone) {
+                    const ans = el.dataset.ans;
+                    if(el.classList.contains('hover-word')) {
+                        const s = el.querySelector('.ans-label');
+                        if(s) {
+                            s.textContent = ans;
+                            if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
+                        }
+                    } else {
+                        const tSpan = el.querySelector('.g-text'); const gLabel = el.querySelector('.g-label');
+                        if(tSpan && gLabel) {
+                            tSpan.textContent = ans;
+                            if (gLabel.offsetWidth > el.offsetWidth) { tSpan.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; gLabel.title = ans; }
+                        }
+                    }
+                }
+            });
+            updateStudentShortcuts(); 
+        }
+
+        function setStudentZoom(delta) {
+            if (delta === 0) { sZoom = 1; } else { sZoom = Math.max(0.5, Math.min(2.5, sZoom + delta)); }
+            const area = document.getElementById('exercise');
+            if ('zoom' in area.style) { area.style.zoom = sZoom; } 
+            else { area.style.transform = 'scale(' + sZoom + ')'; area.style.transformOrigin = "top left"; area.style.width = (100 / sZoom) + '%'; }
+        }
+
+        function setMode(m) {
+            if (answeredItems > 0 || document.querySelector('.marked-gen')) {
+                const t = studentTexts[currentLang];
+                if(!confirm(t.resetWarn)) return;
+                localStorage.removeItem(saveKey); location.reload();
+            }
+            exMode = m; const bp = document.getElementById('btn-practise'); const be = document.getElementById('btn-exam');
+            bp.style.background = m === 'practise' ? 'white' : 'transparent'; bp.style.boxShadow = m === 'practise' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; bp.style.color = m === 'practise' ? '#111827' : '#475569';
+            be.style.background = m === 'exam' ? 'white' : 'transparent'; be.style.boxShadow = m === 'exam' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; be.style.color = m === 'exam' ? '#111827' : '#475569';
+        }
+
+        menu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
+        menu.addEventListener('mouseleave', () => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); });
+
+        document.querySelectorAll('.hover-word, .g-label').forEach(el => {
+            el.onclick = (e) => {
+                e.stopPropagation();
+                activeSubWord = e.target.closest('.s-text');
+                const genBtn = document.querySelector('.gen-btn');
+                
+                if (activeSubWord) {
+                    genBtn.style.display = "block";
+                    const t = studentTexts[currentLang];
+                    genBtn.textContent = activeSubWord.classList.contains('marked-gen') ? t.unmarkGen : t.markGen;
+                } else {
+                    genBtn.style.display = "none";
+                }
+                
+                document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => {
+                    b.style.display = el.dataset.done === "true" ? "none" : "block";
+                });
+                
+                if (el.dataset.done === "true" && !activeSubWord) return;
+                
+                activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
+                if(window.innerWidth > 768) { 
+                    const rect = (activeSubWord || el).getBoundingClientRect();
+                    menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
+                }
+                menu.style.display="block"; 
+                if (el.dataset.done !== "true") {
+                    let firstNorm = menuBtns.find(b => !b.classList.contains('gen-btn'));
+                    if(firstNorm) firstNorm.focus();
+                } else {
+                    genBtn.focus();
+                }
+            };
+            el.onmouseenter = (e) => {
+                clearTimeout(hideMenuTimeout);
+                if(el.dataset.done === "true") return; 
+                activeEl = el; activeSubWord = null; mode = el.classList.contains('hover-word') ? "word" : "group";
+                document.querySelector('.gen-btn').style.display = "none"; 
+                document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => b.style.display = "block");
+                if(window.innerWidth > 768) { 
+                    const rect = el.getBoundingClientRect();
+                    menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
+                }
+                menu.style.display="block";
+            };
+            el.onmouseleave = (e) => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); };
+            el.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } };
+        });
+
+        menuBtns.forEach((btn, index) => {
+            btn.onclick = (e) => {
+                const t = studentTexts[currentLang];
+                
+             if (btn.classList.contains('gen-btn')) {
+                    if (!activeSubWord) return;
+                    const isCorrect = activeSubWord.dataset.u === "true";
+                    const isMarked = activeSubWord.classList.contains('marked-gen');
+                    
+                    if (exMode === 'practise') {
+                        if (!isMarked) {
+                            if (isCorrect) {
+                                activeSubWord.classList.add('marked-gen');
+                                showToast(t.correct, false);
+                            } else {
+                                const currentSubWord = activeSubWord; 
+                                currentSubWord.classList.add('error-gen');
+                                setTimeout(() => currentSubWord.classList.remove('error-gen'), 800);
+                                showToast(t.notGenitive, true);
+                            }
+                        } else {
+                            activeSubWord.classList.remove('marked-gen');
+                        }
+                    } else {
+                        activeSubWord.classList.toggle('marked-gen');
+                    }
+                    
+                    menu.style.display = "none"; 
+                    check();
+                    return;
+                }
+
+                const sel = btn.dataset.val; const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans; 
+                
+                if (exMode === 'practise') {
+                    if(sel === correct) {
+                        solve(activeEl, correct, mode); showToast(t.correct, false); answeredItems++;
+                    } else { 
+                        let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1; activeEl.dataset.mistakes = mistakes;
+                        if(mistakes >= 2) { showToast(t.incorrect + correct, true); solve(activeEl, correct, mode); answeredItems++; } 
+                        else { showToast(t.tryAgain, true); }
+                    }
+                } else {
+                    if(sel === correct) { solve(activeEl, correct, mode); examScore++; } 
+                    else {
+                        solve(activeEl, correct, mode);
+                        if(mode === "word") { activeEl.style.border = "2px solid #ef4444"; } 
+                        else { activeEl.parentElement.style.borderColor = "#ef4444"; }
+                    }
+                    answeredItems++;
+                }
+                
+                menu.style.display = "none"; check();
+                if (activeEl && !activeEl.dataset.done) { activeEl.focus(); } 
+                else if (activeEl && activeEl.dataset.done) {
+                    const allItems = Array.from(document.querySelectorAll('.hover-word, .g-label')); const currentIndex = allItems.indexOf(activeEl); let nextEl = null;
+                    for(let i = currentIndex + 1; i < allItems.length; i++) { if(allItems[i].dataset.done !== "true") { nextEl = allItems[i]; break; } }
+                    if(nextEl) nextEl.focus();
+                }
+            };
+            
+            btn.onkeydown = (e) => {
+                if (e.key === 'ArrowDown') { e.preventDefault(); menuBtns[(index + 1) % menuBtns.length].focus(); } 
+                else if (e.key === 'ArrowUp') { e.preventDefault(); menuBtns[(index - 1 + menuBtns.length) % menuBtns.length].focus(); } 
+                else if (e.key === 'Escape') { e.preventDefault(); menu.style.display = "none"; if (activeEl) activeEl.focus(); }
+            };
+        });
+
+        function showToast(msg, isError) {
+            const x = document.getElementById("toast-container"); x.textContent = msg; x.className = isError ? "show error" : "show success";
+            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+        }
+        function togglePatterns() { document.body.classList.toggle('pattern-mode'); }
+        function toggleContrast() { document.body.classList.toggle('high-contrast'); }
+
+        function solve(el, ans, m) {
+            if(m === "word") {
+                const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
+                el.style.backgroundColor = colors[ans]; el.dataset.done = "true"; el.removeAttribute('tabindex');
+                if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
+            } else { 
+                const tSpan = el.querySelector('.g-text'); if (tSpan) tSpan.textContent = ans; else el.textContent = ans; 
+                el.dataset.done = "true"; el.style.background = "#f0fdf4"; el.removeAttribute('tabindex');
+                if (el.offsetWidth > el.parentElement.offsetWidth) {
+                    if (tSpan) tSpan.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.';
+                    else el.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.';
+                    el.title = ans; 
+                }
+            }
+        }
+
+        function check() { 
+            document.querySelectorAll('.sentence-container').forEach((s, i) => { 
+                const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')];
+                const requiredGens = [...s.querySelectorAll('.s-text[data-u="true"]')];
+                
+                const allItemsDone = items.length === 0 || items.every(item => item.dataset.done === "true");
+                const allGensDone = requiredGens.every(gen => gen.classList.contains('marked-gen'));
+                
+                const translationReady = allItemsDone && (exMode === 'exam' || allGensDone);
+                
+                if(items.length > 0 && translationReady) {
+                    const b = document.getElementById('t-container-' + i); if(b) b.style.display = 'block';
+                }
+            }); 
+            
+            if (exMode === 'exam' && answeredItems === totalPhrases && totalPhrases > 0) {
+                const t = studentTexts[currentLang];
+                let genScore = 0;
+                document.querySelectorAll('.s-text[data-u="true"]').forEach(st => {
+                    if(st.classList.contains('marked-gen')) genScore++;
+                });
+                const finalScore = examScore + genScore;
+                
+                setTimeout(() => {
+                    const pct = Math.round((finalScore / totalItems) * 100);
+                    document.getElementById('final-score-display').textContent = finalScore + " / " + totalItems + " (" + pct + "%)";
+                    
+                    /* Note: The newline here is handled via raw string \n now */
+                    document.getElementById('results-text').value = t.resExercise + (titleInput || t.docTitle).replace(/["'\`]/g, "") + "\n" + t.resDate + new Date().toLocaleDateString() + "\n" + t.resScore + finalScore + " / " + totalItems + " (" + pct + "%)";                    document.getElementById('results-modal').style.display = 'flex';
+                }, 500);
+            }
+        }
+
+       function saveStudentProgress() {
+            const t = studentTexts[currentLang];
+            if(!confirm(t.saveWarning)) return;
+
+            const items = Array.from(document.querySelectorAll('.hover-word, .g-label'));
+            const state = items.map(el => ({ done: el.dataset.done === "true", ans: el.dataset.ans, mistakes: el.dataset.mistakes || 0 }));
+            
+            const subWords = Array.from(document.querySelectorAll('.s-text'));
+            const subState = subWords.map(el => el.classList.contains('marked-gen'));
+            
+            const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)')).map(ta => ta.value);
+            
+            const data = { items: state, subWords: subState, textareas: textareas, exMode: exMode, examScore: examScore, answeredItems: answeredItems };
+            
+            // --- NEW TRY/CATCH BLOCK ---
+            try {
+                localStorage.setItem(saveKey, JSON.stringify(data)); 
+                showToast(t.progSaved || "Progress saved!", false);
+            } catch (e) {
+                console.warn("Save failed", e);
+                showToast("Save failed: Check your browser privacy settings.", true);
+            }
+        }
+
+        function loadStudentProgress() {
+            // --- MOVED getItem INSIDE THE EXISTING TRY BLOCK ---
+            try {
+                const saved = localStorage.getItem(saveKey); 
+                if (!saved) return;
+                
+                const data = JSON.parse(saved); 
+                const items = Array.from(document.querySelectorAll('.hover-word, .g-label')); 
+                const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)'));
+                
+                if (data.items && data.items.length !== items.length) { console.warn("Saved progress length does not match. Ignoring."); return; }
+                exMode = data.exMode || 'practise'; setMode(exMode); examScore = data.examScore || 0; answeredItems = data.answeredItems || 0;
+                
+                data.items.forEach((state, i) => {
+                    if (items[i] && state.done) {
+                        items[i].dataset.ans = state.ans; items[i].dataset.mistakes = state.mistakes; solve(items[i], state.ans, items[i].classList.contains('hover-word') ? 'word' : 'group');
+                    } else if (items[i]) { items[i].dataset.mistakes = state.mistakes; }
+                });
+                
+                if (data.subWords) {
+                    const subWords = Array.from(document.querySelectorAll('.s-text'));
+                    data.subWords.forEach((isMarked, i) => {
+                        if (subWords[i] && isMarked) subWords[i].classList.add('marked-gen');
+                    });
+                }
+                
+                data.textareas.forEach((val, i) => { if (textareas[i]) textareas[i].value = val; }); check(); 
+            } catch (e) { 
+                console.warn("Failed to load progress or storage is blocked.", e); 
+            }
+        }
+
+        function clearStudentProgress() {
+            const msg = currentLang === 'de' ? 'Fortschritt wirklich löschen?' : 'Really clear progress?';
+            if(confirm(msg)) { 
+                // --- NEW TRY/CATCH BLOCK ---
+                try {
+                    localStorage.removeItem(saveKey); 
+                } catch(e) {
+                    console.warn("Failed to clear local storage.", e);
+                }
+                location.reload(); 
+            }
+        }
+
+        function copyResults() {
+            const t = studentTexts[currentLang]; const copyText = document.getElementById("results-text");
+            copyText.select(); copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value).then(() => { showToast(t.copied, false); });
+        }
+
+        function closeResults() { document.getElementById('results-modal').style.display = 'none'; }
+        function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
+        document.addEventListener('mousedown', (e) => { 
+            if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; 
+            if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
+        });
+    
         </script>
     </body></html>
