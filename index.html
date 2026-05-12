@@ -833,6 +833,24 @@ function parseSimpleMarkdown(text) {
     return safeText;
 }
 
+function isTextTooLong(text, maxWords) {
+    if (!text.trim()) return false;
+    
+    // Count words by splitting the text by any whitespace
+    const wordCount = text.trim().split(/\s+/).length;
+    
+    if (wordCount > maxWords) {
+        // Multi-language alert message
+        const msg = AppState.lang === 'de' 
+            ? `Dein Text enthält ${wordCount} Wörter. Bitte beschränke dich auf maximal ${maxWords} Wörter, damit die KI den Code vollständig generieren kann.`
+            : `Your text contains ${wordCount} words. Please limit it to a maximum of ${maxWords} words so the AI can generate the complete code.`;
+        
+        alert(msg);
+        return true; // Returns true if the limit is exceeded
+    }
+    return false; // Returns false if it's safe to proceed
+}
+
 // ==========================================
 // 1. CONFIGURATION (Constants & Setup)
 // ==========================================
@@ -2073,8 +2091,13 @@ function addCustomLabel() {
 function copyAIPrompt() {
     const btn = DOM.btnCopyAi;
     const originalText = btn.textContent;
-    
-    const txtEl = DOM.enterText;
+    const txtEl = DOM.enterText;	
+
+	// ADD THIS NEW CHECK: Stop if text exceeds 300 words
+    if (isTextTooLong(txtEl.value, 300)) {
+        return; 
+    }
+	
     let sanitizedText = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
     sanitizedText = sanitizedText.replace(/"/g, "'");
     txtEl.value = sanitizedText;
@@ -2308,7 +2331,12 @@ function importAI() {
 }
 
 function startManual() {
-    const txtEl = DOM.enterText;
+    const txtEl = DOM.enterText;	
+	// ADD THIS NEW CHECK: Stop if text exceeds 300 words
+    if (isTextTooLong(txtEl.value, 300)) {
+        return; 
+    }
+	
     let sanitizedText = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
     sanitizedText = sanitizedText.replace(/"/g, "'");
     txtEl.value = sanitizedText;
