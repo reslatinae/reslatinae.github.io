@@ -422,7 +422,7 @@
         const totalItems = totalPhrases + totalGens;
 
         function updateStudentShortcuts() {
-            labelShortcuts = {}; let used = new Set([]); 
+            labelShortcuts = {}; let used = new Set(['x', 'k', 'j', 'z', 'g', 'u']); 
             document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(btn => {
                 let f = btn.dataset.val; let assigned = false;
                 for (let i = 0; i < f.length; i++) {
@@ -459,25 +459,22 @@
             if (e.ctrlKey || e.metaKey || e.altKey) return;
             if (e.key.length !== 1 || !/[a-zA-Z]/.test(e.key)) return;
 
-           let key = e.key.toLowerCase();
-
-            // NEW PLACEMENT: Check labels FIRST
-            let matchedLabel = Object.keys(labelShortcuts).find(k => labelShortcuts[k] === key);
-            if (matchedLabel && targetEl.dataset.done !== "true") {
-                e.preventDefault();
-                const btn = Array.from(document.querySelectorAll('.menu-btn:not(.gen-btn)')).find(b => b.dataset.val === matchedLabel);
-                if (btn) { activeEl = targetEl; mode = activeEl.classList.contains('hover-word') ? "word" : "group"; btn.click(); hoveredStudentEl = null; }
-                return; // STOP execution here
-            }
-            
-            // Original tool shortcut remains below
-            if (key === 'g' && activeSubWord) {
+            let key = e.key.toLowerCase();
+            
+            if (key === 'g' && activeSubWord) {
                 e.preventDefault();
                 document.querySelector('.gen-btn').click();
                 return;
             }
 
             if (targetEl.dataset.done === "true") return; 
+
+            let matchedLabel = Object.keys(labelShortcuts).find(k => labelShortcuts[k] === key);
+            if (matchedLabel) {
+                e.preventDefault();
+                const btn = Array.from(document.querySelectorAll('.menu-btn:not(.gen-btn)')).find(b => b.dataset.val === matchedLabel);
+                if (btn) { activeEl = targetEl; mode = activeEl.classList.contains('hover-word') ? "word" : "group"; btn.click(); hoveredStudentEl = null; }
+            }
         });
 
         function switchStudentLang(newLang) {
@@ -1269,7 +1266,7 @@ function setTeacherZoom(delta) {
 
 function updateShortcuts() {
     AppState.ui.labelShortcuts = {};
-    let used = new Set([]);
+    let used = new Set(['x', 'k', 'j', 'z', 'g', 'u']); 
     AppState.functions.forEach(f => {
         let assigned = false;
         for (let i = 0; i < f.length; i++) {
@@ -1811,32 +1808,19 @@ function initEventListeners() {
         if (DOM.editorScreen.style.display !== 'block') return;
 
         if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
-            if (e.ctrlKey || e.metaKey || e.altKey) return; 
-            let key = e.key.toLowerCase();
-            let hw = AppState.ui.hoveredWord;
-            let hgi = AppState.ui.hoveredGroupIndex;
-
-            // NEW PLACEMENT: Check labels FIRST
-            let matchedLabel = Object.keys(AppState.ui.labelShortcuts).find(k => AppState.ui.labelShortcuts[k] === key);
-            if (matchedLabel) {
-                e.preventDefault();
-                AppState.activeFunc = matchedLabel;
-                setMode('tagging');
-                renderPalette();
-                
-                if (hgi !== null) {
-                    AppState.saveToHistory();
-                    AppState.groups[hgi].label = matchedLabel;
-                    updateGroupUI();
-                    StorageManager.triggerAutoSave();
-                } else if (hw && !hw.classList.contains('punct-span')) {
-                    handleWordClick(hw, false);
-                }
-                return; // STOP execution here so UI tools don't fire
-            }
-            
-            // Original tool shortcuts remain below
-            if (key === 'x') {
+            if (e.ctrlKey || e.metaKey || e.altKey) return; 
+            let key = e.key.toLowerCase();
+            let hw = AppState.ui.hoveredWord;
+            let hgi = AppState.ui.hoveredGroupIndex;
+            
+            if (key === 'x') { 
+                e.preventDefault(); 
+                if (hgi === null && hw && !hw.classList.contains('punct-span')) {
+                    let prevMode = AppState.mode; setMode('split'); handleWordClick(hw, false); setMode(prevMode);
+                } else { setMode(AppState.mode === 'split' ? 'tagging' : 'split'); }
+                return; 
+            }
+            if (key === 'k') { 
                 e.preventDefault(); 
                 if (hgi === null && hw && !hw.classList.contains('punct-span')) {
                     if (AppState.mode !== 'group') { setMode('group'); handleWordClick(hw, false); } 
@@ -1857,6 +1841,23 @@ function initEventListeners() {
                     let prevMode = AppState.mode; setMode('attr'); handleWordClick(hw, false); setMode(prevMode);
                 } else { setMode(AppState.mode === 'attr' ? 'tagging' : 'attr'); }
                 return;
+            }
+            
+            let matchedLabel = Object.keys(AppState.ui.labelShortcuts).find(k => AppState.ui.labelShortcuts[k] === key);
+            if (matchedLabel) {
+                e.preventDefault();
+                AppState.activeFunc = matchedLabel;
+                setMode('tagging');
+                renderPalette();
+                
+                if (hgi !== null) {
+                    AppState.saveToHistory();
+                    AppState.groups[hgi].label = matchedLabel;
+                    updateGroupUI();
+                    StorageManager.triggerAutoSave();
+                } else if (hw && !hw.classList.contains('punct-span')) {
+                    handleWordClick(hw, false);
+                }
             }
         }
     });
