@@ -1109,7 +1109,7 @@ const AppState = {
             const shiftAmount = parts.length - 1;
 
             const newItems = parts.map((p, i) => {
-                const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(p);
+				const hasLetters = /[\p{L}\p{M}]/u.test(t);
                 return {
                     w: p,
                     f: hasLetters ? wordObj.f : CONFIG.PUNCT,
@@ -2214,7 +2214,7 @@ function copyAIPrompt() {
         return; 
     }
 	
-    let sanitizedText = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
+    let sanitizedText = txtEl.value.replace(/([\p{L}\p{M}])-\s*([\p{L}\p{M}])/gu, '$1$2');
     sanitizedText = sanitizedText.replace(/"/g, "'");
     txtEl.value = sanitizedText;
     
@@ -2285,7 +2285,9 @@ function applyPrepositionMerging(tokens) {
     let welded = []; let map = {}; const prepLabel = AppState.lang === 'de' ? 'Präpositionale Bestimmung' : 'Prepositional phrase';
     for(let i=0; i < tokens.length; i++) {
         let curr = tokens[i]; map[i] = welded.length;
-        let pureWord = curr.w.split(" ")[0].toLowerCase().replace(/[^a-z]/g, "");
+        // .normalize("NFD") separates base letters from their macrons, 
+		// and /[\u0300-\u036f]/g safely strips the macrons away for a clean comparison.
+		let pureWord = curr.w.split(" ")[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]/g, "");
         if(CONFIG.PREPOSITIONS.includes(pureWord) && i+1 < tokens.length) {
             let nextW = tokens[i+1];
             if(nextW.f !== CONFIG.PUNCT) {
@@ -2302,7 +2304,7 @@ function processTokens(rawTokens) {
     rawTokens.forEach(t => {
         const isEnclitic = /^-?(que|ne|ve)$/i.test(t); const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(t);
         if (!hasLetters) { temp.push({ w: t, f: CONFIG.PUNCT, b: 0, u: false }); }
-        else if (isEnclitic && temp.length > 0 && /[a-zA-Z]/.test(temp[temp.length-1].w)) { temp[temp.length-1].w += t.replace(/^-/, ''); }
+        else if (isEnclitic && temp.length > 0 && /[\p{L}\p{M}]/u.test(temp[temp.length-1].w)) { temp[temp.length-1].w += t.replace(/^-/, ''); }
         else { temp.push({ w: t, f: AppState.getOtherLabel(), b: 0, u: false }); }
     });
     return applyPrepositionMerging(temp).welded;
@@ -2446,12 +2448,12 @@ function startManual() {
         return; 
     }
 	
-    let sanitizedText = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
+    let sanitizedText = txtEl.value.replace(/([\p{L}\p{M}])-\s*([\p{L}\p{M}])/gu, '$1$2');
     sanitizedText = sanitizedText.replace(/"/g, "'");
     txtEl.value = sanitizedText;
 
     const rawInput = sanitizedText;
-    const tokens = rawInput.match(/[a-zA-Z\u00C0-\u017F-]+|[^a-zA-Z\u00C0-\u017F\s]+/gi);
+    const tokens = rawInput.match(/[\p{L}\p{M}-]+|[^\p{L}\p{M}\s]+/gu);
     if (!tokens) return;
     initEditor(processTokens(tokens));
 }
