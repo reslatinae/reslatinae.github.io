@@ -420,7 +420,7 @@
 
     <script type="text/template" id="template-student-js" data-ref="templateStudentJs">
         let activeEl = null; let activeSubWord = null; let mode = ""; const menu = document.getElementById('menu-common'); const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
-        let hideMenuTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1;
+        let hideMenuTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1; let genMistakes = 0;
         const totalPhrases = document.querySelectorAll('.hover-word, .g-label').length;
         const totalGens = document.querySelectorAll('.s-text[data-u="true"]').length;
         const totalItems = totalPhrases + totalGens;
@@ -672,27 +672,24 @@
             btn.onclick = (e) => {
                 const t = studentTexts[currentLang];
                 
-             if (btn.classList.contains('gen-btn')) {
+            if (btn.classList.contains('gen-btn')) {
                     if (!activeSubWord) return;
                     const isCorrect = activeSubWord.dataset.u === "true";
                     const isMarked = activeSubWord.classList.contains('marked-gen');
                     
-                    if (exMode === 'practise') {
-                        if (!isMarked) {
-                            if (isCorrect) {
-                                activeSubWord.classList.add('marked-gen');
-                                showToast(t.correct, false);
-                            } else {
-                                const currentSubWord = activeSubWord; 
-                                currentSubWord.classList.add('error-gen');
-                                setTimeout(() => currentSubWord.classList.remove('error-gen'), 800);
-                                showToast(t.notGenitive, true);
-                            }
+                    if (!isMarked) {
+                        if (isCorrect) {
+                            activeSubWord.classList.add('marked-gen');
+                            showToast(t.correct, false);
                         } else {
-                            activeSubWord.classList.remove('marked-gen');
+                            const currentSubWord = activeSubWord; 
+                            currentSubWord.classList.add('error-gen');
+                            setTimeout(() => currentSubWord.classList.remove('error-gen'), 800);
+                            showToast(t.notGenitive, true);
+                            if (exMode === 'exam') { genMistakes++; }
                         }
                     } else {
-                        activeSubWord.classList.toggle('marked-gen');
+                        activeSubWord.classList.remove('marked-gen');
                     }
                     
                     menu.style.display = "none"; 
@@ -767,20 +764,22 @@
                 const allItemsDone = items.length === 0 || items.every(item => item.dataset.done === "true");
                 const allGensDone = requiredGens.every(gen => gen.classList.contains('marked-gen'));
                 
-                const translationReady = allItemsDone && (exMode === 'exam' || allGensDone);
+                const translationReady = allItemsDone && allGensDone;
                 
                 if(items.length > 0 && translationReady) {
                     const b = document.getElementById('t-container-' + i); if(b) b.style.display = 'block';
                 }
             }); 
             
-            if (exMode === 'exam' && answeredItems === totalPhrases && totalPhrases > 0) {
+            const currentMarkedGens = document.querySelectorAll('.s-text[data-u="true"].marked-gen').length;
+			if (exMode === 'exam' && answeredItems === totalPhrases && currentMarkedGens === totalGens && totalPhrases > 0) {
                 const t = studentTexts[currentLang];
                 let genScore = 0;
                 document.querySelectorAll('.s-text[data-u="true"]').forEach(st => {
                     if(st.classList.contains('marked-gen')) genScore++;
                 });
-                const finalScore = examScore + genScore;
+                let finalScore = examScore + genScore - genMistakes;
+                if (finalScore < 0) finalScore = 0; // Prevents the score from dropping below zero
                 
                 setTimeout(() => {
                     const pct = Math.round((finalScore / totalItems) * 100);
@@ -804,7 +803,7 @@
             
             const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)')).map(ta => ta.value);
             
-            const data = { items: state, subWords: subState, textareas: textareas, exMode: exMode, examScore: examScore, answeredItems: answeredItems };
+            const data = { items: state, subWords: subState, textareas: textareas, exMode: exMode, examScore: examScore, answeredItems: answeredItems, genMistakes: genMistakes };
             
             // --- NEW TRY/CATCH BLOCK ---
             try {
@@ -827,7 +826,7 @@
                 const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)'));
                 
                 if (data.items && data.items.length !== items.length) { console.warn("Saved progress length does not match. Ignoring."); return; }
-                exMode = data.exMode || 'practise'; setMode(exMode); examScore = data.examScore || 0; answeredItems = data.answeredItems || 0;
+                exMode = data.exMode || 'practise'; setMode(exMode); examScore = data.examScore || 0; answeredItems = data.answeredItems || 0; genMistakes = data.genMistakes || 0;
                 
                 data.items.forEach((state, i) => {
                     if (items[i] && state.done) {
@@ -1024,6 +1023,13 @@ const CONFIG = {
         }
     }
 };
+const MODES = {
+    TAGGING: 'tagging',
+    SPLIT: 'split',
+    LINEBREAK: 'linebreak',
+    GROUP: 'group',
+    ATTR: 'attr'
+};
 
 // ==========================================
 // 2. STATE MANAGEMENT
@@ -1035,7 +1041,7 @@ const AppState = {
     colors: { ...CONFIG.SEMANTIC_COLORS },
     lang: 'de',
     level: 'advanced',
-    mode: 'tagging', 
+    mode: MODES.TAGGING,
     activeFunc: 'Sonstiges',
     history: [],
     ui: { /* ... */ },
@@ -1507,16 +1513,16 @@ function changeLevel(level) {
 
 function setMode(newMode) {
     AppState.mode = newMode;
-    if (newMode !== 'tagging') {
+    if (newMode !== MODES.TAGGING) {
         AppState.activeFunc = AppState.getOtherLabel();
     }
-    DOM.splitModeBtn.classList.toggle('active-mode', AppState.mode === 'split');
-    DOM.groupModeBtn.classList.toggle('active-mode', AppState.mode === 'group');
-    DOM.linebreakModeBtn.classList.toggle('active-mode', AppState.mode === 'linebreak');
-    DOM.attrModeBtn.classList.toggle('active-mode', AppState.mode === 'attr');
+    DOM.splitModeBtn.classList.toggle('active-mode', AppState.mode === MODES.SPLIT);
+    DOM.groupModeBtn.classList.toggle('active-mode', AppState.mode === MODES.GROUP);
+    DOM.linebreakModeBtn.classList.toggle('active-mode', AppState.mode === MODES.LINEBREAK);
+    DOM.attrModeBtn.classList.toggle('active-mode', AppState.mode === MODES.ATTR);
     
     document.querySelectorAll('.p-btn').forEach((b) => {
-        b.classList.toggle('active', AppState.mode === 'tagging' && b.dataset.func === AppState.activeFunc);
+        b.classList.toggle('active', AppState.mode === MODES.TAGGING && b.dataset.func === AppState.activeFunc);
     });
     updateStatus();
 }
@@ -1524,10 +1530,10 @@ function setMode(newMode) {
 function updateStatus() {
     const txt = CONFIG.LANG_TEXT[AppState.lang];
     let modeText = "";
-    if (AppState.mode === 'split') modeText = txt.modeSplit; 
-    else if (AppState.mode === 'group') modeText = txt.modeBracket; 
-    else if (AppState.mode === 'linebreak') modeText = txt.modeLineBreak; 
-    else if (AppState.mode === 'attr') modeText = txt.modeAttr; 
+    if (AppState.mode === MODES.SPLIT) modeText = txt.modeSplit; 
+    else if (AppState.mode === MODES.GROUP) modeText = txt.modeBracket; 
+    else if (AppState.mode === MODES.LINEBREAK) modeText = txt.modeLineBreak; 
+    else if (AppState.mode === MODES.ATTR) modeText = txt.modeAttr; 
     else modeText = txt.modeTag + ` (${AppState.activeFunc})`;
     DOM.modeStatus.textContent = modeText;
 }
@@ -1539,7 +1545,7 @@ function renderPalette() {
     
     AppState.functions.forEach((f) => {
         const b = document.createElement('button');
-        b.className = 'p-btn' + (f === AppState.activeFunc && AppState.mode === 'tagging' ? ' active' : '');
+        b.className = 'p-btn' + (f === AppState.activeFunc && AppState.mode === MODES.TAGGING ? ' active' : '');
         b.style.backgroundColor = AppState.colors[f]; b.dataset.func = f; 
         
         let safeF = escapeHTML(f);
@@ -1550,7 +1556,7 @@ function renderPalette() {
             else { innerHTML = `[<u>${shortcut.toUpperCase()}</u>] ${safeF}`; }
         }
         b.innerHTML = innerHTML;
-        b.addEventListener('click', () => { AppState.activeFunc = f; setMode('tagging'); });
+        b.addEventListener('click', () => { AppState.activeFunc = f; setMode(MODES.TAGGING); });
         p.appendChild(b);
     });
     updateStatus();
@@ -1560,10 +1566,13 @@ function renderEditor() {
     const area = DOM.taggingArea;
     area.innerHTML = '';
     
+    // 1. Create an off-screen fragment
+    const fragment = document.createDocumentFragment(); 
+    
     let currentSentenceBox = document.createElement('div');
     currentSentenceBox.className = 'editor-sentence-box';
-    area.appendChild(currentSentenceBox);
-
+    // Do NOT append to 'area' yet!
+    
     AppState.words.forEach((item, i) => {
         const span = document.createElement('span');
         const isPunct = item.f === CONFIG.PUNCT;
@@ -1608,11 +1617,21 @@ function renderEditor() {
         if (item.b === -1) shouldBreak = false;
 
         if (shouldBreak && i < AppState.words.length - 1) { 
+            // 2. Append the finished box to the fragment
+            fragment.appendChild(currentSentenceBox); 
+            
+            // Start a new box
             currentSentenceBox = document.createElement('div');
             currentSentenceBox.className = 'editor-sentence-box';
-            area.appendChild(currentSentenceBox);
         }
     });
+    
+    // Append the final box to the fragment
+    fragment.appendChild(currentSentenceBox);
+    
+    // 3. Append EVERYTHING to the live DOM in one single operation!
+    area.appendChild(fragment); 
+    
     updateGroupUI();
 }
 
@@ -1743,10 +1762,10 @@ function initEventListeners() {
     
     DOM.btnAddLabel.addEventListener('click', addCustomLabel);
     DOM.undoBtn.addEventListener('click', () => AppState.undo() && renderEditor());
-    DOM.splitModeBtn.addEventListener('click', () => setMode(AppState.mode === 'split' ? 'tagging' : 'split'));
-    DOM.linebreakModeBtn.addEventListener('click', () => setMode(AppState.mode === 'linebreak' ? 'tagging' : 'linebreak'));
-    DOM.groupModeBtn.addEventListener('click', () => setMode(AppState.mode === 'group' ? 'tagging' : 'group'));
-    DOM.attrModeBtn.addEventListener('click', () => setMode(AppState.mode === 'attr' ? 'tagging' : 'attr'));
+    DOM.splitModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.SPLIT ? MODES.TAGGING : MODES.SPLIT));
+	DOM.linebreakModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.LINEBREAK ? MODES.TAGGING : MODES.LINEBREAK));
+    DOM.groupModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.GROUP ? MODES.TAGGING : MODES.GROUP));
+    DOM.attrModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.ATTR ? MODES.TAGGING : MODES.ATTR));
     DOM.btnExport.addEventListener('click', exportToStudent);
     DOM.btnSaveWork.addEventListener('click', () => StorageManager.exportProject());
 
@@ -1845,13 +1864,13 @@ function initEventListeners() {
     });
 
     taggingArea.addEventListener('touchstart', (e) => {
-        if (AppState.mode !== 'group') return;
+        if (AppState.mode !== MODES.GROUP) return;
         const word = e.target.closest('.tag-word');
         if (word) { AppState.touch.swipeStartIdx = parseInt(word.dataset.idx); AppState.touch.swipeCurrentIdx = AppState.touch.swipeStartIdx; AppState.touch.isSwiping = false; }
     }, {passive: true});
 
     taggingArea.addEventListener('touchmove', (e) => {
-        if (AppState.mode !== 'group' || AppState.touch.swipeStartIdx === null) return;
+		if (AppState.mode !== MODES.GROUP || AppState.touch.swipeStartIdx === null) return;
         AppState.touch.isSwiping = true;
         if (e.cancelable) e.preventDefault(); 
         const touch = e.touches[0];
@@ -1877,7 +1896,7 @@ function initEventListeners() {
     }, {passive: false});
 
     taggingArea.addEventListener('touchend', (e) => {
-        if (AppState.mode !== 'group' || AppState.touch.swipeStartIdx === null) return;
+        if (AppState.mode !== MODES.GROUP || AppState.touch.swipeStartIdx === null) return;
         if (AppState.touch.isSwiping && AppState.touch.swipeCurrentIdx !== null && AppState.touch.swipeCurrentIdx !== AppState.touch.swipeStartIdx) {
             if (e.cancelable) e.preventDefault(); 
             AppState.ui.pendingGroupStart = Math.min(AppState.touch.swipeStartIdx, AppState.touch.swipeCurrentIdx);
@@ -1897,9 +1916,9 @@ function initEventListeners() {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); AppState.undo() && renderEditor(); return; }
         
-        if (e.key === 'Escape') {
+       if (e.key === 'Escape') {
             if (DOM.groupModal.style.display === 'flex' || DOM.wordModal.style.display === 'flex') return;
-            setMode('tagging');
+            setMode(MODES.TAGGING);
             AppState.ui.startIdx = null; AppState.ui.pendingGroupStart = null; AppState.ui.pendingGroupEnd = null;
             document.querySelectorAll('#tagging-area span.tag-word').forEach(s => s.style.outline = "none");
             return;
@@ -1916,30 +1935,30 @@ function initEventListeners() {
             if (key === 'x') { 
                 e.preventDefault(); 
                 if (hgi === null && hw && !hw.classList.contains('punct-span')) {
-                    let prevMode = AppState.mode; setMode('split'); handleWordClick(hw, false); setMode(prevMode);
-                } else { setMode(AppState.mode === 'split' ? 'tagging' : 'split'); }
+                   let prevMode = AppState.mode; setMode(MODES.SPLIT); handleWordClick(hw, false); setMode(prevMode);
+			} else { setMode(AppState.mode === MODES.SPLIT ? MODES.TAGGING : MODES.SPLIT); }
                 return; 
             }
             if (key === 'm') { 
                 e.preventDefault(); 
                 if (hgi === null && hw && !hw.classList.contains('punct-span')) {
-                    if (AppState.mode !== 'group') { setMode('group'); handleWordClick(hw, false); } 
-                    else { handleWordClick(hw, false); setMode('tagging'); }
-                } else { setMode(AppState.mode === 'group' ? 'tagging' : 'group'); }
+                    if (AppState.mode !== MODES.GROUP) { setMode(MODES.GROUP); handleWordClick(hw, false); } 
+				else { handleWordClick(hw, false); setMode(MODES.TAGGING); }
+				} else { setMode(AppState.mode === MODES.GROUP ? MODES.TAGGING : MODES.GROUP); }
                 return; 
             }
             if (key === 'w') {
                 e.preventDefault();
                 if (hgi === null && hw) {
-                    let prevMode = AppState.mode; setMode('linebreak'); handleWordClick(hw, false); setMode(prevMode);
-                } else { setMode(AppState.mode === 'linebreak' ? 'tagging' : 'linebreak'); }
+                    let prevMode = AppState.mode; setMode(MODES.LINEBREAK); handleWordClick(hw, false); setMode(prevMode);
+                } else { setMode(AppState.mode === MODES.LINEBREAK ? MODES.TAGGING : MODES.LINEBREAK); }
                 return;
             }
             if (key === 'g') {
                 e.preventDefault();
                 if (hgi === null && hw && !hw.classList.contains('punct-span')) {
-                    let prevMode = AppState.mode; setMode('attr'); handleWordClick(hw, false); setMode(prevMode);
-                } else { setMode(AppState.mode === 'attr' ? 'tagging' : 'attr'); }
+                   let prevMode = AppState.mode; setMode(MODES.ATTR); handleWordClick(hw, false); setMode(prevMode);
+				} else { setMode(AppState.mode === MODES.ATTR ? MODES.TAGGING : MODES.ATTR); }
                 return;
             }
             
@@ -1947,8 +1966,7 @@ function initEventListeners() {
             if (matchedLabel) {
                 e.preventDefault();
                 AppState.activeFunc = matchedLabel;
-                setMode('tagging');
-                renderPalette();
+				setMode(MODES.TAGGING);
                 
                 if (hgi !== null) {
                     AppState.saveToHistory();
@@ -2005,16 +2023,16 @@ function handleBoundaryDrop(gIndex, type, targetIdx) {
 function handleWordClick(el) {
     const domIdx = parseInt(el.dataset.idx);
 
-   if (AppState.mode === 'linebreak') {
+   if (AppState.mode === MODES.LINEBREAK) {
         AppState.toggleLineBreak(domIdx);
         return;
     }
     
-    if(AppState.mode === 'split') { 
+    if(AppState.mode === MODES.SPLIT) { 
         // 👇 Look how clean this is now!
         AppState.splitWord(domIdx);
     } 
-    else if(AppState.mode === 'group') {
+    else if(AppState.mode === MODES.GROUP) {
         if(AppState.ui.startIdx === null) { 
             AppState.ui.startIdx = domIdx; el.style.outline = "2px solid #8b5cf6"; el.style.outlineOffset = "2px";
         } else {
@@ -2024,7 +2042,7 @@ function handleWordClick(el) {
             document.querySelectorAll('#tagging-area span.tag-word').forEach(s => s.style.outline = "none");
         }
     } 
-   else if(AppState.mode === 'attr') {
+   else if(AppState.mode === MODES.ATTR) {
         AppState.mutateWord(domIdx, { u: !AppState.words[domIdx].u });
     }
     else { 
@@ -2531,7 +2549,20 @@ function exportToStudent() {
     const titleInput = DOM.pageTitle.value || defaultTitle;
     const filename = titleInput.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".html";
     const imgUrl = DOM.pageImage.value; const teacherNotes = DOM.teacherNotes.value;
-    const exerciseId = Date.now().toString(36); 
+    // Creates a simple, stable hash from a string
+	const generateStableId = (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0; 
+    }
+    return Math.abs(hash).toString(36);
+};
+
+// Use the title + the first 50 chars of the text to ensure uniqueness per exercise, 
+// but stability across re-exports of the same exercise.
+const baseText = AppState.words.slice(0, 10).map(w => w.w).join('');
+const exerciseId = generateStableId(titleInput + baseText);
     
     const blob = new Blob([generateStudentHTML(merged, updatedGroups, titleInput, AppState.functions, imgUrl, teacherNotes, AppState.lang, CONFIG.ABBREVIATIONS, CONFIG.PRESETS, exerciseId, STUDENT_PAGE_CSS, STUDENT_PAGE_JS)], {type: 'text/html'});
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
