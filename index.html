@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title id="page-title" data-ref="pageTitleTag">Latin Syntax Studio</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     <style>
         :root { 
             --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -110,7 +111,10 @@
         .modal-box { background: white; padding: 30px; border-radius: 8px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .modal-title { font-weight: 600; margin-bottom: 16px; font-size: 1.1rem; color: #111827; }
         .modal-input { width: 100%; padding: 12px; margin-bottom: 24px; font-size: 1rem; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 6px; outline: none; }
-        .modal-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .modal-input:focus { 
+			border-color: var(--primary-color); 
+			box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 10%, transparent); 
+		}
         .modal-actions { display: flex; justify-content: flex-end; gap: 12px; }
         .modal-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #4b5563; }
 
@@ -320,7 +324,7 @@
         .z-btn:hover { background: #e5e7eb; }
         .lang-switch-inline { display: flex; gap: 6px; margin-right: auto; }
         .lang-btn { background: #f3f4f6; border: 1px solid transparent; padding: 4px 10px; cursor: pointer; border-radius: 4px; font-size: 0.85rem; color: #4b5563; transition: all 0.2s; font-weight: 500; }
-        .lang-btn.active { background: #eff6ff; color: #3b82f6; border-color: #bfdbfe; font-weight: 600; }
+        .lang-btn.active { background: #eff6ff; color: var(--primary-color); border-color: #bfdbfe; font-weight: 600; }
         
         #exercise-container-wrapper { overflow-x: auto; padding-top: 30px; padding-bottom: 15px; margin-top: 10px; }
         #exercise { transition: transform 0.2s ease-in-out; }
@@ -591,53 +595,77 @@
         menu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
         menu.addEventListener('mouseleave', () => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); });
 
-        document.querySelectorAll('.hover-word, .g-label').forEach(el => {
-            el.onclick = (e) => {
-                e.stopPropagation();
-                activeSubWord = e.target.closest('.s-text');
-                const genBtn = document.querySelector('.gen-btn');
-                
-                if (activeSubWord) {
-                    genBtn.style.display = "block";
-                    const t = studentTexts[currentLang];
-                    genBtn.textContent = activeSubWord.classList.contains('marked-gen') ? t.unmarkGen : t.markGen;
-                } else {
-                    genBtn.style.display = "none";
-                }
-                
-                document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => {
-                    b.style.display = el.dataset.done === "true" ? "none" : "block";
-                });
-                
-                if (el.dataset.done === "true" && !activeSubWord) return;
-                
-                activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
-                if(window.innerWidth > 768) { 
-                    const rect = (activeSubWord || el).getBoundingClientRect();
-                    menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
-                }
-                menu.style.display="block"; 
-                if (el.dataset.done !== "true") {
-                    let firstNorm = menuBtns.find(b => !b.classList.contains('gen-btn'));
-                    if(firstNorm) firstNorm.focus();
-                } else {
-                    genBtn.focus();
-                }
-            };
-            el.onmouseenter = (e) => {
-                clearTimeout(hideMenuTimeout);
-                if(el.dataset.done === "true") return; 
-                activeEl = el; activeSubWord = null; mode = el.classList.contains('hover-word') ? "word" : "group";
-                document.querySelector('.gen-btn').style.display = "none"; 
-                document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => b.style.display = "block");
-                if(window.innerWidth > 768) { 
-                    const rect = el.getBoundingClientRect();
-                    menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
-                }
-                menu.style.display="block";
-            };
-            el.onmouseleave = (e) => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); };
-            el.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } };
+        const exerciseArea = document.getElementById('exercise');
+
+        // 1. Delegated Click handler
+        exerciseArea.addEventListener('click', (e) => {
+            const el = e.target.closest('.hover-word, .g-label');
+            if (!el) return;
+            e.stopPropagation();
+            
+            activeSubWord = e.target.closest('.s-text');
+            const genBtn = document.querySelector('.gen-btn');
+            
+            if (activeSubWord) {
+                genBtn.style.display = "block";
+                const t = studentTexts[currentLang];
+                genBtn.textContent = activeSubWord.classList.contains('marked-gen') ? t.unmarkGen : t.markGen;
+            } else {
+                genBtn.style.display = "none";
+            }
+            
+            document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => {
+                b.style.display = el.dataset.done === "true" ? "none" : "block";
+            });
+            
+            if (el.dataset.done === "true" && !activeSubWord) return;
+            
+            activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
+            if(window.innerWidth > 768) { 
+                const rect = (activeSubWord || el).getBoundingClientRect();
+                menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
+            }
+            menu.style.display="block"; 
+            if (el.dataset.done !== "true") {
+                let firstNorm = menuBtns.find(b => !b.classList.contains('gen-btn'));
+                if(firstNorm) firstNorm.focus();
+            } else {
+                genBtn.focus();
+            }
+        });
+
+        // 2. Delegated Mouseover (handles what onmouseenter did)
+        exerciseArea.addEventListener('mouseover', (e) => {
+            const el = e.target.closest('.hover-word, .g-label');
+            if (!el || el.dataset.done === "true") return;
+            
+            clearTimeout(hideMenuTimeout);
+            activeEl = el; activeSubWord = null; mode = el.classList.contains('hover-word') ? "word" : "group";
+            document.querySelector('.gen-btn').style.display = "none"; 
+            document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => b.style.display = "block");
+            
+            if(window.innerWidth > 768) { 
+                const rect = el.getBoundingClientRect();
+                menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
+            }
+            menu.style.display="block";
+        });
+
+        // 3. Delegated Mouseout (handles what onmouseleave did)
+        exerciseArea.addEventListener('mouseout', (e) => {
+            const el = e.target.closest('.hover-word, .g-label');
+            if (!el) return;
+            hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150);
+        });
+
+        // 4. Delegated Keydown (Accessibility for Enter/Space)
+        exerciseArea.addEventListener('keydown', (e) => {
+            const el = e.target.closest('.hover-word, .g-label');
+            if (!el) return;
+            if(e.key === 'Enter' || e.key === ' ') { 
+                e.preventDefault(); 
+                el.click(); 
+            }
         });
 
         menuBtns.forEach((btn, index) => {
@@ -860,6 +888,10 @@ function debounce(func, wait) {
 
 function escapeHTML(str) {
     if (str == null) return '';
+    // If DOMPurify is loaded, use it. Otherwise, fallback to basic escaping.
+    if (window.DOMPurify) {
+        return DOMPurify.sanitize(String(str), { ALLOWED_TAGS: [] }); // Strips all HTML
+    }
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
@@ -868,6 +900,11 @@ function parseSimpleMarkdown(text) {
     let safeText = escapeHTML(text);
     safeText = safeText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); 
     safeText = safeText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Safely allow the strong/em tags we just generated
+    if (window.DOMPurify) {
+        return DOMPurify.sanitize(safeText, { ALLOWED_TAGS: ['strong', 'em'] });
+    }
     return safeText;
 }
 
@@ -1037,14 +1074,6 @@ const AppState = {
         
         StorageManager.debouncedAutoSave();
         if (shouldRender) renderEditor();
-    },
-
-    mutateGroup(index, updates, shouldRender = true) {
-        this.saveToHistory();
-        Object.assign(this.groups[index], updates);
-        
-        StorageManager.debouncedAutoSave();
-        if (shouldRender) updateGroupUI();
     },
 
     addGroup(groupObj) {
@@ -1769,10 +1798,9 @@ function initEventListeners() {
         }
 
         const el = e.target.closest('.tag-word, .punct-span');
-        if (!el) return;
-        const shiftPressed = e.shiftKey;
-        if (el.clickTimer) clearTimeout(el.clickTimer);
-        el.clickTimer = setTimeout(() => { handleWordClick(el, shiftPressed); el.clickTimer = null; }, 350);
+        if (!el) return;
+        if (el.clickTimer) clearTimeout(el.clickTimer);
+        el.clickTimer = setTimeout(() => { handleWordClick(el); el.clickTimer = null; }, 350);
     });
 
     taggingArea.addEventListener('dblclick', (e) => {
@@ -1974,15 +2002,13 @@ function handleBoundaryDrop(gIndex, type, targetIdx) {
     StorageManager.triggerAutoSave();
 }
 
-function handleWordClick(el, shiftPressed = false) {
+function handleWordClick(el) {
     const domIdx = parseInt(el.dataset.idx);
 
    if (AppState.mode === 'linebreak') {
         AppState.toggleLineBreak(domIdx);
         return;
     }
-    
-    AppState.ui.lastClickedIdx = domIdx;
     
     if(AppState.mode === 'split') { 
         // 👇 Look how clean this is now!
@@ -2334,6 +2360,14 @@ function importAI() {
             alert("The AI's response is missing the 'words' array. Please generate the prompt again.");
             return;
         }
+		// Ensure every word object at least has the required properties to prevent UI crashes
+        d.words = d.words.filter(w => typeof w === 'object' && w !== null && 'w' in w);
+        
+        // Fallback for groups if AI generated something weird
+        if (d.groups && !Array.isArray(d.groups)) {
+            console.warn("AI generated invalid 'groups' format. Ignoring groups.");
+            d.groups = [];
+        }
         
         let rawGroups = (d.groups || []).filter(g => g.label && g.label.toLowerCase() !== CONFIG.MAIN_CLAUSE_EN.toLowerCase() && g.label.toLowerCase() !== CONFIG.MAIN_CLAUSE_DE.toLowerCase() && g.start != null && g.end != null && g.start <= g.end);
         
@@ -2385,21 +2419,6 @@ function importAI() {
         console.error("Unhandled import error:", e); 
         alert("An unexpected error occurred during import. Check the browser console (F12) for more details."); 
     }	
-	function validateAIInput(parsedData) {
-    if (!parsedData || typeof parsedData !== 'object') throw new Error("Root must be an object.");
-    if (!Array.isArray(parsedData.words)) throw new Error("Missing or invalid 'words' array.");
-    
-    parsedData.words.forEach((word, index) => {
-        if (typeof word.w !== 'string') throw new Error(`Word at index ${index} is missing text (w).`);
-        if (typeof word.f !== 'string') throw new Error(`Word at index ${index} is missing a function label (f).`);
-    });
-
-    if (parsedData.groups && !Array.isArray(parsedData.groups)) {
-        throw new Error("'groups' must be an array if provided.");
-    }
-    
-    return true; // Passes validation
-}	
 }
 
 function startManual() {
