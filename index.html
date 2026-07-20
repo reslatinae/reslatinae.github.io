@@ -942,7 +942,7 @@ const CONFIG = {
         '#4ade80', '#C76D72', '#fde047', '#fdba74', '#c4b5fd', 
         '#fbcfe8', '#f472b6', '#93c5fd', '#60a5fa', '#ffedd5', 
         '#e9d5ff', '#fca5a5', '#d6d3d1', '#f3f4f6', '#5eead4', 
-        '#818cf8', '#a7f3d0', '#c084fc', '#e5e7eb',
+        '#818cf8', '#a7f3d0', '#a5f3fc', '#e5e7eb',
         // The 3 exact leftover colors for new teacher functions
         '#e9c46a', '#a3b18a', '#b5838d'
     ],
@@ -968,23 +968,24 @@ const CONFIG = {
         'Subordinate clause': '#818cf8', 'Nebensatz': '#818cf8', // Indigo (Highly distinct from Blues & Purples)
         'Relative clause': '#a7f3d0', 'Relativsatz': '#a7f3d0', // Pale Mint
         'Accusative with infinitive': '#c084fc', 'AcI': '#c084fc', // Bright Purple
+        'Vocative': '#a5f3fc', 'Vokativ': '#a5f3fc', // Pale Cyan
         'Other': '#e5e7eb', 'Sonstiges': '#e5e7eb' // Neutral Gray
     },
     PRESETS: {
         en: {
-            beginner: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Prepositional phrase', 'Other'],
-            intermediate: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Other'],
-            advanced: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Accusative with infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Other']
+            beginner: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Prepositional phrase', 'Vocative', 'Other'],
+            intermediate: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other'],
+            advanced: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Accusative with infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other']
         },
         de: {
-            beginner: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Sonstiges'],
-            intermediate: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Sonstiges'],
-            advanced: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'AcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Sonstiges']
+            beginner: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Vokativ', 'Sonstiges'],
+            intermediate: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges'],
+            advanced: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'AcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges']
         }
     },
     ABBREVIATIONS: {
-        en: { 'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Genitive attribute': 'Gen. Attr', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Conjunction': 'Conj', 'Subjunction': 'Subjunc', 'Accusative with infinitive': 'Acc+Inf', 'Other': 'Other' },
-        de: { 'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Genitivattribut': 'Gen. Attr', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Konjunktion': 'Konj', 'Subjunktion': 'Subjunk', 'AcI': 'AcI', 'Sonstiges': 'Sonst.' }
+        en: { 'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Genitive attribute': 'Gen. Attr', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Conjunction': 'Conj', 'Subjunction': 'Subjunc', 'Accusative with infinitive': 'Acc+Inf', 'Vocative': 'Voc', 'Other': 'Other' },
+        de: { 'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Genitivattribut': 'Gen. Attr', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Konjunktion': 'Konj', 'Subjunktion': 'Subjunk', 'AcI': 'AcI', 'Vokativ': 'Vok', 'Sonstiges': 'Sonst.' }
     },
     LANG_TEXT: {
         en: {
@@ -1361,6 +1362,7 @@ function updateShortcuts() {
         'Subordinate clause': 'n', 'Nebensatz': 'n',
         'Conjunction': 'k', 'Konjunktion': 'k',
         'Subjunction': 'u', 'Subjunktion': 'u',
+        'Vocative': 'h', 'Vokativ': 'h',
         'Other': 'y', 'Sonstiges': 'y'
     };
 
@@ -2332,6 +2334,7 @@ function normalizeLabel(label) {
         if(lower.includes('subject')) return 'Subjekt';
         if(lower.includes('infinitive') && !lower.includes('with')) return 'Infinitiv';
         if(lower === 'verb') return 'Prädikat';
+        if(lower.includes('vocative') || lower.includes('vokativ')) return 'Vokativ';
     } else {
         if(lower.includes('dativ')) return 'Dative object';
         if(lower.includes('akkusativ')) return 'Accusative object';
@@ -2346,6 +2349,7 @@ function normalizeLabel(label) {
         if(lower.includes('partizipial')) return 'Participial phrase';
         if(lower.includes('subjekt')) return 'Subject';
         if(lower.includes('infinitiv') && !lower.includes('aci')) return 'Infinitive';
+        if(lower.includes('vocative') || lower.includes('vokativ')) return 'Vocative';
     }
     return label.charAt(0).toUpperCase() + label.slice(1);
 }
