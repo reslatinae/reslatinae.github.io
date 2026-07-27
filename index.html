@@ -968,7 +968,7 @@ const CONFIG = {
         'Participial phrase': '#5eead4', 'Partizipialkonstruktion': '#5eead4', // Teal
         'Subordinate clause': '#818cf8', 'Nebensatz': '#818cf8', // Indigo (Highly distinct from Blues & Purples)
         'Relative clause': '#a7f3d0', 'Relativsatz': '#a7f3d0', // Pale Mint
-        'Accusative with infinitive': '#c084fc', 'AcI': '#c084fc', // Bright Purple
+        'Accusative/Nominative with infinitive': '#c084fc', 'AcI/NcI': '#c084fc', // Bright Purple
         'Vocative': '#a5f3fc', 'Vokativ': '#a5f3fc', // Pale Cyan
         'Other': '#e5e7eb', 'Sonstiges': '#e5e7eb' // Neutral Gray
     },
@@ -976,17 +976,17 @@ const CONFIG = {
         en: {
             beginner: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Prepositional phrase', 'Vocative', 'Other'],
             intermediate: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other'],
-            advanced: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Accusative with infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other']
+            advanced: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Accusative/Nominative with infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other']
         },
         de: {
             beginner: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Vokativ', 'Sonstiges'],
             intermediate: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges'],
-            advanced: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'AcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges']
+            advanced: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'AcI/NcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges']
         }
     },
     ABBREVIATIONS: {
-        en: { 'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Genitive attribute': 'Gen. Attr', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Conjunction': 'Conj', 'Subjunction': 'Subjunc', 'Accusative with infinitive': 'Acc+Inf', 'Vocative': 'Voc', 'Other': 'Other' },
-        de: { 'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Genitivattribut': 'Gen. Attr', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Konjunktion': 'Konj', 'Subjunktion': 'Subjunk', 'AcI': 'AcI', 'Vokativ': 'Vok', 'Sonstiges': 'Sonst.' }
+        en: { 'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Genitive attribute': 'Gen. Attr', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Conjunction': 'Conj', 'Subjunction': 'Subjunc', 'Accusative/Nominative with infinitive': 'Acc/Nom+Inf', 'Vocative': 'Voc', 'Other': 'Other' },
+        de: { 'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Genitivattribut': 'Gen. Attr', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Konjunktion': 'Konj', 'Subjunktion': 'Subjunk', 'AcI/NcI': 'AcI/NcI', 'Vokativ': 'Vok', 'Sonstiges': 'Sonst.' }
     },
     LANG_TEXT: {
         en: {
@@ -2231,7 +2231,7 @@ function copyAIPrompt() {
 4. KOORDINATION: Wenn eine Konjunktion (z.B. 'et', 'aut', '-que') Wörter mit derselben syntaktischen Funktion verbindet (z.B. zwei Adverbien oder zwei Subjekte), gib der Konjunktion und den Wörtern EXAKT DASSELBE Label, damit sie verschmelzen.
 5. HYPERBATON: Getrennte Phrasen erhalten die gleiche Funktion, bleiben aber an ihrem Platz.
 6. INTERPUNKTION: Jedes Satzzeichen (inkl. Schlusspunkt) wird als eigenes Token mit "f": "${CONFIG.PUNCT}" ausgegeben.
-7. GRUPPEN & NEBENSÄTZE: Identifiziere mehrteilige Konstruktionen (z.B. Nebensatz, AcI, Partizipialkonstruktion). WICHTIG: Wenn du eine 'Subjunktion' oder ein Relativpronomen identifizierst, MUSST du zwingend eine entsprechende Gruppe erstellen. Der "end"-Index schließt den Satz logisch ab (meist beim finiten Verb/Satzzeichen) und zerschneidet keine Phrasen.
+7. GRUPPEN & NEBENSÄTZE: Identifiziere mehrteilige Konstruktionen (z.B. Nebensatz, AcI/NcI, Partizipialkonstruktion). WICHTIG: Wenn du eine 'Subjunktion' oder ein Relativpronomen identifizierst, MUSST du zwingend eine entsprechende Gruppe erstellen. Der "end"-Index schließt den Satz logisch ab (meist beim finiten Verb/Satzzeichen) und zerschneidet keine Phrasen.
 8. GENITIVATTRIBUTE: Adjektive und Genitivattribute werden mit ihrem Bezugswort zusammengefasst (sie erhalten also EXAKT DASSELBE Label, z.B. beide "Subjekt"). Damit das Genitivattribut trotzdem erkennbar bleibt, füge ZWINGEND dem JSON-Objekt des Genitivattributs die Eigenschaft "u": true hinzu. Erstelle KEINE "groups" Klammer für Genitivattribute!
 9. BEISPIEL: Für "Aurum sumptum a Clodia, venenum quaesitum quod Clodiae daretur." antworte exakt so: {"words": [{"w":"Aurum","f":"Subjekt"},{"w":"sumptum","f":"Prädikat"},{"w":"a Clodia","f":"Präpositionale Bestimmung"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subjekt"},{"w":"quaesitum","f":"Prädikat"},{"w":"quod","f":"Subjekt"},{"w":"Clodiae","f":"Dativobjekt","u":true},{"w":"daretur","f":"Prädikat"},{"w":".","f":"Punct"}], "groups": [{"start": 6, "end": 9, "label": "Relativsatz"}]}
 10. WICHTIG: Antworte AUSSCHLIESSLICH mit gültigem JSON. Keine Kommentare, keine abschließenden Kommas (trailing commas) vor Klammern! Format: { "words": [{"w": "Wort", "f": "Label", "u": true}], "groups": [] }
