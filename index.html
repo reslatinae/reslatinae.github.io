@@ -1370,6 +1370,7 @@ function cacheDOM() {
 
 function initApp() {
     cacheDOM();
+    importKeyFromUrl();
     CONFIG.PRESETS.en.advanced.forEach((f) => { if(!AppState.colors[f]) AppState.colors[f] = '#e5e7eb'; });
     CONFIG.PRESETS.de.advanced.forEach((f) => { if(!AppState.colors[f]) AppState.colors[f] = '#e5e7eb'; });
     
@@ -2475,6 +2476,15 @@ function importAI(raw) {
 // ==========================================
 // 7b. OPENAI CALL (the analysis pipeline; manual creation stays as the no-AI alternative)
 // ==========================================
+
+// A link of the form index.html#key=sk-... stores the key in this browser once and drops it from the address bar,
+// so people who receive that link (e.g. via QR code at a presentation) never see the key dialog.
+function importKeyFromUrl() {
+    const m = (location.hash || '').match(/[#&]key=([^&]+)/);
+    if (!m) return;
+    try { localStorage.setItem(CONFIG.AI.KEY_STORAGE, decodeURIComponent(m[1]).trim()); } catch (e) { console.warn("Could not store the API key (storage blocked).", e); }
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+}
 
 function getAiKey() {
     try { return (localStorage.getItem(CONFIG.AI.KEY_STORAGE) || '').trim(); } catch (e) { return ''; }
