@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title id="page-title" data-ref="pageTitleTag">Latin Syntax Studio</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <script src="src/latin-core.js"></script>
     <style>
         :root { 
             --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -934,7 +935,7 @@ function isTextTooLong(text, maxWords) {
     if (!text.trim()) return false;
     
     // Count words by splitting the text by any whitespace
-    const wordCount = text.trim().split(/\s+/).length;
+    const wordCount = LatinCore.countWords(text);
     
     if (wordCount > maxWords) {
         // Multi-language alert message
@@ -967,7 +968,6 @@ const CONFIG = {
         TIMEOUT_MS: 60000,
         KEY_STORAGE: 'latin_tool_openai_key'
     },
-    PREPOSITIONS: ["a", "ab", "ad", "ante", "apud", "circum", "contra", "cum", "de", "e", "ex", "extra", "in", "infra", "inter", "intra", "ob", "per", "post", "prae", "pro", "prope", "propter", "sine", "sub", "super", "trans", "ultra"],
   SAFE_COLORS: [
         // The 19 actively assigned colors
         '#4ade80', '#C76D72', '#fde047', '#fdba74', '#c4b5fd', 
@@ -1044,7 +1044,8 @@ const CONFIG = {
             aiErrRate: "OpenAI rate limit reached. Please wait a moment and try again.",
             aiErrRefusal: "The model refused to analyze this text.", aiErrIncomplete: "The answer was cut off. Please try a shorter text.",
             aiErrNetwork: "Could not reach OpenAI (network problem or timeout). Please check your connection and try again.",
-            aiErrOther: "OpenAI error: "
+            aiErrOther: "OpenAI error: ",
+            aiCoverageWarn: "The AI's answer does not match the text word for word.", aiMissingWords: "Missing from the answer: ", aiExtraWords: "Not in the text: ", aiCoverageAsk: "Import anyway? (Cancel to try again.)"
         },
         de: {
             heading: "Syntax-Werkstatt Latein", instrH3: "Schritt 1: Einrichtung",
@@ -1071,7 +1072,8 @@ const CONFIG = {
             aiErrRate: "OpenAI-Ratenlimit erreicht. Bitte kurz warten und erneut versuchen.",
             aiErrRefusal: "Das Modell hat die Analyse dieses Textes verweigert.", aiErrIncomplete: "Die Antwort wurde abgeschnitten. Bitte einen kürzeren Text versuchen.",
             aiErrNetwork: "OpenAI nicht erreichbar (Netzwerkproblem oder Zeitüberschreitung). Bitte Verbindung prüfen und erneut versuchen.",
-            aiErrOther: "OpenAI-Fehler: "
+            aiErrOther: "OpenAI-Fehler: ",
+            aiCoverageWarn: "Die Antwort der KI stimmt nicht Wort für Wort mit dem Text überein.", aiMissingWords: "In der Antwort fehlt: ", aiExtraWords: "Nicht im Text: ", aiCoverageAsk: "Trotzdem importieren? (Abbrechen, um es erneut zu versuchen.)"
         }
     }
 };
@@ -1169,24 +1171,10 @@ const AppState = {
         const wordObj = this.words[index];
         const text = wordObj.w || "";
 
-        // Case 1: The word actually contains spaces, so we split it into multiple tokens
-        if (text.includes(' ')) {
-            const parts = text.split(/\s+/);
-            const shiftAmount = parts.length - 1;
-
-            const newItems = parts.map((p, i) => {
-                const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(p);
-                return {
-                    w: p,
-                    f: hasLetters ? wordObj.f : CONFIG.PUNCT,
-                    isSplit: i === parts.length - 1 ? wordObj.isSplit : false,
-                    h: i === 0 ? wordObj.h : "",
-                    b: i === parts.length - 1 ? wordObj.b : 0,
-                    u: wordObj.u
-                };
-            });
-            
-            // Inject the new items into the words array
+        // Case 1: a multi-word token ("a Clodia") is split into its parts
+        const newItems = LatinCore.splitTokenParts(wordObj);
+        if (newItems) {
+            const shiftAmount = newItems.length - 1;
             this.words.splice(index, 1, ...newItems);
 
             // Shift all group boundaries to account for the newly inserted words
@@ -2280,8 +2268,7 @@ function getSanitizedSourceText() {
     // (rejoin words hyphenated across line breaks, straight double quotes -> single quotes). Returns null when too long.
     const txtEl = DOM.enterText;
     if (isTextTooLong(txtEl.value, 300)) return null;
-    let sanitizedText = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
-    sanitizedText = sanitizedText.replace(/"/g, "'");
+    const sanitizedText = LatinCore.sanitizeText(txtEl.value);
     txtEl.value = sanitizedText;
     return sanitizedText;
 }
@@ -2315,31 +2302,13 @@ Use ONLY these Labels: ${AppState.functions.join(', ')}.`;
 }
 
 function applyPrepositionMerging(tokens) {
-    let welded = []; let map = {}; const prepLabel = AppState.lang === 'de' ? 'Präpositionale Bestimmung' : 'Prepositional phrase';
-    for(let i=0; i < tokens.length; i++) {
-        let curr = tokens[i]; map[i] = welded.length;
-        let pureWord = curr.w.split(" ")[0].toLowerCase().replace(/[^a-z]/g, "");
-        const isSingleWord = !/\s/.test(curr.w.trim()); // "a Clodia" is already a phrase: never weld it again
-        if(isSingleWord && CONFIG.PREPOSITIONS.includes(pureWord) && i+1 < tokens.length) {
-            let nextW = tokens[i+1];
-            if(nextW.f !== CONFIG.PUNCT) {
-                welded.push({ w: curr.w + " " + nextW.w.replace(/^-/, ''), f: prepLabel, b: curr.b || 0, u: curr.u || nextW.u, h: curr.h || nextW.h, isSplit: nextW.isSplit });
-                map[i+1] = welded.length - 1; i++; 
-            } else { welded.push(curr); }
-        } else { welded.push(curr); }
-    }
-    return { welded, map };
+    const prepLabel = AppState.lang === 'de' ? 'Präpositionale Bestimmung' : 'Prepositional phrase';
+    return LatinCore.weldPrepositions(tokens, prepLabel);
 }
 
 function processTokens(rawTokens) {
-    let temp = [];
-    rawTokens.forEach(t => {
-        const isEnclitic = /^-(que|ne|ve)$/i.test(t); const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(t);
-        if (!hasLetters) { temp.push({ w: t, f: CONFIG.PUNCT, b: 0, u: false }); }
-        else if (isEnclitic && temp.length > 0 && /[a-zA-Z]/.test(temp[temp.length-1].w)) { temp[temp.length-1].w += t.replace(/^-/, ''); }
-        else { temp.push({ w: t, f: AppState.getOtherLabel(), b: 0, u: false }); }
-    });
-    return applyPrepositionMerging(temp).welded;
+    const prepLabel = AppState.lang === 'de' ? 'Präpositionale Bestimmung' : 'Prepositional phrase';
+    return LatinCore.processTokens(rawTokens, AppState.getOtherLabel(), prepLabel);
 }
 
 function normalizeLabel(label) {
@@ -2433,9 +2402,9 @@ function importAI(raw) {
             w.w = w.w || ""; 
             let func = w.f || ""; 
 
-            w.w = w.w.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
+            w.w = LatinCore.joinHyphenation(w.w);
             
-            if (!/[a-zA-Z\u00C0-\u017F]/.test(w.w)) {
+            if (!LatinCore.hasLetters(w.w)) {
                 w.f = CONFIG.PUNCT;
                 w.u = false;
             }
@@ -2466,6 +2435,18 @@ function importAI(raw) {
                 AppState.groups.push({ start: newStart, end: newEnd, label: g.label });
             }
         });
+
+        // Completeness: the software owns the text, the model only the labels. A dropped, altered or invented
+        // word must not slip into an exercise unnoticed.
+        const coverage = LatinCore.compareCoverage(DOM.enterText.value, mergeResult.welded);
+        if (!coverage.ok) {
+            const t = CONFIG.LANG_TEXT[AppState.lang];
+            const lines = [t.aiCoverageWarn];
+            if (coverage.missing.length) lines.push(t.aiMissingWords + coverage.missing.join(', '));
+            if (coverage.extra.length) lines.push(t.aiExtraWords + coverage.extra.join(', '));
+            lines.push('', t.aiCoverageAsk);
+            if (!confirm(lines.join('\n'))) return;
+        }
 
         initEditor(mergeResult.welded);
     } catch(e) { 
@@ -2588,8 +2569,8 @@ async function analyzeWithAI() {
 function startManual() {
     const rawInput = getSanitizedSourceText();
     if (rawInput === null) return;
-    const tokens = rawInput.match(/[a-zA-Z\u00C0-\u017F-]+|[^a-zA-Z\u00C0-\u017F\s]+/gi);
-    if (!tokens) return;
+    const tokens = LatinCore.tokenize(rawInput);
+    if (!tokens.length) return;
     initEditor(processTokens(tokens));
 }
 
@@ -2831,7 +2812,7 @@ function generateExerciseHTML(words, groups, placeholder, lang) {
     words.forEach((word, idx) => {
         const isPunct = word.f === CONFIG.PUNCT;
         const nextWord = words[idx + 1];
-        const nextIsPunct = nextWord && (!/[a-zA-Z\u00C0-\u017F]/.test(nextWord.segments ? nextWord.segments[0].w : "") || nextWord.f === CONFIG.PUNCT);
+        const nextIsPunct = nextWord && (!LatinCore.hasLetters(nextWord.segments ? nextWord.segments[0].w : "") || nextWord.f === CONFIG.PUNCT);
         
         const safeWordHint = parseSimpleMarkdown(word.hint);
         
