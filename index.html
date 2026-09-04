@@ -962,7 +962,7 @@ const CONFIG = {
     SENTENCE_ENDERS: ['.', '!', '?', '·'],
     AI: {
         ENDPOINT: 'https://api.openai.com/v1/responses',
-        PROXY_URL: '',            // set to the deployed worker URL (see worker/README.md): requests then go there WITHOUT a key and the key button disappears
+        PROXY_URL: 'https://latin-syntax-proxy.latin-syntax-proxy.workers.dev/',            // set to the deployed worker URL (see worker/README.md): requests then go there WITHOUT a key and the key button disappears
         MODEL: 'gpt-5.6-luna',    // cheapest current tier (checked 2026-09-04); 'gpt-5.6-terra' is the next step up
         EFFORT: 'low',            // reasoning effort: none | low | medium | high (reasoning tokens are billed as output)
         TIMEOUT_MS: 60000,
