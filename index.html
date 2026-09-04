@@ -961,6 +961,7 @@ const CONFIG = {
     SENTENCE_ENDERS: ['.', '!', '?', '·'],
     AI: {
         ENDPOINT: 'https://api.openai.com/v1/responses',
+        PROXY_URL: '',            // set to the deployed worker URL (see worker/README.md): requests then go there WITHOUT a key and the key button disappears
         MODEL: 'gpt-5.6-luna',    // cheapest current tier (checked 2026-09-04); 'gpt-5.6-terra' is the next step up
         EFFORT: 'low',            // reasoning effort: none | low | medium | high (reasoning tokens are billed as output)
         TIMEOUT_MS: 60000,
@@ -1020,7 +1021,7 @@ const CONFIG = {
     LANG_TEXT: {
         en: {
             heading: "Latin Syntax Studio", instrH3: "Step 1: Setup Instruction",
-            instrBody: "This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br><br>Enter a title, optional notes for the students, an optional picture for the student page and a Latin text of up to 300 words, choose the grammar level and click 'Analyze with AI'. The analysis is done by OpenAI; for this you enter your own OpenAI API key once via the key button (it stays in this browser only). Then check and refine the analysis in the editor and export the student page. You can also start a manual analysis without AI.",
+            instrBody: "This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br><br>Enter a title, optional notes for the students, an optional picture for the student page and a Latin text of up to 300 words, choose the grammar level and click 'Analyze with AI'. The analysis is done by OpenAI.", instrKey: "For this you enter your own OpenAI API key once via the key button; it stays in this browser only.", instrBodyEnd: "Then check and refine the analysis in the editor and export the student page. You can also start a manual analysis without AI.",
             exampleLink: "Want to see what the final result looks like?", linkText: "View Example",
             phTitle: "Exercise Title", phImage: "Optional: Image URL", phNotes: "Optional: Context / Teacher Notes", phText: "Paste Latin text here...",
             btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
@@ -1047,7 +1048,7 @@ const CONFIG = {
         },
         de: {
             heading: "Syntax-Werkstatt Latein", instrH3: "Schritt 1: Einrichtung",
-            instrBody: "Diese Seite ermöglicht es Ihnen, eigene Sätze für die syntaktische Analyse zu erstellen. Geben Sie einen Titel, optionale Hinweise für die Lernenden, ein Bild (optional) und den lateinischen Text (bis 300 Wörter) ein, wählen Sie die Grammatik-Stufe und klicken Sie auf 'Mit KI analysieren'. Die Analyse übernimmt OpenAI; dafür hinterlegen Sie einmalig Ihren eigenen OpenAI-API-Schlüssel über den Schlüssel-Button (er bleibt nur in diesem Browser). Prüfen und verfeinern Sie die Analyse anschließend im Editor und exportieren Sie die Schülerseite. Ohne KI können Sie auch manuell starten.",
+            instrBody: "Diese Seite ermöglicht es Ihnen, eigene Sätze für die syntaktische Analyse zu erstellen. Geben Sie einen Titel, optionale Hinweise für die Lernenden, ein Bild (optional) und den lateinischen Text (bis 300 Wörter) ein, wählen Sie die Grammatik-Stufe und klicken Sie auf 'Mit KI analysieren'. Die Analyse übernimmt OpenAI.", instrKey: "Dafür hinterlegen Sie einmalig Ihren eigenen OpenAI-API-Schlüssel über den Schlüssel-Button; er bleibt nur in diesem Browser.", instrBodyEnd: "Prüfen und verfeinern Sie die Analyse anschließend im Editor und exportieren Sie die Schülerseite. Ohne KI können Sie auch manuell starten.",
             exampleLink: "Möchten Sie sehen, wie das Ergebnis aussieht?", linkText: "Beispiel ansehen",
             phTitle: "Übungstitel (z.B. Interaktives Syntax-Training)", phImage: "Optional: Bild-URL", phNotes: "Optional: Kontext / Lehrerhinweise", phText: "Lateinischen Text hier einfügen...",
             btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
@@ -1476,7 +1477,7 @@ function changeLanguage(lang) {
     DOM.appHeading.textContent = txt.heading; 
     DOM.pageTitleTag.textContent = txt.heading;
     DOM.instrH3.textContent = txt.instrH3; 
-    DOM.instrBody.innerHTML = txt.instrBody;
+    DOM.instrBody.innerHTML = txt.instrBody + (CONFIG.AI.PROXY_URL ? '' : ' ' + txt.instrKey) + ' ' + txt.instrBodyEnd;
     DOM.exampleLinkText.textContent = txt.exampleLink; 
     DOM.linkExample.textContent = txt.linkText;
     DOM.pageTitle.placeholder = txt.phTitle; 
@@ -2503,6 +2504,7 @@ function closeAiKeyModal() {
 
 function updateAiKeyButton() {
     DOM.btnAiKey.textContent = CONFIG.LANG_TEXT[AppState.lang].btnAiKey + (getAiKey() ? ' ✓' : '');
+    DOM.btnAiKey.style.display = CONFIG.AI.PROXY_URL ? 'none' : '';
 }
 
 function saveAiKeyFromModal() {
@@ -2528,8 +2530,9 @@ function buildAISchema() {
 
 async function analyzeWithAI() {
     const t = CONFIG.LANG_TEXT[AppState.lang];
-    const key = getAiKey();
-    if (!key) { alert(t.aiErrNoKey); openAiKeyModal(); return; }
+    const useProxy = !!CONFIG.AI.PROXY_URL;
+    const key = useProxy ? '' : getAiKey();
+    if (!useProxy && !key) { alert(t.aiErrNoKey); openAiKeyModal(); return; }
     const txt = getSanitizedSourceText();
     if (txt === null) return;
     if (!txt.trim()) { alert(t.aiErrNoText); return; }
@@ -2540,10 +2543,12 @@ async function analyzeWithAI() {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), CONFIG.AI.TIMEOUT_MS);
     try {
-        const res = await fetch(CONFIG.AI.ENDPOINT, {
+        const headers = { 'Content-Type': 'application/json' };
+        if (!useProxy) headers['Authorization'] = 'Bearer ' + key; // the proxy adds the key itself
+        const res = await fetch(useProxy ? CONFIG.AI.PROXY_URL : CONFIG.AI.ENDPOINT, {
             method: 'POST',
             signal: ctrl.signal,
-            headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+            headers: headers,
             body: JSON.stringify({
                 model: CONFIG.AI.MODEL,
                 input: buildAIPrompt(txt),
