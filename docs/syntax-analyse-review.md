@@ -73,30 +73,11 @@ Vorschlag (zwei Wege):
 - a) `cum` aus der Liste streichen. `cum` + Ablativ erkennt das Modell ohnehin und vergibt das Label direkt.
 - b) Nur verschmelzen, wenn das Modell beide Wörter bereits als „Präpositionale Bestimmung“ markiert hat. Die Liste dient dann nur noch der manuellen Erstellung, wo kein Modell beteiligt ist.
 
-### 2.3 „Genitivattribut“ existiert als Farbe, Abkürzung und Synonym, aber nicht als Label
-
-`Genitivattribut` hat eine Farbe (Z. 960), eine Abkürzung (Z. 989) und wird in der Synonym-Zuordnung erkannt (Z. 2326, Z. 2342). Es steht aber in keiner Stufenliste. Gibt das Modell entgegen Regel 8 „Genitivattribut“ aus, wird daraus beim Import „Sonstiges“ (Z. 2417); die Information geht verloren.
-
-Vorschlag: Entweder das Label offiziell aufnehmen (dann wäre die Unterstreichung zweitrangig) oder im Prompt ausdrücklich verbieten („Verwende nie das Label Genitivattribut; markiere stattdessen mit u:true“) und die Reste aus Farben/Abkürzungen entfernen.
-
-### 2.4 Deutscher und englischer Prompt sind nicht deckungsgleich
-
-- Regel 4 (Koordination): deutsch mit Beispielen („et“, „aut“, „-que“), englisch ohne.
-- Regel 7: deutsch nennt AcI/NcI und Partizipialkonstruktion als Beispiele, englisch nur „true multi-word clauses“.
-
-Vorschlag: Eine Fassung als Vorlage pflegen und die andere daraus übersetzen, damit beide Sprachen dieselbe Analyse liefern.
-
-### 2.5 Partizipien im Beispiel sind „Prädikat“ ohne Klammer
+### 2.3 Partizipien im Beispiel sind „Prädikat“ ohne Klammer
 
 Im Beispielsatz sind `sumptum` und `quaesitum` als „Prädikat“ markiert (elliptisch, „est“ fehlt), ohne Klammer „Partizipialkonstruktion“, obwohl Regel 7 solche Konstruktionen als Gruppen vorsieht. Für die Cicero-Stelle ist das vertretbar; das Modell verallgemeinert aber: Partizip → Prädikat.
 
 Vorschlag: Beispielsatz mit finiten Verben wählen oder den elliptischen Charakter im Beispiel kurz benennen.
-
-### 2.6 Uneinheitliche Labelnamen in den veröffentlichten Übungen
-
-Ältere Übungen (1,1; 1,2; 2,3-4; 5; 6) zeigen „Verb“ und „AcI“, neuere „Prädikat“ und „AcI/NcI“. Schülerinnen und Schüler begegnen je nach Übung unterschiedlichen Namen für dieselbe Funktion (95 × „Verb“ gegenüber 196 × „Prädikat“).
-
-Vorschlag: Einen Namen festlegen und die betroffenen Übungen neu exportieren. Alternativ „Verb“ als Alias in der Übersetzungstabelle der Schülerseite führen.
 
 ---
 
@@ -104,8 +85,7 @@ Vorschlag: Einen Namen festlegen und die betroffenen Übungen neu exportieren. A
 
 - **Mischung der Ebenen.** Die Liste vereint Kasus (`Ablativ`), Wortarten (`Adverb`, `Konjunktion`, `Subjunktion`, `Infinitiv`) und Satzglieder (`Subjekt`, Objekte, `Prädikativum`). Die 174 „Adverb“-Markierungen zeigen, dass das Label faktisch als „Adverbiale Bestimmung“ dient. Frage: Soll „Adverb“ in „Adverbiale Bestimmung“ umbenannt werden, und soll „Ablativ“ eine Funktion benennen (z. B. „Adverbiale Bestimmung (Abl.)“)?
 - **Fehlende Kategorien.** Es gibt kein `Prädikatsnomen`, keine `Apposition`, kein `Attribut`. Adjektivattribute werden laut Regel 8 mit dem Bezugswort zusammengefasst (konsistent), Appositionen bleiben unbestimmt.
-- **Synonymtabelle.** `normalizeLabel` kennt „Attribut“, „Apposition“, „Adverbiale“, „Objekt“ nicht; solche Ausgaben werden „Sonstiges“. Wenn die Liste bleibt, wie sie ist, könnten wenigstens „Adverbiale“ → „Adverb“ und „Prädikatsnomen“ → „Prädikativum“ ergänzt werden. Mit der KI-Anbindung ist das Modell ohnehin auf die erlaubten Labels festgelegt; die Tabelle greift dann praktisch nicht mehr.
-- **Tastenkürzel.** Die Kürzeltabellen (Z. 444 Schülerseite, Z. 1360 Editor) nennen noch „Accusative with infinitive“ und „AcI“; das aktuelle Label heißt „AcI/NcI“. Das Kürzel `c` funktioniert nur zufällig, weil der Buchstabe frei ist.
+- **Synonymtabelle.** `normalizeLabel` kennt „Attribut“, „Apposition“, „Adverbiale“, „Objekt“ nicht; solche Ausgaben werden „Sonstiges“. Mit der KI-Anbindung ist das Modell ohnehin auf die erlaubten Labels festgelegt, die Tabelle greift also praktisch nicht mehr. Falls die Liste bleibt, wie sie ist, wären „Adverbiale“ → „Adverb“ und „Prädikatsnomen“ → „Prädikativum“ sinnvolle Ergänzungen.
 - **Abkürzungen.** „Prädikat“ und „Nebensatz“ werden nicht gekürzt (Z. 989) und sind unter kurzen Wörtern breiter als das Wort.
 
 ---
@@ -118,10 +98,15 @@ Vorschlag: Einen Namen festlegen und die betroffenen Übungen neu exportieren. A
 
 ---
 
-## 5. Bereits im Cleanup geändert (Code-Fehler, keine Grammatikentscheidung)
+## 5. Bereits umgesetzt
 
+Diese Punkte waren eindeutige Fehler oder reine Vereinheitlichungen und sind bereits geändert; die grammatischen Entscheidungen der Abschnitte 2 bis 4 sind davon unberührt.
+
+- **„Genitivattribut“ ist kein Label mehr.** Farbe und Abkürzung sind entfernt; gibt das Modell trotzdem „Genitivattribut“ aus, wird daraus ausdrücklich „Sonstiges“. Genitivattribute werden weiterhin über die Markierung `"u": true` am Wort ausgezeichnet, wie Regel 8 es vorsieht.
+- **Deutscher und englischer Prompt sind deckungsgleich.** Regel 4 nennt in beiden Sprachen dieselben Konjunktionen, Regel 7 dieselben Konstruktionen, Regel 8 erklärt die Markierung in beiden Sprachen mit dem Beispiel „amor patriae“ und stellt klar, dass ein Genitivattribut kein eigenes Label und keine Klammer bekommt. Ein Test hält die Parität fest.
+- **Einheitliche Labelnamen.** „Verb“ heißt jetzt überall „Prädikat“, „AcI“ und „Accusative with infinitive“ heißen „AcI/NcI“. Die 15 veröffentlichten Übungen wurden entsprechend umgeschrieben; alte Namen werden beim Import weiterhin erkannt. Die Tastenkürzel-Tabelle nennt keine veralteten Labels mehr.
 - **Prompt-Beispiel korrigiert.** Das Beispiel in Regel 9 hatte `Clodiae` (ein Dativobjekt) mit `"u": true` markiert, obwohl Regel 8 dieses Kennzeichen für Genitivattribute reserviert; die Markierung ist entfernt, und Regel 8 zeigt jetzt ein echtes Beispiel („amor patriae“). Ein Testlauf hatte gezeigt, dass das Modell den Fehler aus dem Beispiel übernahm.
 - **Enklitika nur mit Bindestrich.** Bisher wurde jedes alleinstehende „ne“ oder „ve“ an das vorhergehende Wort geklebt („Timeo ne veniat“ → „Timeone veniat“). Jetzt gilt die Regel nur für „-que“, „-ne“, „-ve“ mit Bindestrich.
 - **Keine doppelte Präpositionsverschmelzung.** Ein Token, das schon eine Phrase ist („a Clodia“, wie im Prompt-Beispiel vorgegeben), wurde erneut mit dem Folgewort verschmolzen („in foro Romae ambulabat“ als eine Präpositionalphrase, samt falscher Genitiv-Unterstreichung). Jetzt werden nur einzelne Wörter aus der Präpositionsliste verschmolzen.
 
-Beides beseitigt offensichtliches Fehlverhalten; die Präpositionsliste, die Regeln des Prompts und die Label-Listen sind unverändert.
+Die Präpositionsliste und die Label-Listen selbst sind unverändert; die offenen Fragen der Abschnitte 2 bis 4 warten auf Ihre Entscheidung.
