@@ -23,7 +23,7 @@ The key is never part of this repository, of saved project files, or of exported
 
 ## What to expect from the AI, honestly
 
-The AI writes a **draft that the teacher corrects**, not a finished answer. Review every exercise in the editor before it reaches students: subjects, clause boundaries, predicatives and the ablative absolute are the places to look first. If the AI drops, changes or invents a word, the page warns before importing. (An earlier version of this project tried a local Latin parser instead of an AI service; it reached about 70 percent correct labels and was abandoned. The AI service has not been measured on the same material yet; the exported exercises in this repository, which contain the teacher's own corrected analyses, would be the material for that.)
+The AI writes a **draft that the teacher corrects**, not a finished answer. Review every exercise in the editor before it reaches students: subjects, clause boundaries, predicatives and the ablative absolute are the places to look first. If the AI drops, changes or invents a word, the page warns before importing.
 
 Grammar-side rules (the prompt, the label sets, the preposition list, the enclitic rule) are documented and questioned in `docs/syntax-analyse-review.md`. Decisions about them are the author's.
 
@@ -48,6 +48,4 @@ npm test
 
 `index.html` is edited directly; `src/latin-core.js` holds the pure text functions so they can be tested. The student page template sits inside `index.html` in two `<script type="text/template">` blocks (CSS and JavaScript). The Worker is deployed separately with Wrangler (see `worker/README.md`).
 
-## Credits
 
-Created by Anke Walter, with help from J. L., ChatGPT and Gemini. The picture on the example pages was designed by Freepik (www.freepik.com).
