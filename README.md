@@ -33,6 +33,8 @@ Grammar-side rules (the prompt, the label sets, the preposition list, the enclit
 |---|---|
 | `index.html` | The teacher tool, including the template of the exported student page |
 | `src/latin-core.js` | The text logic the tool shares with the tests: tokenising, enclitics, preposition welding, the completeness check of AI answers |
+| `src/latin-labels.js` | The label system: which labels exist per level, their colours, abbreviations and shortcuts, and how a label from the AI or an older exercise is mapped onto a current one |
+| `src/latin-prompt.js` | The instruction sent to the AI, German and English kept parallel |
 | `worker/` | The Cloudflare Worker that holds the OpenAI key (optional), with its own README |
 | `docs/syntax-analyse-review.md` | Review of the syntax-analysis logic with proposals (German) |
 | `tests/` | Automated tests for `src/latin-core.js` |
