@@ -189,12 +189,8 @@
                 </select>
             </div>
 
-            <button class="btn-action" style="background:var(--primary-color);" id="btn-copy-ai" data-ref="btnCopyAi">1. Copy AI Prompt</button>
-            <span style="margin: 0 16px; font-weight:600; color:#64748b; font-size: 0.9rem;" id="or-text-ai" data-ref="orTextAi">OR</span>
-            <button class="btn-action" style="background:#7c3aed;" id="btn-analyze-ai" data-ref="btnAnalyzeAi">✨ Analyze with AI</button>
+            <button class="btn-action" style="background:var(--primary-color);" id="btn-analyze-ai" data-ref="btnAnalyzeAi">✨ Analyze with AI</button>
             <button class="subtle-btn" style="margin-left:8px;" id="btn-ai-key" data-ref="btnAiKey">🔑 API key</button>
-            <textarea id="ai-json" data-ref="aiJson" rows="2" style="width:100%; margin: 16px 0; padding:12px; border:1px solid #d1d5db; border-radius:6px; box-sizing: border-box;" placeholder="Paste JSON here..."></textarea>
-            <button class="btn-action" style="background:#10b981;" id="btn-import" data-ref="btnImport">2. Import</button>
             <span style="margin: 0 16px; font-weight:600; color:#64748b; font-size: 0.9rem;" id="or-text" data-ref="orText">OR</span>
             <label class="btn-action" style="background:#64748b; cursor: pointer; display:inline-block;">
                 <span id="btn-load" data-ref="btnLoad">Load Saved Project</span> <input type="file" style="display:none" accept=".json" id="file-load-setup" data-ref="fileLoadSetup">
@@ -1024,10 +1020,10 @@ const CONFIG = {
     LANG_TEXT: {
         en: {
             heading: "Latin Syntax Studio", instrH3: "Step 1: Setup Instruction",
-            instrBody: "This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br><br>On this page, you will be asked to provide a title, optional notes for the students, a picture for the student page (optional) and a text or a few sentences. Then, click 'Copy AI Prompt' and paste the prompt into a large language model such as ChatGPT or Gemini. Finally, paste the JSON code the AI gives you into the box and click 'Import' or 'Start manual creation'.<br><br>Alternatively, click 'Analyze with AI' to let OpenAI do this step directly; this needs your own OpenAI API key, entered once via the key button next to it.",
+            instrBody: "This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br><br>Enter a title, optional notes for the students, an optional picture for the student page and a Latin text of up to 300 words, choose the grammar level and click 'Analyze with AI'. The analysis is done by OpenAI; for this you enter your own OpenAI API key once via the key button (it stays in this browser only). Then check and refine the analysis in the editor and export the student page. You can also start a manual analysis without AI.",
             exampleLink: "Want to see what the final result looks like?", linkText: "View Example",
-            phTitle: "Exercise Title", phImage: "Optional: Image URL", phNotes: "Optional: Context / Teacher Notes", phText: "Paste Latin text here...", phJson: "Paste JSON here...",
-            btnCopy: "1. Copy AI Prompt", btnImport: "2. Import", btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
+            phTitle: "Exercise Title", phImage: "Optional: Image URL", phNotes: "Optional: Context / Teacher Notes", phText: "Paste Latin text here...",
+            btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
             lblLevel: "Grammar Level:", optBeg: "Beginner", optInt: "Intermediate", optAdv: "Advanced (All)",
             editH3: "Step 2: Editing Instruction",
             editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically. Use 'Manual Split' to separate. Use 'Draw Bracket' to group phrases. You can use 'Mark Genitive' to draw an underline marking a genitive attribute inside a larger phrase group! Double-click any word or punctuation to edit it or add a hint. Shortcuts: 'X' for Split, 'M' for Bracket, 'G' for Genitive Underline, 'W' to Toggle Break, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.",
@@ -1036,7 +1032,7 @@ const CONFIG = {
             btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work",
             modalTitle: "Name this Syntactic Group:", btnCancel: "Cancel", btnSaveGroup: "Save", btnDelete: "Delete", confirmDelete: "Are you sure you want to delete this word?",
             modeTag: "Mode: Tagging", modeSplit: "Mode: Manual Split", modeLineBreak: "Mode: Toggle Break", modeBracket: "Mode: Drawing Bracket", modeAttr: "Mode: Mark Genitive",
-            togglePat: "Toggle Patterns", toggleCon: "Toggle High Contrast", promptSuccess: "Prompt copied!", promptFail: "Copy failed!",
+            togglePat: "Toggle Patterns", toggleCon: "Toggle High Contrast",
             phWordHint: "E.g. Derived from...", phGroupHint: "E.g. Look out for the ablative...", phGroupSearch: "Type to search...",
             btnAnalyze: "✨ Analyze with AI", btnAnalyzeBusy: "⏳ Analyzing…", btnAiKey: "🔑 API key",
             aiKeyTitle: "OpenAI API key", aiKeyLabel: "API key:", aiKeyRemove: "Remove",
@@ -1046,15 +1042,15 @@ const CONFIG = {
             aiErrBilling: "Your OpenAI credit or spend limit is used up. Top up or raise the limit at platform.openai.com.",
             aiErrRate: "OpenAI rate limit reached. Please wait a moment and try again.",
             aiErrRefusal: "The model refused to analyze this text.", aiErrIncomplete: "The answer was cut off. Please try a shorter text.",
-            aiErrNetwork: "Could not reach OpenAI (network, CORS or timeout). Use 'Copy AI Prompt' instead.",
+            aiErrNetwork: "Could not reach OpenAI (network problem or timeout). Please check your connection and try again.",
             aiErrOther: "OpenAI error: "
         },
         de: {
             heading: "Syntax-Werkstatt Latein", instrH3: "Schritt 1: Einrichtung",
-            instrBody: "Diese Seite ermöglicht es Ihnen, eigene Sätze für die syntaktische Analyse zu erstellen. Geben Sie einen Titel, optionale Hinweise, ein Bild (optional) und den lateinischen Text ein. Klicken Sie dann auf 'KI-Prompt kopieren', fügen Sie diesen in ChatGPT oder Gemini ein und kopieren Sie den JSON-Code der KI in das Importfeld. Klicken Sie abschließend auf 'Importieren' oder 'Manuell starten'.<br><br>Alternativ klicken Sie auf 'Mit KI analysieren', damit OpenAI diesen Schritt direkt übernimmt; dafür wird einmalig Ihr eigener OpenAI-API-Schlüssel benötigt (Schlüssel-Button daneben).",
+            instrBody: "Diese Seite ermöglicht es Ihnen, eigene Sätze für die syntaktische Analyse zu erstellen. Geben Sie einen Titel, optionale Hinweise für die Lernenden, ein Bild (optional) und den lateinischen Text (bis 300 Wörter) ein, wählen Sie die Grammatik-Stufe und klicken Sie auf 'Mit KI analysieren'. Die Analyse übernimmt OpenAI; dafür hinterlegen Sie einmalig Ihren eigenen OpenAI-API-Schlüssel über den Schlüssel-Button (er bleibt nur in diesem Browser). Prüfen und verfeinern Sie die Analyse anschließend im Editor und exportieren Sie die Schülerseite. Ohne KI können Sie auch manuell starten.",
             exampleLink: "Möchten Sie sehen, wie das Ergebnis aussieht?", linkText: "Beispiel ansehen",
-            phTitle: "Übungstitel (z.B. Interaktives Syntax-Training)", phImage: "Optional: Bild-URL", phNotes: "Optional: Kontext / Lehrerhinweise", phText: "Lateinischen Text hier einfügen...", phJson: "JSON hier einfügen...",
-            btnCopy: "1. KI-Prompt kopieren", btnImport: "2. Importieren", btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
+            phTitle: "Übungstitel (z.B. Interaktives Syntax-Training)", phImage: "Optional: Bild-URL", phNotes: "Optional: Kontext / Lehrerhinweise", phText: "Lateinischen Text hier einfügen...",
+            btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
             lblLevel: "Grammatik-Level:", optBeg: "Anfänger", optInt: "Fortgeschritten", optAdv: "Profi (Alle)",
             editH3: "Schritt 2: Bearbeitung",
             editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Klammer zeichnen'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer größeren Gruppe durch Unterstreichung hervorheben! Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Shortcuts: 'X' für Trennen, 'M' für Klammer, 'G' für Genitiv-Unterstreichung, 'W' für Umbruch, Strg+Z für Rückgängig.",
@@ -1063,7 +1059,7 @@ const CONFIG = {
             btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden",
             modalTitle: "Name der syntaktischen Gruppe:", btnCancel: "Abbrechen", btnSaveGroup: "Speichern", btnDelete: "Löschen", confirmDelete: "Möchten Sie dieses Wort wirklich löschen?",
             modeTag: "Modus: Markieren", modeSplit: "Modus: Manuell trennen", modeLineBreak: "Modus: Umbruch umschalten", modeBracket: "Modus: Klammer zeichnen", modeAttr: "Modus: Genitiv markieren",
-            togglePat: "Muster umschalten", toggleCon: "Hoher Kontrast", promptSuccess: "Prompt kopiert!", promptFail: "Kopieren fehlgeschlagen!",
+            togglePat: "Muster umschalten", toggleCon: "Hoher Kontrast",
             phWordHint: "Z.B. abgeleitet von...", phGroupHint: "Z.B. Achte auf den Ablativ...", phGroupSearch: "Tippen zum Suchen...",
             btnAnalyze: "✨ Mit KI analysieren", btnAnalyzeBusy: "⏳ Analysiere…", btnAiKey: "🔑 API-Schlüssel",
             aiKeyTitle: "OpenAI-API-Schlüssel", aiKeyLabel: "API-Schlüssel:", aiKeyRemove: "Entfernen",
@@ -1073,7 +1069,7 @@ const CONFIG = {
             aiErrBilling: "Ihr OpenAI-Guthaben bzw. Ausgabenlimit ist aufgebraucht. Bitte auf platform.openai.com aufladen oder das Limit erhöhen.",
             aiErrRate: "OpenAI-Ratenlimit erreicht. Bitte kurz warten und erneut versuchen.",
             aiErrRefusal: "Das Modell hat die Analyse dieses Textes verweigert.", aiErrIncomplete: "Die Antwort wurde abgeschnitten. Bitte einen kürzeren Text versuchen.",
-            aiErrNetwork: "OpenAI nicht erreichbar (Netzwerk, CORS oder Timeout). Bitte stattdessen 'KI-Prompt kopieren' verwenden.",
+            aiErrNetwork: "OpenAI nicht erreichbar (Netzwerkproblem oder Zeitüberschreitung). Bitte Verbindung prüfen und erneut versuchen.",
             aiErrOther: "OpenAI-Fehler: "
         }
     }
@@ -1492,14 +1488,11 @@ function changeLanguage(lang) {
     
     DOM.teacherNotes.placeholder = txt.phNotes; 
     DOM.enterText.placeholder = txt.phText;
-    DOM.aiJson.placeholder = txt.phJson; 
-    DOM.btnCopyAi.textContent = txt.btnCopy;
-    DOM.btnImport.textContent = txt.btnImport; 
     DOM.orText.textContent = txt.or;
     DOM.btnLoad.textContent = txt.btnLoad; 
     DOM.btnManual.textContent = txt.btnManual;
     if (!DOM.btnAnalyzeAi.disabled) DOM.btnAnalyzeAi.textContent = txt.btnAnalyze; // keep the busy label while a request runs
-    DOM.orTextAi.textContent = txt.or; DOM.btnAiKey.textContent = txt.btnAiKey;
+    updateAiKeyButton();
     DOM.aiKeyTitle.textContent = txt.aiKeyTitle; DOM.lblAiKey.textContent = txt.aiKeyLabel; DOM.aiKeyNote.textContent = txt.aiKeyNote;
     DOM.btnAiKeyRemove.textContent = txt.aiKeyRemove; DOM.btnAiKeyCancel.textContent = txt.btnCancel; DOM.btnAiKeySave.textContent = txt.btnSaveGroup;
     
@@ -1819,8 +1812,6 @@ function initEventListeners() {
     DOM.grammarLevelSetup.addEventListener('change', (e) => changeLevel(e.target.value));
     DOM.grammarLevelEditor.addEventListener('change', (e) => changeLevel(e.target.value));
     
-    DOM.btnCopyAi.addEventListener('click', copyAIPrompt);
-    DOM.btnImport.addEventListener('click', importAI);
     DOM.btnAnalyzeAi.addEventListener('click', analyzeWithAI);
     DOM.btnAiKey.addEventListener('click', openAiKeyModal);
     DOM.btnAiKeyCancel.addEventListener('click', closeAiKeyModal);
@@ -2321,48 +2312,6 @@ Verwende ausschließlich diese Labels: ${AppState.functions.join(', ')}.`
 Use ONLY these Labels: ${AppState.functions.join(', ')}.`;
 }
 
-function copyAIPrompt() {
-    const btn = DOM.btnCopyAi;
-    const originalText = btn.textContent;
-    const txt = getSanitizedSourceText();
-    if (txt === null) return;
-    const promptText = buildAIPrompt(txt);
-
-    const showStatus = (isSuccess) => {
-        btn.textContent = isSuccess ? "✅ " + CONFIG.LANG_TEXT[AppState.lang].promptSuccess : "❌ " + CONFIG.LANG_TEXT[AppState.lang].promptFail;
-        btn.style.backgroundColor = isSuccess ? "#10b981" : "#ef4444";
-        setTimeout(() => {
-            btn.textContent = originalText;
-            btn.style.backgroundColor = "var(--primary-color)";
-        }, 2000);
-    };
-
-    const synchronousFallback = () => {
-        const textArea = document.createElement("textarea");
-        textArea.value = promptText;
-        textArea.style.position = "fixed"; // Prevents scrolling
-        textArea.style.opacity = "0";      // Hides it visually
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-            const success = document.execCommand('copy');
-            showStatus(success);
-        } catch (err) {
-            showStatus(false);
-        }
-        document.body.removeChild(textArea);
-    };
-
-    // Safely attempt the modern approach first, catching local-file security blocks
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(promptText)
-            .then(() => showStatus(true))
-            .catch(() => synchronousFallback());
-    } else {
-        synchronousFallback();
-    }
-}
-
 function applyPrepositionMerging(tokens) {
     let welded = []; let map = {}; const prepLabel = AppState.lang === 'de' ? 'Präpositionale Bestimmung' : 'Prepositional phrase';
     for(let i=0; i < tokens.length; i++) {
@@ -2435,9 +2384,8 @@ function normalizeLabel(label) {
     return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
-function importAI() {
+function importAI(raw) {
     try {
-        const raw = DOM.aiJson.value;
         
         let cleanJson = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
         const jsonMatch = cleanJson.match(/\{[\s\S]*"words"[\s\S]*\}/);
@@ -2525,7 +2473,7 @@ function importAI() {
 }
 
 // ==========================================
-// 7b. DIRECT OPENAI CALL (optional; the copy/paste flow above stays as the fallback)
+// 7b. OPENAI CALL (the analysis pipeline; manual creation stays as the no-AI alternative)
 // ==========================================
 
 function getAiKey() {
@@ -2543,6 +2491,10 @@ function closeAiKeyModal() {
     DOM.aiKeyInput.value = '';
 }
 
+function updateAiKeyButton() {
+    DOM.btnAiKey.textContent = CONFIG.LANG_TEXT[AppState.lang].btnAiKey + (getAiKey() ? ' ✓' : '');
+}
+
 function saveAiKeyFromModal() {
     const key = DOM.aiKeyInput.value.trim();
     try {
@@ -2550,6 +2502,7 @@ function saveAiKeyFromModal() {
         else localStorage.removeItem(CONFIG.AI.KEY_STORAGE);
     } catch (e) { console.warn("Could not store the API key (storage blocked).", e); }
     closeAiKeyModal();
+    updateAiKeyButton();
 }
 
 // Strict schema for OpenAI Structured Outputs: every object is closed (additionalProperties:false, all keys required)
@@ -2606,8 +2559,7 @@ async function analyzeWithAI() {
         if (refusal) { alert(t.aiErrRefusal); return; }
         if (data.status === 'incomplete') { alert(t.aiErrIncomplete); return; }
         if (data.status !== 'completed' || !textPart) { alert(t.aiErrOther + (err.message || data.status || 'empty response')); return; }
-        DOM.aiJson.value = textPart.text; // stays visible, so the manual "Import" button works on it as well
-        importAI();
+        importAI(textPart.text);
     } catch (e) {
         console.error("OpenAI request failed:", e); // AbortError (timeout) or TypeError (network / CORS)
         alert(t.aiErrNetwork);
