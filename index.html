@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title id="page-title" data-ref="pageTitleTag">Latin Syntax Studio</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <script src="src/latin-core.js"></script>
+    <script src="src/latin-labels.js"></script>
+    <script src="src/latin-prompt.js"></script>
     <style>
         :root { 
             --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -85,6 +88,7 @@
         
         .btn-action { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; color: white; transition: opacity 0.2s; font-size: 0.9rem; }
         .btn-action:hover { opacity: 0.9; }
+        .btn-action:disabled { opacity: 0.6; cursor: wait; }
         .btn-action.active-mode { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); outline: 2px solid #111827; outline-offset: 2px; }
         #split-mode-btn.active-mode { outline-color: #ef4444; background: #dc2626 !important; }
         #group-mode-btn.active-mode { outline-color: #8b5cf6; background: #7c3aed !important; }
@@ -188,9 +192,8 @@
                 </select>
             </div>
 
-            <button class="btn-action" style="background:var(--primary-color);" id="btn-copy-ai" data-ref="btnCopyAi">1. Copy AI Prompt</button>
-            <textarea id="ai-json" data-ref="aiJson" rows="2" style="width:100%; margin: 16px 0; padding:12px; border:1px solid #d1d5db; border-radius:6px; box-sizing: border-box;" placeholder="Paste JSON here..."></textarea>
-            <button class="btn-action" style="background:#10b981;" id="btn-import" data-ref="btnImport">2. Import</button>
+            <button class="btn-action" style="background:var(--primary-color);" id="btn-analyze-ai" data-ref="btnAnalyzeAi">✨ Analyze with AI</button>
+            <button class="subtle-btn" style="margin-left:8px;" id="btn-ai-key" data-ref="btnAiKey">🔑 API key</button>
             <span style="margin: 0 16px; font-weight:600; color:#64748b; font-size: 0.9rem;" id="or-text" data-ref="orText">OR</span>
             <label class="btn-action" style="background:#64748b; cursor: pointer; display:inline-block;">
                 <span id="btn-load" data-ref="btnLoad">Load Saved Project</span> <input type="file" style="display:none" accept=".json" id="file-load-setup" data-ref="fileLoadSetup">
@@ -303,6 +306,20 @@
         </div>
     </div>
     
+    <div id="ai-key-modal" class="modal-overlay" data-ref="aiKeyModal">
+        <div class="modal-box">
+            <div class="modal-title" id="ai-key-title" data-ref="aiKeyTitle">OpenAI API key</div>
+            <p id="ai-key-note" data-ref="aiKeyNote" style="font-size:0.85rem; color:#4b5563; margin:0 0 16px; line-height:1.4;"></p>
+            <label class="modal-label" id="lbl-ai-key" data-ref="lblAiKey">API key:</label>
+            <input type="password" id="ai-key-input" class="modal-input" data-ref="aiKeyInput" placeholder="sk-..." autocomplete="off" spellcheck="false">
+            <div class="modal-actions">
+                <button class="btn-action" style="background:#ef4444; margin-right:auto;" id="btn-ai-key-remove" data-ref="btnAiKeyRemove">Remove</button>
+                <button class="btn-action" style="background:#64748b;" id="btn-ai-key-cancel" data-ref="btnAiKeyCancel">Cancel</button>
+                <button class="btn-action" style="background:var(--primary-color);" id="btn-ai-key-save" data-ref="btnAiKeySave">Save</button>
+            </div>
+        </div>
+    </div>
+
     <div id="autosave-status" data-ref="autosaveStatus">Autosaved</div>
 <!-- ========================================== -->
     <!-- STUDENT PAGE TEMPLATES -->
@@ -429,27 +446,7 @@
             labelShortcuts = {};
             let used = new Set(['x', 'm', 'w', 'g']); 
             
-            const hardcoded = {
-                'Subject': 's', 'Subjekt': 's',
-                'Verb': 'p', 'Prädikat': 'p',
-                'Accusative object': 'a', 'Akkusativobjekt': 'a',
-                'Dative object': 'd', 'Dativobjekt': 'd',
-                'Genitive object': 'v', 'Genitivobjekt': 'v',
-                'Ablative': 'l', 'Ablativ': 'l',
-                'Ablative absolute': 'b', 'Ablativus absolutus': 'b',
-                'Prepositional phrase': 'o', 'Präpositionale Bestimmung': 'o',
-                'Predicative': 'r', 'Prädikativum': 'r',
-                'Adverb': 'e',
-                'Infinitive': 'i', 'Infinitiv': 'i',
-                'Accusative with infinitive': 'c', 'AcI': 'c',
-                'Participial phrase': 'z', 'Partizipialkonstruktion': 'z',
-                'Relative clause': 't', 'Relativsatz': 't',
-                'Subordinate clause': 'n', 'Nebensatz': 'n',
-                'Conjunction': 'k', 'Konjunktion': 'k',
-                'Subjunction': 'u', 'Subjunktion': 'u',
-                'Vocative': 'f', 'Vokativ': 'f',
-                'Other': 'y', 'Sonstiges': 'y'
-            };
+            const hardcoded = SHORTCUTS;
             
             const btns = Array.from(document.querySelectorAll('.menu-btn:not(.gen-btn)'));
             
@@ -920,7 +917,7 @@ function isTextTooLong(text, maxWords) {
     if (!text.trim()) return false;
     
     // Count words by splitting the text by any whitespace
-    const wordCount = text.trim().split(/\s+/).length;
+    const wordCount = LatinCore.countWords(text);
     
     if (wordCount > maxWords) {
         // Multi-language alert message
@@ -945,64 +942,25 @@ const CONFIG = {
     MAIN_CLAUSE_EN: 'Main clause',
     MAIN_CLAUSE_DE: 'Hauptsatz',
     SENTENCE_ENDERS: ['.', '!', '?', '·'],
-    PREPOSITIONS: ["a", "ab", "ad", "ante", "apud", "circum", "contra", "cum", "de", "e", "ex", "extra", "in", "infra", "inter", "intra", "ob", "per", "post", "prae", "pro", "prope", "propter", "sine", "sub", "super", "trans", "ultra"],
-  SAFE_COLORS: [
-        // The 19 actively assigned colors
-        '#4ade80', '#C76D72', '#fde047', '#fdba74', '#c4b5fd', 
-        '#fbcfe8', '#f472b6', '#93c5fd', '#60a5fa', '#ffedd5', 
-        '#e9d5ff', '#fca5a5', '#d6d3d1', '#f3f4f6', '#5eead4', 
-        '#818cf8', '#a7f3d0', '#a5f3fc', '#e5e7eb',
-        // The 3 exact leftover colors for new teacher functions
-        '#e9c46a', '#a3b18a', '#b5838d'
-    ],
-    SEMANTIC_COLORS: {
-        // --- Core Sentence Components (The Force Field) ---
-        'Subject': '#4ade80', 'Subjekt': '#4ade80', // Bright Green
-        'Verb': '#C76D72', 'Prädikat': '#C76D72', // Dark Rose
-        'Accusative object': '#fde047', 'Akkusativobjekt': '#fde047', // Bright Yellow
-        'Dative object': '#fdba74', 'Dativobjekt': '#fdba74', // Soft Orange
-        'Prepositional phrase': '#c4b5fd', 'Präpositionale Bestimmung': '#c4b5fd', // Light Violet
-        
-        // --- Secondary Elements & Clauses ---
-        'Genitive object': '#fbcfe8', 'Genitivobjekt': '#fbcfe8', // Light Pink
-        'Genitive attribute': '#f472b6', 'Genitivattribut': '#f472b6', // Deep Pink
-        'Ablative': '#93c5fd', 'Ablativ': '#93c5fd', // Soft Blue
-        'Ablative absolute': '#60a5fa', 'Ablativus absolutus': '#60a5fa', // Brighter Blue
-        'Adverb': '#ffedd5', // Pale Peach
-        'Infinitive': '#e9d5ff', 'Infinitiv': '#e9d5ff', // Pale Lilac
-        'Predicative': '#fca5a5', 'Prädikativum': '#fca5a5', // Rose
-        'Conjunction': '#d6d3d1', 'Konjunktion': '#d6d3d1', // Warm Grey
-        'Subjunction': '#f3f4f6', 'Subjunktion': '#f3f4f6', // Light Grey
-        'Participial phrase': '#5eead4', 'Partizipialkonstruktion': '#5eead4', // Teal
-        'Subordinate clause': '#818cf8', 'Nebensatz': '#818cf8', // Indigo (Highly distinct from Blues & Purples)
-        'Relative clause': '#a7f3d0', 'Relativsatz': '#a7f3d0', // Pale Mint
-        'Accusative/Nominative with infinitive': '#c084fc', 'AcI/NcI': '#c084fc', // Bright Purple
-        'Vocative': '#a5f3fc', 'Vokativ': '#a5f3fc', // Pale Cyan
-        'Other': '#e5e7eb', 'Sonstiges': '#e5e7eb' // Neutral Gray
+    AI: {
+        ENDPOINT: 'https://api.openai.com/v1/responses',
+        PROXY_URL: 'https://latin-syntax-proxy.latin-syntax-proxy.workers.dev/',            // set to the deployed worker URL (see worker/README.md): requests then go there WITHOUT a key and the key button disappears
+        MODEL: 'gpt-5.6-luna',    // cheapest current tier (checked 2026-09-04); 'gpt-5.6-terra' is the next step up
+        EFFORT: 'low',            // reasoning effort: none | low | medium | high (reasoning tokens are billed as output)
+        TIMEOUT_MS: 60000,
+        KEY_STORAGE: 'latin_tool_openai_key'
     },
-    PRESETS: {
-        en: {
-            beginner: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Prepositional phrase', 'Vocative', 'Other'],
-            intermediate: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other'],
-            advanced: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Accusative/Nominative with infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other']
-        },
-        de: {
-            beginner: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Vokativ', 'Sonstiges'],
-            intermediate: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges'],
-            advanced: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'AcI/NcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges']
-        }
-    },
-    ABBREVIATIONS: {
-        en: { 'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Genitive attribute': 'Gen. Attr', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Conjunction': 'Conj', 'Subjunction': 'Subjunc', 'Accusative/Nominative with infinitive': 'Acc/Nom+Inf', 'Vocative': 'Voc', 'Other': 'Other' },
-        de: { 'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Genitivattribut': 'Gen. Attr', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Konjunktion': 'Konj', 'Subjunktion': 'Subjunk', 'AcI/NcI': 'AcI/NcI', 'Vokativ': 'Vok', 'Sonstiges': 'Sonst.' }
-    },
+    SAFE_COLORS: LatinLabels.SAFE_COLORS,
+    SEMANTIC_COLORS: LatinLabels.SEMANTIC_COLORS,
+    PRESETS: LatinLabels.PRESETS,
+    ABBREVIATIONS: LatinLabels.ABBREVIATIONS,
     LANG_TEXT: {
         en: {
             heading: "Latin Syntax Studio", instrH3: "Step 1: Setup Instruction",
-            instrBody: "This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br><br>On this page, you will be asked to provide a title, optional notes for the students, a picture for the student page (optional) and a text or a few sentences. Then, click 'Copy AI Prompt' and paste the prompt into a large language model such as ChatGPT or Gemini. Finally, paste the JSON code the AI gives you into the box and click 'Import' or 'Start manual creation'.",
+            instrBody: "This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br><br>Enter a title, optional notes for the students, an optional picture for the student page and a Latin text of up to 300 words, choose the grammar level and click 'Analyze with AI'. The analysis is done by OpenAI.", instrKey: "For this you enter your own OpenAI API key once via the key button; it stays in this browser only.", instrBodyEnd: "Then check and refine the analysis in the editor and export the student page. You can also start a manual analysis without AI.",
             exampleLink: "Want to see what the final result looks like?", linkText: "View Example",
-            phTitle: "Exercise Title", phImage: "Optional: Image URL", phNotes: "Optional: Context / Teacher Notes", phText: "Paste Latin text here...", phJson: "Paste JSON here...",
-            btnCopy: "1. Copy AI Prompt", btnImport: "2. Import", btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
+            phTitle: "Exercise Title", phImage: "Optional: Image URL", phNotes: "Optional: Context / Teacher Notes", phText: "Paste Latin text here...",
+            btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
             lblLevel: "Grammar Level:", optBeg: "Beginner", optInt: "Intermediate", optAdv: "Advanced (All)",
             editH3: "Step 2: Editing Instruction",
             editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically. Use 'Manual Split' to separate. Use 'Draw Bracket' to group phrases. You can use 'Mark Genitive' to draw an underline marking a genitive attribute inside a larger phrase group! Double-click any word or punctuation to edit it or add a hint. Shortcuts: 'X' for Split, 'M' for Bracket, 'G' for Genitive Underline, 'W' to Toggle Break, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.",
@@ -1011,15 +969,26 @@ const CONFIG = {
             btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work",
             modalTitle: "Name this Syntactic Group:", btnCancel: "Cancel", btnSaveGroup: "Save", btnDelete: "Delete", confirmDelete: "Are you sure you want to delete this word?",
             modeTag: "Mode: Tagging", modeSplit: "Mode: Manual Split", modeLineBreak: "Mode: Toggle Break", modeBracket: "Mode: Drawing Bracket", modeAttr: "Mode: Mark Genitive",
-            togglePat: "Toggle Patterns", toggleCon: "Toggle High Contrast", promptSuccess: "Prompt copied!", promptFail: "Copy failed!",
-            phWordHint: "E.g. Derived from...", phGroupHint: "E.g. Look out for the ablative...", phGroupSearch: "Type to search..."
+            togglePat: "Toggle Patterns", toggleCon: "Toggle High Contrast",
+            phWordHint: "E.g. Derived from...", phGroupHint: "E.g. Look out for the ablative...", phGroupSearch: "Type to search...",
+            btnAnalyze: "✨ Analyze with AI", btnAnalyzeBusy: "⏳ Analyzing…", btnAiKey: "🔑 API key",
+            aiKeyTitle: "OpenAI API key", aiKeyLabel: "API key:", aiKeyRemove: "Remove",
+            aiKeyNote: "Stored only in this browser (localStorage) and sent directly to OpenAI. Anyone using this browser profile can read it. Use a key with a spend limit and remove it when you are done.",
+            aiErrNoKey: "Please enter your OpenAI API key first.", aiErrNoText: "Please paste a Latin text first.",
+            aiErrAuth: "OpenAI rejected the API key (401). Please check the key.",
+            aiErrBilling: "Your OpenAI credit or spend limit is used up. Top up or raise the limit at platform.openai.com.",
+            aiErrRate: "OpenAI rate limit reached. Please wait a moment and try again.",
+            aiErrRefusal: "The model refused to analyze this text.", aiErrIncomplete: "The answer was cut off. Please try a shorter text.",
+            aiErrNetwork: "Could not reach OpenAI (network problem or timeout). Please check your connection and try again.",
+            aiErrOther: "OpenAI error: ",
+            aiCoverageWarn: "The AI's answer does not match the text word for word.", aiMissingWords: "Missing from the answer: ", aiExtraWords: "Not in the text: ", aiCoverageAsk: "Import anyway? (Cancel to try again.)"
         },
         de: {
             heading: "Syntax-Werkstatt Latein", instrH3: "Schritt 1: Einrichtung",
-            instrBody: "Diese Seite ermöglicht es Ihnen, eigene Sätze für die syntaktische Analyse zu erstellen. Geben Sie einen Titel, optionale Hinweise, ein Bild (optional) und den lateinischen Text ein. Klicken Sie dann auf 'KI-Prompt kopieren', fügen Sie diesen in ChatGPT oder Gemini ein und kopieren Sie den JSON-Code der KI in das Importfeld. Klicken Sie abschließend auf 'Importieren' oder 'Manuell starten'.",
+            instrBody: "Diese Seite ermöglicht es Ihnen, eigene Sätze für die syntaktische Analyse zu erstellen. Geben Sie einen Titel, optionale Hinweise für die Lernenden, ein Bild (optional) und den lateinischen Text (bis 300 Wörter) ein, wählen Sie die Grammatik-Stufe und klicken Sie auf 'Mit KI analysieren'. Die Analyse übernimmt OpenAI.", instrKey: "Dafür hinterlegen Sie einmalig Ihren eigenen OpenAI-API-Schlüssel über den Schlüssel-Button; er bleibt nur in diesem Browser.", instrBodyEnd: "Prüfen und verfeinern Sie die Analyse anschließend im Editor und exportieren Sie die Schülerseite. Ohne KI können Sie auch manuell starten.",
             exampleLink: "Möchten Sie sehen, wie das Ergebnis aussieht?", linkText: "Beispiel ansehen",
-            phTitle: "Übungstitel (z.B. Interaktives Syntax-Training)", phImage: "Optional: Bild-URL", phNotes: "Optional: Kontext / Lehrerhinweise", phText: "Lateinischen Text hier einfügen...", phJson: "JSON hier einfügen...",
-            btnCopy: "1. KI-Prompt kopieren", btnImport: "2. Importieren", btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
+            phTitle: "Übungstitel (z.B. Interaktives Syntax-Training)", phImage: "Optional: Bild-URL", phNotes: "Optional: Kontext / Lehrerhinweise", phText: "Lateinischen Text hier einfügen...",
+            btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
             lblLevel: "Grammatik-Level:", optBeg: "Anfänger", optInt: "Fortgeschritten", optAdv: "Profi (Alle)",
             editH3: "Schritt 2: Bearbeitung",
             editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Klammer zeichnen'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer größeren Gruppe durch Unterstreichung hervorheben! Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Shortcuts: 'X' für Trennen, 'M' für Klammer, 'G' für Genitiv-Unterstreichung, 'W' für Umbruch, Strg+Z für Rückgängig.",
@@ -1028,8 +997,19 @@ const CONFIG = {
             btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden",
             modalTitle: "Name der syntaktischen Gruppe:", btnCancel: "Abbrechen", btnSaveGroup: "Speichern", btnDelete: "Löschen", confirmDelete: "Möchten Sie dieses Wort wirklich löschen?",
             modeTag: "Modus: Markieren", modeSplit: "Modus: Manuell trennen", modeLineBreak: "Modus: Umbruch umschalten", modeBracket: "Modus: Klammer zeichnen", modeAttr: "Modus: Genitiv markieren",
-            togglePat: "Muster umschalten", toggleCon: "Hoher Kontrast", promptSuccess: "Prompt kopiert!", promptFail: "Kopieren fehlgeschlagen!",
-            phWordHint: "Z.B. abgeleitet von...", phGroupHint: "Z.B. Achte auf den Ablativ...", phGroupSearch: "Tippen zum Suchen..."
+            togglePat: "Muster umschalten", toggleCon: "Hoher Kontrast",
+            phWordHint: "Z.B. abgeleitet von...", phGroupHint: "Z.B. Achte auf den Ablativ...", phGroupSearch: "Tippen zum Suchen...",
+            btnAnalyze: "✨ Mit KI analysieren", btnAnalyzeBusy: "⏳ Analysiere…", btnAiKey: "🔑 API-Schlüssel",
+            aiKeyTitle: "OpenAI-API-Schlüssel", aiKeyLabel: "API-Schlüssel:", aiKeyRemove: "Entfernen",
+            aiKeyNote: "Wird nur in diesem Browser gespeichert (localStorage) und direkt an OpenAI gesendet. Jeder, der dieses Browserprofil nutzt, kann ihn auslesen. Verwenden Sie einen Schlüssel mit Ausgabenlimit und entfernen Sie ihn nach Gebrauch.",
+            aiErrNoKey: "Bitte zuerst den OpenAI-API-Schlüssel eingeben.", aiErrNoText: "Bitte zuerst einen lateinischen Text einfügen.",
+            aiErrAuth: "OpenAI hat den API-Schlüssel abgelehnt (401). Bitte Schlüssel prüfen.",
+            aiErrBilling: "Ihr OpenAI-Guthaben bzw. Ausgabenlimit ist aufgebraucht. Bitte auf platform.openai.com aufladen oder das Limit erhöhen.",
+            aiErrRate: "OpenAI-Ratenlimit erreicht. Bitte kurz warten und erneut versuchen.",
+            aiErrRefusal: "Das Modell hat die Analyse dieses Textes verweigert.", aiErrIncomplete: "Die Antwort wurde abgeschnitten. Bitte einen kürzeren Text versuchen.",
+            aiErrNetwork: "OpenAI nicht erreichbar (Netzwerkproblem oder Zeitüberschreitung). Bitte Verbindung prüfen und erneut versuchen.",
+            aiErrOther: "OpenAI-Fehler: ",
+            aiCoverageWarn: "Die Antwort der KI stimmt nicht Wort für Wort mit dem Text überein.", aiMissingWords: "In der Antwort fehlt: ", aiExtraWords: "Nicht im Text: ", aiCoverageAsk: "Trotzdem importieren? (Abbrechen, um es erneut zu versuchen.)"
         }
     }
 };
@@ -1127,24 +1107,10 @@ const AppState = {
         const wordObj = this.words[index];
         const text = wordObj.w || "";
 
-        // Case 1: The word actually contains spaces, so we split it into multiple tokens
-        if (text.includes(' ')) {
-            const parts = text.split(/\s+/);
-            const shiftAmount = parts.length - 1;
-
-            const newItems = parts.map((p, i) => {
-                const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(p);
-                return {
-                    w: p,
-                    f: hasLetters ? wordObj.f : CONFIG.PUNCT,
-                    isSplit: i === parts.length - 1 ? wordObj.isSplit : false,
-                    h: i === 0 ? wordObj.h : "",
-                    b: i === parts.length - 1 ? wordObj.b : 0,
-                    u: wordObj.u
-                };
-            });
-            
-            // Inject the new items into the words array
+        // Case 1: a multi-word token ("a Clodia") is split into its parts
+        const newItems = LatinCore.splitTokenParts(wordObj);
+        if (newItems) {
+            const shiftAmount = newItems.length - 1;
             this.words.splice(index, 1, ...newItems);
 
             // Shift all group boundaries to account for the newly inserted words
@@ -1329,6 +1295,7 @@ function cacheDOM() {
 
 function initApp() {
     cacheDOM();
+    importKeyFromUrl();
     CONFIG.PRESETS.en.advanced.forEach((f) => { if(!AppState.colors[f]) AppState.colors[f] = '#e5e7eb'; });
     CONFIG.PRESETS.de.advanced.forEach((f) => { if(!AppState.colors[f]) AppState.colors[f] = '#e5e7eb'; });
     
@@ -1366,28 +1333,7 @@ function updateShortcuts() {
     // Reserved Tool Keys
     let used = new Set(['x', 'm', 'w', 'g']); 
     
-    // Unified Intuitive Dictionary (EN & DE match exactly)
-    const hardcoded = {
-        'Subject': 's', 'Subjekt': 's',
-        'Verb': 'p', 'Prädikat': 'p',
-        'Accusative object': 'a', 'Akkusativobjekt': 'a',
-        'Dative object': 'd', 'Dativobjekt': 'd',
-        'Genitive object': 'v', 'Genitivobjekt': 'v',
-        'Ablative': 'l', 'Ablativ': 'l',
-        'Ablative absolute': 'b', 'Ablativus absolutus': 'b',
-        'Prepositional phrase': 'o', 'Präpositionale Bestimmung': 'o',
-        'Predicative': 'r', 'Prädikativum': 'r',
-        'Adverb': 'e',
-        'Infinitive': 'i', 'Infinitiv': 'i',
-        'Accusative with infinitive': 'c', 'AcI': 'c',
-        'Participial phrase': 'z', 'Partizipialkonstruktion': 'z',
-        'Relative clause': 't', 'Relativsatz': 't',
-        'Subordinate clause': 'n', 'Nebensatz': 'n',
-        'Conjunction': 'k', 'Konjunktion': 'k',
-        'Subjunction': 'u', 'Subjunktion': 'u',
-        'Vocative': 'f', 'Vokativ': 'f',
-        'Other': 'y', 'Sonstiges': 'y'
-    };
+    const hardcoded = LatinLabels.SHORTCUTS;
 
     // First pass: Assign hardcoded shortcuts
     AppState.functions.forEach(f => {
@@ -1434,7 +1380,7 @@ function changeLanguage(lang) {
     DOM.appHeading.textContent = txt.heading; 
     DOM.pageTitleTag.textContent = txt.heading;
     DOM.instrH3.textContent = txt.instrH3; 
-    DOM.instrBody.innerHTML = txt.instrBody;
+    DOM.instrBody.innerHTML = txt.instrBody + (CONFIG.AI.PROXY_URL ? '' : ' ' + txt.instrKey) + ' ' + txt.instrBodyEnd;
     DOM.exampleLinkText.textContent = txt.exampleLink; 
     DOM.linkExample.textContent = txt.linkText;
     DOM.pageTitle.placeholder = txt.phTitle; 
@@ -1447,12 +1393,13 @@ function changeLanguage(lang) {
     
     DOM.teacherNotes.placeholder = txt.phNotes; 
     DOM.enterText.placeholder = txt.phText;
-    DOM.aiJson.placeholder = txt.phJson; 
-    DOM.btnCopyAi.textContent = txt.btnCopy;
-    DOM.btnImport.textContent = txt.btnImport; 
     DOM.orText.textContent = txt.or;
     DOM.btnLoad.textContent = txt.btnLoad; 
     DOM.btnManual.textContent = txt.btnManual;
+    if (!DOM.btnAnalyzeAi.disabled) DOM.btnAnalyzeAi.textContent = txt.btnAnalyze; // keep the busy label while a request runs
+    updateAiKeyButton();
+    DOM.aiKeyTitle.textContent = txt.aiKeyTitle; DOM.lblAiKey.textContent = txt.aiKeyLabel; DOM.aiKeyNote.textContent = txt.aiKeyNote;
+    DOM.btnAiKeyRemove.textContent = txt.aiKeyRemove; DOM.btnAiKeyCancel.textContent = txt.btnCancel; DOM.btnAiKeySave.textContent = txt.btnSaveGroup;
     
     DOM.lblLevel.textContent = txt.lblLevel; 
     DOM.optBeg.textContent = txt.optBeg;
@@ -1770,8 +1717,12 @@ function initEventListeners() {
     DOM.grammarLevelSetup.addEventListener('change', (e) => changeLevel(e.target.value));
     DOM.grammarLevelEditor.addEventListener('change', (e) => changeLevel(e.target.value));
     
-    DOM.btnCopyAi.addEventListener('click', copyAIPrompt);
-    DOM.btnImport.addEventListener('click', importAI);
+    DOM.btnAnalyzeAi.addEventListener('click', analyzeWithAI);
+    DOM.btnAiKey.addEventListener('click', openAiKeyModal);
+    DOM.btnAiKeyCancel.addEventListener('click', closeAiKeyModal);
+    DOM.btnAiKeySave.addEventListener('click', saveAiKeyFromModal);
+    DOM.btnAiKeyRemove.addEventListener('click', () => { DOM.aiKeyInput.value = ''; saveAiKeyFromModal(); });
+    DOM.aiKeyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveAiKeyFromModal(); else if (e.key === 'Escape') closeAiKeyModal(); });
     
     DOM.fileLoadSetup.addEventListener('change', (e) => {
         if(e.target.files.length > 0) { StorageManager.importProject(e.target.files[0]); e.target.value = ''; }
@@ -2227,158 +2178,36 @@ function addCustomLabel() {
 // 7. IMPORT / EXPORT / PARSING LOGIC
 // ==========================================
 
-function copyAIPrompt() {
-    const btn = DOM.btnCopyAi;
-    const originalText = btn.textContent;
-    const txtEl = DOM.enterText;	
-
-	// ADD THIS NEW CHECK: Stop if text exceeds 300 words
-    if (isTextTooLong(txtEl.value, 300)) {
-        return; 
-    }
-	
-    let sanitizedText = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
-    sanitizedText = sanitizedText.replace(/"/g, "'");
+function getSanitizedSourceText() {
+    // Shared by Copy Prompt, Analyze with AI and Manual Creation: word-limit guard plus the same light clean-up
+    // (rejoin words hyphenated across line breaks, straight double quotes -> single quotes). Returns null when too long.
+    const txtEl = DOM.enterText;
+    if (isTextTooLong(txtEl.value, 300)) return null;
+    const sanitizedText = LatinCore.sanitizeText(txtEl.value);
     txtEl.value = sanitizedText;
-    
-    const txt = sanitizedText;
-    
-    const promptText = AppState.lang === 'de' 
-    ? `Analysiere die lateinische Syntax von: "${txt}".
-1. KEINE ÜBERSETZUNG: Analysiere direkt die lateinische Morphologie und Syntax (Kasus, Kongruenz, Verbvalenz). Übersetze den Satz NICHT im Hintergrund und analysiere auf keinen Fall die deutsche Übersetzung!
-2. STRIKTE REGEL: Behalte die EXAKTE Wortreihenfolge bei. Lass KEINE Wörter und KEINE Satzzeichen aus (insbesondere nicht den Schlusspunkt!).
-3. PHRASEN: Benachbarte Wörter einer Phrase erhalten die gleiche Funktion.
-4. KOORDINATION: Wenn eine Konjunktion (z.B. 'et', 'aut', '-que') Wörter mit derselben syntaktischen Funktion verbindet (z.B. zwei Adverbien oder zwei Subjekte), gib der Konjunktion und den Wörtern EXAKT DASSELBE Label, damit sie verschmelzen.
-5. HYPERBATON: Getrennte Phrasen erhalten die gleiche Funktion, bleiben aber an ihrem Platz.
-6. INTERPUNKTION: Jedes Satzzeichen (inkl. Schlusspunkt) wird als eigenes Token mit "f": "${CONFIG.PUNCT}" ausgegeben.
-7. GRUPPEN & NEBENSÄTZE: Identifiziere mehrteilige Konstruktionen (z.B. Nebensatz, AcI/NcI, Partizipialkonstruktion). WICHTIG: Wenn du eine 'Subjunktion' oder ein Relativpronomen identifizierst, MUSST du zwingend eine entsprechende Gruppe erstellen. Der "end"-Index schließt den Satz logisch ab (meist beim finiten Verb/Satzzeichen) und zerschneidet keine Phrasen.
-8. GENITIVATTRIBUTE: Adjektive und Genitivattribute werden mit ihrem Bezugswort zusammengefasst (sie erhalten also EXAKT DASSELBE Label, z.B. beide "Subjekt"). Damit das Genitivattribut trotzdem erkennbar bleibt, füge ZWINGEND dem JSON-Objekt des Genitivattributs die Eigenschaft "u": true hinzu. Erstelle KEINE "groups" Klammer für Genitivattribute!
-9. BEISPIEL: Für "Aurum sumptum a Clodia, venenum quaesitum quod Clodiae daretur." antworte exakt so: {"words": [{"w":"Aurum","f":"Subjekt"},{"w":"sumptum","f":"Prädikat"},{"w":"a Clodia","f":"Präpositionale Bestimmung"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subjekt"},{"w":"quaesitum","f":"Prädikat"},{"w":"quod","f":"Subjekt"},{"w":"Clodiae","f":"Dativobjekt","u":true},{"w":"daretur","f":"Prädikat"},{"w":".","f":"Punct"}], "groups": [{"start": 6, "end": 9, "label": "Relativsatz"}]}
-10. WICHTIG: Antworte AUSSCHLIESSLICH mit gültigem JSON. Keine Kommentare, keine abschließenden Kommas (trailing commas) vor Klammern! Format: { "words": [{"w": "Wort", "f": "Label", "u": true}], "groups": [] }
-Verwende ausschließlich diese Labels: ${AppState.functions.join(', ')}.`
-    : `Analyze Latin syntax of: "${txt}". 
-1. NO TRANSLATION: Analyze the Latin morphology and syntax directly (cases, agreement, verb valency). Do NOT translate the sentence in the background and do not analyze the syntax of an English translation!
-2. STRICT RULE: Maintain the EXACT word order. Do NOT omit any words or punctuation marks (especially the final full stop!).
-3. PHRASES: Adjacent phrase words get same function. 
-4. COORDINATION: If a conjunction connects words with the same syntactical function, give the conjunction and the words the EXACT SAME label so they merge. 
-5. HYPERBATON: Split phrases get same function but kept in place.
-6. PUNCTUATION: Include EVERY punctuation mark as a separate token "f": "${CONFIG.PUNCT}".
-7. GROUPS & CLAUSES: Identify true multi-word clauses. IMPORTANT: If you tag a word as a 'Subjunction' or relative pronoun, you MUST create a corresponding group in the "groups" array. The "end" index logically closes the clause and NEVER cuts a phrase in half.
-8. GENITIVE ATTRIBUTES: Adjectives and genitive attributes are grouped with the words they modify (give them the EXACT SAME label, e.g., both "Subject"). To distinguish the genitive attribute, you MUST add the property "u": true to the JSON object of the genitive word. Do NOT create a "groups" bracket for genitive attributes!
-9. EXAMPLE: For "Aurum sumptum a Clodia, venenum quaesitum quod Clodiae daretur." answer exactly like this: {"words": [{"w":"Aurum","f":"Subject"},{"w":"sumptum","f":"Verb"},{"w":"a Clodia","f":"Prepositional phrase"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subject"},{"w":"quaesitum","f":"Verb"},{"w":"quod","f":"Subject"},{"w":"Clodiae","f":"Dative object","u":true},{"w":"daretur","f":"Verb"},{"w":".","f":"Punct"}], "groups": [{"start": 6, "end": 9, "label": "Relative clause"}]}
-10. IMPORTANT: Return ONLY valid JSON. No comments, no trailing commas before brackets! Format: { "words": [{"w": "Word", "f": "Label", "u": true}], "groups": [] } 
-Use ONLY these Labels: ${AppState.functions.join(', ')}.`;
+    return sanitizedText;
+}
 
-    const showStatus = (isSuccess) => {
-        btn.textContent = isSuccess ? "✅ " + CONFIG.LANG_TEXT[AppState.lang].promptSuccess : "❌ " + CONFIG.LANG_TEXT[AppState.lang].promptFail;
-        btn.style.backgroundColor = isSuccess ? "#10b981" : "#ef4444";
-        setTimeout(() => {
-            btn.textContent = originalText;
-            btn.style.backgroundColor = "var(--primary-color)";
-        }, 2000);
-    };
-
-    const synchronousFallback = () => {
-        const textArea = document.createElement("textarea");
-        textArea.value = promptText;
-        textArea.style.position = "fixed"; // Prevents scrolling
-        textArea.style.opacity = "0";      // Hides it visually
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-            const success = document.execCommand('copy');
-            showStatus(success);
-        } catch (err) {
-            showStatus(false);
-        }
-        document.body.removeChild(textArea);
-    };
-
-    // Safely attempt the modern approach first, catching local-file security blocks
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(promptText)
-            .then(() => showStatus(true))
-            .catch(() => synchronousFallback());
-    } else {
-        synchronousFallback();
-    }
+function buildAIPrompt(txt) {
+    return LatinPrompt.buildPrompt(AppState.lang, txt, AppState.functions);
 }
 
 function applyPrepositionMerging(tokens) {
-    let welded = []; let map = {}; const prepLabel = AppState.lang === 'de' ? 'Präpositionale Bestimmung' : 'Prepositional phrase';
-    for(let i=0; i < tokens.length; i++) {
-        let curr = tokens[i]; map[i] = welded.length;
-        let pureWord = curr.w.split(" ")[0].toLowerCase().replace(/[^a-z]/g, "");
-        const isSingleWord = !/\s/.test(curr.w.trim()); // "a Clodia" is already a phrase: never weld it again
-        if(isSingleWord && CONFIG.PREPOSITIONS.includes(pureWord) && i+1 < tokens.length) {
-            let nextW = tokens[i+1];
-            if(nextW.f !== CONFIG.PUNCT) {
-                welded.push({ w: curr.w + " " + nextW.w.replace(/^-/, ''), f: prepLabel, b: curr.b || 0, u: curr.u || nextW.u, h: curr.h || nextW.h, isSplit: nextW.isSplit });
-                map[i+1] = welded.length - 1; i++; 
-            } else { welded.push(curr); }
-        } else { welded.push(curr); }
-    }
-    return { welded, map };
+    const prepLabel = AppState.lang === 'de' ? 'Präpositionale Bestimmung' : 'Prepositional phrase';
+    return LatinCore.weldPrepositions(tokens, prepLabel);
 }
 
 function processTokens(rawTokens) {
-    let temp = [];
-    rawTokens.forEach(t => {
-        const isEnclitic = /^-(que|ne|ve)$/i.test(t); const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(t);
-        if (!hasLetters) { temp.push({ w: t, f: CONFIG.PUNCT, b: 0, u: false }); }
-        else if (isEnclitic && temp.length > 0 && /[a-zA-Z]/.test(temp[temp.length-1].w)) { temp[temp.length-1].w += t.replace(/^-/, ''); }
-        else { temp.push({ w: t, f: AppState.getOtherLabel(), b: 0, u: false }); }
-    });
-    return applyPrepositionMerging(temp).welded;
+    const prepLabel = AppState.lang === 'de' ? 'Präpositionale Bestimmung' : 'Prepositional phrase';
+    return LatinCore.processTokens(rawTokens, AppState.getOtherLabel(), prepLabel);
 }
 
 function normalizeLabel(label) {
-    if (!label) return AppState.getOtherLabel();
-    let lower = label.trim().toLowerCase();
-    let match = CONFIG.PRESETS[AppState.lang].advanced.find(f => f.toLowerCase() === lower);
-    if (match) return match;
-    let otherLang = AppState.lang === 'en' ? 'de' : 'en';
-    let otherIndex = CONFIG.PRESETS[otherLang].advanced.findIndex(f => f.toLowerCase() === lower);
-    if (otherIndex !== -1) return CONFIG.PRESETS[AppState.lang].advanced[otherIndex];
-    
-    if (AppState.lang === 'de') {
-        if(lower.includes('dative') || lower === 'dativ') return 'Dativobjekt';
-        if(lower.includes('accusative') || lower === 'akkusativ') return 'Akkusativobjekt';
-        if(lower.includes('genitivattribut') || lower.includes('genitive attr')) return 'Genitivattribut';
-        if(lower.includes('genitive') || lower === 'genitiv') return 'Genitivobjekt';
-        if(lower.includes('prepositional')) return 'Präpositionale Bestimmung';
-        if(lower.includes('ablative abs')) return 'Ablativus absolutus';
-        if(lower.includes('relative')) return 'Relativsatz';
-        if(lower.includes('subordinate')) return 'Nebensatz';
-        if(lower.includes('conjunction') || lower.includes('konjunktion')) return 'Konjunktion';
-        if(lower.includes('subjunction')) return 'Subjunktion';
-        if(lower.includes('participial')) return 'Partizipialkonstruktion';
-        if(lower.includes('subject')) return 'Subjekt';
-        if(lower.includes('infinitive') && !lower.includes('with')) return 'Infinitiv';
-        if(lower === 'verb') return 'Prädikat';
-        if(lower.includes('vocative') || lower.includes('vokativ')) return 'Vokativ';
-    } else {
-        if(lower.includes('dativ')) return 'Dative object';
-        if(lower.includes('akkusativ')) return 'Accusative object';
-        if(lower.includes('genitivattribut') || lower.includes('genitive attr')) return 'Genitive attribute';
-        if(lower.includes('genitiv')) return 'Genitive object';
-        if(lower.includes('präpositional')) return 'Prepositional phrase';
-        if(lower.includes('ablativus abs')) return 'Ablative absolute';
-        if(lower.includes('relativ')) return 'Relative clause';
-        if(lower.includes('neben')) return 'Subordinate clause';
-        if(lower.includes('konjunktion') || lower.includes('conjunction')) return 'Conjunction';
-        if(lower.includes('subjunktion')) return 'Subjunction';
-        if(lower.includes('partizipial')) return 'Participial phrase';
-        if(lower.includes('subjekt')) return 'Subject';
-        if(lower.includes('infinitiv') && !lower.includes('aci')) return 'Infinitive';
-        if(lower.includes('vocative') || lower.includes('vokativ')) return 'Vocative';
-    }
-    return label.charAt(0).toUpperCase() + label.slice(1);
+    return LatinLabels.normalizeLabel(label, AppState.lang);
 }
 
-function importAI() {
+function importAI(raw) {
     try {
-        const raw = DOM.aiJson.value;
         
         let cleanJson = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
         const jsonMatch = cleanJson.match(/\{[\s\S]*"words"[\s\S]*\}/);
@@ -2424,9 +2253,9 @@ function importAI() {
             w.w = w.w || ""; 
             let func = w.f || ""; 
 
-            w.w = w.w.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
+            w.w = LatinCore.joinHyphenation(w.w);
             
-            if (!/[a-zA-Z\u00C0-\u017F]/.test(w.w)) {
+            if (!LatinCore.hasLetters(w.w)) {
                 w.f = CONFIG.PUNCT;
                 w.u = false;
             }
@@ -2458,6 +2287,18 @@ function importAI() {
             }
         });
 
+        // Completeness: the software owns the text, the model only the labels. A dropped, altered or invented
+        // word must not slip into an exercise unnoticed.
+        const coverage = LatinCore.compareCoverage(DOM.enterText.value, mergeResult.welded);
+        if (!coverage.ok) {
+            const t = CONFIG.LANG_TEXT[AppState.lang];
+            const lines = [t.aiCoverageWarn];
+            if (coverage.missing.length) lines.push(t.aiMissingWords + coverage.missing.join(', '));
+            if (coverage.extra.length) lines.push(t.aiExtraWords + coverage.extra.join(', '));
+            lines.push('', t.aiCoverageAsk);
+            if (!confirm(lines.join('\n'))) return;
+        }
+
         initEditor(mergeResult.welded);
     } catch(e) { 
         console.error("Unhandled import error:", e); 
@@ -2465,20 +2306,122 @@ function importAI() {
     }	
 }
 
-function startManual() {
-    const txtEl = DOM.enterText;	
-	// ADD THIS NEW CHECK: Stop if text exceeds 300 words
-    if (isTextTooLong(txtEl.value, 300)) {
-        return; 
-    }
-	
-    let sanitizedText = txtEl.value.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
-    sanitizedText = sanitizedText.replace(/"/g, "'");
-    txtEl.value = sanitizedText;
+// ==========================================
+// 7b. OPENAI CALL (the analysis pipeline; manual creation stays as the no-AI alternative)
+// ==========================================
 
-    const rawInput = sanitizedText;
-    const tokens = rawInput.match(/[a-zA-Z\u00C0-\u017F-]+|[^a-zA-Z\u00C0-\u017F\s]+/gi);
-    if (!tokens) return;
+// A link of the form index.html#key=sk-... stores the key in this browser once and drops it from the address bar,
+// so people who receive that link (e.g. via QR code at a presentation) never see the key dialog.
+function importKeyFromUrl() {
+    const m = (location.hash || '').match(/[#&]key=([^&]+)/);
+    if (!m) return;
+    try { localStorage.setItem(CONFIG.AI.KEY_STORAGE, decodeURIComponent(m[1]).trim()); } catch (e) { console.warn("Could not store the API key (storage blocked).", e); }
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+}
+
+function getAiKey() {
+    try { return (localStorage.getItem(CONFIG.AI.KEY_STORAGE) || '').trim(); } catch (e) { return ''; }
+}
+
+function openAiKeyModal() {
+    DOM.aiKeyInput.value = getAiKey();
+    DOM.aiKeyModal.style.display = 'flex';
+    DOM.aiKeyInput.focus();
+}
+
+function closeAiKeyModal() {
+    DOM.aiKeyModal.style.display = 'none';
+    DOM.aiKeyInput.value = '';
+}
+
+function updateAiKeyButton() {
+    DOM.btnAiKey.textContent = CONFIG.LANG_TEXT[AppState.lang].btnAiKey + (getAiKey() ? ' ✓' : '');
+    DOM.btnAiKey.style.display = CONFIG.AI.PROXY_URL ? 'none' : '';
+}
+
+function saveAiKeyFromModal() {
+    const key = DOM.aiKeyInput.value.trim();
+    try {
+        if (key) localStorage.setItem(CONFIG.AI.KEY_STORAGE, key);
+        else localStorage.removeItem(CONFIG.AI.KEY_STORAGE);
+    } catch (e) { console.warn("Could not store the API key (storage blocked).", e); }
+    closeAiKeyModal();
+    updateAiKeyButton();
+}
+
+// Strict schema for OpenAI Structured Outputs: every object is closed (additionalProperties:false, all keys required)
+// and labels are restricted to exactly the strings importAI() accepts for the current language and level.
+function buildAISchema() {
+    const labels = [...AppState.functions];
+    const obj = (props) => ({ type: 'object', additionalProperties: false, required: Object.keys(props), properties: props });
+    return obj({
+        words: { type: 'array', items: obj({ w: { type: 'string' }, f: { type: 'string', enum: labels.concat(CONFIG.PUNCT) }, u: { type: 'boolean' } }) },
+        groups: { type: 'array', items: obj({ start: { type: 'integer' }, end: { type: 'integer' }, label: { type: 'string', enum: labels } }) }
+    });
+}
+
+async function analyzeWithAI() {
+    const t = CONFIG.LANG_TEXT[AppState.lang];
+    const useProxy = !!CONFIG.AI.PROXY_URL;
+    const key = useProxy ? '' : getAiKey();
+    if (!useProxy && !key) { alert(t.aiErrNoKey); openAiKeyModal(); return; }
+    const txt = getSanitizedSourceText();
+    if (txt === null) return;
+    if (!txt.trim()) { alert(t.aiErrNoText); return; }
+
+    const btn = DOM.btnAnalyzeAi;
+    btn.disabled = true; btn.textContent = t.btnAnalyzeBusy;
+    DOM.grammarLevelSetup.disabled = true; // the label list is part of the request
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), CONFIG.AI.TIMEOUT_MS);
+    try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (!useProxy) headers['Authorization'] = 'Bearer ' + key; // the proxy adds the key itself
+        const res = await fetch(useProxy ? CONFIG.AI.PROXY_URL : CONFIG.AI.ENDPOINT, {
+            method: 'POST',
+            signal: ctrl.signal,
+            headers: headers,
+            body: JSON.stringify({
+                model: CONFIG.AI.MODEL,
+                input: buildAIPrompt(txt),
+                reasoning: { effort: CONFIG.AI.EFFORT },
+                text: { format: { type: 'json_schema', name: 'latin_analysis', schema: buildAISchema(), strict: true } }
+            })
+        });
+        const data = await res.json().catch(() => ({}));
+        const err = (data && data.error) || {};
+        if (!res.ok) {
+            const billingCodes = ['credit_balance_exhausted', 'organization_spend_limit_exceeded', 'project_spend_limit_exceeded', 'insufficient_quota'];
+            if (res.status === 401) alert(t.aiErrAuth);
+            else if (res.status === 429 && billingCodes.includes(err.code)) alert(t.aiErrBilling);
+            else if (res.status === 429) alert(t.aiErrRate);
+            else alert(t.aiErrOther + (err.message || ('HTTP ' + res.status)));
+            return;
+        }
+        // Responses API: the text sits in the "message" output item (not necessarily output[0]) as an "output_text" part.
+        const message = (data.output || []).find(o => o.type === 'message');
+        const parts = (message && message.content) || [];
+        const refusal = parts.find(p => p.type === 'refusal');
+        const textPart = parts.find(p => p.type === 'output_text');
+        if (refusal) { alert(t.aiErrRefusal); return; }
+        if (data.status === 'incomplete') { alert(t.aiErrIncomplete); return; }
+        if (data.status !== 'completed' || !textPart) { alert(t.aiErrOther + (err.message || data.status || 'empty response')); return; }
+        importAI(textPart.text);
+    } catch (e) {
+        console.error("OpenAI request failed:", e); // AbortError (timeout) or TypeError (network / CORS)
+        alert(t.aiErrNetwork);
+    } finally {
+        clearTimeout(timer);
+        btn.disabled = false; btn.textContent = CONFIG.LANG_TEXT[AppState.lang].btnAnalyze;
+        DOM.grammarLevelSetup.disabled = false;
+    }
+}
+
+function startManual() {
+    const rawInput = getSanitizedSourceText();
+    if (rawInput === null) return;
+    const tokens = LatinCore.tokenize(rawInput);
+    if (!tokens.length) return;
     initEditor(processTokens(tokens));
 }
 
@@ -2596,12 +2539,7 @@ const exerciseId = generateStableId(titleInput + baseText);
 
 function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lang, allAbbrevs, allPresets, exerciseId, STUDENT_PAGE_CSS, STUDENT_PAGE_JS) {
     const filteredLabels = allLabels.filter(l => l !== CONFIG.MAIN_CLAUSE_EN && l !== CONFIG.MAIN_CLAUSE_DE);
-    const labelMap = { en: {}, de: {} };
-    allPresets.en.advanced.forEach((enLabel, idx) => {
-        const deLabel = allPresets.de.advanced[idx];
-        labelMap.en[deLabel] = enLabel; labelMap.en[enLabel] = enLabel; 
-        labelMap.de[enLabel] = deLabel; labelMap.de[deLabel] = deLabel; 
-    });
+    const labelMap = LatinLabels.buildLabelMap();
     
     const studentTexts = {
         en: {
@@ -2693,6 +2631,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         </div>
         <div id="toast-container"></div>
         <script>
+            const SHORTCUTS = ${JSON.stringify(LatinLabels.SHORTCUTS)};
             const colors = ${JSON.stringify(AppState.colors)}; const abbreviations = ${JSON.stringify(allAbbrevs)}; const labelMap = ${JSON.stringify(labelMap)};
             const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const titleInput = ${JSON.stringify(title).replace(/</g, '\\u003c')};
             const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + '${exerciseId}';
@@ -2720,7 +2659,7 @@ function generateExerciseHTML(words, groups, placeholder, lang) {
     words.forEach((word, idx) => {
         const isPunct = word.f === CONFIG.PUNCT;
         const nextWord = words[idx + 1];
-        const nextIsPunct = nextWord && (!/[a-zA-Z\u00C0-\u017F]/.test(nextWord.segments ? nextWord.segments[0].w : "") || nextWord.f === CONFIG.PUNCT);
+        const nextIsPunct = nextWord && (!LatinCore.hasLetters(nextWord.segments ? nextWord.segments[0].w : "") || nextWord.f === CONFIG.PUNCT);
         
         const safeWordHint = parseSimpleMarkdown(word.hint);
         
