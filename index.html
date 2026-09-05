@@ -522,7 +522,7 @@
 
         function switchStudentLang(newLang) {
             if (newLang === currentLang) return;
-            currentLang = newLang; const t = studentTexts[newLang];
+            currentLang = newLang; document.documentElement.lang = newLang; const t = studentTexts[newLang];
             
             document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
             document.querySelector(`.lang-btn[onclick="switchStudentLang('${newLang}')"]`).classList.add('active');
@@ -586,7 +586,8 @@
             if (answeredItems > 0 || document.querySelector('.marked-gen')) {
                 const t = studentTexts[currentLang];
                 if(!confirm(t.resetWarn)) return;
-                localStorage.removeItem(saveKey); location.reload();
+                try { localStorage.removeItem(saveKey); sessionStorage.setItem(saveKey + '_mode', m); } catch(e) { console.warn("Storage blocked", e); }
+                location.reload(); return;
             }
             exMode = m; const bp = document.getElementById('btn-practise'); const be = document.getElementById('btn-exam');
             bp.style.background = m === 'practise' ? 'white' : 'transparent'; bp.style.boxShadow = m === 'practise' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; bp.style.color = m === 'practise' ? '#111827' : '#475569';
@@ -641,6 +642,7 @@
             if (!el || el.dataset.done === "true") return;
             
             clearTimeout(hideMenuTimeout);
+            if (el === activeEl && menu.style.display === 'block') return; // keep the clicked sub-word (Mark Genitive) selected while the pointer stays on this phrase
             activeEl = el; activeSubWord = null; mode = el.classList.contains('hover-word') ? "word" : "group";
             document.querySelector('.gen-btn').style.display = "none"; 
             document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => b.style.display = "block");
@@ -868,11 +870,19 @@
         }
 
         function closeResults() { document.getElementById('results-modal').style.display = 'none'; }
-        function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
+        function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
         document.addEventListener('mousedown', (e) => { 
             if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; 
             if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
         });
+
+        function initStudentPage() {
+            let pendingMode = null;
+            try { pendingMode = sessionStorage.getItem(saveKey + '_mode'); sessionStorage.removeItem(saveKey + '_mode'); } catch(e) {}
+            if (pendingMode === 'practise' || pendingMode === 'exam') setMode(pendingMode);
+            loadStudentProgress();
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initStudentPage); else initStudentPage();
     </script>
 <script>
 // ==========================================
@@ -888,10 +898,8 @@ function debounce(func, wait) {
 
 function escapeHTML(str) {
     if (str == null) return '';
-    // If DOMPurify is loaded, use it. Otherwise, fallback to basic escaping.
-    if (window.DOMPurify) {
-        return DOMPurify.sanitize(String(str), { ALLOWED_TAGS: [] }); // Strips all HTML
-    }
+    // Plain entity escaping, safe in text and attribute contexts.
+    // (Not DOMPurify: it returns strings without '<' unchanged, so quotes and '&' would leak into attributes.)
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
@@ -1046,8 +1054,22 @@ const AppState = {
     mode: MODES.TAGGING,
     activeFunc: 'Sonstiges',
     history: [],
-    ui: { /* ... */ },
-    touch: { /* ... */ },
+    ui: {
+        zoom: 1,
+        hoveredGroupIndex: null,
+        hoveredWord: null,
+        startIdx: null,
+        pendingGroupStart: null,
+        pendingGroupEnd: null,
+        editingGroupIndex: null,
+        editingWordNode: null,
+        labelShortcuts: {}
+    },
+    touch: {
+        swipeStartIdx: null,
+        swipeCurrentIdx: null,
+        isSwiping: false
+    },
     
     saveToHistory() {
         this.history.push({ 
@@ -1471,13 +1493,13 @@ function changeLanguage(lang) {
 
     DOM.linkExample.href = lang === 'de' ? "example_page_de.html" : "example_page.html";
 
-    if(DOM.editorScreen.style.display === 'block') {
-        const oldList = CONFIG.PRESETS[oldLang].advanced; 
-        const newList = CONFIG.PRESETS[lang].advanced;
-        
-        const idxActive = oldList.indexOf(AppState.activeFunc);
-        if(idxActive !== -1) AppState.activeFunc = newList[idxActive];
+    // Remap the active label on every switch (also on the setup screen), so the next click never applies a label from the old language.
+    const oldList = CONFIG.PRESETS[oldLang].advanced;
+    const newList = CONFIG.PRESETS[lang].advanced;
+    const idxActive = oldList.indexOf(AppState.activeFunc);
+    if(idxActive !== -1) AppState.activeFunc = newList[idxActive];
 
+    if(DOM.editorScreen.style.display === 'block') {
         AppState.words.forEach(w => {
             if (w.f === CONFIG.PUNCT) return;
             const idx = oldList.indexOf(w.f);
@@ -1551,12 +1573,11 @@ function renderPalette() {
         b.className = 'p-btn' + (f === AppState.activeFunc && AppState.mode === MODES.TAGGING ? ' active' : '');
         b.style.backgroundColor = AppState.colors[f]; b.dataset.func = f; 
         
-        let safeF = escapeHTML(f);
-        let shortcut = AppState.ui.labelShortcuts[f]; let innerHTML = safeF;
+        let shortcut = AppState.ui.labelShortcuts[f]; let innerHTML = escapeHTML(f);
         if (shortcut) {
-            let idx = safeF.toLowerCase().indexOf(shortcut);
-            if (idx !== -1) { innerHTML = safeF.substring(0, idx) + '<u>' + safeF[idx] + '</u>' + safeF.substring(idx + 1); } 
-            else { innerHTML = `[<u>${shortcut.toUpperCase()}</u>] ${safeF}`; }
+            let idx = f.toLowerCase().indexOf(shortcut);
+            if (idx !== -1) { innerHTML = escapeHTML(f.substring(0, idx)) + '<u>' + escapeHTML(f[idx]) + '</u>' + escapeHTML(f.substring(idx + 1)); }
+            else { innerHTML = `[<u>${shortcut.toUpperCase()}</u>] ${escapeHTML(f)}`; }
         }
         b.innerHTML = innerHTML;
         b.addEventListener('click', () => { AppState.activeFunc = f; setMode(MODES.TAGGING); });
@@ -1917,6 +1938,7 @@ function initEventListeners() {
 
     document.addEventListener('keydown', function(e) {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (DOM.editorScreen.style.display !== 'block') return; // editor-only shortcuts (Undo, Escape, tool keys)
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); AppState.undo() && renderEditor(); return; }
         
        if (e.key === 'Escape') {
@@ -1926,8 +1948,6 @@ function initEventListeners() {
             document.querySelectorAll('#tagging-area span.tag-word').forEach(s => s.style.outline = "none");
             return;
         }
-
-        if (DOM.editorScreen.style.display !== 'block') return;
 
         if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
             if (e.ctrlKey || e.metaKey || e.altKey) return; 
@@ -2115,7 +2135,7 @@ function openGroupModal() {
     DOM.labelSuggestions.innerHTML = '';
     AppState.functions.forEach(f => { 
         const opt = document.createElement('option'); 
-        opt.value = escapeHTML(f); 
+        opt.value = f; 
         DOM.labelSuggestions.appendChild(opt); 
     });
     DOM.groupNameInput.value = ''; 
@@ -2129,7 +2149,7 @@ function editGroupLabel(index) {
     DOM.labelSuggestions.innerHTML = '';
     AppState.functions.forEach(f => { 
         const opt = document.createElement('option'); 
-        opt.value = escapeHTML(f); 
+        opt.value = f; 
         DOM.labelSuggestions.appendChild(opt); 
     });
     DOM.groupNameInput.value = AppState.groups[index].label; 
@@ -2289,7 +2309,8 @@ function applyPrepositionMerging(tokens) {
     for(let i=0; i < tokens.length; i++) {
         let curr = tokens[i]; map[i] = welded.length;
         let pureWord = curr.w.split(" ")[0].toLowerCase().replace(/[^a-z]/g, "");
-        if(CONFIG.PREPOSITIONS.includes(pureWord) && i+1 < tokens.length) {
+        const isSingleWord = !/\s/.test(curr.w.trim()); // "a Clodia" is already a phrase: never weld it again
+        if(isSingleWord && CONFIG.PREPOSITIONS.includes(pureWord) && i+1 < tokens.length) {
             let nextW = tokens[i+1];
             if(nextW.f !== CONFIG.PUNCT) {
                 welded.push({ w: curr.w + " " + nextW.w.replace(/^-/, ''), f: prepLabel, b: curr.b || 0, u: curr.u || nextW.u, h: curr.h || nextW.h, isSplit: nextW.isSplit });
@@ -2303,7 +2324,7 @@ function applyPrepositionMerging(tokens) {
 function processTokens(rawTokens) {
     let temp = [];
     rawTokens.forEach(t => {
-        const isEnclitic = /^-?(que|ne|ve)$/i.test(t); const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(t);
+        const isEnclitic = /^-(que|ne|ve)$/i.test(t); const hasLetters = /[a-zA-Z\u00C0-\u017F]/.test(t);
         if (!hasLetters) { temp.push({ w: t, f: CONFIG.PUNCT, b: 0, u: false }); }
         else if (isEnclitic && temp.length > 0 && /[a-zA-Z]/.test(temp[temp.length-1].w)) { temp[temp.length-1].w += t.replace(/^-/, ''); }
         else { temp.push({ w: t, f: AppState.getOtherLabel(), b: 0, u: false }); }
@@ -2619,7 +2640,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     const safeTitle = escapeHTML(pageTitle);
     const safeNotes = notes ? escapeHTML(notes).replace(/\n/g, '<br>') : '';
 
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${safeTitle}</title>
     <style>${STUDENT_PAGE_CSS}</style></head>
     <body>
@@ -2673,7 +2694,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         <div id="toast-container"></div>
         <script>
             const colors = ${JSON.stringify(AppState.colors)}; const abbreviations = ${JSON.stringify(allAbbrevs)}; const labelMap = ${JSON.stringify(labelMap)};
-            const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const titleInput = ${JSON.stringify(title)};
+            const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const titleInput = ${JSON.stringify(title).replace(/</g, '\\u003c')};
             const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + '${exerciseId}';
         <\/script>
         <script>
@@ -2692,6 +2713,10 @@ function generateExerciseHTML(words, groups, placeholder, lang) {
     // than constantly concatenating a massive string.
     let htmlParts = ['<div class="sentence-container">'];
 
+    // One click handler for word and group hints (group hints had none and could never be opened).
+    const hintToggle = "event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');";
+    const hintIconHtml = (safeHint) => `<span class="hint-icon" title="Hint" onclick="${hintToggle}">💡<span class="tooltip-text">${safeHint}</span></span>`;
+
     words.forEach((word, idx) => {
         const isPunct = word.f === CONFIG.PUNCT;
         const nextWord = words[idx + 1];
@@ -2700,11 +2725,7 @@ function generateExerciseHTML(words, groups, placeholder, lang) {
         const safeWordHint = parseSimpleMarkdown(word.hint);
         
         // Template literals allow multi-line strings and easy variable injection
-        const hintHtml = word.hint 
-            ? `<span class="hint-icon" title="Hint" onclick="event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');">
-                 💡<span class="tooltip-text">${safeWordHint}</span>
-               </span>` 
-            : '';
+        const hintHtml = word.hint ? hintIconHtml(safeWordHint) : '';
 
         // Using .map() and .join('') for the segments instead of manual loops
         const safeWordHtml = word.segments 
@@ -2721,9 +2742,7 @@ function generateExerciseHTML(words, groups, placeholder, lang) {
 
         groups.forEach(g => {
             const safeGroupHint = parseSimpleMarkdown(g.hint);
-            const gHintHtml = g.hint 
-                ? `<span class="hint-icon" title="Hint">💡<span class="tooltip-text">${safeGroupHint}</span></span>` 
-                : '';
+            const gHintHtml = g.hint ? hintIconHtml(safeGroupHint) : '';
             const safeLabel = escapeHTML(g.label);
             
             if (idx === g.start) {
