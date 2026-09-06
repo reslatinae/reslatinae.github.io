@@ -336,6 +336,10 @@
         .s-text { border-bottom: 3px dashed transparent; transition: border-color 0.2s, background-color 0.2s; border-radius: 2px; }
         .s-text.marked-gen { border-bottom-color: #ec4899; }
         .s-text.error-gen { border-bottom-color: #ef4444; background-color: #fef2f2; }
+        .s-text.missed-gen { border-bottom-color: #f59e0b; border-bottom-style: solid; background-color: #fffbeb; }
+
+        .btn-submit-exam { background: #10b981 !important; }
+        .btn-submit-exam:hover { background: #059669 !important; }
 
         .s-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom:none; border-radius: 6px 6px 0 0; padding: 22px 6px 6px 6px; margin: 20px 4px 0 4px; vertical-align: bottom; transition: all 0.2s; z-index: 1; }
         .s-group:hover, .s-group:focus-within { z-index: 10; }
@@ -395,6 +399,7 @@
         body.high-contrast .hover-word { background-color: #333; color: #fff; border-bottom: 2px solid #555; }
         body.high-contrast .hover-word[data-done="true"] { border: 2px solid #fff !important; color: #000 !important; font-weight: 600; }
         body.high-contrast .s-text.marked-gen { border-bottom-color: #f472b6 !important; }
+        body.high-contrast .s-text.missed-gen { border-bottom-color: #fbbf24 !important; background-color: #3a2f00 !important; }
         body.high-contrast .s-group { border-color: #fff !important; }
         body.high-contrast .g-label { background: #000 !important; color: #fff !important; border-color: #fff !important; }
         body.high-contrast .punct { color: #fff; }
@@ -420,7 +425,7 @@
 
     <script type="text/template" id="template-student-js" data-ref="templateStudentJs">
         let activeEl = null; let activeSubWord = null; let mode = ""; const menu = document.getElementById('menu-common'); const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
-        let hideMenuTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1; let genMistakes = 0;
+        let hideMenuTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1; let examFinalized = false;
         const totalPhrases = document.querySelectorAll('.hover-word, .g-label').length;
         const totalGens = document.querySelectorAll('.s-text[data-u="true"]').length;
         const totalItems = totalPhrases + totalGens;
@@ -535,6 +540,7 @@
             
             const fBtns = document.querySelectorAll('.footer-toolbar .btn');
             fBtns[0].textContent = t.btnSaveProg; fBtns[1].textContent = t.btnClearProg; fBtns[2].textContent = t.print; fBtns[3].textContent = t.download;
+            const submitBtn = document.getElementById('btn-submit-exam'); if (submitBtn) submitBtn.textContent = t.btnSubmitExam;
             
             document.querySelector('.results-title').textContent = t.examResults; document.querySelector('.btn-copy').textContent = t.copyResults;
             document.querySelector('#results-modal .btn:not(.btn-copy)').textContent = t.close; document.querySelectorAll('textarea:not(.results-textarea)').forEach(ta => ta.placeholder = t.transPlaceholder);
@@ -592,6 +598,8 @@
             exMode = m; const bp = document.getElementById('btn-practise'); const be = document.getElementById('btn-exam');
             bp.style.background = m === 'practise' ? 'white' : 'transparent'; bp.style.boxShadow = m === 'practise' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; bp.style.color = m === 'practise' ? '#111827' : '#475569';
             be.style.background = m === 'exam' ? 'white' : 'transparent'; be.style.boxShadow = m === 'exam' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; be.style.color = m === 'exam' ? '#111827' : '#475569';
+            const submitBtn = document.getElementById('btn-submit-exam');
+            if (submitBtn) submitBtn.style.display = (m === 'exam' && !examFinalized) ? 'inline-block' : 'none';
         }
 
         menu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
@@ -689,7 +697,6 @@
                             currentSubWord.classList.add('error-gen');
                             setTimeout(() => currentSubWord.classList.remove('error-gen'), 800);
                             showToast(t.notGenitive, true);
-                            if (exMode === 'exam') { genMistakes++; }
                         }
                     } else {
                         activeSubWord.classList.remove('marked-gen');
@@ -775,23 +782,68 @@
             }); 
             
             const currentMarkedGens = document.querySelectorAll('.s-text[data-u="true"].marked-gen').length;
-			if (exMode === 'exam' && answeredItems === totalPhrases && currentMarkedGens === totalGens && totalPhrases > 0) {
-                const t = studentTexts[currentLang];
-                let genScore = 0;
-                document.querySelectorAll('.s-text[data-u="true"]').forEach(st => {
-                    if(st.classList.contains('marked-gen')) genScore++;
-                });
-                let finalScore = examScore + genScore - genMistakes;
-                if (finalScore < 0) finalScore = 0; // Prevents the score from dropping below zero
-                
-                setTimeout(() => {
-                    const pct = Math.round((finalScore / totalItems) * 100);
-                    document.getElementById('final-score-display').textContent = finalScore + " / " + totalItems + " (" + pct + "%)";
-                    
-                    /* Note: The newline here is handled via raw string \n now */
-                    document.getElementById('results-text').value = t.resExercise + (titleInput || t.docTitle).replace(/["'\`]/g, "") + "\n" + t.resDate + new Date().toLocaleDateString() + "\n" + t.resScore + finalScore + " / " + totalItems + " (" + pct + "%)";                    document.getElementById('results-modal').style.display = 'flex';
-                }, 500);
+			if (exMode === 'exam' && !examFinalized && answeredItems === totalPhrases && currentMarkedGens === totalGens && totalPhrases > 0) {
+                finalizeExam();
             }
+        }
+
+        function finalizeExam() {
+            if (examFinalized) return;
+            examFinalized = true;
+            const t = studentTexts[currentLang];
+            let genScore = 0;
+            document.querySelectorAll('.s-text[data-u="true"]').forEach(st => {
+                if(st.classList.contains('marked-gen')) genScore++;
+            });
+            // Genitive attributes now weigh exactly like labelled phrases: 1 point if found, 0 if not.
+            // (No separate deduction for earlier wrong guesses while searching - matches how a wrong
+            // label only ever costs the single point of that task, never more.)
+            let finalScore = examScore + genScore;
+            if (finalScore < 0) finalScore = 0; // Prevents the score from dropping below zero
+
+            const submitBtn = document.getElementById('btn-submit-exam');
+            if (submitBtn) submitBtn.style.display = 'none';
+
+            setTimeout(() => {
+                const pct = Math.round((finalScore / totalItems) * 100);
+                document.getElementById('final-score-display').textContent = finalScore + " / " + totalItems + " (" + pct + "%)";
+
+                /* Note: The newline here is handled via raw string \n now */
+                document.getElementById('results-text').value = t.resExercise + (titleInput || t.docTitle).replace(/["'\`]/g, "") + "\n" + t.resDate + new Date().toLocaleDateString() + "\n" + t.resScore + finalScore + " / " + totalItems + " (" + pct + "%)";                    document.getElementById('results-modal').style.display = 'flex';
+            }, 500);
+        }
+
+        function submitExam() {
+            if (exMode !== 'exam' || examFinalized) return;
+            const t = studentTexts[currentLang];
+            if (!confirm(t.confirmSubmit)) return;
+
+            // Reveal every translation box, even for sentences that were never fully solved.
+            document.querySelectorAll('.sentence-container').forEach((s, i) => {
+                const b = document.getElementById('t-container-' + i);
+                if (b) b.style.display = 'block';
+            });
+
+            // Any phrase/group left unanswered counts as an error: reveal the correct label so
+            // the student sees what was missing, same as an actively wrong guess would show.
+            document.querySelectorAll('.hover-word, .g-label').forEach(el => {
+                if (el.dataset.done !== "true") {
+                    const m = el.classList.contains('hover-word') ? "word" : "group";
+                    const correct = m === "word" ? el.dataset.ans : el.parentElement.dataset.ans;
+                    solve(el, correct, m);
+                    if (m === "word") { el.style.border = "2px solid #ef4444"; }
+                    else { el.parentElement.style.borderColor = "#ef4444"; }
+                    answeredItems++;
+                }
+            });
+
+            // Any required genitive attribute that was never found: highlight it so the student
+            // sees what was missing; it earns no point, same as an unanswered phrase.
+            document.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').forEach(st => {
+                st.classList.add('missed-gen');
+            });
+
+            finalizeExam();
         }
 
        function saveStudentProgress() {
@@ -806,7 +858,7 @@
             
             const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)')).map(ta => ta.value);
             
-            const data = { items: state, subWords: subState, textareas: textareas, exMode: exMode, examScore: examScore, answeredItems: answeredItems, genMistakes: genMistakes };
+            const data = { items: state, subWords: subState, textareas: textareas, exMode: exMode, examScore: examScore, answeredItems: answeredItems };
             
             // --- NEW TRY/CATCH BLOCK ---
             try {
@@ -829,7 +881,7 @@
                 const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)'));
                 
                 if (data.items && data.items.length !== items.length) { console.warn("Saved progress length does not match. Ignoring."); return; }
-                exMode = data.exMode || 'practise'; setMode(exMode); examScore = data.examScore || 0; answeredItems = data.answeredItems || 0; genMistakes = data.genMistakes || 0;
+                exMode = data.exMode || 'practise'; setMode(exMode); examScore = data.examScore || 0; answeredItems = data.answeredItems || 0;
                 
                 data.items.forEach((state, i) => {
                     if (items[i] && state.done) {
@@ -945,7 +997,7 @@ const CONFIG = {
     MAIN_CLAUSE_EN: 'Main clause',
     MAIN_CLAUSE_DE: 'Hauptsatz',
     SENTENCE_ENDERS: ['.', '!', '?', '·'],
-    PREPOSITIONS: ["a", "ab", "ad", "ante", "apud", "circum", "contra", "cum", "de", "e", "ex", "extra", "in", "infra", "inter", "intra", "ob", "per", "post", "prae", "pro", "prope", "propter", "sine", "sub", "super", "trans", "ultra"],
+    PREPOSITIONS: ["a", "ab", "ad", "ante", "apud", "circum", "contra", "de", "e", "ex", "extra", "in", "infra", "inter", "intra", "ob", "per", "post", "prae", "pro", "prope", "propter", "sine", "sub", "super", "trans", "ultra"],
   SAFE_COLORS: [
         // The 19 actively assigned colors
         '#4ade80', '#C76D72', '#fde047', '#fdba74', '#c4b5fd', 
@@ -968,7 +1020,7 @@ const CONFIG = {
         'Genitive attribute': '#f472b6', 'Genitivattribut': '#f472b6', // Deep Pink
         'Ablative': '#93c5fd', 'Ablativ': '#93c5fd', // Soft Blue
         'Ablative absolute': '#60a5fa', 'Ablativus absolutus': '#60a5fa', // Brighter Blue
-        'Adverb': '#ffedd5', // Pale Peach
+        'Adverbiale Bestimmung': '#ffedd5', // Pale Peach
         'Infinitive': '#e9d5ff', 'Infinitiv': '#e9d5ff', // Pale Lilac
         'Predicative': '#fca5a5', 'Prädikativum': '#fca5a5', // Rose
         'Conjunction': '#d6d3d1', 'Konjunktion': '#d6d3d1', // Warm Grey
@@ -988,13 +1040,21 @@ const CONFIG = {
         },
         de: {
             beginner: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Vokativ', 'Sonstiges'],
-            intermediate: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges'],
-            advanced: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverb', 'Infinitiv', 'AcI/NcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges']
+            intermediate: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverbiale Bestimmung', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges'],
+            advanced: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverbiale Bestimmung', 'Infinitiv', 'AcI/NcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges']
         }
+    },
+    // Bracket/group ("Klammer") labels for multi-word clause constructions. Unlike PRESETS (the
+    // per-word function labels, which shrink at lower levels), this fixed list applies at every
+    // grammar level: a beginner exercise can still contain a correctly labelled Nebensatz/Relativsatz
+    // bracket even though those words never appear in the beginner word-label list.
+    GROUP_LABELS: {
+        en: ['Subordinate clause', 'Relative clause', 'Accusative/Nominative with infinitive', 'Participial phrase', 'Ablative absolute'],
+        de: ['Nebensatz', 'Relativsatz', 'AcI/NcI', 'Partizipialkonstruktion', 'Ablativus absolutus']
     },
     ABBREVIATIONS: {
         en: { 'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Genitive attribute': 'Gen. Attr', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Conjunction': 'Conj', 'Subjunction': 'Subjunc', 'Accusative/Nominative with infinitive': 'Acc/Nom+Inf', 'Vocative': 'Voc', 'Other': 'Other' },
-        de: { 'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Genitivattribut': 'Gen. Attr', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverb': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'Nebensatz', 'Konjunktion': 'Konj', 'Subjunktion': 'Subjunk', 'AcI/NcI': 'AcI/NcI', 'Vokativ': 'Vok', 'Sonstiges': 'Sonst.' }
+        de: { 'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Genitivattribut': 'Gen. Attr', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverbiale Bestimmung': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'N.satz', 'Konjunktion': 'Konj', 'Subjunktion': 'Subjunk', 'AcI/NcI': 'AcI/NcI', 'Vokativ': 'Vok', 'Sonstiges': 'Sonst.' }
     },
     LANG_TEXT: {
         en: {
@@ -2133,7 +2193,10 @@ function deleteWordFromModal() {
 
 function openGroupModal() {
     DOM.labelSuggestions.innerHTML = '';
-    AppState.functions.forEach(f => { 
+    // Suggest the level's word labels PLUS the fixed clause labels (these are valid for brackets
+    // at every level, even where they aren't part of the level's own word-label list).
+    const suggestions = [...new Set([...AppState.functions, ...CONFIG.GROUP_LABELS[AppState.lang]])];
+    suggestions.forEach(f => { 
         const opt = document.createElement('option'); 
         opt.value = f; 
         DOM.labelSuggestions.appendChild(opt); 
@@ -2147,7 +2210,8 @@ function openGroupModal() {
 function editGroupLabel(index) {
     AppState.ui.editingGroupIndex = index;
     DOM.labelSuggestions.innerHTML = '';
-    AppState.functions.forEach(f => { 
+    const suggestions = [...new Set([...AppState.functions, ...CONFIG.GROUP_LABELS[AppState.lang]])];
+    suggestions.forEach(f => { 
         const opt = document.createElement('option'); 
         opt.value = f; 
         DOM.labelSuggestions.appendChild(opt); 
@@ -2243,31 +2307,63 @@ function copyAIPrompt() {
     
     const txt = sanitizedText;
     
-    const promptText = AppState.lang === 'de' 
-    ? `Analysiere die lateinische Syntax von: "${txt}".
-1. KEINE ÜBERSETZUNG: Analysiere direkt die lateinische Morphologie und Syntax (Kasus, Kongruenz, Verbvalenz). Übersetze den Satz NICHT im Hintergrund und analysiere auf keinen Fall die deutsche Übersetzung!
-2. STRIKTE REGEL: Behalte die EXAKTE Wortreihenfolge bei. Lass KEINE Wörter und KEINE Satzzeichen aus (insbesondere nicht den Schlusspunkt!).
-3. PHRASEN: Benachbarte Wörter einer Phrase erhalten die gleiche Funktion.
-4. KOORDINATION: Wenn eine Konjunktion (z.B. 'et', 'aut', '-que') Wörter mit derselben syntaktischen Funktion verbindet (z.B. zwei Adverbien oder zwei Subjekte), gib der Konjunktion und den Wörtern EXAKT DASSELBE Label, damit sie verschmelzen.
-5. HYPERBATON: Getrennte Phrasen erhalten die gleiche Funktion, bleiben aber an ihrem Platz.
-6. INTERPUNKTION: Jedes Satzzeichen (inkl. Schlusspunkt) wird als eigenes Token mit "f": "${CONFIG.PUNCT}" ausgegeben.
-7. GRUPPEN & NEBENSÄTZE: Identifiziere mehrteilige Konstruktionen (z.B. Nebensatz, AcI/NcI, Partizipialkonstruktion). WICHTIG: Wenn du eine 'Subjunktion' oder ein Relativpronomen identifizierst, MUSST du zwingend eine entsprechende Gruppe erstellen. Der "end"-Index schließt den Satz logisch ab (meist beim finiten Verb/Satzzeichen) und zerschneidet keine Phrasen.
-8. GENITIVATTRIBUTE: Adjektive und Genitivattribute werden mit ihrem Bezugswort zusammengefasst (sie erhalten also EXAKT DASSELBE Label, z.B. beide "Subjekt"). Damit das Genitivattribut trotzdem erkennbar bleibt, füge ZWINGEND dem JSON-Objekt des Genitivattributs die Eigenschaft "u": true hinzu. Erstelle KEINE "groups" Klammer für Genitivattribute!
-9. BEISPIEL: Für "Aurum sumptum a Clodia, venenum quaesitum quod Clodiae daretur." antworte exakt so: {"words": [{"w":"Aurum","f":"Subjekt"},{"w":"sumptum","f":"Prädikat"},{"w":"a Clodia","f":"Präpositionale Bestimmung"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subjekt"},{"w":"quaesitum","f":"Prädikat"},{"w":"quod","f":"Subjekt"},{"w":"Clodiae","f":"Dativobjekt","u":true},{"w":"daretur","f":"Prädikat"},{"w":".","f":"Punct"}], "groups": [{"start": 6, "end": 9, "label": "Relativsatz"}]}
-10. WICHTIG: Antworte AUSSCHLIESSLICH mit gültigem JSON. Keine Kommentare, keine abschließenden Kommas (trailing commas) vor Klammern! Format: { "words": [{"w": "Wort", "f": "Label", "u": true}], "groups": [] }
-Verwende ausschließlich diese Labels: ${AppState.functions.join(', ')}.`
-    : `Analyze Latin syntax of: "${txt}". 
-1. NO TRANSLATION: Analyze the Latin morphology and syntax directly (cases, agreement, verb valency). Do NOT translate the sentence in the background and do not analyze the syntax of an English translation!
-2. STRICT RULE: Maintain the EXACT word order. Do NOT omit any words or punctuation marks (especially the final full stop!).
-3. PHRASES: Adjacent phrase words get same function. 
-4. COORDINATION: If a conjunction connects words with the same syntactical function, give the conjunction and the words the EXACT SAME label so they merge. 
-5. HYPERBATON: Split phrases get same function but kept in place.
-6. PUNCTUATION: Include EVERY punctuation mark as a separate token "f": "${CONFIG.PUNCT}".
-7. GROUPS & CLAUSES: Identify true multi-word clauses. IMPORTANT: If you tag a word as a 'Subjunction' or relative pronoun, you MUST create a corresponding group in the "groups" array. The "end" index logically closes the clause and NEVER cuts a phrase in half.
-8. GENITIVE ATTRIBUTES: Adjectives and genitive attributes are grouped with the words they modify (give them the EXACT SAME label, e.g., both "Subject"). To distinguish the genitive attribute, you MUST add the property "u": true to the JSON object of the genitive word. Do NOT create a "groups" bracket for genitive attributes!
-9. EXAMPLE: For "Aurum sumptum a Clodia, venenum quaesitum quod Clodiae daretur." answer exactly like this: {"words": [{"w":"Aurum","f":"Subject"},{"w":"sumptum","f":"Verb"},{"w":"a Clodia","f":"Prepositional phrase"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subject"},{"w":"quaesitum","f":"Verb"},{"w":"quod","f":"Subject"},{"w":"Clodiae","f":"Dative object","u":true},{"w":"daretur","f":"Verb"},{"w":".","f":"Punct"}], "groups": [{"start": 6, "end": 9, "label": "Relative clause"}]}
-10. IMPORTANT: Return ONLY valid JSON. No comments, no trailing commas before brackets! Format: { "words": [{"w": "Word", "f": "Label", "u": true}], "groups": [] } 
-Use ONLY these Labels: ${AppState.functions.join(', ')}.`;
+    // Single source of truth for the AI prompt: each rule is authored in German (the maintained
+    // master copy) with its English translation directly beside it. Editing a rule means editing
+    // both halves of the same object, so the two languages can no longer silently drift apart the
+    // way rules 4 (coordination examples) and 7 (clause-type examples) previously did.
+    const AI_PROMPT_RULES = [
+        {
+            de: `KEINE ÜBERSETZUNG: Analysiere direkt die lateinische Morphologie und Syntax (Kasus, Kongruenz, Verbvalenz). Übersetze den Satz NICHT im Hintergrund und analysiere auf keinen Fall die deutsche Übersetzung!`,
+            en: `NO TRANSLATION: Analyze the Latin morphology and syntax directly (cases, agreement, verb valency). Do NOT translate the sentence in the background and do not analyze the syntax of an English translation!`
+        },
+        {
+            de: `STRIKTE REGEL: Behalte die EXAKTE Wortreihenfolge bei. Lass KEINE Wörter und KEINE Satzzeichen aus (insbesondere nicht den Schlusspunkt!).`,
+            en: `STRICT RULE: Maintain the EXACT word order. Do NOT omit any words or punctuation marks (especially the final full stop!).`
+        },
+        {
+            de: `PHRASEN: Benachbarte Wörter einer Phrase erhalten die gleiche Funktion.`,
+            en: `PHRASES: Adjacent phrase words get the same function.`
+        },
+        {
+            de: `KOORDINATION: Wenn eine Konjunktion (z.B. 'et', 'aut', '-que') Wörter mit derselben syntaktischen Funktion verbindet (z.B. zwei Adverbien oder zwei Subjekte), gib der Konjunktion und den Wörtern EXAKT DASSELBE Label, damit sie verschmelzen.`,
+            en: `COORDINATION: If a conjunction (e.g. 'et', 'aut', '-que') connects words with the same syntactical function (e.g. two adverbs or two subjects), give the conjunction and the words the EXACT SAME label so they merge.`
+        },
+        {
+            de: `HYPERBATON: Getrennte Phrasen erhalten die gleiche Funktion, bleiben aber an ihrem Platz.`,
+            en: `HYPERBATON: Split phrases get the same function but stay in place.`
+        },
+        {
+            de: (t, C) => `INTERPUNKTION: Jedes Satzzeichen (inkl. Schlusspunkt) wird als eigenes Token mit "f": "${C.PUNCT}" ausgegeben.`,
+            en: (t, C) => `PUNCTUATION: Include EVERY punctuation mark (including the final full stop) as a separate token with "f": "${C.PUNCT}".`
+        },
+        {
+            de: (t, C) => `GRUPPEN & NEBENSÄTZE: Identifiziere mehrteilige Konstruktionen (z.B. Nebensatz, AcI/NcI, Partizipialkonstruktion). WICHTIG: Wenn du eine 'Subjunktion' oder ein Relativpronomen identifizierst, MUSST du zwingend eine entsprechende Gruppe erstellen und ihr eines dieser festen Satz-Labels geben (diese gelten unabhängig vom gewählten Niveau, auch wenn sie unten nicht bei den Wort-Labels stehen): ${C.GROUP_LABELS.de.join(', ')}. Der "end"-Index schließt den Satz logisch ab (meist beim finiten Verb/Satzzeichen) und zerschneidet keine Phrasen.`,
+            en: (t, C) => `GROUPS & CLAUSES: Identify true multi-word clauses (e.g. subordinate clauses, accusative/nominative with infinitive, participial phrases). IMPORTANT: If you tag a word as a 'Subjunction' or relative pronoun, you MUST create a corresponding group in the "groups" array and give it one of these fixed clause labels (these apply regardless of the chosen level, even if they are not in the word-label list below): ${C.GROUP_LABELS.en.join(', ')}. The "end" index logically closes the clause and NEVER cuts a phrase in half.`
+        },
+        {
+            de: `GENITIVATTRIBUTE: Adjektive und Genitivattribute werden mit ihrem Bezugswort zusammengefasst (sie erhalten also EXAKT DASSELBE Label, z.B. beide "Subjekt"). Damit das Genitivattribut trotzdem erkennbar bleibt, füge ZWINGEND dem JSON-Objekt des Genitivattributs die Eigenschaft "u": true hinzu. Erstelle KEINE "groups" Klammer für Genitivattribute! Verwende NIEMALS das Label "Genitivattribut" selbst als Funktionslabel ("f") - markiere ein Genitivattribut ausschließlich über die Eigenschaft "u": true.`,
+            en: `GENITIVE ATTRIBUTES: Adjectives and genitive attributes are grouped with the words they modify (give them the EXACT SAME label, e.g., both "Subject"). To distinguish the genitive attribute, you MUST add the property "u": true to the JSON object of the genitive word. Do NOT create a "groups" bracket for genitive attributes! NEVER use the label "Genitive attribute" itself as a word's function ("f") - mark a genitive attribute exclusively via the "u": true property.`
+        },
+        {
+            de: `BEISPIEL: Für "Aurum Metelli sumitur a Clodia, venenum quaeritur quod Clodiae daretur." antworte exakt so: {"words": [{"w":"Aurum","f":"Subjekt"}, {"w":"Metelli","f":"Subjekt","u":true}, {"w":"sumitur","f":"Prädikat"},{"w":"a Clodia","f":"Präpositionale Bestimmung"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subjekt"},{"w":"quaesitum","f":"Prädikat"},{"w":"quod","f":"Subjekt"},{"w":"Clodiae","f":"Dativobjekt"},{"w":"daretur","f":"Prädikat"},{"w":".","f":"Punct"}], "groups": [{"start": 7, "end": 10, "label": "Relativsatz"}]}`,
+            en: `EXAMPLE: For "Aurum Metelli sumitur a Clodia, venenum quaeritur quod Clodiae daretur." answer exactly like this: {"words": [{"w":"Aurum","f":"Subject"}, {"w":"Metelli","f":"Subject","u":true}, {"w":"sumitur","f":"Verb"},{"w":"a Clodia","f":"Prepositional phrase"},{"w":",","f":"Punct"},{"w":"venenum","f":"Subject"},{"w":"quaeritur","f":"Verb"},{"w":"quod","f":"Subject"},{"w":"Clodiae","f":"Dative object"},{"w":"daretur","f":"Verb"},{"w":".","f":"Punct"}], "groups": [{"start": 7, "end": 10, "label": "Relative clause"}]}`
+        },
+        {
+            de: (t, C) => `WICHTIG: Antworte AUSSCHLIESSLICH mit gültigem JSON. Keine Kommentare, keine abschließenden Kommas (trailing commas) vor Klammern! Format: { "words": [{"w": "Wort", "f": "Label", "u": true}], "groups": [] }\nVerwende für die Wort-Labels ("f") ausschließlich diese Labels: ${AppState.functions.join(', ')}. Für Klammern ("groups") darfst du zusätzlich - unabhängig vom gewählten Niveau - diese Satz-Labels verwenden: ${C.GROUP_LABELS.de.join(', ')}.`,
+            en: (t, C) => `IMPORTANT: Return ONLY valid JSON. No comments, no trailing commas before brackets! Format: { "words": [{"w": "Word", "f": "Label", "u": true}], "groups": [] }\nFor word labels ("f") use ONLY these Labels: ${AppState.functions.join(', ')}. For groups/clauses ("groups") you may additionally use these fixed clause labels, regardless of the chosen level: ${C.GROUP_LABELS.en.join(', ')}.`
+        }
+    ];
+
+    function buildAIPrompt(txt, lang) {
+        const intro = lang === 'de' ? `Analysiere die lateinische Syntax von: "${txt}".` : `Analyze Latin syntax of: "${txt}".`;
+        const body = AI_PROMPT_RULES.map((rule, i) => {
+            const raw = typeof rule[lang] === 'function' ? rule[lang](txt, CONFIG) : rule[lang];
+            return `${i + 1}. ${raw}`;
+        }).join('\n');
+        return `${intro}\n${body}`;
+    }
+
+    const promptText = buildAIPrompt(txt, AppState.lang);
 
     const showStatus = (isSuccess) => {
         btn.textContent = isSuccess ? "✅ " + CONFIG.LANG_TEXT[AppState.lang].promptSuccess : "❌ " + CONFIG.LANG_TEXT[AppState.lang].promptFail;
@@ -2357,6 +2453,8 @@ function normalizeLabel(label) {
         if(lower.includes('infinitive') && !lower.includes('with')) return 'Infinitiv';
         if(lower === 'verb') return 'Prädikat';
         if(lower.includes('vocative') || lower.includes('vokativ')) return 'Vokativ';
+        if(lower.includes('adverbiale')) return 'Adverbiale Bestimmung';
+        if(lower.includes('prädikatsnomen')) return 'Prädikativum';
     } else {
         if(lower.includes('dativ')) return 'Dative object';
         if(lower.includes('akkusativ')) return 'Accusative object';
@@ -2372,6 +2470,8 @@ function normalizeLabel(label) {
         if(lower.includes('subjekt')) return 'Subject';
         if(lower.includes('infinitiv') && !lower.includes('aci')) return 'Infinitive';
         if(lower.includes('vocative') || lower.includes('vokativ')) return 'Vocative';
+        if(lower.includes('adverbiale')) return 'Adverb';
+        if(lower.includes('prädikatsnomen') || lower.includes('predicate nominal') || lower.includes('predicate noun')) return 'Predicative';
     }
     return label.charAt(0).toUpperCase() + label.slice(1);
 }
@@ -2417,28 +2517,55 @@ function importAI() {
         
         rawGroups.forEach(g => { 
             let norm = normalizeLabel(g.label);
-            g.label = AppState.functions.includes(norm) ? norm : AppState.getOtherLabel();
+            // Groups may use either the current level's word labels or the fixed, level-independent
+            // clause labels (Nebensatz, Relativsatz, AcI/NcI, Partizipialkonstruktion, Ablativus
+            // absolutus) - so a correctly-labelled clause never gets silently downgraded to "Sonstiges"
+            // just because the exercise is set to Beginner/Anfänger.
+            g.label = (AppState.functions.includes(norm) || CONFIG.GROUP_LABELS[AppState.lang].includes(norm)) ? norm : AppState.getOtherLabel();
         });
 
-        d.words.forEach(w => {
-            w.w = w.w || ""; 
-            let func = w.f || ""; 
+        // Fixed sentinel for the label the prompt now forbids the AI from using directly (see rule 8).
+        // If it slips through anyway, recover the word's real function from a neighbour instead of
+        // discarding it to "Sonstiges"/"Other".
+        const GENITIVE_ATTR_LABEL = AppState.lang === 'de' ? 'Genitivattribut' : 'Genitive attribute';
 
-            w.w = w.w.replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
-            
-            if (!/[a-zA-Z\u00C0-\u017F]/.test(w.w)) {
-                w.f = CONFIG.PUNCT;
-                w.u = false;
+        d.words.forEach(w => {
+            w.w = (w.w || "").replace(/([a-zA-Z\u00C0-\u017F])-\s*([a-zA-Z\u00C0-\u017F])/g, '$1$2');
+        });
+
+        // Pass 1: resolve every word's function/underline flag, except genitive-attribute-label
+        // words, which are deferred so they can borrow an already-resolved neighbour's label below.
+        const resolved = d.words.map(w => {
+            const func = w.f || "";
+            if (!/[a-zA-Z\u00C0-\u017F]/.test(w.w)) return { f: CONFIG.PUNCT, u: false, isPunct: true };
+            if (func.toLowerCase() === CONFIG.MAIN_CLAUSE_EN.toLowerCase() || func.toLowerCase() === CONFIG.MAIN_CLAUSE_DE.toLowerCase()) {
+                return { f: AppState.getOtherLabel(), u: !!w.u, isPunct: false };
             }
-            else if (func.toLowerCase() === CONFIG.MAIN_CLAUSE_EN.toLowerCase() || func.toLowerCase() === CONFIG.MAIN_CLAUSE_DE.toLowerCase()) {
-                w.f = AppState.getOtherLabel();
+            const norm = normalizeLabel(func);
+            if (norm === GENITIVE_ATTR_LABEL) {
+                return { f: null, u: true, isPunct: false, isGenAttr: true };
             }
-            else {
-                let norm = normalizeLabel(func);
-                w.f = AppState.functions.includes(norm) ? norm : AppState.getOtherLabel();
-            }
+            return { f: AppState.functions.includes(norm) ? norm : AppState.getOtherLabel(), u: !!w.u, isPunct: false };
+        });
+
+        // Pass 2: a word wrongly labelled "Genitivattribut"/"Genitive attribute" inherits its actual
+        // function from the nearest neighbouring word (preferring the preceding word, since the
+        // genitive attribute typically follows its head noun, e.g. "Aurum Metelli" - "Metelli"
+        // should copy "Aurum"'s label) - matching the "EXACT SAME label as the head word" rule
+        // instead of collapsing to "Sonstiges"/"Other".
+        resolved.forEach((r, i) => {
+            if (!r.isGenAttr) return;
+            const prev = resolved[i - 1];
+            const next = resolved[i + 1];
+            if (prev && !prev.isPunct && !prev.isGenAttr) r.f = prev.f;
+            else if (next && !next.isPunct && !next.isGenAttr) r.f = next.f;
+            else r.f = AppState.getOtherLabel();
+        });
+
+        d.words.forEach((w, i) => {
+            w.f = resolved[i].f;
             w.b = w.b || 0;
-            w.u = !!w.u;
+            w.u = resolved[i].u;
         });
         
         const mergeResult = applyPrepositionMerging(d.words);
@@ -2484,6 +2611,11 @@ function startManual() {
 
 function initEditor(words) {
     AppState.functions = [...CONFIG.PRESETS[AppState.lang][AppState.level]];
+    // Fixed clause labels (see GROUP_LABELS) can be used in "groups" at any level, so they may not
+    // be part of the level's own word-label preset. Without this, a beginner-level exercise that
+    // correctly has a "Relativsatz" bracket would lose that label from the palette right here, and
+    // it would then be missing from the exported student page's answer choices for that bracket.
+    AppState.groups.forEach(g => { if (g.label && !AppState.functions.includes(g.label)) AppState.functions.push(g.label); });
     AppState.history = [];
     AppState.words = words;
     DOM.editorPageTitle.value = DOM.pageTitle.value;
@@ -2613,6 +2745,8 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             transPlaceholder: "Enter translation...", docTitle: "Interactive Syntax Explorer",
             practiseMode: "Practise Mode", examMode: "Exam Mode",
             resetWarn: "Changing the mode will reload the page and reset your progress. Continue?",
+            btnSubmitExam: "✅ Submit Exam",
+            confirmSubmit: "Submit the exam now? Any unanswered phrases and any genitive attributes you haven't found yet will be counted as errors.",
             examResults: "Exam Results", copyResults: "Copy to Clipboard", copied: "Copied!", close: "Close",
             saveWarning: "⚠️ Note: Your progress is saved locally in this web browser. You must open this file on this exact same device and browser to resume your work later. Clearing your browser data will delete your progress. Do you want to save now?",
             resExercise: "Exercise: ", resDate: "Date: ", resScore: "Score: ",
@@ -2627,6 +2761,8 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             transPlaceholder: "Übersetzung eingeben...", docTitle: "Interaktives Syntax-Training",
             practiseMode: "Übungsmodus", examMode: "Prüfungsmodus",
             resetWarn: "Ein Moduswechsel lädt die Seite neu und setzt deinen Fortschritt zurück. Fortfahren?",
+            btnSubmitExam: "✅ Prüfung abgeben",
+            confirmSubmit: "Prüfung jetzt abgeben? Unbeantwortete Wortgruppen und noch nicht gefundene Genitivattribute werden als Fehler gewertet.",
             examResults: "Prüfungsergebnisse", copyResults: "Ergebnisse kopieren", copied: "Kopiert!", close: "Schließen",
             saveWarning: "⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?",
             resExercise: "Übung: ", resDate: "Datum: ", resScore: "Ergebnis: ",
@@ -2677,6 +2813,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             <button class="btn" onclick="clearStudentProgress()" id="btn-clear-progress">${t.btnClearProg}</button>
             <button class="btn" onclick="window.print()">${t.print}</button> 
             <button class="btn" onclick="downloadPage()">${t.download}</button>
+            <button class="btn btn-submit-exam" onclick="submitExam()" id="btn-submit-exam" style="display:none;">${t.btnSubmitExam}</button>
         </div>
         <div id="menu-common" class="radio-menu">
             <button type="button" class="menu-btn gen-btn" data-action="toggle-gen">🖍️ Mark Genitive (G)</button>
