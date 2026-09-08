@@ -1,0 +1,8 @@
+{
+  "name": "latin-syntax-studio",
+  "private": true,
+  "description": "Anke Walter's Latin Syntax Studio: a static teacher editor that exports interactive student exercises. No build step; this file only runs the tests.",
+  "scripts": {
+    "test": "node --test \"tests/**/*.test.js\""
+  }
+}
