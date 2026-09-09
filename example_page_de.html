@@ -29,6 +29,15 @@
         .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
         .hover-word:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
         
+        /* Interactive Genitive Underline Elements */
+        .s-text { border-bottom: 3px dashed transparent; transition: border-color 0.2s, background-color 0.2s; border-radius: 2px; }
+        .s-text.marked-gen { border-bottom-color: #ec4899; }
+        .s-text.error-gen { border-bottom-color: #ef4444; background-color: #fef2f2; }
+        .s-text.missed-gen { border-bottom-color: #f59e0b; border-bottom-style: solid; background-color: #fffbeb; }
+
+        .btn-submit-exam { background: #10b981 !important; }
+        .btn-submit-exam:hover { background: #059669 !important; }
+
         .s-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom:none; border-radius: 6px 6px 0 0; padding: 22px 6px 6px 6px; margin: 20px 4px 0 4px; vertical-align: bottom; transition: all 0.2s; z-index: 1; }
         .s-group:hover, .s-group:focus-within { z-index: 10; }
         
@@ -54,6 +63,8 @@
         .menu-btn:hover, .menu-btn:focus-visible { background-color: #f3f4f6; color: #111827; outline: none; }
         .menu-btn:focus-visible { box-shadow: inset 2px 0 0 0 #3b82f6; }
         
+        .gen-btn { color: #ec4899; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 4px; display: none; }
+
         .footer-toolbar { margin-top: 40px; padding: 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
         .btn { padding: 10px 20px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font-weight: 500; color: white; background: #1f2937; transition: opacity 0.2s; }
         .btn:hover { opacity: 0.9; }
@@ -84,6 +95,8 @@
         body.high-contrast .teacher-note { background: #1e1e1e !important; border: 1px solid #444 !important; color: #e5e7eb !important; }
         body.high-contrast .hover-word { background-color: #333; color: #fff; border-bottom: 2px solid #555; }
         body.high-contrast .hover-word[data-done="true"] { border: 2px solid #fff !important; color: #000 !important; font-weight: 600; }
+        body.high-contrast .s-text.marked-gen { border-bottom-color: #f472b6 !important; }
+        body.high-contrast .s-text.missed-gen { border-bottom-color: #fbbf24 !important; background-color: #3a2f00 !important; }
         body.high-contrast .s-group { border-color: #fff !important; }
         body.high-contrast .g-label { background: #000 !important; color: #fff !important; border-color: #fff !important; }
         body.high-contrast .punct { color: #fff; }
@@ -109,7 +122,9 @@
 </head>
 <body>
     <h1>Beispielanalyse: Caesar, Catullus & Vergil</h1>
-    <div class="instruction-box">Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen. Du kannst auch mit der Maus über ein Wort oder eine Gruppe fahren und den unterstrichenen Buchstaben auf deiner Tastatur drücken, um eine Funktion schnell auszuwählen. Wenn du ein Glühbirnen-Symbol (💡) siehst, klicke darauf, um einen hilfreichen Tipp zu erhalten!<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.</div>
+    <div class="instruction-box">
+        Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken, um die syntaktische Funktion auszuwählen. <br><br><strong>Wichtig:</strong> Du musst auch versteckte Genitivattribute aufspüren! Klicke dazu direkt auf das Genitivattribut innerhalb eines Wortblocks und nutze das <strong>🖍️ Genitiv markieren</strong> Werkzeug, um es hervorzuheben. Sobald du jede Wortgruppe korrekt analysiert und alle Genitive gefunden hast, erscheint ein Textfeld für deine Übersetzung[cite: 1].
+    </div>
     
     <div class="exercise-wrapper">
         <div style="text-align: center; margin-bottom: 24px;">
@@ -134,47 +149,7 @@
 
         <div id="exercise-container-wrapper">
             <div id="exercise">
-                
-                <h2>Caesar, <i>De Bello Gallico</i> 1,1</h2>
-                <div class="sentence-container">
-                    <span class="hover-word" tabindex="0" data-ans="Subjekt">Gallia</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">est</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">omnis</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">divisa</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">in partes tres</span><span class="punct">,</span> 
-                    <div class="s-group" data-ans="Relativsatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">quarum unam</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">incolunt</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Belgae</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">aliam</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Aquitani</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">tertiam</span> 
-                    <div class="s-group" data-ans="Relativsatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjekt">qui</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">ipsorum lingua</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">Celtae</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">nostra</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">Galli</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">appellantur</span><span class="punct">.</span></div></div>
-                </div>
-                <div id="t-container-0" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div>
-                
-                <div class="sentence-container">
-                    <span class="hover-word" tabindex="0" data-ans="Subjekt">Hi omnes</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">lingua, institutis, legibus</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">inter se</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">differunt</span><span class="punct">.</span> 
-                </div>
-                <div id="t-container-1" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div>
-                
-                <div class="sentence-container">
-                    <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Gallos</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">ab Aquitanis</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Garumna flumen</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">a Belgis</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Matrona et Sequana</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">dividit</span><span class="punct">.</span> 
-                </div>
-                <div id="t-container-2" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div>
-
-                <h2>Catullus 64,1-7</h2>
-                <div class="sentence-container">
-                    <div class="s-group" data-ans="Subjekt"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Ablativ">Peliaco</span> <span class="hover-word" tabindex="0" data-ans="Adverb">quondam</span> <span class="hover-word" tabindex="0" data-ans="Partizipialkonstruktion">prognatae</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">vertice</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">pinus</span></div> <span class="hover-word" tabindex="0" data-ans="Prädikat">dicuntur</span> 
-                    <div class="s-group" data-ans="Infinitiv"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">liquidas Neptuni</span> <span class="hover-word" tabindex="0" data-ans="Infinitiv">nasse</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">per undas Phasidos</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">ad fluctus et fines Aeetaeos</span><span class="punct">,</span></div> 
-                    <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion">cum</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">lecti iuvenes, Argiuae robora pubis</span><span class="punct">,</span> 
-                    <div class="s-group" data-ans="Partizipialkonstruktion"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">auratam</span> <span class="hover-word" tabindex="0" data-ans="Partizipialkonstruktion">optantes</span> <span class="hover-word" tabindex="0" data-ans="Dativobjekt">Colchis</span> <span class="hover-word" tabindex="0" data-ans="Infinitiv">avertere</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">pellem</span></div> 
-                    <span class="hover-word" tabindex="0" data-ans="Prädikat">ausi sunt</span> 
-                    <div class="s-group" data-ans="Infinitiv"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">vada salsa</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">cita</span> <span class="hover-word" tabindex="0" data-ans="Infinitiv">decurrere</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">puppi</span><span class="punct">,</span></div> 
-                    <div class="s-group" data-ans="Partizipialkonstruktion"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">caerula</span> <span class="hover-word" tabindex="0" data-ans="Partizipialkonstruktion">verrentes</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">abiegnis</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">aequora</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">palmis</span><span class="punct">.</span></div></div> 
-                </div>
-                <div id="t-container-3" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div>
-
-                <h2>Vergil, <i>Aeneis</i> 1,1-7</h2>
-                <div class="sentence-container">
-                    <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Arma virumque</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">canō</span><span class="punct">,</span> 
-                    <div class="s-group" data-ans="Relativsatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">Trōiae</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">quī</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">prīmus</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">ab ōrīs</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Ītaliam</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">fātō</span> <span class="hover-word" tabindex="0" data-ans="Prädikativum">profugus</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">Lāvīniaque</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">vēnit</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">lītora</span><span class="punct">,</span></div> 
-                    <span class="hover-word" tabindex="0" data-ans="Adverb">multum</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">ille</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">et terrīs</span> <span class="hover-word" tabindex="0" data-ans="Partizipialkonstruktion">iactātus</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">et altō</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">vī superum</span> <span class="hover-word" tabindex="0" data-ans="Präpositionale Bestimmung">saevae memorem Iūnōnis ob īram</span><span class="punct">;</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">multa</span> <span class="hover-word" tabindex="0" data-ans="Adverb">quoque</span> <span class="hover-word" tabindex="0" data-ans="Ablativ">et bellō</span> <span class="hover-word" tabindex="0" data-ans="Partizipialkonstruktion">passus</span><span class="punct">,</span> 
-                    <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjunktion">dum</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">conderet</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">urbem</span><span class="punct">,</span> <span class="hover-word" tabindex="0" data-ans="Prädikat">inferretque</span> <span class="hover-word" tabindex="0" data-ans="Akkusativobjekt">deōs</span> <span class="hover-word" tabindex="0" data-ans="Dativobjekt">Latiō</span><span class="punct">,</span> 
-                    <div class="s-group" data-ans="Nebensatz"><span class="g-label" tabindex="0"><span class="g-text">?</span></span><span class="hover-word" tabindex="0" data-ans="Subjekt">genus</span> <span class="hover-word" tabindex="0" data-ans="Adverb">unde</span> <span class="hover-word" tabindex="0" data-ans="Subjekt">Latīnum, Albānīque patrēs, atque altae moenia Rōmae</span><span class="punct">.</span></div></div> 
-                </div>
-                <div id="t-container-4" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div>
-
+                <!-- Populated dynamically via updated JSON[cite: 3] -->
             </div>
         </div>
     </div>
@@ -186,27 +161,12 @@
         <button class="btn" onclick="clearStudentProgress()" id="btn-clear-progress">🗑️ Fortschritt löschen</button>
         <button class="btn" onclick="window.print()">Drucken</button> 
         <button class="btn" onclick="downloadPage()">HTML herunterladen</button>
+        <button class="btn btn-submit-exam" onclick="submitExam()" id="btn-submit-exam" style="display:none;">✅ Prüfung abgeben</button>
     </div>
     
     <div id="menu-common" class="radio-menu">
-        <button type="button" class="menu-btn" data-val="Subjekt">Subjekt</button>
-        <button type="button" class="menu-btn" data-val="Prädikat">Prädikat</button>
-        <button type="button" class="menu-btn" data-val="Akkusativobjekt">Akkusativobjekt</button>
-        <button type="button" class="menu-btn" data-val="Dativobjekt">Dativobjekt</button>
-        <button type="button" class="menu-btn" data-val="Genitivobjekt">Genitivobjekt</button>
-        <button type="button" class="menu-btn" data-val="Ablativ">Ablativ</button>
-        <button type="button" class="menu-btn" data-val="Ablativus absolutus">Ablativus absolutus</button>
-        <button type="button" class="menu-btn" data-val="Prädikativum">Prädikativum</button>
-        <button type="button" class="menu-btn" data-val="Präpositionale Bestimmung">Präpositionale Bestimmung</button>
-        <button type="button" class="menu-btn" data-val="Adverb">Adverb</button>
-        <button type="button" class="menu-btn" data-val="Infinitiv">Infinitiv</button>
-        <button type="button" class="menu-btn" data-val="AcI">AcI</button>
-        <button type="button" class="menu-btn" data-val="Partizipialkonstruktion">Partizipialkonstruktion</button>
-        <button type="button" class="menu-btn" data-val="Relativsatz">Relativsatz</button>
-        <button type="button" class="menu-btn" data-val="Nebensatz">Nebensatz</button>
-        <button type="button" class="menu-btn" data-val="Konjunktion">Konjunktion</button>
-        <button type="button" class="menu-btn" data-val="Subjunktion">Subjunktion</button>
-        <button type="button" class="menu-btn" data-val="Sonstiges">Sonstiges</button>
+        <button type="button" class="menu-btn gen-btn" data-action="toggle-gen">🖍️ Genitiv markieren (G)</button>
+        <!-- Buttons injected dynamically -->
     </div>
     
     <div id="results-modal">
@@ -222,292 +182,423 @@
     <div id="toast-container"></div>
     
     <script>
-        const colors = {"Subjekt":"#bef264","Subject":"#bef264","Prädikat":"#fca5a5","Verb":"#fca5a5","Akkusativobjekt":"#bde0f5","Accusative object":"#bde0f5","Dativobjekt":"#ffd480","Dative object":"#ffd480","Genitivobjekt":"#ebbcd4","Genitive object":"#ebbcd4","Ablativ":"#93c5fd","Ablative":"#93c5fd","Ablativus absolutus":"#bfdbfe","Ablative absolute":"#bfdbfe","Prädikativum":"#c4b5fd","Predicative":"#c4b5fd","Präpositionale Bestimmung":"#e9d5ff","Prepositional phrase":"#e9d5ff","Adverb":"#fef08a","Infinitiv":"#fbcfe8","Infinitive":"#fbcfe8","AcI":"#d8b4fe","Accusative with infinitive":"#d8b4fe","Partizipialkonstruktion":"#f9a8d4","Participial phrase":"#f9a8d4","Relativsatz":"#99f6e4","Relative clause":"#99f6e4","Nebensatz":"#cbd5e1","Subordinate clause":"#cbd5e1","Konjunktion":"#ffedd5","Conjunction":"#ffedd5","Subjunktion":"#85e6c7","Subjunction":"#85e6c7","Sonstiges":"#e5e7eb","Other":"#e5e7eb"}; 
-        const abbreviations = {"en":{"Subject":"Subj","Accusative object":"Acc. Obj","Dative object":"Dat. Obj","Genitive object":"Gen. Obj","Ablative":"Abl","Ablative absolute":"Abl. Abs.","Predicative":"Pred","Prepositional phrase":"Prep. Phr","Adverb":"Adv","Verb":"Verb","Infinitive":"Inf","Participial phrase":"Part. Phr","Relative clause":"Rel. Cl","Subordinate clause":"Sub. Cl","Conjunction":"Conj","Subjunction":"Subjunc","Accusative with infinitive":"Acc+Inf","Other":"Other","Main clause":"Main"},"de":{"Subjekt":"Subj","Akkusativobjekt":"Akk. Obj","Dativobjekt":"Dat. Obj","Genitivobjekt":"Gen. Obj","Ablativ":"Abl","Ablativus absolutus":"Abl. Abs.","Prädikativum":"Präd","Präpositionale Bestimmung":"Präp. Best.","Adverb":"Adv","Prädikat":"Prädikat","Infinitiv":"Inf","Partizipialkonstruktion":"Part. Konstr","Relativsatz":"Rel. Satz","Nebensatz":"Nebensatz","Konjunktion":"Konj","Subjunktion":"Subjunk","AcI":"AcI","Sonstiges":"Sonst.","Main clause":"Hauptsatz"}};
-        const labelMap = {"en":{"Subjekt":"Subject","Subject":"Subject","Prädikat":"Verb","Verb":"Verb","Akkusativobjekt":"Accusative object","Accusative object":"Accusative object","Dativobjekt":"Dative object","Dative object":"Dative object","Genitivobjekt":"Genitive object","Genitive object":"Genitive object","Ablativ":"Ablative","Ablative":"Ablative","Ablativus absolutus":"Ablative absolute","Ablative absolute":"Ablative absolute","Prädikativum":"Predicative","Predicative":"Predicative","Präpositionale Bestimmung":"Prepositional phrase","Prepositional phrase":"Prepositional phrase","Adverb":"Adverb","Infinitiv":"Infinitive","Infinitive":"Infinitive","AcI":"Accusative with infinitive","Accusative with infinitive":"Accusative with infinitive","Partizipialkonstruktion":"Participial phrase","Participial phrase":"Participial phrase","Relativsatz":"Relative clause","Relative clause":"Relative clause","Nebensatz":"Subordinate clause","Subordinate clause":"Subordinate clause","Konjunktion":"Conjunction","Conjunction":"Conjunction","Subjunktion":"Subjunction","Subjunction":"Subjunction","Sonstiges":"Other","Other":"Other"},"de":{"Subject":"Subjekt","Subjekt":"Subjekt","Verb":"Prädikat","Prädikat":"Prädikat","Accusative object":"Akkusativobjekt","Akkusativobjekt":"Akkusativobjekt","Dative object":"Dativobjekt","Dativobjekt":"Dativobjekt","Genitive object":"Genitivobjekt","Genitivobjekt":"Genitivobjekt","Ablative":"Ablativ","Ablativ":"Ablativ","Ablative absolute":"Ablativus absolutus","Ablativus absolutus":"Ablativus absolutus","Predicative":"Prädikativum","Prädikativum":"Prädikativum","Prepositional phrase":"Präpositionale Bestimmung","Präpositionale Bestimmung":"Präpositionale Bestimmung","Adverb":"Adverb","Infinitive":"Infinitiv","Infinitiv":"Infinitiv","Accusative with infinitive":"AcI","AcI":"AcI","Participial phrase":"Partizipialkonstruktion","Partizipialkonstruktion":"Partizipialkonstruktion","Relative clause":"Relativsatz","Relativsatz":"Relativsatz","Subordinate clause":"Nebensatz","Nebensatz":"Nebensatz","Conjunction":"Konjunktion","Konjunktion":"Konjunktion","Subjunction":"Subjunktion","Subjunktion":"Subjunktion","Other":"Sonstiges","Sonstiges":"Sonstiges"}};
-        const studentTexts = {"en":{"instr":"This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words—or navigate to them using the Tab and Enter keys—to select their syntactical function. You can also hover over a word and press the underlined letter on your keyboard to instantly select a function. If you see a light bulb icon (💡), click on it for a helpful hint!<br><br>Once you have correctly analyzed every word group in a sentence, a textbox will appear into which you can write your translation.","note":"Note:","togglePat":"Toggle Patterns","toggleCon":"High Contrast","print":"Print Analysis","download":"Download HTML","btnSaveProg":"💾 Save Progress","btnClearProg":"🗑️ Clear Progress","progSaved":"Progress saved!","progCleared":"Progress cleared!","correct":"Correct!","incorrect":"Incorrect. The correct answer is: ","tryAgain":"Incorrect label, try again!","transPlaceholder":"Enter translation...","docTitle":"Interactive Syntax Explorer","practiseMode":"Practise Mode","examMode":"Exam Mode","resetWarn":"Changing the mode will reload the page and reset your progress. Continue?","examResults":"Exam Results","copyResults":"Copy to Clipboard","copied":"Copied!","close":"Close","saveWarning":"⚠️ Note: Your progress is saved locally in this web browser. You must open this file on this exact same device and browser to resume your work later. Clearing your browser data will delete your progress. Do you want to save now?","resExercise":"Exercise: ","resDate":"Date: ","resScore":"Score: "},"de":{"instr":"Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Du kannst auf ein Wort oder eine Gruppe klicken—oder mit den Tab und Enter Tasten dorthin navigieren—um die syntaktische Funktion auszuwählen. Du kannst auch mit der Maus über ein Wort oder eine Gruppe fahren und den unterstrichenen Buchstaben auf deiner Tastatur drücken, um eine Funktion schnell auszuwählen. Wenn du ein Glühbirnen-Symbol (💡) siehst, klicke darauf, um einen hilfreichen Tipp zu erhalten!<br><br>Sobald du jede Wortgruppe in einem Satz korrekt analysiert hast, erscheint ein Textfeld für deine Übersetzung.","note":"Hinweis:","togglePat":"Muster umschalten","toggleCon":"Hoher Kontrast","print":"Drucken","download":"HTML herunterladen","btnSaveProg":"💾 Fortschritt speichern","btnClearProg":"🗑️ Fortschritt löschen","progSaved":"Fortschritt gespeichert!","progCleared":"Fortschritt gelöscht!","correct":"Richtig!","incorrect":"Falsch. Die richtige Antwort ist: ","tryAgain":"Falsches Label, versuch es nochmal!","transPlaceholder":"Übersetzung eingeben...","docTitle":"Interaktives Syntax-Training","practiseMode":"Übungsmodus","examMode":"Prüfungsmodus","resetWarn":"Ein Moduswechsel lädt die Seite neu und setzt deinen Fortschritt zurück. Fortfahren?","examResults":"Prüfungsergebnisse","copyResults":"Ergebnisse kopieren","copied":"Kopiert!","close":"Schließen","saveWarning":"⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?","resExercise":"Übung: ","resDate":"Datum: ","resScore":"Ergebnis: "}};
+        const exerciseData = {
+            lang: "de",
+            words: [{"w":"Gallia","f":"Subjekt","u":false,"b":0},{"w":"est","f":"Prädikat","u":false,"b":0},{"w":"omnis","f":"Prädikativum","u":false,"b":0,"h":"Hier aufpassen; welche Funktion hat omnis in diesem Satz?"},{"w":"divisa","f":"Prädikat","u":false,"b":0},{"w":"in partes","f":"Präpositionale Bestimmung","b":0,"u":false},{"w":"tres","f":"Präpositionale Bestimmung","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"quarum","f":"Akkusativobjekt","u":true,"b":0},{"w":"unam","f":"Akkusativobjekt","u":false,"b":0},{"w":"incolunt","f":"Prädikat","u":false,"b":0},{"w":"Belgae","f":"Subjekt","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"aliam","f":"Akkusativobjekt","u":false,"b":0},{"w":"Aquitani","f":"Subjekt","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"tertiam","f":"Akkusativobjekt","u":false,"b":0},{"w":"qui","f":"Subjekt","u":false,"b":0},{"w":"ipsorum","f":"Ablativ","u":true,"b":0},{"w":"lingua","f":"Ablativ","u":false,"b":0},{"w":"Celtae","f":"Prädikativum","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"nostra","f":"Ablativ","u":false,"b":0},{"w":"Galli","f":"Prädikativum","u":false,"b":0},{"w":"appellantur","f":"Prädikat","u":false,"b":0},{"w":".","f":"Punct","u":false,"b":0},{"w":"Hi","f":"Subjekt","u":false,"b":0},{"w":"omnes","f":"Subjekt","u":false,"b":0},{"w":"lingua","f":"Ablativ","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"institutis","f":"Ablativ","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"legibus","f":"Ablativ","u":false,"b":0},{"w":"inter se","f":"Präpositionale Bestimmung","b":0,"u":false},{"w":"differunt","f":"Prädikat","u":false,"b":0},{"w":".","f":"Punct","u":false,"b":0},{"w":"Gallos","f":"Akkusativobjekt","u":false,"b":0},{"w":"ab Aquitanis","f":"Präpositionale Bestimmung","b":0,"u":false},{"w":"Garumna","f":"Subjekt","u":false,"b":0},{"w":"flumen","f":"Subjekt","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"a Belgis","f":"Präpositionale Bestimmung","b":0,"u":false},{"w":"Matrona","f":"Subjekt","u":false,"b":0},{"w":"et","f":"Subjekt","u":false,"b":0},{"w":"Sequana","f":"Subjekt","u":false,"b":0},{"w":"dividit","f":"Prädikat","u":false,"b":0},{"w":".","f":"Punct","u":false,"b":0},{"w":"Peliaco","f":"Ablativ","u":false,"b":0},{"w":"quondam","f":"Adverbiale Bestimmung","u":false,"b":0},{"w":"prognatae","f":"Subjekt","u":false,"b":0},{"w":"vertice","f":"Ablativ","u":false,"b":0},{"w":"pinus","f":"Subjekt","u":false,"b":0},{"w":"dicuntur","f":"Prädikat","u":false,"b":0},{"w":"liquidas","f":"Präpositionale Bestimmung","u":false,"b":0},{"w":"Neptuni","f":"Präpositionale Bestimmung","u":true,"b":0},{"w":"nasse","f":"Infinitiv","u":false,"b":0},{"w":"per","f":"Präpositionale Bestimmung","isSplit":false,"b":0,"u":false},{"w":"undas","f":"Präpositionale Bestimmung","isSplit":true,"h":"","b":0,"u":false},{"w":"Phasidos","f":"Präpositionale Bestimmung","u":true,"b":0},{"w":"ad fluctus","f":"Präpositionale Bestimmung","b":0,"u":false},{"w":"et","f":"Präpositionale Bestimmung","u":false,"b":0},{"w":"fines","f":"Präpositionale Bestimmung","u":false,"b":0},{"w":"Aeetaeos","f":"Präpositionale Bestimmung","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"cum","f":"Subjunktion","u":false,"b":0},{"w":"lecti","f":"Subjekt","u":false,"b":0},{"w":"iuvenes","f":"Subjekt","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"Argiuae","f":"Subjekt","u":true,"b":0},{"w":"robora","f":"Subjekt","u":false,"b":0},{"w":"pubis","f":"Subjekt","u":true,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"auratam","f":"Akkusativobjekt","u":false,"b":0},{"w":"optantes","f":"Subjekt","u":false,"b":0},{"w":"Colchis","f":"Ablativ","u":false,"b":0},{"w":"avertere","f":"Infinitiv","u":false,"b":0},{"w":"pellem","f":"Akkusativobjekt","u":false,"b":0},{"w":"ausi","f":"Prädikat","u":false,"b":0},{"w":"sunt","f":"Prädikat","u":false,"b":0},{"w":"vada","f":"Akkusativobjekt","u":false,"b":0},{"w":"salsa","f":"Akkusativobjekt","u":false,"b":0},{"w":"cita","f":"Ablativ","u":false,"b":0},{"w":"decurrere","f":"Infinitiv","u":false,"b":0},{"w":"puppi","f":"Ablativ","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"caerula","f":"Akkusativobjekt","u":false,"b":0},{"w":"verrentes","f":"Subjekt","u":false,"b":0},{"w":"abiegnis","f":"Ablativ","u":false,"b":0},{"w":"aequora","f":"Akkusativobjekt","u":false,"b":0},{"w":"palmis","f":"Ablativ","u":false,"b":0},{"w":".","f":"Punct","u":false,"b":0},{"w":"Arma","f":"Akkusativobjekt","u":false,"b":0},{"w":"virumque","f":"Akkusativobjekt","u":false,"b":0},{"w":"canō","f":"Prädikat","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"Trōiae","f":"Präpositionale Bestimmung","u":true,"b":0},{"w":"quī","f":"Subjekt","u":false,"b":0},{"w":"prīmus","f":"Prädikativum","u":false,"b":0},{"w":"ab ōrīs","f":"Präpositionale Bestimmung","b":0,"u":false},{"w":"Ītaliam","f":"Akkusativobjekt","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"fātō","f":"Ablativ","u":false,"b":0},{"w":"profugus","f":"Subjekt","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"Lāvīniaque","f":"Akkusativobjekt","u":false,"b":0},{"w":"vēnit","f":"Prädikat","u":false,"b":0},{"w":"lītora","f":"Akkusativobjekt","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"multum","f":"Adverbiale Bestimmung","u":false,"b":0},{"w":"ille","f":"Subjekt","u":false,"b":0},{"w":"et","f":"Ablativ","u":false,"b":0},{"w":"terrīs","f":"Ablativ","u":false,"b":0},{"w":"iactātus","f":"Prädikat","u":false,"b":0,"h":"ergänze: est"},{"w":"et","f":"Ablativ","u":false,"b":0},{"w":"altō","f":"Ablativ","u":false,"b":0,"isSplit":true},{"w":"vī","f":"Ablativ","u":false,"b":0},{"w":"superum","f":"Ablativ","u":true,"b":0},{"w":"saevae","f":"Präpositionale Bestimmung","u":true,"b":0},{"w":"memorem","f":"Präpositionale Bestimmung","u":false,"b":0},{"w":"Iūnōnis","f":"Präpositionale Bestimmung","u":true,"b":0},{"w":"ob īram","f":"Präpositionale Bestimmung","b":0,"u":false},{"w":";","f":"Punct","u":false,"b":0},{"w":"multa","f":"Akkusativobjekt","u":false,"b":0},{"w":"quoque","f":"Adverbiale Bestimmung","u":false,"b":0},{"w":"et","f":"Ablativ","u":false,"b":0},{"w":"bellō","f":"Ablativ","u":false,"b":0},{"w":"passus","f":"Prädikat","u":false,"b":0,"h":"ergänze: est"},{"w":",","f":"Punct","u":false,"b":0},{"w":"dum","f":"Subjunktion","u":false,"b":0},{"w":"conderet","f":"Prädikat","u":false,"b":0},{"w":"urbem","f":"Akkusativobjekt","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"inferretque","f":"Prädikat","u":false,"b":0},{"w":"deōs","f":"Akkusativobjekt","u":false,"b":0},{"w":"Latiō","f":"Dativobjekt","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"genus","f":"Subjekt","u":false,"b":0},{"w":"unde","f":"Subjunktion","u":false,"b":0},{"w":"Latīnum","f":"Subjekt","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"Albānīque","f":"Subjekt","u":false,"b":0},{"w":"patrēs","f":"Subjekt","u":false,"b":0},{"w":",","f":"Punct","u":false,"b":0},{"w":"atque","f":"Subjekt","u":false,"b":0},{"w":"altae","f":"Subjekt","u":true,"b":0},{"w":"moenia","f":"Subjekt","u":false,"b":0},{"w":"Rōmae","f":"Subjekt","u":true,"b":0},{"w":".","f":"Punct","u":false,"b":0}],
+            groups: [{"start":7,"end":23,"label":"Relativsatz"},{"start":52,"end":61,"label":"AcI/NcI"},{"start":63,"end":88,"label":"Nebensatz"},{"start":84,"end":88,"label":"Partizipialkonstruktion"},{"start":16,"end":23,"label":"Relativsatz"},{"start":46,"end":50,"label":"Partizipialkonstruktion"},{"start":71,"end":75,"label":"Partizipialkonstruktion"},{"start":94,"end":105,"label":"Relativsatz"},{"start":100,"end":101,"label":"Partizipialkonstruktion"},{"start":127,"end":145,"label":"Nebensatz"},{"start":135,"end":145,"label":"Nebensatz","hint":"In diesem Nebensatz fehlt das Prädikat."}],
+            customFunctions: ["Subjekt","Prädikat","Akkusativobjekt","Dativobjekt","Genitivobjekt","Ablativ","Ablativus absolutus","Prädikativum","Präpositionale Bestimmung","Adverbiale Bestimmung","Infinitiv","AcI/NcI","Partizipialkonstruktion","Relativsatz","Nebensatz","Konjunktion","Subjunktion","Vokativ","Sonstiges"],
+            customColors: {"Subject":"#4ade80","Subjekt":"#4ade80","Verb":"#C76D72","Prädikat":"#C76D72","Accusative object":"#fde047","Akkusativobjekt":"#fde047","Dative object":"#fdba74","Dativobjekt":"#fdba74","Prepositional phrase":"#c4b5fd","Präpositionale Bestimmung":"#c4b5fd","Genitive object":"#fbcfe8","Genitivobjekt":"#fbcfe8","Ablative":"#93c5fd","Ablativ":"#93c5fd","Ablative absolute":"#60a5fa","Ablativus absolutus":"#60a5fa","Adverb":"#ffedd5","Adverbiale Bestimmung":"#ffedd5","Infinitive":"#e9d5ff","Infinitiv":"#e9d5ff","Predicative":"#fca5a5","Prädikativum":"#fca5a5","Conjunction":"#d6d3d1","Konjunktion":"#d6d3d1","Subjunction":"#f3f4f6","Subjunktion":"#f3f4f6","Participial phrase":"#5eead4","Partizipialkonstruktion":"#5eead4","Subordinate clause":"#818cf8","Nebensatz":"#818cf8","Relative clause":"#a7f3d0","Relativsatz":"#a7f3d0","Accusative/Nominative with infinitive":"#c084fc","AcI/NcI":"#c084fc","Vocative":"#a5f3fc","Vokativ":"#a5f3fc","Other":"#e5e7eb","Sonstiges":"#e5e7eb"}
+        };
+        
+        const colors = exerciseData.customColors;
+        const abbreviations = {"en":{"Subject":"Subj","Accusative object":"Acc. Obj","Dative object":"Dat. Obj","Genitive object":"Gen. Obj","Ablative":"Abl","Ablative absolute":"Abl. Abs.","Genitive attribute":"Gen. Attr","Predicative":"Pred","Prepositional phrase":"Prep. Phr","Adverb":"Adv","Verb":"Verb","Infinitive":"Inf","Participial phrase":"Part. Phr","Relative clause":"Rel. Cl","Subordinate clause":"Sub. Cl","Conjunction":"Conj","Subjunction":"Subjunc","Accusative/Nominative with infinitive":"Acc/Nom+Inf","Vocative":"Voc","Other":"Other"},"de":{"Subjekt":"Subj","Akkusativobjekt":"Akk. Obj","Dative object":"Dat. Obj","Genitivobjekt":"Gen. Obj","Ablativ":"Abl","Ablativus absolutus":"Abl. Abs.","Genitivattribut":"Gen. Attr","Prädikativum":"Präd","Präpositionale Bestimmung":"Präp. Best.","Adverbiale Bestimmung":"Adv","Prädikat":"Prädikat","Infinitiv":"Inf","Partizipialkonstruktion":"Part. Konstr","Relativsatz":"Rel. Satz","Nebensatz":"N.satz","Konjunktion":"Konj","Subjunktion":"Subjunk","AcI/NcI":"AcI/NcI","Vokativ":"Vok","Sonstiges":"Sonst."}};
+        const labelMap = {"en":{"Subjekt":"Subject","Subject":"Subject","Prädikat":"Verb","Verb":"Verb","Akkusativobjekt":"Accusative object","Accusative object":"Accusative object","Dativobjekt":"Dative object","Dative object":"Dative object","Genitivobjekt":"Genitive object","Genitive object":"Genitive object","Ablativ":"Ablative","Ablative":"Ablative","Ablativus absolutus":"Ablative absolute","Ablative absolute":"Ablative absolute","Prädikativum":"Predicative","Predicative":"Predicative","Präpositionale Bestimmung":"Prepositional phrase","Prepositional phrase":"Prepositional phrase","Adverbiale Bestimmung":"Adverb","Adverb":"Adverb","Infinitiv":"Infinitive","Infinitive":"Infinitive","AcI/NcI":"Accusative/Nominative with infinitive","Accusative/Nominative with infinitive":"Accusative/Nominative with infinitive","Partizipialkonstruktion":"Participial phrase","Participial phrase":"Participial phrase","Relativsatz":"Relative clause","Relative clause":"Relative clause","Nebensatz":"Subordinate clause","Subordinate clause":"Subordinate clause","Konjunktion":"Conjunction","Conjunction":"Conjunction","Subjunktion":"Subjunction","Subjunction":"Subjunction","Sonstiges":"Other","Other":"Other"},"de":{"Subject":"Subjekt","Subjekt":"Subjekt","Verb":"Prädikat","Prädikat":"Prädikat","Accusative object":"Akkusativobjekt","Akkusativobjekt":"Akkusativobjekt","Dative object":"Dativobjekt","Dativobjekt":"Dativobjekt","Genitive object":"Genitivobjekt","Genitivobjekt":"Genitivobjekt","Ablative":"Ablativ","Ablativ":"Ablativ","Ablative absolute":"Ablativus absolutus","Ablativus absolutus":"Ablativus absolutus","Predicative":"Prädikativum","Prädikativum":"Prädikativum","Prepositional phrase":"Präpositionale Bestimmung","Präpositionale Bestimmung":"Präpositionale Bestimmung","Adverb":"Adverbiale Bestimmung","Adverbiale Bestimmung":"Adverbiale Bestimmung","Infinitive":"Infinitiv","Infinitiv":"Infinitiv","Accusative/Nominative with infinitive":"AcI/NcI","AcI/NcI":"AcI/NcI","Participial phrase":"Partizipialkonstruktion","Partizipialkonstruktion":"Partizipialkonstruktion","Relative clause":"Relativsatz","Relativsatz":"Relativsatz","Subordinate clause":"Nebensatz","Subordinate clause":"Nebensatz","Conjunction":"Konjunktion","Konjunktion":"Konjunktion","Subjunction":"Subjunktion","Subjunktion":"Subjunktion","Other":"Sonstiges","Sonstiges":"Sonstiges"}};
+        const studentTexts = {"en":{"instr":"This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words to select their syntactical function. <br><br><strong>Important:</strong> You must also locate hidden Genitive Attributes! Click directly on a genitive word inside a phrase box and use the <strong>🖍️ Mark Genitive</strong> tool to reveal it. Once you have correctly analyzed every phrase and found all genitives, a textbox will appear into which you can write your translation[cite: 1].","note":"Note:","togglePat":"Toggle Patterns","toggleCon":"High Contrast","print":"Print Analysis","download":"Download HTML","btnSaveProg":"💾 Save Progress","btnClearProg":"🗑️ Clear Progress","progSaved":"Progress saved!","progCleared":"Progress cleared!","correct":"Correct!","incorrect":"Incorrect. The correct answer is: ","tryAgain":"Incorrect label, try again!","transPlaceholder":"Enter translation...","docTitle":"Interactive Syntax Explorer","practiseMode":"Practise Mode","examMode":"Exam Mode","resetWarn":"Changing the mode will reload the page and reset your progress. Continue?","btnSubmitExam":"✅ Submit Exam","confirmSubmit":"Submit the exam now? Any unanswered phrases and any genitive attributes you haven't found yet will be counted as errors.","examResults":"Exam Results","copyResults":"Copy to Clipboard","copied":"Copied!","close":"Close","saveWarning":"⚠️ Note: Your progress is saved locally in this web browser. You must open this file on this exact same device and browser to resume your work later. Clearing your browser data will delete your progress. Do you want to save now?","resExercise":"Exercise: ","resDate":"Date: ","resScore":"Score: ","markGen":"🖍️ Mark Genitive (G)","unmarkGen":"❌ Unmark Genitive (G)","notGenitive":"Not a genitive attribute!"},"de":{"instr":"Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen. <br><br><strong>Wichtig:</strong> Du musst auch versteckte Genitivattribute aufspüren! Klicke dazu direkt auf das Genitivattribut innerhalb eines Wortblocks und nutze das <strong>🖍️ Genitiv markieren</strong> Werkzeug, um es hervorzuheben. Sobald du jede Wortgruppe korrekt analysiert und alle Genitive gefunden hast, erscheint ein Textfeld für deine Übersetzung[cite: 1].","note":"Hinweis:","togglePat":"Muster umschalten","toggleCon":"Hoher Kontrast","print":"Drucken","download":"HTML herunterladen","btnSaveProg":"💾 Fortschritt speichern","btnClearProg":"🗑️ Fortschritt löschen","progSaved":"Fortschritt gespeichert!","progCleared":"Fortschritt gelöscht!","correct":"Richtig!","incorrect":"Falsch. Die richtige Antwort ist: ","tryAgain":"Falsches Label, versuch es nochmal!","transPlaceholder":"Übersetzung eingeben...","docTitle":"Interaktives Syntax-Training","practiseMode":"Übungsmodus","examMode":"Prüfungsmodus","resetWarn":"Ein Moduswechsel lädt die Seite neu und setzt deinen Fortschritt zurück. Fortfahren?","btnSubmitExam":"✅ Prüfung abgeben","confirmSubmit":"Prüfung jetzt abgeben? Unbeantwortete Wortgruppen und noch nicht gefundene Genitivattribute werden als Fehler gewertet.","examResults":"Prüfungsergebnisse","copyResults":"Ergebnisse kopieren","copied":"Kopiert!","close":"Schließen","saveWarning":"⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?","resExercise":"Übung: ","resDate":"Datum: ","resScore":"Ergebnis: ","markGen":"🖍️ Genitiv markieren (G)","unmarkGen":"❌ Markierung aufheben (G)","notGenitive":"Kein Genitivattribut!"}};
         let currentLang = 'de';
         const titleInput = "Beispielanalyse: Caesar, Catullus & Vergil";
-        const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_example_de';
-    </script>
-    <script>
-        let activeEl = null; let mode = ""; const menu = document.getElementById('menu-common'); const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
-        let hideMenuTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1;
-        const totalItems = document.querySelectorAll('.hover-word, .g-label').length;
-
-        function updateStudentShortcuts() {
-            labelShortcuts = {}; let used = new Set(['x', 'k', 'j', 'z']); 
-            document.querySelectorAll('.menu-btn').forEach(btn => {
-                let f = btn.dataset.val; let assigned = false;
-                for (let i = 0; i < f.length; i++) {
-                    let char = f[i].toLowerCase();
-                    if (/[a-z]/.test(char) && !used.has(char)) { labelShortcuts[f] = char; used.add(char); assigned = true; break; }
-                }
-                if (!assigned) {
-                    for (let code = 97; code <= 122; code++) {
-                        let char = String.fromCharCode(code);
-                        if (!used.has(char)) { labelShortcuts[f] = char; used.add(char); break; }
-                    }
-                }
-                let shortcut = labelShortcuts[f]; let innerHTML = f;
-                if (shortcut) {
-                    let idx = f.toLowerCase().indexOf(shortcut);
-                    if (idx !== -1) { innerHTML = f.substring(0, idx) + '<u>' + f[idx] + '</u>' + f.substring(idx + 1); } 
-                    else { innerHTML = '[<u>' + shortcut.toUpperCase() + '</u>] ' + f; }
-                }
-                btn.innerHTML = innerHTML;
-            });
+        const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_example_render';
+        
+        function escapeHTML(str) {
+            if (str == null) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
-        updateStudentShortcuts();
-
-        document.addEventListener('mouseover', (e) => { 
-            const el = e.target.closest('.hover-word, .g-label');
-            hoveredStudentEl = (el && el.dataset.done !== "true") ? el : null;
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            let targetEl = hoveredStudentEl;
-            if (!targetEl && document.activeElement && (document.activeElement.classList.contains('hover-word') || document.activeElement.classList.contains('g-label'))) { targetEl = document.activeElement; }
-            if (!targetEl || targetEl.dataset.done === "true") return;
-            if (e.ctrlKey || e.metaKey || e.altKey) return;
-            if (e.key.length !== 1 || !/[a-zA-Z]/.test(e.key)) return;
-
-            let key = e.key.toLowerCase();
-            let matchedLabel = Object.keys(labelShortcuts).find(k => labelShortcuts[k] === key);
-
-            if (matchedLabel) {
-                e.preventDefault();
-                const btn = Array.from(document.querySelectorAll('.menu-btn')).find(b => b.dataset.val === matchedLabel);
-                if (btn) { activeEl = targetEl; mode = activeEl.classList.contains('hover-word') ? "word" : "group"; btn.click(); hoveredStudentEl = null; }
-            }
-        });
-
-        function switchStudentLang(newLang) {
-            if (newLang === currentLang) return;
-            currentLang = newLang; const t = studentTexts[newLang];
-            
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector('.lang-btn[onclick="switchStudentLang(\'' + newLang + '\')"]').classList.add('active');
-            
-            document.querySelector('.instruction-box').innerHTML = t.instr;
-            const tn = document.querySelector('.teacher-note span'); if(tn) tn.textContent = t.note;
-            
-            document.getElementById('btn-practise').textContent = t.practiseMode; document.getElementById('btn-exam').textContent = t.examMode;
-            document.querySelector('button[onclick="togglePatterns()"]').title = t.togglePat; document.querySelector('button[onclick="toggleContrast()"]').title = t.toggleCon;
-            
-            const fBtns = document.querySelectorAll('.footer-toolbar .btn');
-            fBtns[0].textContent = t.btnSaveProg; fBtns[1].textContent = t.btnClearProg; fBtns[2].textContent = t.print; fBtns[3].textContent = t.download;
-            
-            document.querySelector('.results-title').textContent = t.examResults; document.querySelector('.btn-copy').textContent = t.copyResults;
-            document.querySelector('#results-modal .btn:not(.btn-copy)').textContent = t.close; document.querySelectorAll('textarea:not(.results-textarea)').forEach(ta => ta.placeholder = t.transPlaceholder);
-            
-            if (document.title === studentTexts.en.docTitle || document.title === studentTexts.de.docTitle) {
-                document.title = t.docTitle; document.querySelector('h1').textContent = t.docTitle;
-            }
-            
-            const map = labelMap[newLang] || {}; const translateLabel = (l) => map[l] || l;
-            
-            document.querySelectorAll('.menu-btn').forEach(btn => {
-                const newVal = translateLabel(btn.dataset.val); btn.dataset.val = newVal; btn.textContent = newVal;
+        function parseSimpleMarkdown(text) {
+            if (!text) return '';
+            let safeText = escapeHTML(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+            return safeText;
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const menu = document.getElementById('menu-common');
+            exerciseData.customFunctions.forEach(label => {
+                let btn = document.createElement('button');
+                btn.type = "button";
+                btn.className = "menu-btn";
+                btn.dataset.val = escapeHTML(label);
+                btn.textContent = label;
+                menu.appendChild(btn);
             });
             
-            document.querySelectorAll('.hover-word, .s-group').forEach(el => {
-                if(el.dataset.ans) el.dataset.ans = translateLabel(el.dataset.ans);
-                let isDone = false;
-                if (el.classList.contains('hover-word')) { isDone = el.dataset.done === "true"; } 
-                else { const gLabel = el.querySelector('.g-label'); if (gLabel) isDone = gLabel.dataset.done === "true"; }
-                
-                if(isDone) {
-                    const ans = el.dataset.ans;
-                    if(el.classList.contains('hover-word')) {
-                        const s = el.querySelector('.ans-label');
-                        if(s) {
-                            s.textContent = ans;
-                            if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
-                        }
-                    } else {
-                        const tSpan = el.querySelector('.g-text'); const gLabel = el.querySelector('.g-label');
-                        if(tSpan && gLabel) {
-                            tSpan.textContent = ans;
-                            if (gLabel.offsetWidth > el.offsetWidth) { tSpan.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; gLabel.title = ans; }
+            let tempTokens = JSON.parse(JSON.stringify(exerciseData.words));
+            tempTokens.forEach((token, index) => {
+                token.idx = index;
+                if(token.f !== "Punct") {
+                    token.activeGroups = exerciseData.groups.filter(g => token.idx >= g.start && token.idx <= g.end).map(g => exerciseData.groups.indexOf(g)).sort().join(',');
+                } else { token.activeGroups = ""; }
+            });
+            
+            for(let i = 1; i < tempTokens.length - 1; i++) {
+                let curr = tempTokens[i];
+                if(curr.f === "Punct") {
+                    let prev = tempTokens[i-1]; let nextIdx = i + 1;
+                    while(nextIdx < tempTokens.length && tempTokens[nextIdx].f === "Punct") { nextIdx++; }
+                    if(nextIdx < tempTokens.length) {
+                        let next = tempTokens[nextIdx];
+                        if(prev.f !== "Punct" && prev.f === next.f && !prev.isSplit && prev.activeGroups === next.activeGroups && prev.b === 0) {
+                            curr.f = prev.f; curr.activeGroups = prev.activeGroups;
                         }
                     }
                 }
-            });
-            updateStudentShortcuts(); 
-        }
-
-        function setStudentZoom(delta) {
-            if (delta === 0) { sZoom = 1; } else { sZoom = Math.max(0.5, Math.min(2.5, sZoom + delta)); }
-            const area = document.getElementById('exercise');
-            if ('zoom' in area.style) { area.style.zoom = sZoom; } 
-            else { area.style.transform = 'scale(' + sZoom + ')'; area.style.transformOrigin = "top left"; area.style.width = (100 / sZoom) + '%'; }
-        }
-
-        function setMode(m) {
-            if (answeredItems > 0) {
-                const t = studentTexts[currentLang];
-                if(!confirm(t.resetWarn)) return;
-                localStorage.removeItem(saveKey); location.reload();
             }
-            exMode = m; const bp = document.getElementById('btn-practise'); const be = document.getElementById('btn-exam');
-            bp.style.background = m === 'practise' ? 'white' : 'transparent'; bp.style.boxShadow = m === 'practise' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; bp.style.color = m === 'practise' ? '#111827' : '#475569';
-            be.style.background = m === 'exam' ? 'white' : 'transparent'; be.style.boxShadow = m === 'exam' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; be.style.color = m === 'exam' ? '#111827' : '#475569';
-        }
 
-        menu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
-        menu.addEventListener('mouseleave', () => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); });
-
-        document.querySelectorAll('.hover-word, .g-label').forEach(el => {
-            el.onclick = (e) => {
-                e.stopPropagation();
-                if(el.dataset.done) return;
-                activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
-                if(window.innerWidth > 768) { 
-                    const rect = el.getBoundingClientRect();
-                    menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
-                }
-                menu.style.display="block"; menuBtns[0].focus();
-            };
-            el.onmouseenter = (e) => {
-                clearTimeout(hideMenuTimeout);
-                if(el.dataset.done === "true") return;
-                activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
-                if(window.innerWidth > 768) { 
-                    const rect = el.getBoundingClientRect();
-                    menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
-                }
-                menu.style.display="block";
-            };
-            el.onmouseleave = (e) => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); };
-            el.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } };
-        });
-
-        menuBtns.forEach((btn, index) => {
-            btn.onclick = (e) => {
-                const sel = btn.dataset.val; const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans; const t = studentTexts[currentLang];
+            let merged = []; let current = null;
+            tempTokens.forEach((token, i) => {
+                const canMerge = current && current.f === token.f && !["Punct", "Other", "Sonstiges"].includes(token.f) && !(i > 0 && tempTokens[i-1].isSplit) && current.activeGroups === token.activeGroups && !(i > 0 && tempTokens[i-1].b === 1);
                 
-                if (exMode === 'practise') {
-                    if(sel === correct) {
-                        solve(activeEl, correct, mode); showToast(t.correct, false); answeredItems++;
-                    } else { 
-                        let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1; activeEl.dataset.mistakes = mistakes;
-                        if(mistakes >= 2) { showToast(t.incorrect + correct, true); solve(activeEl, correct, mode); answeredItems++; } 
-                        else { showToast(t.tryAgain, true); }
-                    }
+                if (canMerge) {
+                    current.segments.push({ w: token.w, u: token.u, space: (['.', ',', ';', ':', '!', '?'].includes(token.w) ? '' : ' ') });
+                    current.originalIndices.push(token.idx);
+                    if(token.h) current.hint = current.hint ? current.hint + " | " + token.h : token.h;
                 } else {
-                    if(sel === correct) { solve(activeEl, correct, mode); showToast(t.correct, false); examScore++; } 
-                    else {
-                        showToast(t.incorrect + correct, true); solve(activeEl, correct, mode);
-                        if(mode === "word") { activeEl.style.border = "2px solid #ef4444"; } 
-                        else { activeEl.parentElement.style.borderColor = "#ef4444"; }
-                    }
-                    answeredItems++;
+                    if (current) merged.push(current);
+                    current = { f: token.f, originalIndices: [token.idx], activeGroups: token.activeGroups, hint: token.h, b: token.b, segments: [{ w: token.w, u: token.u, space: '' }] };
                 }
-                
-                menu.style.display = "none"; check();
-                if (activeEl && !activeEl.dataset.done) { activeEl.focus(); } 
-                else if (activeEl && activeEl.dataset.done) {
-                    const allItems = Array.from(document.querySelectorAll('.hover-word, .g-label')); const currentIndex = allItems.indexOf(activeEl); let nextEl = null;
-                    for(let i = currentIndex + 1; i < allItems.length; i++) { if(allItems[i].dataset.done !== "true") { nextEl = allItems[i]; break; } }
-                    if(nextEl) nextEl.focus();
-                }
-            };
+            });
+            if (current) merged.push(current);
+
+            const updatedGroups = exerciseData.groups.map(g => {
+                const newStart = merged.findIndex(m => m.originalIndices.includes(g.start));
+                let newEnd = merged.findIndex(m => m.originalIndices.includes(g.end));
+                if(newEnd === -1) newEnd = newStart; 
+                return { ...g, start: newStart, end: newEnd, label: g.label, hint: g.hint };
+            }).sort((a, b) => {
+                if (a.start !== b.start) return a.start - b.start; return b.end - a.end; 
+            });
             
-            btn.onkeydown = (e) => {
-                if (e.key === 'ArrowDown') { e.preventDefault(); menuBtns[(index + 1) % menuBtns.length].focus(); } 
-                else if (e.key === 'ArrowUp') { e.preventDefault(); menuBtns[(index - 1 + menuBtns.length) % menuBtns.length].focus(); } 
-                else if (e.key === 'Escape') { e.preventDefault(); menu.style.display = "none"; if (activeEl) activeEl.focus(); }
-            };
+            let sIdx = 0; let containerOpen = true;
+            let htmlParts = ['<h2>Caesar, <i>De Bello Gallico</i> 1,1</h2>', '<div class="sentence-container">'];
+            let pendingClosers = "";
+            
+            const hintToggle = "event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');";
+            const hintIconHtml = (safeHint) => `<span class="hint-icon" title="Hint" onclick="${hintToggle}">💡<span class="tooltip-text">${safeHint}</span></span>`;
+
+            merged.forEach((word, idx) => {
+                if (word.segments[0].w === "Peliaco") htmlParts.push('<h2>Catullus 64,1-7</h2><div class="sentence-container">');
+                if (word.segments[0].w === "Arma") htmlParts.push('<h2>Vergil, <i>Aeneis</i> 1,1-7</h2><div class="sentence-container">');
+
+                const isPunct = word.f === "Punct";
+                const nextWord = merged[idx + 1];
+                const nextIsPunct = nextWord && (!/[a-zA-Z\u00C0-\u017F]/.test(nextWord.segments ? nextWord.segments[0].w : "") || nextWord.f === "Punct");
+                const safeWordHint = parseSimpleMarkdown(word.hint);
+                const hintHtml = word.hint ? hintIconHtml(safeWordHint) : '';
+                
+                const safeWordHtml = word.segments.map(seg => `${seg.space ? ' ' : ''}<span class="s-text" data-u="${seg.u ? 'true' : 'false'}">${escapeHTML(seg.w)}</span>`).join('');
+                const safeFunc = escapeHTML(word.f);
+                const content = isPunct ? `<span class="punct">${safeWordHtml}</span>` : `<span class="hover-word" tabindex="0" data-ans="${safeFunc}">${safeWordHtml}${hintHtml}</span>`;
+
+                let openDivs = ""; let closeDivs = "";
+                updatedGroups.forEach(g => {
+                    const safeGroupHint = parseSimpleMarkdown(g.hint);
+                    const gHintHtml = g.hint ? hintIconHtml(safeGroupHint) : '';
+                    if (idx === g.start) openDivs += `<div class="s-group" data-ans="${escapeHTML(g.label)}"><span class="g-label" tabindex="0"><span class="g-text">?</span>${gHintHtml}</span>`;
+                    if (idx === g.end) closeDivs += `</div>`;
+                });
+
+                const spacing = nextIsPunct ? "" : " ";
+
+                if (isPunct) {
+                    htmlParts.push(`${openDivs}${content}${pendingClosers}${closeDivs}${spacing}`);
+                    pendingClosers = ""; 
+                } else {
+                    htmlParts.push(`${openDivs}${content}`);
+                    if (closeDivs && nextIsPunct) pendingClosers = closeDivs;
+                    else htmlParts.push(closeDivs);
+                    htmlParts.push(spacing);
+                }
+
+                const defaultBreak = isPunct && word.segments && ['.', '!', '?', '·'].some(end => word.segments[0].w.includes(end));
+                const shouldBreak = word.b === 1 || (defaultBreak && word.b !== -1);
+
+                if (shouldBreak) {
+                    htmlParts.push(`<div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div>`); 
+                    sIdx++; containerOpen = false;
+                    if (idx < merged.length - 1 && merged[idx+1].segments[0].w !== "Peliaco" && merged[idx+1].segments[0].w !== "Arma") {
+                        htmlParts.push(`<div class="sentence-container">`); containerOpen = true;
+                    }
+                }
+            });
+            
+            if (containerOpen) htmlParts.push(`<div id="t-container-${sIdx}" class="trans-box" style="display:none;"><textarea placeholder="Übersetzung eingeben..."></textarea></div></div>`);
+            document.getElementById('exercise').innerHTML = htmlParts.join('');
+
+            initStudentLogic();
         });
 
-        function showToast(msg, isError) {
-            const x = document.getElementById("toast-container"); x.textContent = msg; x.className = isError ? "show error" : "show success";
-            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-        }
-        function togglePatterns() { document.body.classList.toggle('pattern-mode'); }
-        function toggleContrast() { document.body.classList.toggle('high-contrast'); }
+        function initStudentLogic() {
+            let activeEl = null; let activeSubWord = null; let mode = ""; const menu = document.getElementById('menu-common'); let menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
+            let hideMenuTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1; let examFinalized = false;
+            
+            const totalPhrases = document.querySelectorAll('.hover-word, .g-label').length;
+            const totalGens = document.querySelectorAll('.s-text[data-u="true"]').length;
+            const totalItems = totalPhrases + totalGens;
 
-        function solve(el, ans, m) {
-            if(m === "word") {
-                const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
-                el.style.backgroundColor = colors[ans]; el.dataset.done = "true"; el.removeAttribute('tabindex');
-                if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
-            } else { 
-                const tSpan = el.querySelector('.g-text'); if (tSpan) tSpan.textContent = ans; else el.textContent = ans; 
-                el.dataset.done = "true"; el.style.background = "#f0fdf4"; el.removeAttribute('tabindex');
-                if (el.offsetWidth > el.parentElement.offsetWidth) {
-                    if (tSpan) tSpan.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.';
-                    else el.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.';
-                    el.title = ans; 
+            function updateStudentShortcuts() {
+                labelShortcuts = {}; let used = new Set(['x', 'm', 'w', 'g']); 
+                const hardcoded = { 'Subject': 's', 'Subjekt': 's', 'Verb': 'p', 'Prädikat': 'p', 'Accusative object': 'a', 'Akkusativobjekt': 'a', 'Dative object': 'd', 'Dativobjekt': 'd', 'Genitive object': 'v', 'Genitivobjekt': 'v', 'Ablative': 'l', 'Ablativ': 'l', 'Ablative absolute': 'b', 'Ablativus absolutus': 'b', 'Prepositional phrase': 'o', 'Präpositionale Bestimmung': 'o', 'Predicative': 'r', 'Prädikativum': 'r', 'Adverb': 'e', 'Infinitive': 'i', 'Infinitiv': 'i', 'Accusative with infinitive': 'c', 'AcI': 'c', 'Participial phrase': 'z', 'Partizipialkonstruktion': 'z', 'Relative clause': 't', 'Relativsatz': 't', 'Subordinate clause': 'n', 'Nebensatz': 'n', 'Conjunction': 'k', 'Konjunktion': 'k', 'Subjunction': 'u', 'Subjunktion': 'u', 'Vocative': 'f', 'Vokativ': 'f', 'Other': 'y', 'Sonstiges': 'y' };
+                const btns = Array.from(document.querySelectorAll('.menu-btn:not(.gen-btn)'));
+                
+                btns.forEach(btn => { let f = btn.dataset.val; if (hardcoded[f] && !used.has(hardcoded[f])) { labelShortcuts[f] = hardcoded[f]; used.add(hardcoded[f]); } });
+                btns.forEach(btn => {
+                    let f = btn.dataset.val; let assigned = !!labelShortcuts[f];
+                    if (!assigned) { for (let i = 0; i < f.length; i++) { let char = f[i].toLowerCase(); if (/[a-z]/.test(char) && !used.has(char)) { labelShortcuts[f] = char; used.add(char); assigned = true; break; } } }
+                    if (!assigned) { for (let code = 97; code <= 122; code++) { let char = String.fromCharCode(code); if (!used.has(char)) { labelShortcuts[f] = char; used.add(char); break; } } }
+                    let shortcut = labelShortcuts[f]; let innerHTML = f;
+                    if (shortcut) {
+                        let idx = f.toLowerCase().indexOf(shortcut);
+                        if (idx !== -1) { innerHTML = f.substring(0, idx) + '<u>' + f[idx] + '</u>' + f.substring(idx + 1); } else { innerHTML = '[<u>' + shortcut.toUpperCase() + '</u>] ' + f; }
+                    }
+                    btn.innerHTML = innerHTML;
+                });
+            }
+            updateStudentShortcuts();
+
+            document.addEventListener('mouseover', (e) => { const el = e.target.closest('.hover-word, .g-label'); hoveredStudentEl = el ? el : null; });
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                let targetEl = hoveredStudentEl;
+                if (!targetEl && document.activeElement && (document.activeElement.classList.contains('hover-word') || document.activeElement.classList.contains('g-label'))) { targetEl = document.activeElement; }
+                if (!targetEl) return;
+                if (e.ctrlKey || e.metaKey || e.altKey) return;
+                if (e.key.length !== 1 || !/[a-zA-Z]/.test(e.key)) return;
+
+                let key = e.key.toLowerCase();
+                if (key === 'g' && activeSubWord) { e.preventDefault(); document.querySelector('.gen-btn').click(); return; }
+                if (targetEl.dataset.done === "true") return; 
+
+                let matchedLabel = Object.keys(labelShortcuts).find(k => labelShortcuts[k] === key);
+                if (matchedLabel) {
+                    e.preventDefault();
+                    const btn = Array.from(document.querySelectorAll('.menu-btn:not(.gen-btn)')).find(b => b.dataset.val === matchedLabel);
+                    if (btn) { activeEl = targetEl; mode = activeEl.classList.contains('hover-word') ? "word" : "group"; btn.click(); hoveredStudentEl = null; }
+                }
+            });
+
+            window.switchStudentLang = function(newLang) {
+                if (newLang === currentLang) return;
+                currentLang = newLang; document.documentElement.lang = newLang; const t = studentTexts[newLang];
+                
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector(`.lang-btn[onclick="switchStudentLang('${newLang}')"]`).classList.add('active');
+                
+                document.querySelector('.instruction-box').innerHTML = t.instr;
+                const tn = document.querySelector('.teacher-note span'); if(tn) tn.textContent = t.note;
+                
+                document.getElementById('btn-practise').textContent = t.practiseMode; document.getElementById('btn-exam').textContent = t.examMode;
+                document.querySelector('button[onclick="togglePatterns()"]').title = t.togglePat; document.querySelector('button[onclick="toggleContrast()"]').title = t.toggleCon;
+                
+                const fBtns = document.querySelectorAll('.footer-toolbar .btn');
+                fBtns[0].textContent = t.btnSaveProg; fBtns[1].textContent = t.btnClearProg; fBtns[2].textContent = t.print; fBtns[3].textContent = t.download;
+                const submitBtn = document.getElementById('btn-submit-exam'); if (submitBtn) submitBtn.textContent = t.btnSubmitExam;
+                
+                document.querySelector('.results-title').textContent = t.examResults; document.querySelector('.btn-copy').textContent = t.copyResults;
+                document.querySelector('#results-modal .btn:not(.btn-copy)').textContent = t.close; document.querySelectorAll('textarea:not(.results-textarea)').forEach(ta => ta.placeholder = t.transPlaceholder);
+                
+                if (document.title === studentTexts.en.docTitle || document.title === studentTexts.de.docTitle) { document.title = t.docTitle; document.querySelector('h1').textContent = t.docTitle; }
+                
+                const map = labelMap[newLang] || {}; const translateLabel = (l) => map[l] || l;
+                
+                document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(btn => {
+                    const newVal = translateLabel(btn.dataset.val); btn.dataset.val = newVal; btn.textContent = newVal;
+                });
+                
+                document.querySelectorAll('.hover-word, .s-group').forEach(el => {
+                    if(el.dataset.ans) el.dataset.ans = translateLabel(el.dataset.ans);
+                    let isDone = false;
+                    if (el.classList.contains('hover-word')) { isDone = el.dataset.done === "true"; } 
+                    else { const gLabel = el.querySelector('.g-label'); if (gLabel) isDone = gLabel.dataset.done === "true"; }
+                    
+                    if(isDone) {
+                        const ans = el.dataset.ans;
+                        if(el.classList.contains('hover-word')) {
+                            const s = el.querySelector('.ans-label');
+                            if(s) { s.textContent = ans; if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; } }
+                        } else {
+                            const tSpan = el.querySelector('.g-text'); const gLabel = el.querySelector('.g-label');
+                            if(tSpan && gLabel) { tSpan.textContent = ans; if (gLabel.offsetWidth > el.offsetWidth) { tSpan.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; gLabel.title = ans; } }
+                        }
+                    }
+                });
+                updateStudentShortcuts(); 
+            }
+
+            window.setStudentZoom = function(delta) {
+                if (delta === 0) { sZoom = 1; } else { sZoom = Math.max(0.5, Math.min(2.5, sZoom + delta)); }
+                const area = document.getElementById('exercise');
+                if ('zoom' in area.style) { area.style.zoom = sZoom; } else { area.style.transform = 'scale(' + sZoom + ')'; area.style.transformOrigin = "top left"; area.style.width = (100 / sZoom) + '%'; }
+            }
+
+            window.setMode = function(m) {
+                if (answeredItems > 0 || document.querySelector('.marked-gen')) {
+                    const t = studentTexts[currentLang];
+                    if(!confirm(t.resetWarn)) return;
+                    try { localStorage.removeItem(saveKey); sessionStorage.setItem(saveKey + '_mode', m); } catch(e) { console.warn("Storage blocked", e); }
+                    location.reload(); return;
+                }
+                exMode = m; const bp = document.getElementById('btn-practise'); const be = document.getElementById('btn-exam');
+                bp.style.background = m === 'practise' ? 'white' : 'transparent'; bp.style.boxShadow = m === 'practise' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; bp.style.color = m === 'practise' ? '#111827' : '#475569';
+                be.style.background = m === 'exam' ? 'white' : 'transparent'; be.style.boxShadow = m === 'exam' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; be.style.color = m === 'exam' ? '#111827' : '#475569';
+                const submitBtn = document.getElementById('btn-submit-exam');
+                if (submitBtn) submitBtn.style.display = (m === 'exam' && !examFinalized) ? 'inline-block' : 'none';
+            }
+
+            menu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
+            menu.addEventListener('mouseleave', () => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); });
+
+            const exerciseArea = document.getElementById('exercise');
+
+            exerciseArea.addEventListener('click', (e) => {
+                const el = e.target.closest('.hover-word, .g-label');
+                if (!el) return;
+                e.stopPropagation();
+                
+                activeSubWord = e.target.closest('.s-text');
+                const genBtn = document.querySelector('.gen-btn');
+                
+                if (activeSubWord) {
+                    genBtn.style.display = "block"; const t = studentTexts[currentLang];
+                    genBtn.textContent = activeSubWord.classList.contains('marked-gen') ? t.unmarkGen : t.markGen;
+                } else { genBtn.style.display = "none"; }
+                
+                document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => { b.style.display = el.dataset.done === "true" ? "none" : "block"; });
+                
+                if (el.dataset.done === "true" && !activeSubWord) return;
+                
+                activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
+                if(window.innerWidth > 768) { const rect = (activeSubWord || el).getBoundingClientRect(); menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; }
+                menu.style.display="block"; 
+                if (el.dataset.done !== "true") { let firstNorm = menuBtns.find(b => !b.classList.contains('gen-btn')); if(firstNorm) firstNorm.focus(); } else { genBtn.focus(); }
+            });
+
+            exerciseArea.addEventListener('mouseover', (e) => {
+                const el = e.target.closest('.hover-word, .g-label');
+                if (!el || el.dataset.done === "true") return;
+                clearTimeout(hideMenuTimeout);
+                if (el === activeEl && menu.style.display === 'block') return; 
+                activeEl = el; activeSubWord = null; mode = el.classList.contains('hover-word') ? "word" : "group";
+                document.querySelector('.gen-btn').style.display = "none"; 
+                document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => b.style.display = "block");
+                if(window.innerWidth > 768) { const rect = el.getBoundingClientRect(); menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; }
+                menu.style.display="block";
+            });
+
+            exerciseArea.addEventListener('mouseout', (e) => { const el = e.target.closest('.hover-word, .g-label'); if (!el) return; hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); });
+            exerciseArea.addEventListener('keydown', (e) => { const el = e.target.closest('.hover-word, .g-label'); if (!el) return; if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); } });
+
+            menuBtns.forEach((btn, index) => {
+                btn.onclick = (e) => {
+                    const t = studentTexts[currentLang];
+                    if (btn.classList.contains('gen-btn')) {
+                        if (!activeSubWord) return;
+                        const isCorrect = activeSubWord.dataset.u === "true"; const isMarked = activeSubWord.classList.contains('marked-gen');
+                        if (!isMarked) {
+                            if (isCorrect) { activeSubWord.classList.add('marked-gen'); showToast(t.correct, false); } 
+                            else { const currentSubWord = activeSubWord; currentSubWord.classList.add('error-gen'); setTimeout(() => currentSubWord.classList.remove('error-gen'), 800); showToast(t.notGenitive, true); }
+                        } else { activeSubWord.classList.remove('marked-gen'); }
+                        menu.style.display = "none"; check(); return;
+                    }
+
+                    const sel = btn.dataset.val; const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans; 
+                    
+                    if (exMode === 'practise') {
+                        if(sel === correct) { solve(activeEl, correct, mode); showToast(t.correct, false); answeredItems++; } 
+                        else { let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1; activeEl.dataset.mistakes = mistakes; if(mistakes >= 2) { showToast(t.incorrect + correct, true); solve(activeEl, correct, mode); answeredItems++; } else { showToast(t.tryAgain, true); } }
+                    } else {
+                        if(sel === correct) { solve(activeEl, correct, mode); examScore++; } 
+                        else { solve(activeEl, correct, mode); if(mode === "word") { activeEl.style.border = "2px solid #ef4444"; } else { activeEl.parentElement.style.borderColor = "#ef4444"; } }
+                        answeredItems++;
+                    }
+                    menu.style.display = "none"; check();
+                    if (activeEl && !activeEl.dataset.done) { activeEl.focus(); } else if (activeEl && activeEl.dataset.done) {
+                        const allItems = Array.from(document.querySelectorAll('.hover-word, .g-label')); const currentIndex = allItems.indexOf(activeEl); let nextEl = null;
+                        for(let i = currentIndex + 1; i < allItems.length; i++) { if(allItems[i].dataset.done !== "true") { nextEl = allItems[i]; break; } }
+                        if(nextEl) nextEl.focus();
+                    }
+                };
+                btn.onkeydown = (e) => { if (e.key === 'ArrowDown') { e.preventDefault(); menuBtns[(index + 1) % menuBtns.length].focus(); } else if (e.key === 'ArrowUp') { e.preventDefault(); menuBtns[(index - 1 + menuBtns.length) % menuBtns.length].focus(); } else if (e.key === 'Escape') { e.preventDefault(); menu.style.display = "none"; if (activeEl) activeEl.focus(); } };
+            });
+
+            function showToast(msg, isError) { const x = document.getElementById("toast-container"); x.textContent = msg; x.className = isError ? "show error" : "show success"; setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000); }
+            window.togglePatterns = function() { document.body.classList.toggle('pattern-mode'); }
+            window.toggleContrast = function() { document.body.classList.toggle('high-contrast'); }
+
+            function solve(el, ans, m) {
+                if(m === "word") {
+                    const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s); el.style.backgroundColor = colors[ans]; el.dataset.done = "true"; el.removeAttribute('tabindex');
+                    if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
+                } else { 
+                    const tSpan = el.querySelector('.g-text'); if (tSpan) tSpan.textContent = ans; else el.textContent = ans; el.dataset.done = "true"; el.style.background = "#f0fdf4"; el.removeAttribute('tabindex');
+                    if (el.offsetWidth > el.parentElement.offsetWidth) { if (tSpan) tSpan.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.'; else el.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.'; el.title = ans; }
                 }
             }
-        }
 
-        function check() { 
-            document.querySelectorAll('.sentence-container').forEach((s, i) => { 
-                const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')];
-                if(items.length > 0 && items.every(item => item.dataset.done === "true")) {
-                    const b = document.getElementById('t-container-' + i); if(b) b.style.display = 'block';
-                }
-            }); 
-            
-            if (answeredItems === totalItems && totalItems > 0 && exMode === 'exam') {
-                const t = studentTexts[currentLang];
+            function check() { 
+                document.querySelectorAll('.sentence-container').forEach((s, i) => { 
+                    const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')]; const requiredGens = [...s.querySelectorAll('.s-text[data-u="true"]')];
+                    const allItemsDone = items.length === 0 || items.every(item => item.dataset.done === "true"); const allGensDone = requiredGens.every(gen => gen.classList.contains('marked-gen'));
+                    const translationReady = allItemsDone && allGensDone;
+                    if(items.length > 0 && translationReady) { const b = document.getElementById('t-container-' + i); if(b) b.style.display = 'block'; }
+                }); 
+                const currentMarkedGens = document.querySelectorAll('.s-text[data-u="true"].marked-gen').length;
+                if (exMode === 'exam' && !examFinalized && answeredItems === totalPhrases && currentMarkedGens === totalGens && totalPhrases > 0) { finalizeExam(); }
+            }
+
+            function finalizeExam() {
+                if (examFinalized) return;
+                examFinalized = true; const t = studentTexts[currentLang]; let genScore = 0;
+                document.querySelectorAll('.s-text[data-u="true"]').forEach(st => { if(st.classList.contains('marked-gen')) genScore++; });
+                let finalScore = examScore + genScore; if (finalScore < 0) finalScore = 0;
+                const submitBtn = document.getElementById('btn-submit-exam'); if (submitBtn) submitBtn.style.display = 'none';
+
                 setTimeout(() => {
-                    const pct = Math.round((examScore / totalItems) * 100);
-                    document.getElementById('final-score-display').textContent = examScore + " / " + totalItems + " (" + pct + "%)";
-                    document.getElementById('results-text').value = t.resExercise + (titleInput || t.docTitle).replace(/["'`]/g, "") + "\n" + t.resDate + new Date().toLocaleDateString() + "\n" + t.resScore + examScore + " / " + totalItems + " (" + pct + "%)";
+                    const pct = Math.round((finalScore / totalItems) * 100);
+                    document.getElementById('final-score-display').textContent = finalScore + " / " + totalItems + " (" + pct + "%)";
+                    document.getElementById('results-text').value = t.resExercise + (titleInput || t.docTitle).replace(/["'`]/g, "") + "\n" + t.resDate + new Date().toLocaleDateString() + "\n" + t.resScore + finalScore + " / " + totalItems + " (" + pct + "%)";                    
                     document.getElementById('results-modal').style.display = 'flex';
                 }, 500);
             }
-        }
 
-        function saveStudentProgress() {
-            const t = studentTexts[currentLang];
-            if(!confirm(t.saveWarning)) return;
-
-            const items = Array.from(document.querySelectorAll('.hover-word, .g-label'));
-            const state = items.map(el => ({ done: el.dataset.done === "true", ans: el.dataset.ans, mistakes: el.dataset.mistakes || 0 }));
-            const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)')).map(ta => ta.value);
-            const data = { items: state, textareas: textareas, exMode: exMode, examScore: examScore, answeredItems: answeredItems };
-            localStorage.setItem(saveKey, JSON.stringify(data)); showToast(t.progSaved || "Fortschritt gespeichert!", false);
-        }
-
-        function loadStudentProgress() {
-            const saved = localStorage.getItem(saveKey); if (!saved) return;
-            try {
-                const data = JSON.parse(saved); const items = Array.from(document.querySelectorAll('.hover-word, .g-label')); const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)'));
-                if (data.items && data.items.length !== items.length) { console.warn("Saved progress length does not match. Ignoring."); return; }
-                exMode = data.exMode || 'practise'; setMode(exMode); examScore = data.examScore || 0; answeredItems = data.answeredItems || 0;
-                data.items.forEach((state, i) => {
-                    if (items[i] && state.done) {
-                        items[i].dataset.ans = state.ans; items[i].dataset.mistakes = state.mistakes; solve(items[i], state.ans, items[i].classList.contains('hover-word') ? 'word' : 'group');
-                    } else if (items[i]) { items[i].dataset.mistakes = state.mistakes; }
+            window.submitExam = function() {
+                if (exMode !== 'exam' || examFinalized) return; const t = studentTexts[currentLang]; if (!confirm(t.confirmSubmit)) return;
+                document.querySelectorAll('.sentence-container').forEach((s, i) => { const b = document.getElementById('t-container-' + i); if (b) b.style.display = 'block'; });
+                document.querySelectorAll('.hover-word, .g-label').forEach(el => {
+                    if (el.dataset.done !== "true") { const m = el.classList.contains('hover-word') ? "word" : "group"; const correct = m === "word" ? el.dataset.ans : el.parentElement.dataset.ans; solve(el, correct, m); if (m === "word") { el.style.border = "2px solid #ef4444"; } else { el.parentElement.style.borderColor = "#ef4444"; } answeredItems++; }
                 });
-                data.textareas.forEach((val, i) => { if (textareas[i]) textareas[i].value = val; }); check(); 
-            } catch (e) { console.error("Failed to load progress", e); }
-        }
+                document.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').forEach(st => { st.classList.add('missed-gen'); });
+                finalizeExam();
+            }
 
-        function clearStudentProgress() {
-            const msg = currentLang === 'de' ? 'Fortschritt wirklich löschen?' : 'Really clear progress?';
-            if(confirm(msg)) { localStorage.removeItem(saveKey); location.reload(); }
-        }
-        document.addEventListener('DOMContentLoaded', loadStudentProgress);
+            window.saveStudentProgress = function() {
+                const t = studentTexts[currentLang]; if(!confirm(t.saveWarning)) return;
+                const items = Array.from(document.querySelectorAll('.hover-word, .g-label')); const state = items.map(el => ({ done: el.dataset.done === "true", ans: el.dataset.ans, mistakes: el.dataset.mistakes || 0 }));
+                const subWords = Array.from(document.querySelectorAll('.s-text')); const subState = subWords.map(el => el.classList.contains('marked-gen'));
+                const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)')).map(ta => ta.value);
+                const data = { items: state, subWords: subState, textareas: textareas, exMode: exMode, examScore: examScore, answeredItems: answeredItems };
+                try { localStorage.setItem(saveKey, JSON.stringify(data)); showToast(t.progSaved || "Progress saved!", false); } catch (e) { console.warn("Save failed", e); showToast("Save failed: Check your browser privacy settings.", true); }
+            }
 
-        function copyResults() {
-            const t = studentTexts[currentLang]; const copyText = document.getElementById("results-text");
-            copyText.select(); copyText.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(copyText.value).then(() => { showToast(t.copied, false); });
-        }
+            window.loadStudentProgress = function() {
+                try {
+                    const saved = localStorage.getItem(saveKey); if (!saved) return;
+                    const data = JSON.parse(saved); const items = Array.from(document.querySelectorAll('.hover-word, .g-label')); const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)'));
+                    if (data.items && data.items.length !== items.length) { console.warn("Saved progress length does not match. Ignoring."); return; }
+                    exMode = data.exMode || 'practise'; setMode(exMode); examScore = data.examScore || 0; answeredItems = data.answeredItems || 0;
+                    data.items.forEach((state, i) => { if (items[i] && state.done) { items[i].dataset.ans = state.ans; items[i].dataset.mistakes = state.mistakes; solve(items[i], state.ans, items[i].classList.contains('hover-word') ? 'word' : 'group'); } else if (items[i]) { items[i].dataset.mistakes = state.mistakes; } });
+                    if (data.subWords) { const subWords = Array.from(document.querySelectorAll('.s-text')); data.subWords.forEach((isMarked, i) => { if (subWords[i] && isMarked) subWords[i].classList.add('marked-gen'); }); }
+                    data.textareas.forEach((val, i) => { if (textareas[i]) textareas[i].value = val; }); check(); 
+                } catch (e) { console.warn("Failed to load progress or storage is blocked.", e); }
+            }
 
-        function closeResults() { document.getElementById('results-modal').style.display = 'none'; }
-        function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise_de.html'; a.click(); }
-        document.addEventListener('mousedown', (e) => { 
-            if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; 
-            if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
-        });
+            window.clearStudentProgress = function() { const msg = currentLang === 'de' ? 'Fortschritt wirklich löschen?' : 'Really clear progress?'; if(confirm(msg)) { try { localStorage.removeItem(saveKey); } catch(e) { console.warn("Failed to clear local storage.", e); } location.reload(); } }
+            window.copyResults = function() { const t = studentTexts[currentLang]; const copyText = document.getElementById("results-text"); copyText.select(); copyText.setSelectionRange(0, 99999); navigator.clipboard.writeText(copyText.value).then(() => { showToast(t.copied, false); }); }
+            window.closeResults = function() { document.getElementById('results-modal').style.display = 'none'; }
+            window.downloadPage = function() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
+            
+            document.addEventListener('mousedown', (e) => { if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip')); });
+
+            let pendingMode = null; try { pendingMode = sessionStorage.getItem(saveKey + '_mode'); sessionStorage.removeItem(saveKey + '_mode'); } catch(e) {}
+            if (pendingMode === 'practise' || pendingMode === 'exam') setMode(pendingMode);
+            loadStudentProgress();
+        }
     </script>
 </body>
 </html>
