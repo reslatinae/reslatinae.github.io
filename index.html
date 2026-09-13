@@ -1815,8 +1815,25 @@ function updateWordVisuals(idx) {
     span.dataset.func = func;
     const shortLabel = CONFIG.ABBREVIATIONS[AppState.lang][func] || (func.length > 6 ? func.substring(0,5)+"." : func);
     span.dataset.short = shortLabel;
-    span.setProperty('--backgroundColor', AppState.colors[func]);
-    
+    span.style.setProperty('--background-color', AppState.colors[func]);
+
+    // Update merge hints
+    for (let borderIdx = idx-1; borderIdx <= idx; borderIdx++) { // two passes: previous-current and current-next
+        let potentiallyMergingSpan = document.getElementById(`word-${borderIdx}`);
+        if(!potentiallyMergingSpan) continue;
+
+        let canMerge = checkMergeCompatibility(AppState.words[borderIdx], AppState.words[borderIdx+1]);
+        for (const group of AppState.groups) {
+            if(group.end === borderIdx) canMerge = false;
+            if(group.start === borderIdx+1) canMerge = false;
+        }
+        if(canMerge) {
+            potentiallyMergingSpan.classList.add('merge-right');
+        } else {
+            potentiallyMergingSpan.classList.remove('merge-right');
+        }
+    }
+
     if (item.u) span.classList.add('attr-underline');
     else span.classList.remove('attr-underline');
 }
@@ -2347,18 +2364,23 @@ function saveGroupFromModal() {
             if(hint) newGroup.hint = hint; 
             if(errorHint) newGroup.errorHint = errorHint;
             AppState.addGroup(newGroup); // This automatically saves and updates the UI!
+            updateWordVisuals(newGroup.start);
+            updateWordVisuals(newGroup.end);
         }
         updateGroupUI(); StorageManager.triggerAutoSave();
     }
     closeGroupModal();
 }
 
-function removeGroup(index) { 
-    AppState.removeGroup(index); 
+function removeGroup(index) {
+    const group = AppState.groups[index];
+    AppState.removeGroup(index);
+    updateWordVisuals(group.start);
+    updateWordVisuals(group.end);
 }
 
 function adjustGroupStart(groupIndex, delta) {
-    let g = AppState.groups[groupIndex]; let newStart = g.start + delta;
+    let g = AppState.groups[groupIndex]; const oldStart = g.start; let newStart = g.start + delta;
     while(newStart >= 0 && newStart <= g.end) {
         if (AppState.words[newStart] && AppState.words[newStart].f !== CONFIG.PUNCT) break;
         newStart += delta;
@@ -2366,10 +2388,13 @@ function adjustGroupStart(groupIndex, delta) {
     if (newStart >= 0 && newStart <= g.end && AppState.words[newStart] && AppState.words[newStart].f !== CONFIG.PUNCT) {
         AppState.saveToHistory(); g.start = newStart; updateGroupUI(); StorageManager.triggerAutoSave();
     }
+    updateWordVisuals(oldStart);
+    updateWordVisuals(newStart);
 }
 
 function adjustGroupEnd(groupIndex, delta) {
-    let g = AppState.groups[groupIndex]; let newEnd = g.end + delta; const maxIdx = AppState.words.length - 1;
+    let g = AppState.groups[groupIndex]; const oldEnd = g.end; let newEnd = g.end + delta;
+    const maxIdx = AppState.words.length - 1;
     while(newEnd >= g.start && newEnd <= maxIdx) {
         if (AppState.words[newEnd] && AppState.words[newEnd].f !== CONFIG.PUNCT) break;
         newEnd += delta;
@@ -2377,6 +2402,8 @@ function adjustGroupEnd(groupIndex, delta) {
     if (newEnd >= g.start && newEnd <= maxIdx && AppState.words[newEnd] && AppState.words[newEnd].f !== CONFIG.PUNCT) {
         AppState.saveToHistory(); g.end = newEnd; updateGroupUI(); StorageManager.triggerAutoSave();
     }
+    updateWordVisuals(oldEnd);
+    updateWordVisuals(newEnd);
 }
 
 function addCustomLabel() {
@@ -2734,6 +2761,18 @@ function initEditor(words) {
 
 window.addEventListener('DOMContentLoaded', initApp);
 
+function checkMergeCompatibility(token1, token2) {
+    if(!token1 || !token2) {return false;}
+
+    const isMergeableType = ![CONFIG.PUNCT, CONFIG.OTHER_EN, CONFIG.OTHER_DE].includes(token2.f);
+    const splitExists = token1.isSplit;
+    const sameFunction = token1.f === token2.f;
+    const sameGroups = token1.activeGroups === token2.activeGroups;
+    const hasBreak = token1.b === 1;
+
+    return sameFunction && isMergeableType && !splitExists && sameGroups && !hasBreak;
+}
+
 /**
  * Take an array of tokens and merge adjacent same-type tokens into one, containing a space.
  * @param {Object[]} tokens The individual token objects
@@ -2750,13 +2789,8 @@ function mergeNeighbouringTokens(tokens) {
     let merged = [];
     let current = null;
     tokens.forEach((token, i) => {
-        const isMergeableType = ![CONFIG.PUNCT, CONFIG.OTHER_EN, CONFIG.OTHER_DE].includes(token.f);
         const prevToken = i > 0 ? tokens[i - 1] : null;
-        const splitExists = prevToken && prevToken.isSplit;
-        const sameGroups = current && current.activeGroups === token.activeGroups;
-        const hasBreak = prevToken && prevToken.b === 1;
-
-        const canMerge = current && current.f === token.f && isMergeableType && !splitExists && sameGroups && !hasBreak;
+        const canMerge = checkMergeCompatibility(token, prevToken);
 
         if (canMerge) {
             current.segments.push({
