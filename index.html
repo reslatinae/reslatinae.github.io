@@ -57,7 +57,12 @@
         
         .tag-word { display: inline-block; margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; position: relative; font-size: 1.15rem; vertical-align: bottom; color: #111827; padding: 2px 8px; border-radius: 4px; cursor: pointer; border-bottom: 2px solid #e5e7eb; white-space: nowrap; height: 1.6rem; line-height: 1.6rem; user-select: none; transition: margin-top 0.3s ease; }
         .tag-word:hover { filter: brightness(0.95); }
-        .tag-word[data-hint]::before { content: '💡'; position: absolute; top: -12px; right: -8px; font-size: 0.7rem; pointer-events: none; }
+        .hint-icon { position: relative; display: inline-block; cursor: pointer; font-size: 0.75rem; z-index: 20; filter: grayscale(0.2); transition: filter 0.2s; }
+        .hint-icon:hover { filter: grayscale(0); }
+        .tag-word .hint-icon { position: absolute; top: -12px; right: -8px; font-size: 0.7rem; }
+        .hint-icon .tooltip-text { visibility: hidden; width: max-content; max-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; position: absolute; z-index: 1000; bottom: 150%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.85rem; font-weight: normal; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none; white-space: normal; line-height: 1.4; }
+        .hint-icon .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #1f2937 transparent transparent transparent; }
+        .hint-icon.show-tooltip .tooltip-text { visibility: visible; opacity: 1; }
         .punct-span { display: inline-block; margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; padding: 2px 2px; font-size: 1.15rem; vertical-align: bottom; color: #111827; position: relative; font-weight: 500; cursor: pointer; user-select: none; border-bottom: 2px solid transparent; height: 1.6rem; line-height: 1.6rem; transition: margin-top 0.3s ease, opacity 0.2s; }
         .split-right { border-right: 3px dashed #ef4444 !important; margin-right: 12px !important; }
         
@@ -281,6 +286,8 @@
             <datalist id="label-suggestions" data-ref="labelSuggestions"></datalist>
             <label class="modal-label" id="lbl-group-hint" data-ref="lblGroupHint">Hint (optional):</label>
             <input type="text" id="group-hint-input" class="modal-input" data-ref="groupHintInput" placeholder="E.g. Look out for the ablative...">
+            <label class="modal-label" id="lbl-group-error-hint" data-ref="lblGroupErrorHint">Hint after wrong answer (optional):</label>
+            <input type="text" id="group-error-hint-input" class="modal-input" data-ref="groupErrorHintInput" placeholder="E.g. Think about what introduces this clause...">
             <div class="modal-actions">
                 <button class="btn-action" style="background:#64748b;" id="btn-cancel-group" data-ref="btnCancelGroup">Cancel</button>
                 <button class="btn-action" style="background:var(--primary-color);" id="btn-save-group" data-ref="btnSaveGroup">Save</button>
@@ -295,6 +302,8 @@
             <input type="text" id="word-text-input" class="modal-input" data-ref="wordTextInput">
             <label class="modal-label" id="lbl-word-hint" data-ref="lblWordHint">Hint (optional):</label>
             <input type="text" id="word-hint-input" class="modal-input" data-ref="wordHintInput" placeholder="E.g. Derived from...">
+            <label class="modal-label" id="lbl-word-error-hint" data-ref="lblWordErrorHint">Hint after wrong answer (optional):</label>
+            <input type="text" id="word-error-hint-input" class="modal-input" data-ref="wordErrorHintInput" placeholder="E.g. Check the case ending...">
             <div class="modal-actions">
                 <button class="btn-action" style="background:#ef4444; margin-right:auto;" id="btn-delete-word" data-ref="btnDeleteWord">Delete</button>
                 <button class="btn-action" style="background:#64748b;" id="btn-cancel-word" data-ref="btnCancelWord">Cancel</button>
@@ -310,6 +319,7 @@
     
     <script type="text/template" id="template-student-css" data-ref="templateStudentCss">
         :root { --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+		html { scrollbar-gutter: stable; }
         body, button, input, textarea, select { font-family: var(--main-font); }
         body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background-color: #f9fafb; color: #1f2937; line-height: 1.5; }
         h1 { text-align: center; color: #111827; margin-bottom: 32px; font-weight: 600; letter-spacing: -0.025em; }
@@ -329,8 +339,9 @@
         #exercise-container-wrapper { overflow-x: auto; padding-top: 30px; padding-bottom: 15px; margin-top: 10px; }
         #exercise { transition: transform 0.2s ease-in-out; }
 
-        .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
-        .hover-word:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+        .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; margin: 0 3px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
+		.hover-word::before { content: ""; position: absolute; top: 0; bottom: 0; left: -4px; right: -4px; z-index: -1; }
+		.hover-word:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
         
         /* Interactive Genitive Underline Elements */
         .s-text { border-bottom: 3px dashed transparent; transition: border-color 0.2s, background-color 0.2s; border-radius: 2px; }
@@ -372,7 +383,7 @@
         .btn { padding: 10px 20px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font-weight: 500; color: white; background: #1f2937; transition: opacity 0.2s; }
         .btn:hover { opacity: 0.9; }
         .ex-img { max-width: 100%; height: auto; display: block; margin: 30px auto 10px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 300px; object-fit: contain; }
-        #toast-container { visibility: hidden; min-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 14px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.95rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast-container { visibility: hidden; min-width: 250px; max-width: min(90vw, 480px); background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 14px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.95rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
         #toast-container.show { visibility: visible; opacity: 1; bottom: 40px; }
         #toast-container.error { background-color: #7f1d1d; border: 1px solid #ef4444; }
         #toast-container.success { background-color: #064e3b; border: 1px solid #10b981; }
@@ -425,7 +436,7 @@
 
     <script type="text/template" id="template-student-js" data-ref="templateStudentJs">
         let activeEl = null; let activeSubWord = null; let mode = ""; const menu = document.getElementById('menu-common'); const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
-        let hideMenuTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1; let examFinalized = false;
+        let hideMenuTimeout; let toastHideTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1; let examFinalized = false;
         const totalPhrases = document.querySelectorAll('.hover-word, .g-label').length;
         const totalGens = document.querySelectorAll('.s-text[data-u="true"]').length;
         const totalItems = totalPhrases + totalGens;
@@ -603,15 +614,16 @@
         }
 
         menu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
-        menu.addEventListener('mouseleave', () => { hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); });
+        menu.addEventListener('mouseleave', () => { clearTimeout(hideMenuTimeout); hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); });
 
         const exerciseArea = document.getElementById('exercise');
 
         // 1. Delegated Click handler
         exerciseArea.addEventListener('click', (e) => {
-            const el = e.target.closest('.hover-word, .g-label');
-            if (!el) return;
-            e.stopPropagation();
+			const el = e.target.closest('.hover-word, .g-label');
+			if (!el) return;
+			dismissToastOnInteraction();
+			e.stopPropagation();
             
             activeSubWord = e.target.closest('.s-text');
             const genBtn = document.querySelector('.gen-btn');
@@ -644,30 +656,39 @@
             }
         });
 
-        // 2. Delegated Mouseover (handles what onmouseenter did)
-        exerciseArea.addEventListener('mouseover', (e) => {
-            const el = e.target.closest('.hover-word, .g-label');
+        // Shared logic to position and show the menu for a given word/group element.
+        // Used both by hover and by the automatic advance to the next word.
+        function openMenuFor(el) {
             if (!el || el.dataset.done === "true") return;
-            
-            clearTimeout(hideMenuTimeout);
-            if (el === activeEl && menu.style.display === 'block') return; // keep the clicked sub-word (Mark Genitive) selected while the pointer stays on this phrase
             activeEl = el; activeSubWord = null; mode = el.classList.contains('hover-word') ? "word" : "group";
-            document.querySelector('.gen-btn').style.display = "none"; 
+            document.querySelector('.gen-btn').style.display = "none";
             document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => b.style.display = "block");
-            
-            if(window.innerWidth > 768) { 
+
+            if(window.innerWidth > 768) {
                 const rect = el.getBoundingClientRect();
-                menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
+                menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px";
             }
             menu.style.display="block";
-        });
+        }
+
+        // 2. Delegated Mouseover (handles what onmouseenter did)
+       exerciseArea.addEventListener('mouseover', (e) => {
+			const el = e.target.closest('.hover-word, .g-label');
+			if (!el) return;
+			dismissToastOnInteraction();
+			clearTimeout(hideMenuTimeout); // stop any pending hide as soon as the pointer lands on any word/group, done or not
+			if (el.dataset.done === "true") return;
+			if (el === activeEl && menu.style.display === 'block') return; // keep the clicked sub-word (Mark Genitive) selected while the pointer stays on this phrase
+			openMenuFor(el);
+		});
 
         // 3. Delegated Mouseout (handles what onmouseleave did)
         exerciseArea.addEventListener('mouseout', (e) => {
-            const el = e.target.closest('.hover-word, .g-label');
-            if (!el) return;
-            hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150);
-        });
+			const el = e.target.closest('.hover-word, .g-label');
+			if (!el) return;
+			clearTimeout(hideMenuTimeout); // never let two hide-timers run at once - the earlier one would otherwise survive and close a menu that gets reopened moments later
+			hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150);
+		});
 
         // 4. Delegated Keydown (Accessibility for Enter/Space)
         exerciseArea.addEventListener('keydown', (e) => {
@@ -715,7 +736,11 @@
                     } else { 
                         let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1; activeEl.dataset.mistakes = mistakes;
                         if(mistakes >= 2) { showToast(t.incorrect + correct, true); solve(activeEl, correct, mode); answeredItems++; } 
-                        else { showToast(t.tryAgain, true); }
+                        else { 
+                            const errHint = activeEl.dataset.errhint;
+                            if (errHint) { showToast(t.tryAgain + " 💡 " + errHint, true); }
+                            else { showToast(t.tryAgain, true); }
+                        }
                     }
                 } else {
                     if(sel === correct) { solve(activeEl, correct, mode); examScore++; } 
@@ -732,7 +757,7 @@
                 else if (activeEl && activeEl.dataset.done) {
                     const allItems = Array.from(document.querySelectorAll('.hover-word, .g-label')); const currentIndex = allItems.indexOf(activeEl); let nextEl = null;
                     for(let i = currentIndex + 1; i < allItems.length; i++) { if(allItems[i].dataset.done !== "true") { nextEl = allItems[i]; break; } }
-                    if(nextEl) nextEl.focus();
+                    if(nextEl) { nextEl.focus(); openMenuFor(nextEl); }
                 }
             };
             
@@ -743,10 +768,21 @@
             };
         });
 
-        function showToast(msg, isError) {
-            const x = document.getElementById("toast-container"); x.textContent = msg; x.className = isError ? "show error" : "show success";
-            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-        }
+        function showToast(msg, isError, duration = 3000) {
+    const x = document.getElementById("toast-container"); x.textContent = msg; x.className = isError ? "show error" : "show success";
+    clearTimeout(toastHideTimeout);
+    document.removeEventListener('mousemove', dismissToastOnInteraction);
+    document.removeEventListener('click', dismissToastOnInteraction);
+    if (!isError) {
+    // Mistakes (especially ones showing a teacher hint) stay on screen until the
+    // student moves to or clicks another word/group - see dismissToastOnInteraction()
+    // calls in the exerciseArea mouseover/click handlers below.
+    toastHideTimeout = setTimeout(function(){ x.className = x.className.replace("show", ""); }, duration);
+}
+}
+function dismissToastOnInteraction() {
+    document.getElementById("toast-container").className = document.getElementById("toast-container").className.replace("show", "");
+}
         function togglePatterns() { document.body.classList.toggle('pattern-mode'); }
         function toggleContrast() { document.body.classList.toggle('high-contrast'); }
 
@@ -1067,12 +1103,14 @@ const CONFIG = {
             editH3: "Step 2: Editing Instruction",
             editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically. Use 'Manual Split' to separate. Use 'Draw Bracket' to group phrases. You can use 'Mark Genitive' to draw an underline marking a genitive attribute inside a larger phrase group! Double-click any word or punctuation to edit it or add a hint. Shortcuts: 'X' for Split, 'M' for Bracket, 'G' for Genitive Underline, 'W' to Toggle Break, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.",
            	wordModalTitle: "Edit Word & Hint", wordTextLabel: "Word Text:", hintLabel: "Hint (optional):", groupHintLabel: "Group Hint (optional):",
+            errorHintLabel: "Hint after wrong answer (optional):",
             phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (W)", btnBracket: "Draw Bracket (M)", btnAttr: "Mark Genitive (G)",
             btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work",
             modalTitle: "Name this Syntactic Group:", btnCancel: "Cancel", btnSaveGroup: "Save", btnDelete: "Delete", confirmDelete: "Are you sure you want to delete this word?",
             modeTag: "Mode: Tagging", modeSplit: "Mode: Manual Split", modeLineBreak: "Mode: Toggle Break", modeBracket: "Mode: Drawing Bracket", modeAttr: "Mode: Mark Genitive",
             togglePat: "Toggle Patterns", toggleCon: "Toggle High Contrast", promptSuccess: "Prompt copied!", promptFail: "Copy failed!",
-            phWordHint: "E.g. Derived from...", phGroupHint: "E.g. Look out for the ablative...", phGroupSearch: "Type to search..."
+            phWordHint: "E.g. Derived from...", phGroupHint: "E.g. Look out for the ablative...", phGroupSearch: "Type to search...",
+            phWordErrorHint: "E.g. Check the case ending...", phGroupErrorHint: "E.g. Think about what introduces this clause..."
         },
         de: {
             heading: "Syntax-Werkstatt Latein", instrH3: "Schritt 1: Einrichtung",
@@ -1084,12 +1122,14 @@ const CONFIG = {
             editH3: "Schritt 2: Bearbeitung",
             editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Klammer zeichnen'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer größeren Gruppe durch Unterstreichung hervorheben! Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Shortcuts: 'X' für Trennen, 'M' für Klammer, 'G' für Genitiv-Unterstreichung, 'W' für Umbruch, Strg+Z für Rückgängig.",
            	wordModalTitle: "Wort & Hinweis bearbeiten", wordTextLabel: "Worttext:", hintLabel: "Hinweis (optional):", groupHintLabel: "Gruppen-Hinweis (optional):",
+            errorHintLabel: "Hinweis nach falscher Antwort (optional):",
             phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (W)", btnBracket: "Klammer zeichnen (M)", btnAttr: "Genitiv markieren (G)",
             btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden",
             modalTitle: "Name der syntaktischen Gruppe:", btnCancel: "Abbrechen", btnSaveGroup: "Speichern", btnDelete: "Löschen", confirmDelete: "Möchten Sie dieses Wort wirklich löschen?",
             modeTag: "Modus: Markieren", modeSplit: "Modus: Manuell trennen", modeLineBreak: "Modus: Umbruch umschalten", modeBracket: "Modus: Klammer zeichnen", modeAttr: "Modus: Genitiv markieren",
             togglePat: "Muster umschalten", toggleCon: "Hoher Kontrast", promptSuccess: "Prompt kopiert!", promptFail: "Kopieren fehlgeschlagen!",
-            phWordHint: "Z.B. abgeleitet von...", phGroupHint: "Z.B. Achte auf den Ablativ...", phGroupSearch: "Tippen zum Suchen..."
+            phWordHint: "Z.B. abgeleitet von...", phGroupHint: "Z.B. Achte auf den Ablativ...", phGroupSearch: "Tippen zum Suchen...",
+            phWordErrorHint: "Z.B. Achte auf die Kasusendung...", phGroupErrorHint: "Z.B. Überlege, was diesen Satz einleitet..."
         }
     }
 };
@@ -1199,6 +1239,7 @@ const AppState = {
                     f: hasLetters ? wordObj.f : CONFIG.PUNCT,
                     isSplit: i === parts.length - 1 ? wordObj.isSplit : false,
                     h: i === 0 ? wordObj.h : "",
+                    eh: i === 0 ? wordObj.eh : "",
                     b: i === parts.length - 1 ? wordObj.b : 0,
                     u: wordObj.u
                 };
@@ -1529,6 +1570,10 @@ function changeLanguage(lang) {
     DOM.wordHintInput.placeholder = txt.phWordHint;
     DOM.groupHintInput.placeholder = txt.phGroupHint;
     DOM.groupNameInput.placeholder = txt.phGroupSearch;
+    DOM.wordErrorHintInput.placeholder = txt.phWordErrorHint;
+    DOM.groupErrorHintInput.placeholder = txt.phGroupErrorHint;
+    DOM.lblWordErrorHint.textContent = txt.errorHintLabel;
+    DOM.lblGroupErrorHint.textContent = txt.errorHintLabel;
     
     DOM.undoBtn.textContent = txt.btnUndo; 
     DOM.splitModeBtn.textContent = txt.btnSplit;
@@ -1678,7 +1723,25 @@ function renderEditor() {
             span.dataset.func = func;
             const shortLabel = CONFIG.ABBREVIATIONS[AppState.lang][func] || (func.length > 6 ? func.substring(0,5)+"." : func);
             span.dataset.short = shortLabel;
-            if(item.h) span.dataset.hint = item.h;
+            if(item.h) {
+                span.dataset.hint = item.h;
+                const hintIcon = document.createElement('span');
+                hintIcon.className = 'hint-icon';
+                hintIcon.title = 'Hint';
+                hintIcon.textContent = '💡';
+                hintIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (span.clickTimer) { clearTimeout(span.clickTimer); span.clickTimer = null; }
+                    document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => { if (el !== hintIcon) el.classList.remove('show-tooltip'); });
+                    hintIcon.classList.toggle('show-tooltip');
+                });
+                hintIcon.addEventListener('dblclick', (e) => e.stopPropagation());
+                const tooltipText = document.createElement('span');
+                tooltipText.className = 'tooltip-text';
+                tooltipText.innerHTML = parseSimpleMarkdown(item.h);
+                hintIcon.appendChild(tooltipText);
+                span.appendChild(hintIcon);
+            }
             span.style.backgroundColor = AppState.colors[func];
         } else { 
             span.dataset.func = CONFIG.PUNCT; 
@@ -1793,7 +1856,7 @@ function updateGroupUI() {
                 
                 let safeLabel = escapeHTML(g.label);
                 let labelHTML = `<span class="clickable-label" title="Rename group" data-action="rename-group" data-idx="${g.originalIndex}">${safeLabel}</span>`;
-                if(g.hint) labelHTML += ' <span style="font-size:0.7rem;">💡</span>';
+                if(g.hint) labelHTML += ` <span class="hint-icon" title="Hint" data-action="toggle-hint" data-idx="${g.originalIndex}">💡<span class="tooltip-text">${parseSimpleMarkdown(g.hint)}</span></span>`;
                 
                 let startDrag = `draggable="true" data-drag-type="start" data-group-idx="${g.originalIndex}"`;
                 let endDrag = `draggable="true" data-drag-type="end" data-group-idx="${g.originalIndex}"`;
@@ -1878,6 +1941,12 @@ function initEventListeners() {
         if(DOM.editorPageTitle) DOM.editorPageTitle.value = e.target.value;
     });
 
+    document.addEventListener('mousedown', (e) => {
+        if (!e.target.closest('.hint-icon')) {
+            document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
+        }
+    });
+
     const taggingArea = DOM.taggingArea;
 
     taggingArea.addEventListener('mouseover', (e) => {
@@ -1897,6 +1966,10 @@ function initEventListeners() {
             else if (action === 'del-group') removeGroup(idx);
             else if (action === 'adj-start') adjustGroupStart(idx, parseInt(btn.dataset.dir));
             else if (action === 'adj-end') adjustGroupEnd(idx, parseInt(btn.dataset.dir));
+            else if (action === 'toggle-hint') {
+                document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => { if (el !== btn) el.classList.remove('show-tooltip'); });
+                btn.classList.toggle('show-tooltip');
+            }
             return;
         }
 
@@ -2144,6 +2217,7 @@ function handleWordDoubleClick(el, e) {
     const domIdx = parseInt(el.dataset.idx);
     DOM.wordTextInput.value = AppState.words[domIdx].w || "";
     DOM.wordHintInput.value = AppState.words[domIdx].h || "";
+    DOM.wordErrorHintInput.value = AppState.words[domIdx].eh || "";
     DOM.wordModal.style.display = 'flex';
     DOM.wordTextInput.focus();
 }
@@ -2158,9 +2232,10 @@ function saveWordFromModal() {
         const domIdx = parseInt(AppState.ui.editingWordNode.dataset.idx);
         const newText = DOM.wordTextInput.value.trim();
         const newHint = DOM.wordHintInput.value.trim();
+        const newErrorHint = DOM.wordErrorHintInput.value.trim();
         
         if (newText) {
-            AppState.mutateWord(domIdx, { w: newText, h: newHint });
+            AppState.mutateWord(domIdx, { w: newText, h: newHint, eh: newErrorHint });
         }
     }
     closeWordModal();
@@ -2203,6 +2278,7 @@ function openGroupModal() {
     });
     DOM.groupNameInput.value = ''; 
     DOM.groupHintInput.value = ''; 
+    DOM.groupErrorHintInput.value = '';
     DOM.groupModal.style.display = 'flex'; 
     DOM.groupNameInput.focus();
 }
@@ -2218,6 +2294,7 @@ function editGroupLabel(index) {
     });
     DOM.groupNameInput.value = AppState.groups[index].label; 
     DOM.groupHintInput.value = AppState.groups[index].hint || "";
+    DOM.groupErrorHintInput.value = AppState.groups[index].errorHint || "";
     DOM.groupModal.style.display = 'flex'; 
     DOM.groupNameInput.focus();
 }
@@ -2232,6 +2309,7 @@ function closeGroupModal() {
 function saveGroupFromModal() {
     const label = DOM.groupNameInput.value.trim();
     const hint = DOM.groupHintInput.value.trim();
+    const errorHint = DOM.groupErrorHintInput.value.trim();
     
     if(label) {
         AppState.saveToHistory(); 
@@ -2242,9 +2320,11 @@ function saveGroupFromModal() {
         if(AppState.ui.editingGroupIndex !== null) {
             AppState.groups[AppState.ui.editingGroupIndex].label = label;
             if(hint) AppState.groups[AppState.ui.editingGroupIndex].hint = hint; else delete AppState.groups[AppState.ui.editingGroupIndex].hint;
+            if(errorHint) AppState.groups[AppState.ui.editingGroupIndex].errorHint = errorHint; else delete AppState.groups[AppState.ui.editingGroupIndex].errorHint;
         } else if(AppState.ui.pendingGroupStart !== null) {
             let newGroup = { start: AppState.ui.pendingGroupStart, end: AppState.ui.pendingGroupEnd, label: label };
             if(hint) newGroup.hint = hint; 
+            if(errorHint) newGroup.errorHint = errorHint;
             AppState.addGroup(newGroup); // This automatically saves and updates the UI!
         }
         updateGroupUI(); StorageManager.triggerAutoSave();
@@ -2409,7 +2489,7 @@ function applyPrepositionMerging(tokens) {
         if(isSingleWord && CONFIG.PREPOSITIONS.includes(pureWord) && i+1 < tokens.length) {
             let nextW = tokens[i+1];
             if(nextW.f !== CONFIG.PUNCT) {
-                welded.push({ w: curr.w + " " + nextW.w.replace(/^-/, ''), f: prepLabel, b: curr.b || 0, u: curr.u || nextW.u, h: curr.h || nextW.h, isSplit: nextW.isSplit });
+                welded.push({ w: curr.w + " " + nextW.w.replace(/^-/, ''), f: prepLabel, b: curr.b || 0, u: curr.u || nextW.u, h: curr.h || nextW.h, eh: curr.eh || nextW.eh, isSplit: nextW.isSplit });
                 map[i+1] = welded.length - 1; i++; 
             } else { welded.push(curr); }
         } else { welded.push(curr); }
@@ -2679,6 +2759,7 @@ function exportToStudent() {
             });
             current.originalIndices.push(token.idx);
             if(token.h) current.hint = current.hint ? current.hint + " | " + token.h : token.h;
+            if(token.eh) current.eh = current.eh ? current.eh + " | " + token.eh : token.eh;
             current.b = token.b; 
         } else {
             if (current) merged.push(current);
@@ -2687,6 +2768,7 @@ function exportToStudent() {
                 originalIndices: [token.idx], 
                 activeGroups: token.activeGroups, 
                 hint: token.h, 
+                eh: token.eh,
                 b: token.b,
                 segments: [{ w: token.w, u: token.u, space: '' }]
             };
@@ -2870,9 +2952,10 @@ function generateExerciseHTML(words, groups, placeholder, lang) {
             : `<span class="s-text" data-u="false">${escapeHTML(word.w || "")}</span>`;
 
         const safeFunc = escapeHTML(word.f);
+        const errHintAttr = word.eh ? ` data-errhint="${escapeHTML(word.eh)}"` : '';
         const content = isPunct 
             ? `<span class="punct">${safeWordHtml}</span>` 
-            : `<span class="hover-word" tabindex="0" data-ans="${safeFunc}">${safeWordHtml}${hintHtml}</span>`;
+            : `<span class="hover-word" tabindex="0" data-ans="${safeFunc}"${errHintAttr}>${safeWordHtml}${hintHtml}</span>`;
 
         let openDivs = "";
         let closeDivs = "";
@@ -2881,9 +2964,10 @@ function generateExerciseHTML(words, groups, placeholder, lang) {
             const safeGroupHint = parseSimpleMarkdown(g.hint);
             const gHintHtml = g.hint ? hintIconHtml(safeGroupHint) : '';
             const safeLabel = escapeHTML(g.label);
+            const gErrHintAttr = g.errorHint ? ` data-errhint="${escapeHTML(g.errorHint)}"` : '';
             
             if (idx === g.start) {
-                openDivs += `<div class="s-group" data-ans="${safeLabel}"><span class="g-label" tabindex="0"><span class="g-text">?</span>${gHintHtml}</span>`;
+                openDivs += `<div class="s-group" data-ans="${safeLabel}"><span class="g-label" tabindex="0"${gErrHintAttr}><span class="g-text">?</span>${gHintHtml}</span>`;
             }
             if (idx === g.end) {
                 closeDivs += `</div>`;
