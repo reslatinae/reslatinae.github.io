@@ -757,10 +757,11 @@
                 else if (activeEl && activeEl.dataset.done) {
                     const allItems = Array.from(document.querySelectorAll('.hover-word, .g-label')); const currentIndex = allItems.indexOf(activeEl); let nextEl = null;
                     for(let i = currentIndex + 1; i < allItems.length; i++) { if(allItems[i].dataset.done !== "true") { nextEl = allItems[i]; break; } }
-						if (!nextEl) {
-						for(let i = currentIndex - 1; i >= 0; i--) { if(allItems[i].dataset.done !== "true") { nextEl = allItems[i]; break; } }
+						    if (!nextEl) {
+								for(let i = currentIndex - 1; i >= 0; i--) { if(allItems[i].dataset.done !== "true") { nextEl = allItems[i]; break; } }
+								}
+							if (nextEl) { nextEl.focus(); openMenuFor(nextEl); }
 						}
-                }
             };
             
             btn.onkeydown = (e) => {
@@ -837,7 +838,6 @@ function dismissToastOnInteraction() {
             // (No separate deduction for earlier wrong guesses while searching - matches how a wrong
             // label only ever costs the single point of that task, never more.)
             let finalScore = examScore + genScore;
-            if (finalScore < 0) finalScore = 0; // Prevents the score from dropping below zero
 
             const submitBtn = document.getElementById('btn-submit-exam');
             if (submitBtn) submitBtn.style.display = 'none';
