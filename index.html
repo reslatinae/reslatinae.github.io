@@ -55,7 +55,7 @@
         #tagging-area { display: block; line-height: 1.6; transition: transform 0.2s ease-in-out; }
         .editor-sentence-box { padding: 30px 20px 20px 20px; margin-bottom: 24px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); line-height: 1.6; }
         
-        .tag-word { display: inline-block; margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; position: relative; font-size: 1.15rem; vertical-align: bottom; color: #111827; padding: 2px 8px; border-radius: 4px; cursor: pointer; border-bottom: 2px solid #e5e7eb; white-space: nowrap; height: 1.6rem; line-height: 1.6rem; user-select: none; transition: margin-top 0.3s ease; }
+        .tag-word { display: inline-block; margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; position: relative; font-size: 1.15rem; vertical-align: bottom; color: #111827; padding: 2px 8px; border-radius: 4px; cursor: pointer; border-bottom: 2px solid #e5e7eb; white-space: nowrap; height: 1.6rem; line-height: 1.6rem; user-select: none; transition: margin-top 0.3s ease; background-color: var(--background-color); }
         .tag-word:hover { filter: brightness(0.95); }
         .hint-icon { position: relative; display: inline-block; cursor: pointer; font-size: 0.75rem; z-index: 20; filter: grayscale(0.2); transition: filter 0.2s; }
         .hint-icon:hover { filter: grayscale(0); }
@@ -65,7 +65,8 @@
         .hint-icon.show-tooltip .tooltip-text { visibility: visible; opacity: 1; }
         .punct-span { display: inline-block; margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; padding: 2px 2px; font-size: 1.15rem; vertical-align: bottom; color: #111827; position: relative; font-weight: 500; cursor: pointer; user-select: none; border-bottom: 2px solid transparent; height: 1.6rem; line-height: 1.6rem; transition: margin-top 0.3s ease, opacity 0.2s; }
         .split-right { border-right: 3px dashed #ef4444 !important; margin-right: 12px !important; }
-        
+        .merge-right { box-shadow: 5px 0 2px color-mix(in srgb, var(--background-color) 60%, transparent) !important; }
+
         /* Genitive Attribute Underline Feature */
         .attr-underline { border-bottom: 3px dashed #ec4899 !important; padding-bottom: 2px; }
         .tag-word.attr-underline::after { content: attr(data-short) ' (GEN)'; color: #ec4899; font-weight: 800; background: #fdf2f8; border-color: #ec4899; }
@@ -736,7 +737,7 @@
                     } else { 
                         let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1; activeEl.dataset.mistakes = mistakes;
                         if(mistakes >= 2) { showToast(t.incorrect + correct, true); solve(activeEl, correct, mode); answeredItems++; } 
-                        else { 
+                        else {
                             const errHint = activeEl.dataset.errhint;
                             if (errHint) { showToast(t.tryAgain + " 💡 " + errHint, true); }
                             else { showToast(t.tryAgain, true); }
@@ -792,7 +793,7 @@ function dismissToastOnInteraction() {
         function solve(el, ans, m) {
             if(m === "word") {
                 const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
-                el.style.backgroundColor = colors[ans]; el.dataset.done = "true"; el.removeAttribute('tabindex');
+                el.style.setProperty('--background-color', colors[ans]); el.dataset.done = "true"; el.removeAttribute('tabindex');
                 if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
             } else { 
                 const tSpan = el.querySelector('.g-text'); if (tSpan) tSpan.textContent = ans; else el.textContent = ans; 
@@ -1576,7 +1577,7 @@ function changeLanguage(lang) {
     DOM.groupErrorHintInput.placeholder = txt.phGroupErrorHint;
     DOM.lblWordErrorHint.textContent = txt.errorHintLabel;
     DOM.lblGroupErrorHint.textContent = txt.errorHintLabel;
-    
+
     DOM.undoBtn.textContent = txt.btnUndo; 
     DOM.splitModeBtn.textContent = txt.btnSplit;
     DOM.linebreakModeBtn.textContent = txt.btnLineBreak; 
@@ -1693,6 +1694,20 @@ function renderPalette() {
     updateStatus();
 }
 
+/**
+ * Predict which tokens will merge with the one directly after them, and return their indices.
+ * @param {Object[]} tokens
+ * @returns {int[]}
+ */
+function whichTokensWillMerge(tokens) {
+    const mergedTokens = mergeNeighbouringTokens(tokens);
+    const indices = [];
+    for (const mergedToken of mergedTokens) {
+        indices.push(...mergedToken.originalIndices.slice(0, -1));
+    }
+    return indices;
+}
+
 function renderEditor() {
     const area = DOM.taggingArea;
     area.innerHTML = '';
@@ -1703,13 +1718,17 @@ function renderEditor() {
     let currentSentenceBox = document.createElement('div');
     currentSentenceBox.className = 'editor-sentence-box';
     // Do NOT append to 'area' yet!
-    
+
+    mergingIndices = whichTokensWillMerge(AppState.words);
+
     AppState.words.forEach((item, i) => {
         const span = document.createElement('span');
         const isPunct = item.f === CONFIG.PUNCT;
+        const willMerge = mergingIndices.includes(item.idx);
         span.textContent = item.w;
         span.className = isPunct ? 'punct-span' : 'tag-word';
         if (item.isSplit) span.classList.add('split-right');
+        if (willMerge) span.classList.add('merge-right');
         if (item.u && !isPunct) span.classList.add('attr-underline');
         
         span.dataset.idx = i;
@@ -1744,7 +1763,7 @@ function renderEditor() {
                 hintIcon.appendChild(tooltipText);
                 span.appendChild(hintIcon);
             }
-            span.style.backgroundColor = AppState.colors[func];
+            span.style.setProperty('--background-color', AppState.colors[func]);
         } else { 
             span.dataset.func = CONFIG.PUNCT; 
         }
@@ -1796,8 +1815,25 @@ function updateWordVisuals(idx) {
     span.dataset.func = func;
     const shortLabel = CONFIG.ABBREVIATIONS[AppState.lang][func] || (func.length > 6 ? func.substring(0,5)+"." : func);
     span.dataset.short = shortLabel;
-    span.style.backgroundColor = AppState.colors[func];
-    
+    span.style.setProperty('--background-color', AppState.colors[func]);
+
+    // Update merge hints
+    for (let borderIdx = idx-1; borderIdx <= idx; borderIdx++) { // two passes: previous-current and current-next
+        let potentiallyMergingSpan = document.getElementById(`word-${borderIdx}`);
+        if(!potentiallyMergingSpan) continue;
+
+        let canMerge = checkMergeCompatibility(AppState.words[borderIdx], AppState.words[borderIdx+1]);
+        for (const group of AppState.groups) {
+            if(group.end === borderIdx) canMerge = false;
+            if(group.start === borderIdx+1) canMerge = false;
+        }
+        if(canMerge) {
+            potentiallyMergingSpan.classList.add('merge-right');
+        } else {
+            potentiallyMergingSpan.classList.remove('merge-right');
+        }
+    }
+
     if (item.u) span.classList.add('attr-underline');
     else span.classList.remove('attr-underline');
 }
@@ -2235,7 +2271,7 @@ function saveWordFromModal() {
         const newText = DOM.wordTextInput.value.trim();
         const newHint = DOM.wordHintInput.value.trim();
         const newErrorHint = DOM.wordErrorHintInput.value.trim();
-        
+
         if (newText) {
             AppState.mutateWord(domIdx, { w: newText, h: newHint, eh: newErrorHint });
         }
@@ -2281,7 +2317,7 @@ function openGroupModal() {
     DOM.groupNameInput.value = ''; 
     DOM.groupHintInput.value = ''; 
     DOM.groupErrorHintInput.value = '';
-    DOM.groupModal.style.display = 'flex'; 
+    DOM.groupModal.style.display = 'flex';
     DOM.groupNameInput.focus();
 }
 
@@ -2297,7 +2333,7 @@ function editGroupLabel(index) {
     DOM.groupNameInput.value = AppState.groups[index].label; 
     DOM.groupHintInput.value = AppState.groups[index].hint || "";
     DOM.groupErrorHintInput.value = AppState.groups[index].errorHint || "";
-    DOM.groupModal.style.display = 'flex'; 
+    DOM.groupModal.style.display = 'flex';
     DOM.groupNameInput.focus();
 }
 
@@ -2312,7 +2348,7 @@ function saveGroupFromModal() {
     const label = DOM.groupNameInput.value.trim();
     const hint = DOM.groupHintInput.value.trim();
     const errorHint = DOM.groupErrorHintInput.value.trim();
-    
+
     if(label) {
         AppState.saveToHistory(); 
         if(!AppState.functions.includes(label)) {
@@ -2328,18 +2364,23 @@ function saveGroupFromModal() {
             if(hint) newGroup.hint = hint; 
             if(errorHint) newGroup.errorHint = errorHint;
             AppState.addGroup(newGroup); // This automatically saves and updates the UI!
+            updateWordVisuals(newGroup.start);
+            updateWordVisuals(newGroup.end);
         }
         updateGroupUI(); StorageManager.triggerAutoSave();
     }
     closeGroupModal();
 }
 
-function removeGroup(index) { 
-    AppState.removeGroup(index); 
+function removeGroup(index) {
+    const group = AppState.groups[index];
+    AppState.removeGroup(index);
+    updateWordVisuals(group.start);
+    updateWordVisuals(group.end);
 }
 
 function adjustGroupStart(groupIndex, delta) {
-    let g = AppState.groups[groupIndex]; let newStart = g.start + delta;
+    let g = AppState.groups[groupIndex]; const oldStart = g.start; let newStart = g.start + delta;
     while(newStart >= 0 && newStart <= g.end) {
         if (AppState.words[newStart] && AppState.words[newStart].f !== CONFIG.PUNCT) break;
         newStart += delta;
@@ -2347,10 +2388,13 @@ function adjustGroupStart(groupIndex, delta) {
     if (newStart >= 0 && newStart <= g.end && AppState.words[newStart] && AppState.words[newStart].f !== CONFIG.PUNCT) {
         AppState.saveToHistory(); g.start = newStart; updateGroupUI(); StorageManager.triggerAutoSave();
     }
+    updateWordVisuals(oldStart);
+    updateWordVisuals(newStart);
 }
 
 function adjustGroupEnd(groupIndex, delta) {
-    let g = AppState.groups[groupIndex]; let newEnd = g.end + delta; const maxIdx = AppState.words.length - 1;
+    let g = AppState.groups[groupIndex]; const oldEnd = g.end; let newEnd = g.end + delta;
+    const maxIdx = AppState.words.length - 1;
     while(newEnd >= g.start && newEnd <= maxIdx) {
         if (AppState.words[newEnd] && AppState.words[newEnd].f !== CONFIG.PUNCT) break;
         newEnd += delta;
@@ -2358,6 +2402,8 @@ function adjustGroupEnd(groupIndex, delta) {
     if (newEnd >= g.start && newEnd <= maxIdx && AppState.words[newEnd] && AppState.words[newEnd].f !== CONFIG.PUNCT) {
         AppState.saveToHistory(); g.end = newEnd; updateGroupUI(); StorageManager.triggerAutoSave();
     }
+    updateWordVisuals(oldEnd);
+    updateWordVisuals(newEnd);
 }
 
 function addCustomLabel() {
@@ -2667,6 +2713,13 @@ function importAI() {
             }
         });
 
+        // Add indices
+        d.words.forEach((w, idx) => {
+            w.idx = idx;
+        });
+
+
+
         initEditor(mergeResult.welded);
     } catch(e) { 
         console.error("Unhandled import error:", e); 
@@ -2708,6 +2761,64 @@ function initEditor(words) {
 
 window.addEventListener('DOMContentLoaded', initApp);
 
+function checkMergeCompatibility(token1, token2) {
+    if(!token1 || !token2) {return false;}
+
+    const isMergeableType = ![CONFIG.PUNCT, CONFIG.OTHER_EN, CONFIG.OTHER_DE].includes(token2.f);
+    const splitExists = token1.isSplit;
+    const sameFunction = token1.f === token2.f;
+    const sameGroups = token1.activeGroups === token2.activeGroups;
+    const hasBreak = token1.b === 1;
+
+    return sameFunction && isMergeableType && !splitExists && sameGroups && !hasBreak;
+}
+
+/**
+ * Take an array of tokens and merge adjacent same-type tokens into one, containing a space.
+ * @param {Object[]} tokens The individual token objects
+ * @param {string} tokens[].w The string representation of the token, as it appears in the text
+ * @param {string} tokens[].f The syntactic role, such as "Prädikat" or "Vokativ"
+ * @param {string} tokens[].h A hint for the student
+ * @param tokens[].activeGroups Which groups (brackets) this token belongs to
+ * @param {int} tokens[].b 1 if this contains a break, else 0
+ * @param {int} tokens[].idx Index of the token in the original text
+ *
+ * @returns {Object[]} A potentially shorter list of tokens
+ */
+function mergeNeighbouringTokens(tokens) {
+    let merged = [];
+    let current = null;
+    tokens.forEach((token, i) => {
+        const prevToken = i > 0 ? tokens[i - 1] : null;
+        const canMerge = checkMergeCompatibility(token, prevToken);
+
+        if (canMerge) {
+            current.segments.push({
+                w: token.w,
+                u: token.u,
+                space: (['.', ',', ';', ':', '!', '?'].includes(token.w) ? '' : ' ')
+            });
+            current.originalIndices.push(token.idx);
+            if (token.h) current.hint = current.hint ? current.hint + " | " + token.h : token.h;
+            if(token.eh) current.eh = current.eh ? current.eh + " | " + token.eh : token.eh;
+            current.b = token.b;
+        } else {
+            if (current) merged.push(current);
+            current = {
+                f: token.f,
+                originalIndices: [token.idx],
+                activeGroups: token.activeGroups,
+                hint: token.h,
+                eh: token.eh,
+                b: token.b,
+                segments: [{w: token.w, u: token.u, space: ''}]
+            };
+        }
+    });
+    if (current) merged.push(current);
+    return merged;
+}
+
 // ==========================================
 // ==========================================
 // 8. STUDENT EXPORT GENERATION
@@ -2742,41 +2853,7 @@ function exportToStudent() {
             }
         }
     }
-
-    let merged = []; let current = null;
-    tempTokens.forEach((token, i) => {
-        const isMergeableType = ![CONFIG.PUNCT, CONFIG.OTHER_EN, CONFIG.OTHER_DE].includes(token.f);
-        const prevToken = i > 0 ? tempTokens[i-1] : null;
-        const splitExists = prevToken && prevToken.isSplit;
-        const sameGroups = current && current.activeGroups === token.activeGroups;
-        const hasBreak = prevToken && prevToken.b === 1;
-        
-        const canMerge = current && current.f === token.f && isMergeableType && !splitExists && sameGroups && !hasBreak;
-        
-        if (canMerge) {
-            current.segments.push({
-                w: token.w,
-                u: token.u,
-                space: (['.', ',', ';', ':', '!', '?'].includes(token.w) ? '' : ' ')
-            });
-            current.originalIndices.push(token.idx);
-            if(token.h) current.hint = current.hint ? current.hint + " | " + token.h : token.h;
-            if(token.eh) current.eh = current.eh ? current.eh + " | " + token.eh : token.eh;
-            current.b = token.b; 
-        } else {
-            if (current) merged.push(current);
-            current = { 
-                f: token.f, 
-                originalIndices: [token.idx], 
-                activeGroups: token.activeGroups, 
-                hint: token.h, 
-                eh: token.eh,
-                b: token.b,
-                segments: [{ w: token.w, u: token.u, space: '' }]
-            };
-        }
-    });
-    if (current) merged.push(current);
+    let merged = mergeNeighbouringTokens(tempTokens);
 
     const updatedGroups = AppState.groups.map(g => {
         const newStart = merged.findIndex(m => m.originalIndices.includes(g.start));
@@ -2953,7 +3030,7 @@ function generateExerciseHTML(words, groups, placeholder, lang) {
 
         const safeFunc = escapeHTML(word.f);
         const errHintAttr = word.eh ? ` data-errhint="${escapeHTML(word.eh)}"` : '';
-        const content = isPunct 
+        const content = isPunct
             ? `<span class="punct">${safeWordHtml}</span>` 
             : `<span class="hover-word" tabindex="0" data-ans="${safeFunc}"${errHintAttr}>${safeWordHtml}${hintHtml}</span>`;
 
@@ -2965,7 +3042,7 @@ function generateExerciseHTML(words, groups, placeholder, lang) {
             const gHintHtml = g.hint ? hintIconHtml(safeGroupHint) : '';
             const safeLabel = escapeHTML(g.label);
             const gErrHintAttr = g.errorHint ? ` data-errhint="${escapeHTML(g.errorHint)}"` : '';
-            
+
             if (idx === g.start) {
                 openDivs += `<div class="s-group" data-ans="${safeLabel}"><span class="g-label" tabindex="0"${gErrHintAttr}><span class="g-text">?</span>${gHintHtml}</span>`;
             }
