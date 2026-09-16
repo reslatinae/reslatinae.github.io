@@ -1,0 +1,22 @@
+// Cloudflare Worker configuration for the key-holding proxy (see README.md).
+// The OpenAI key is NOT here: it is a secret, set with `npx wrangler secret put OPENAI_API_KEY`.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "latin-syntax-proxy",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-04",
+  "observability": { "enabled": true },
+
+  "vars": {
+    // Websites allowed to use the proxy (the browser's Origin header: scheme + host, no path).
+    "ALLOWED_ORIGINS": "https://reslatinae.github.io,https://federicodip.github.io",
+    // Models the proxy will forward; anything else is refused before it costs money.
+    "ALLOWED_MODELS": "gpt-5.6-luna,gpt-5.6-terra"
+  },
+
+  // Approximate per-location counters (Cloudflare only allows periods of 10 or 60 seconds).
+  "ratelimits": [
+    { "name": "LIMIT_PER_IP", "namespace_id": "1001", "simple": { "limit": 30, "period": 60 } },
+    { "name": "LIMIT_GLOBAL", "namespace_id": "1002", "simple": { "limit": 120, "period": 60 } }
+  ]
+}
