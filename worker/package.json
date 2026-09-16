@@ -9,6 +9,6 @@
     "secret": "wrangler secret put OPENAI_API_KEY"
   },
   "devDependencies": {
-    "wrangler": "^4.129.0"
+    "wrangler": "^4.132.0"
   }
 }
