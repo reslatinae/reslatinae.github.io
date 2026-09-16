@@ -54,6 +54,7 @@
                     b: curr.b || 0,
                     u: !!(curr.u || nextW.u),
                     h: curr.h || nextW.h,
+                    eh: curr.eh || nextW.eh,
                     isSplit: nextW.isSplit
                 });
                 map[i + 1] = welded.length - 1; i++;
@@ -88,6 +89,7 @@
             f: hasLetters(p) ? wordObj.f : PUNCT,
             isSplit: i === parts.length - 1 ? wordObj.isSplit : false,
             h: i === 0 ? wordObj.h : '',
+            eh: i === 0 ? wordObj.eh : '',
             b: i === parts.length - 1 ? wordObj.b : 0,
             u: wordObj.u
         }));

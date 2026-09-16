@@ -67,6 +67,17 @@ test('preposition matching ignores macrons ("ā Clodiā")', () => {
     const { welded } = L.weldPrepositions([{ w: 'ā', f: 'Sonstiges' }, { w: 'Clodiā', f: 'Sonstiges' }], DE.prep);
     assert.deepEqual(words(welded), ['ā Clodiā']);
 });
+test('a "hint after wrong answer" (eh) survives welding, from either word', () => {
+    const a = L.weldPrepositions([{ w: 'in', f: 'X', eh: 'Kasus?' }, { w: 'urbe', f: 'X' }], DE.prep).welded[0];
+    const b = L.weldPrepositions([{ w: 'in', f: 'X' }, { w: 'urbe', f: 'X', eh: 'Ablativ!' }], DE.prep).welded[0];
+    assert.equal(a.eh, 'Kasus?');
+    assert.equal(b.eh, 'Ablativ!');
+});
+test('splitTokenParts gives the error hint to the first part only, like the normal hint', () => {
+    const parts = L.splitTokenParts({ w: 'a Clodia', f: 'P', h: 'hint', eh: 'error hint' });
+    assert.equal(parts[0].eh, 'error hint');
+    assert.equal(parts[1].eh, '');
+});
 test('a genitive flag on the welded noun is kept on the phrase', () => {
     const { welded } = L.weldPrepositions([{ w: 'in', f: 'X' }, { w: 'urbe', f: 'X', u: true }], DE.prep);
     assert.equal(welded[0].u, true);
