@@ -521,8 +521,8 @@
         const totalGens = document.querySelectorAll('.s-text[data-u="true"]').length;
         const totalItems = totalPhrases + totalGens;
 
-        // ---- Legend of all syntactic functions; clicking one changes its colour (saved in this browser for all exercises) ----
-        const COLOR_PREF_KEY = 'latin_student_colors';
+        // ---- Legend of all syntactic functions; clicking one changes its colour (saved in this browser for this exercise) ----
+        const COLOR_PREF_KEY = saveKey + '_colors'; // per exercise: a new page always starts with the teacher's colours
         const teacherColors = Object.assign({}, colors); // the teacher's colours, before any student preference is applied
         let legendOpenLabel = null;
 
@@ -542,13 +542,13 @@
             document.querySelectorAll('.hover-word[data-done="true"]').forEach(el => { if (colors[el.dataset.ans]) paintWord(el, colors[el.dataset.ans]); });
         }
         function genAltColor(bg) {
-            // Colour for the gaps of the pink genitive underline: none on very light backgrounds (pink alone is clearly visible),
-            // otherwise white or near-black, whichever contrasts more, so the line stays visible on any label colour.
+            // Genitive underline colour: fully white on dark and medium colours (every red included); on light colours pink,
+            // with near-black gaps where pink alone would be too faint. Returns the gap colour; '#ffffff' means 'all white'.
             const lum = (hex) => { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n) || f.length !== 6) return null; return [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0); };
             const lb = lum(bg); if (lb === null) return 'transparent';
             const ratio = (c) => { const l = lum(c); return (Math.max(l, lb) + 0.05) / (Math.min(l, lb) + 0.05); };
-            if (ratio('#ec4899') >= 3 && lb >= 0.1) return 'transparent';
-            return ratio('#ffffff') >= ratio('#111827') ? '#ffffff' : '#111827';
+            if (ratio('#ffffff') >= 3) return '#ffffff';
+            return ratio('#ec4899') >= 3 ? 'transparent' : '#111827';
         }
         function setGenUnderline(el, bg) {
             // On dark colours the genitive underline turns fully white; elsewhere it stays pink (with dark gaps where pink alone is too faint).
@@ -605,19 +605,6 @@
                 list.appendChild(chip);
             });
             box.appendChild(list);
-            // Keyboard shortcuts
-            const keys = document.createElement('div'); keys.className = 'legend-keys';
-            const kt = document.createElement('div'); kt.className = 'legend-keys-title'; kt.textContent = t.keysTitle;
-            const kh = document.createElement('p'); kh.textContent = t.keysHint;
-            keys.append(kt, kh);
-            const keyRow = (labels, text) => {
-                const row = document.createElement('div'); row.className = 'key-row';
-                labels.forEach(l => { const k = document.createElement('kbd'); k.textContent = l; row.appendChild(k); });
-                const span = document.createElement('span'); span.className = 'key-text'; span.textContent = text; row.appendChild(span);
-                keys.appendChild(row);
-            };
-            if (totalGens > 0) keyRow(['G'], t.keysGen);
-            box.appendChild(keys);
         }
         function openColorPopover(label, anchor) {
             const pop = document.getElementById('color-popover'); const t = studentTexts[currentLang];
@@ -1174,7 +1161,7 @@ function dismissToastOnInteraction() {
         }
 
         function closeResults() { document.getElementById('results-modal').style.display = 'none'; }
-        function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
+        function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], {type: 'text/html'})); a.download = ((titleInput || studentTexts[currentLang].docTitle).replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '').replace(/\s+/g, ' ').trim().replace(/^\.+/, '') || 'Syntax-Studio Latein') + '.html'; a.click(); }
         document.addEventListener('mousedown', (e) => { 
             if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; 
             if(!e.target.closest('#color-popover, .legend-chip')) closeColorPopover(false);
@@ -1246,6 +1233,7 @@ function isTextTooLong(text, maxWords) {
 // ==========================================
 const CONFIG = {
     STORAGE_KEY: 'latin_tool_autosave',
+    COLOR_PREF_KEY: 'latin_tool_label_colors', // the teacher's colour choices, reused for every new exercise in this browser
     PUNCT: 'Punct',
     OTHER_EN: 'Other',
     OTHER_DE: 'Sonstiges',
@@ -1383,7 +1371,11 @@ const AppState = {
         const lastState = this.history.pop();
         this.groups = lastState.groups;
         this.words = lastState.words;
-        if (lastState.colors) this.colors = lastState.colors;
+        if (lastState.colors) {
+            const changed = JSON.stringify(lastState.colors) !== JSON.stringify(this.colors);
+            this.colors = lastState.colors;
+            if (changed) saveTeacherColors(); // undoing a colour change also updates the remembered colours
+        }
         this.ui.startIdx = null;
         
         // Automatically trigger UI updates and save on undo
@@ -1619,6 +1611,7 @@ function initApp() {
     importKeyFromUrl();
     CONFIG.PRESETS.en.advanced.forEach((f) => { if(!AppState.colors[f]) AppState.colors[f] = '#e5e7eb'; });
     CONFIG.PRESETS.de.advanced.forEach((f) => { if(!AppState.colors[f]) AppState.colors[f] = '#e5e7eb'; });
+    loadTeacherColors(); // the teacher's earlier colour choices replace the standard colours (a loaded project still uses its own)
     
     changeLanguage('de'); 
     changeLevel('advanced');
@@ -1626,6 +1619,11 @@ function initApp() {
 
     initEventListeners();
     StorageManager.checkAutoSaveOnLoad();    
+}
+
+function safeFileName(name) {
+    // Keep the title readable as a file name ("Syntax-Studio Latein.html"); only characters that file systems forbid are removed.
+    return String(name || '').replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '').replace(/\s+/g, ' ').trim().replace(/^\.+/, '') || 'Syntax-Studio Latein';
 }
 
 function getUnusedSafeColor() {
@@ -1877,13 +1875,13 @@ function setGenUnderline(el, bg) {
     el.style.setProperty('--gen-alt', alt === '#ffffff' ? 'transparent' : alt);
 }
 function genAltColor(bg) {
-    // Colour for the gaps of the pink genitive underline: none on very light backgrounds (pink alone is clearly visible),
-    // otherwise white or near-black, whichever contrasts more, so the line stays visible on any label colour.
+    // Genitive underline colour: fully white on dark and medium colours (every red included); on light colours pink,
+    // with near-black gaps where pink alone would be too faint. Returns the gap colour; '#ffffff' means 'all white'.
     const lum = (hex) => { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n) || f.length !== 6) return null; return [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0); };
     const lb = lum(bg); if (lb === null) return 'transparent';
     const ratio = (c) => { const l = lum(c); return (Math.max(l, lb) + 0.05) / (Math.min(l, lb) + 0.05); };
-    if (ratio('#ec4899') >= 3 && lb >= 0.1) return 'transparent';
-    return ratio('#ffffff') >= ratio('#111827') ? '#ffffff' : '#111827';
+    if (ratio('#ffffff') >= 3) return '#ffffff';
+    return ratio('#ec4899') >= 3 ? 'transparent' : '#111827';
 }
 function isDarkColor(hex) { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n)) return false; return (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) < 140; }
 function findColorOwner(label, col) {
@@ -1897,6 +1895,17 @@ function counterpartLabel(label) {
     return cp && cp !== label ? cp : null;
 }
 
+function saveTeacherColors() {
+    try { localStorage.setItem(CONFIG.COLOR_PREF_KEY, JSON.stringify(AppState.colors)); } catch (e) { console.warn("Could not save colours (storage blocked).", e); }
+}
+
+function loadTeacherColors() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(CONFIG.COLOR_PREF_KEY) || '{}') || {};
+        Object.keys(saved).forEach(l => { if (typeof saved[l] === 'string' && /^#[0-9a-f]{3,8}$/i.test(saved[l])) AppState.colors[l] = saved[l]; });
+    } catch (e) { console.warn("Could not read saved colours.", e); }
+}
+
 function setLabelColor(label, col) {
     const oldCol = AppState.colors[label];
     if (!col || (oldCol || '').toLowerCase() === col.toLowerCase()) return;
@@ -1908,6 +1917,7 @@ function setLabelColor(label, col) {
     owners.forEach(o => apply(o, CONFIG.NEUTRAL_COLOR));
     renderPalette();
     renderEditor();
+    saveTeacherColors();
     StorageManager.debouncedAutoSave();
 }
 
@@ -3005,7 +3015,7 @@ function exportToStudent() {
 
     const defaultTitle = AppState.lang === 'en' ? 'Latin Syntax Studio' : 'Syntax-Studio Latein';
     const titleInput = DOM.pageTitle.value || defaultTitle;
-    const filename = titleInput.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".html";
+    const filename = safeFileName(titleInput) + ".html";
     const imgUrl = DOM.pageImage.value; const teacherNotes = DOM.teacherNotes.value;
     // Creates a simple, stable hash from a string
 	const generateStableId = (str) => {
