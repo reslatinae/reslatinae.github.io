@@ -1177,6 +1177,7 @@ const CONFIG = {
     MAIN_CLAUSE_EN: 'Main clause',
     MAIN_CLAUSE_DE: 'Hauptsatz',
     SENTENCE_ENDERS: ['.', '!', '?', '·'],
+    NEUTRAL_COLOR: '#e5e7eb', // grey given to a label whose colour was taken by another label
     AI: {
         ENDPOINT: 'https://api.openai.com/v1/responses',
         PROXY_URL: 'https://latin-syntax-proxy.latin-syntax-proxy.workers.dev/',            // set to the deployed worker URL (see worker/README.md): requests then go there WITHOUT a key and the key button disappears
@@ -1220,7 +1221,7 @@ const CONFIG = {
             aiErrOther: "OpenAI error: ",
             aiCoverageWarn: "The AI's answer does not match the text word for word.", aiMissingWords: "Missing from the answer: ", aiExtraWords: "Not in the text: ", aiCoverageAsk: "Import anyway? (Cancel to try again.)",
             phWordErrorHint: "E.g. Check the case ending...", phGroupErrorHint: "E.g. Think about what introduces this clause...",
-            colorBtn: "Change colour", colorTitle: "Colour for:", colorSwap: "Swap with: ", colorReset: "↺ Default colour"
+            colorBtn: "Change colour", colorTitle: "Colour for:", colorInUse: "Used by {label} (it will turn grey)", colorReset: "↺ Default colour"
         },
         de: {
             heading: "Syntax-Studio Latein", instrH3: "Schritt 1: Einrichtung",
@@ -1251,7 +1252,7 @@ const CONFIG = {
             aiErrOther: "OpenAI-Fehler: ",
             aiCoverageWarn: "Die Antwort der KI stimmt nicht Wort für Wort mit dem Text überein.", aiMissingWords: "In der Antwort fehlt: ", aiExtraWords: "Nicht im Text: ", aiCoverageAsk: "Trotzdem importieren? (Abbrechen, um es erneut zu versuchen.)",
             phWordErrorHint: "Z.B. Achte auf die Kasusendung...", phGroupErrorHint: "Z.B. Überlege, was diesen Satz einleitet...",
-            colorBtn: "Farbe ändern", colorTitle: "Farbe für:", colorSwap: "Tauschen mit: ", colorReset: "↺ Standardfarbe"
+            colorBtn: "Farbe ändern", colorTitle: "Farbe für:", colorInUse: "Belegt von {label} (wird dann grau)", colorReset: "↺ Standardfarbe"
         }
     }
 };
@@ -1810,10 +1811,11 @@ function setLabelColor(label, col) {
     const oldCol = AppState.colors[label];
     if (!col || (oldCol || '').toLowerCase() === col.toLowerCase()) return;
     AppState.saveToHistory();
-    const owner = findColorOwner(label, col); // a colour already in use is swapped, so no two labels share a colour
+    // A label that already had this colour turns grey, so no two labels share a colour; the teacher can then give it a new one.
+    const owners = AppState.functions.filter(f => f !== label && (AppState.colors[f] || '').toLowerCase() === col.toLowerCase());
     const apply = (l, c) => { AppState.colors[l] = c; const cp = counterpartLabel(l); if (cp) AppState.colors[cp] = c; };
     apply(label, col);
-    if (owner && oldCol) apply(owner, oldCol);
+    owners.forEach(o => apply(o, CONFIG.NEUTRAL_COLOR));
     renderPalette();
     renderEditor();
     StorageManager.debouncedAutoSave();
@@ -1831,7 +1833,7 @@ function openColorPopover(label, anchor) {
         sw.style.backgroundColor = col; sw.style.color = isDarkColor(col) ? '#fff' : '#111827';
         if (col.toLowerCase() === current) sw.classList.add('current');
         const owner = findColorOwner(label, col);
-        if (owner) { sw.textContent = '⇄'; sw.title = txt.colorSwap + owner; } else { sw.title = col; }
+        if (owner) { sw.textContent = '•'; sw.title = txt.colorInUse.replace('{label}', owner); } else { sw.title = col; }
         sw.setAttribute('aria-label', sw.title);
         sw.addEventListener('click', () => { closeColorPopover(); setLabelColor(label, col); });
         grid.appendChild(sw);
