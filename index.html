@@ -49,6 +49,19 @@
         .p-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: all 0.15s ease-in-out; color: #111827 !important; }
         .p-btn.active { border-color: #111827; box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1); }
         .p-btn u { text-decoration: underline; text-underline-offset: 2px; font-weight: 700; }
+        .p-wrap { display: inline-flex; align-items: stretch; }
+        .p-wrap .p-btn { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+        .p-color { border: 1px solid transparent; border-left: 1px solid rgba(17,24,39,0.2); border-radius: 0 6px 6px 0; padding: 0 7px; cursor: pointer; font-size: 0.7rem; color: #111827; }
+        .p-color:hover { filter: brightness(0.92); }
+        .p-color:focus-visible { outline: 2px solid #111827; outline-offset: 1px; }
+        .color-popover { display: none; position: fixed; z-index: 1500; background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.15); width: max-content; max-width: 260px; }
+        .color-pop-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; color: #111827; }
+        .color-pop-grid { display: grid; grid-template-columns: repeat(6, 30px); gap: 6px; }
+        .color-swatch { width: 30px; height: 30px; border-radius: 6px; border: 1px solid rgba(17,24,39,0.25); cursor: pointer; padding: 0; font-size: 0.75rem; color: #111827; }
+        .color-swatch:hover, .color-swatch:focus-visible { outline: 2px solid #111827; outline-offset: 1px; }
+        .color-swatch.current { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111827; }
+        .color-pop-reset { margin-top: 10px; width: 100%; padding: 6px; border: 1px solid #e5e7eb; background: #f9fafb; border-radius: 6px; cursor: pointer; font-size: 0.8rem; color: #374151; }
+        .color-pop-reset:hover { background: #f3f4f6; }
         
         .zoom-controls { display: flex; gap: 6px; align-items: center; background: #f3f4f6; padding: 4px 8px; border-radius: 6px; border: 1px solid #e5e7eb; }
         .z-btn { background: white; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.9rem; font-weight: bold; color: #374151; transition: background 0.1s; }
@@ -149,6 +162,10 @@
         body.high-contrast .bracket-badge, body.high-contrast .bracket-end-controls { border: 1px solid #fff !important; }
         body.high-contrast .attr-underline { border-bottom-color: #f472b6 !important; }
         body.high-contrast .tag-word.attr-underline::after { color: #f472b6; border-color: #f472b6; background: #000; }
+        body.high-contrast .color-popover { background: #1e1e1e; border-color: #555; }
+        body.high-contrast .color-pop-title { color: #fff; }
+        body.high-contrast .color-swatch.current { box-shadow: 0 0 0 2px #1e1e1e, 0 0 0 4px #fff; }
+        body.high-contrast .color-pop-reset { background: #333; color: #fff; border-color: #555; }
 
         @media (max-width: 768px) {
             body { margin: 10px; padding: 0; } .container { padding: 20px; } .setup-row { flex-direction: column; gap: 12px; }
@@ -329,6 +346,7 @@
     </div>
 
     <div id="autosave-status" data-ref="autosaveStatus">Autosaved</div>
+    <div id="color-popover" class="color-popover" data-ref="colorPopover" role="dialog"></div>
 <!-- ========================================== -->
     <!-- STUDENT PAGE TEMPLATES -->
     <!-- ========================================== -->
@@ -395,6 +413,22 @@
         
         .gen-btn { color: #ec4899; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 4px; display: none; }
 
+        .color-panel { display: none; position: absolute; z-index: 1100; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.15); width: 280px; max-height: 70vh; overflow-y: auto; line-height: 1.3; box-sizing: border-box; }
+        .color-panel-head { display: flex; justify-content: space-between; align-items: center; font-weight: 600; margin-bottom: 4px; color: #111827; }
+        .color-panel-close { border: none; background: transparent; cursor: pointer; font-size: 1rem; color: #4b5563; padding: 2px 6px; border-radius: 4px; }
+        .color-panel-close:hover { background: #f3f4f6; }
+        .color-panel-hint { font-size: 0.8rem; color: #6b7280; margin: 0 0 8px; }
+        .color-row { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: none; background: transparent; padding: 5px 6px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #374151; font-family: inherit; }
+        .color-row:hover, .color-row:focus-visible, .color-row.open { background: #f3f4f6; outline: none; }
+        .color-row:focus-visible { box-shadow: inset 2px 0 0 0 #3b82f6; }
+        .color-chip { width: 18px; height: 18px; border-radius: 4px; border: 1px solid rgba(17,24,39,0.25); flex-shrink: 0; }
+        .color-grid { display: grid; grid-template-columns: repeat(6, 30px); gap: 6px; padding: 6px 6px 10px 32px; }
+        .color-swatch { width: 30px; height: 30px; border-radius: 6px; border: 1px solid rgba(17,24,39,0.25); cursor: pointer; padding: 0; font-size: 0.75rem; color: #111827; }
+        .color-swatch:hover, .color-swatch:focus-visible { outline: 2px solid #111827; outline-offset: 1px; }
+        .color-swatch.current { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111827; }
+        .color-panel-reset { margin-top: 8px; width: 100%; padding: 6px; border: 1px solid #e5e7eb; background: #f9fafb; border-radius: 6px; cursor: pointer; font-size: 0.8rem; color: #374151; font-family: inherit; }
+        .color-panel-reset:hover { background: #f3f4f6; }
+
         .footer-toolbar { margin-top: 40px; padding: 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
         .btn { padding: 10px 20px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font-weight: 500; color: white; background: #1f2937; transition: opacity 0.2s; }
         .btn:hover { opacity: 0.9; }
@@ -439,6 +473,12 @@
         body.high-contrast #results-modal .results-textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
         body.high-contrast .tooltip-text { background-color: #fff; color: #000; border: 1px solid #ccc; }
         body.high-contrast .tooltip-text::after { border-color: #fff transparent transparent transparent; }
+        body.high-contrast .color-panel { background: #1e1e1e; border-color: #555; color: #fff; }
+        body.high-contrast .color-panel-head, body.high-contrast .color-row, body.high-contrast .color-panel-close { color: #fff; }
+        body.high-contrast .color-panel-hint { color: #d1d5db; }
+        body.high-contrast .color-row:hover, body.high-contrast .color-row:focus-visible, body.high-contrast .color-row.open, body.high-contrast .color-panel-close:hover { background: #333; }
+        body.high-contrast .color-swatch.current { box-shadow: 0 0 0 2px #1e1e1e, 0 0 0 4px #fff; }
+        body.high-contrast .color-panel-reset { background: #333; color: #fff; border-color: #555; }
         
         @media (max-width: 768px) {
             body { margin: 15px; } .exercise-wrapper { padding: 20px; line-height: 4.5; }
@@ -446,8 +486,9 @@
             .s-group { padding-top: 24px; margin: 20px 2px 0 2px; } .sentence-container { padding: 20px 10px 10px 10px; }
             .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-radius: 8px; }
             .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f3f4f6; }
+            .color-panel { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-width: 340px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         }
-        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal { display: none !important; } }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal, #color-panel { display: none !important; } }
     </script>
 
     <script type="text/template" id="template-student-js" data-ref="templateStudentJs">
@@ -456,6 +497,105 @@
         const totalPhrases = document.querySelectorAll('.hover-word, .g-label').length;
         const totalGens = document.querySelectorAll('.s-text[data-u="true"]').length;
         const totalItems = totalPhrases + totalGens;
+
+        // ---- Colour choice (per label, saved in this browser for all exercises) ----
+        const COLOR_PREF_KEY = 'latin_student_colors';
+        const teacherColors = Object.assign({}, colors); // the teacher's colours, before any student preference is applied
+        let colorPanelLabel = null;
+
+        function colorCounterpart(label) {
+            const other = currentLang === 'de' ? 'en' : 'de';
+            const cp = (labelMap[other] || {})[label];
+            return cp && cp !== label ? cp : null;
+        }
+        function currentLabels() { return Array.from(document.querySelectorAll('.menu-btn:not(.gen-btn)')).map(b => b.dataset.val); }
+        function readColorPrefs() { try { return JSON.parse(localStorage.getItem(COLOR_PREF_KEY) || '{}') || {}; } catch(e) { return {}; } }
+        function writeColorPrefs(p) { try { localStorage.setItem(COLOR_PREF_KEY, JSON.stringify(p)); } catch(e) { console.warn("Could not save colours (storage blocked).", e); } }
+        function applyStoredColors() {
+            const p = readColorPrefs();
+            Object.keys(p).forEach(l => { if (typeof p[l] === 'string' && /^#[0-9a-f]{3,8}$/i.test(p[l])) colors[l] = p[l]; });
+        }
+        function recolorSolved() {
+            document.querySelectorAll('.hover-word[data-done="true"]').forEach(el => { if (colors[el.dataset.ans]) el.style.backgroundColor = colors[el.dataset.ans]; });
+        }
+        function findColorOwner(label, col) {
+            return currentLabels().find(l => l !== label && (colors[l] || '').toLowerCase() === col.toLowerCase());
+        }
+        function isDarkColor(hex) { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n)) return false; return (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) < 140; }
+        function setStudentColor(label, col) {
+            const old = colors[label];
+            if ((old || '').toLowerCase() === col.toLowerCase()) return;
+            const owner = findColorOwner(label, col); // a colour already in use is swapped, so no two labels share a colour
+            const prefs = readColorPrefs();
+            const apply = (l, c) => { [l, colorCounterpart(l)].forEach(k => { if (k) { colors[k] = c; prefs[k] = c; } }); };
+            apply(label, col);
+            if (owner && old) apply(owner, old);
+            writeColorPrefs(prefs); recolorSolved(); renderColorPanel();
+            const cur = document.querySelector('#color-panel .color-swatch.current'); if (cur) cur.focus();
+        }
+        function resetStudentColors() {
+            try { localStorage.removeItem(COLOR_PREF_KEY); } catch(e) {}
+            Object.keys(teacherColors).forEach(k => { colors[k] = teacherColors[k]; });
+            recolorSolved(); renderColorPanel();
+        }
+        function renderColorPanel() {
+            const panel = document.getElementById('color-panel'); const t = studentTexts[currentLang];
+            panel.innerHTML = '';
+            const head = document.createElement('div'); head.className = 'color-panel-head';
+            const ttl = document.createElement('span'); ttl.textContent = '🎨 ' + t.colorsTitle;
+            const x = document.createElement('button'); x.type = 'button'; x.className = 'color-panel-close'; x.textContent = '✕'; x.title = t.close; x.onclick = closeColorPanel;
+            head.append(ttl, x); panel.appendChild(head);
+            const hint = document.createElement('p'); hint.className = 'color-panel-hint'; hint.textContent = t.colorsHint; panel.appendChild(hint);
+            currentLabels().forEach(label => {
+                const row = document.createElement('button'); row.type = 'button'; row.className = 'color-row' + (label === colorPanelLabel ? ' open' : '');
+                row.setAttribute('aria-expanded', label === colorPanelLabel ? 'true' : 'false');
+                const chip = document.createElement('span'); chip.className = 'color-chip'; chip.style.backgroundColor = colors[label] || '#e5e7eb';
+                const name = document.createElement('span'); name.textContent = label;
+                row.append(chip, name);
+                row.onclick = () => {
+                    colorPanelLabel = colorPanelLabel === label ? null : label; renderColorPanel();
+                    const again = Array.from(document.querySelectorAll('#color-panel .color-row')).find(r => r.lastChild.textContent === label);
+                    if (again) again.focus();
+                };
+                panel.appendChild(row);
+                if (label === colorPanelLabel) {
+                    const grid = document.createElement('div'); grid.className = 'color-grid';
+                    SAFE_COLORS.forEach(col => {
+                        const sw = document.createElement('button'); sw.type = 'button'; sw.className = 'color-swatch'; sw.style.backgroundColor = col; sw.style.color = isDarkColor(col) ? '#fff' : '#111827';
+                        if ((colors[label] || '').toLowerCase() === col.toLowerCase()) sw.classList.add('current');
+                        const owner = findColorOwner(label, col);
+                        if (owner) { sw.textContent = '⇄'; sw.title = t.colorsSwap + owner; } else { sw.title = col; }
+                        sw.setAttribute('aria-label', sw.title);
+                        sw.onclick = () => setStudentColor(label, col);
+                        grid.appendChild(sw);
+                    });
+                    panel.appendChild(grid);
+                }
+            });
+            const reset = document.createElement('button'); reset.type = 'button'; reset.className = 'color-panel-reset'; reset.textContent = t.colorsReset; reset.onclick = resetStudentColors;
+            panel.appendChild(reset);
+        }
+        function toggleColorPanel(e) {
+            if (e) e.stopPropagation();
+            const panel = document.getElementById('color-panel');
+            if (panel.style.display === 'block') { closeColorPanel(); return; }
+            colorPanelLabel = null; renderColorPanel(); panel.style.display = 'block';
+            if (window.innerWidth > 768) {
+                const r = document.getElementById('btn-colors').getBoundingClientRect();
+                panel.style.top = (r.bottom + window.scrollY + 6) + 'px';
+                panel.style.left = Math.max(8, r.right + window.scrollX - panel.offsetWidth) + 'px';
+            }
+            const first = panel.querySelector('.color-row'); if (first) first.focus();
+        }
+        function closeColorPanel() {
+            const panel = document.getElementById('color-panel');
+            if (panel) panel.style.display = 'none';
+            colorPanelLabel = null;
+        }
+        document.addEventListener('keydown', (e) => {
+            const panel = document.getElementById('color-panel');
+            if (e.key === 'Escape' && panel && panel.style.display === 'block') { e.preventDefault(); closeColorPanel(); document.getElementById('btn-colors').focus(); }
+        });
 
         function updateStudentShortcuts() {
             labelShortcuts = {};
@@ -508,6 +648,7 @@
 
         document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.target.closest && e.target.closest('#color-panel')) return; // label shortcuts are off while choosing colours
             let targetEl = hoveredStudentEl;
             if (!targetEl && document.activeElement && (document.activeElement.classList.contains('hover-word') || document.activeElement.classList.contains('g-label'))) { targetEl = document.activeElement; }
             if (!targetEl) return;
@@ -586,6 +727,9 @@
                 }
             });
             updateStudentShortcuts(); 
+            const colorsBtn = document.getElementById('btn-colors'); if (colorsBtn) colorsBtn.title = t.colorsTitle;
+            const colorPanel = document.getElementById('color-panel');
+            if (colorPanel && colorPanel.style.display === 'block') { colorPanelLabel = null; renderColorPanel(); }
         }
 
         function setStudentZoom(delta) {
@@ -959,10 +1103,12 @@ function dismissToastOnInteraction() {
         function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
         document.addEventListener('mousedown', (e) => { 
             if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; 
+            if(!e.target.closest('#color-panel, #btn-colors')) closeColorPanel();
             if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
         });
 
         function initStudentPage() {
+            applyStoredColors(); // before progress is restored, so restored answers already use the student's colours
             let pendingMode = null;
             try { pendingMode = sessionStorage.getItem(saveKey + '_mode'); sessionStorage.removeItem(saveKey + '_mode'); } catch(e) {}
             if (pendingMode === 'practise' || pendingMode === 'exam') setMode(pendingMode);
@@ -1053,7 +1199,7 @@ const CONFIG = {
             btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
             lblLevel: "Grammar Level:", optBeg: "Beginner", optInt: "Intermediate", optAdv: "Advanced (All)",
             editH3: "Step 2: Editing Instruction",
-            editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically. Use 'Manual Split' to separate. Use 'Define Word Group' to group phrases. You can use 'Mark Genitive' to draw an underline marking a genitive attribute inside a larger phrase group! Double-click any word or punctuation to edit it or add a hint. Shortcuts: 'X' for Split, 'M' for Word Group, 'G' for Genitive Underline, 'W' to Toggle Break, Ctrl+Z to Undo. At the end, hit 'Export Student Page'.",
+            editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically. Use 'Manual Split' to separate. Use 'Define Word Group' to group phrases. You can use 'Mark Genitive' to draw an underline marking a genitive attribute inside a larger phrase group! Double-click any word or punctuation to edit it or add a hint. Shortcuts: 'X' for Split, 'M' for Word Group, 'G' for Genitive Underline, 'W' to Toggle Break, Ctrl+Z to Undo. Click ▾ next to a label (or right-click the label) to change its colour. At the end, hit 'Export Student Page'.",
            	wordModalTitle: "Edit Word & Hint", wordTextLabel: "Word Text:", hintLabel: "Hint (optional):", groupHintLabel: "Group Hint (optional):",
             errorHintLabel: "Hint after wrong answer (optional):",
             phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (W)", btnBracket: "Define Word Group (M)", btnAttr: "Mark Genitive (G)",
@@ -1073,7 +1219,8 @@ const CONFIG = {
             aiErrNetwork: "Could not reach OpenAI (network problem or timeout). Please check your connection and try again.",
             aiErrOther: "OpenAI error: ",
             aiCoverageWarn: "The AI's answer does not match the text word for word.", aiMissingWords: "Missing from the answer: ", aiExtraWords: "Not in the text: ", aiCoverageAsk: "Import anyway? (Cancel to try again.)",
-            phWordErrorHint: "E.g. Check the case ending...", phGroupErrorHint: "E.g. Think about what introduces this clause..."
+            phWordErrorHint: "E.g. Check the case ending...", phGroupErrorHint: "E.g. Think about what introduces this clause...",
+            colorBtn: "Change colour", colorTitle: "Colour for:", colorSwap: "Swap with: ", colorReset: "↺ Default colour"
         },
         de: {
             heading: "Syntax-Studio Latein", instrH3: "Schritt 1: Einrichtung",
@@ -1083,7 +1230,7 @@ const CONFIG = {
             btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
             lblLevel: "Grammatik-Level:", optBeg: "Anfänger", optInt: "Fortgeschritten", optAdv: "Profi (Alle)",
             editH3: "Schritt 2: Bearbeitung",
-            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer größeren Gruppe durch Unterstreichung hervorheben! Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Shortcuts: 'X' für Trennen, 'M' für Wortgruppe, 'G' für Genitiv-Unterstreichung, 'W' für Umbruch, Strg+Z für Rückgängig.",
+            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer größeren Gruppe durch Unterstreichung hervorheben! Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Shortcuts: 'X' für Trennen, 'M' für Wortgruppe, 'G' für Genitiv-Unterstreichung, 'W' für Umbruch, Strg+Z für Rückgängig. Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe.",
            	wordModalTitle: "Wort & Hinweis bearbeiten", wordTextLabel: "Worttext:", hintLabel: "Hinweis (optional):", groupHintLabel: "Gruppen-Hinweis (optional):",
             errorHintLabel: "Hinweis nach falscher Antwort (optional):",
             phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (W)", btnBracket: "Wortgruppe definieren (M)", btnAttr: "Genitiv markieren (G)",
@@ -1103,7 +1250,8 @@ const CONFIG = {
             aiErrNetwork: "OpenAI nicht erreichbar (Netzwerkproblem oder Zeitüberschreitung). Bitte Verbindung prüfen und erneut versuchen.",
             aiErrOther: "OpenAI-Fehler: ",
             aiCoverageWarn: "Die Antwort der KI stimmt nicht Wort für Wort mit dem Text überein.", aiMissingWords: "In der Antwort fehlt: ", aiExtraWords: "Nicht im Text: ", aiCoverageAsk: "Trotzdem importieren? (Abbrechen, um es erneut zu versuchen.)",
-            phWordErrorHint: "Z.B. Achte auf die Kasusendung...", phGroupErrorHint: "Z.B. Überlege, was diesen Satz einleitet..."
+            phWordErrorHint: "Z.B. Achte auf die Kasusendung...", phGroupErrorHint: "Z.B. Überlege, was diesen Satz einleitet...",
+            colorBtn: "Farbe ändern", colorTitle: "Farbe für:", colorSwap: "Tauschen mit: ", colorReset: "↺ Standardfarbe"
         }
     }
 };
@@ -1148,7 +1296,8 @@ const AppState = {
     saveToHistory() {
         this.history.push({ 
             words: JSON.parse(JSON.stringify(this.words)), 
-            groups: JSON.parse(JSON.stringify(this.groups)) 
+            groups: JSON.parse(JSON.stringify(this.groups)),
+            colors: JSON.parse(JSON.stringify(this.colors))
         });
         if (this.history.length > 50) this.history.shift();
     },
@@ -1158,10 +1307,12 @@ const AppState = {
         const lastState = this.history.pop();
         this.groups = lastState.groups;
         this.words = lastState.words;
+        if (lastState.colors) this.colors = lastState.colors;
         this.ui.startIdx = null;
         
         // Automatically trigger UI updates and save on undo
         renderEditor();
+        renderPalette();
         StorageManager.debouncedAutoSave();
         return true;
     },
@@ -1609,9 +1760,11 @@ function updateStatus() {
 }
 
 function renderPalette() {
+    closeColorPopover();
     updateShortcuts();
     const p = DOM.labelPalette; 
     p.innerHTML = '';
+    const txt = CONFIG.LANG_TEXT[AppState.lang];
     
     AppState.functions.forEach((f) => {
         const b = document.createElement('button');
@@ -1626,9 +1779,81 @@ function renderPalette() {
         }
         b.innerHTML = innerHTML;
         b.addEventListener('click', () => { AppState.activeFunc = f; setMode(MODES.TAGGING); });
-        p.appendChild(b);
+
+        const wrap = document.createElement('span'); wrap.className = 'p-wrap';
+        const c = document.createElement('button');
+        c.type = 'button'; c.className = 'p-color'; c.textContent = '▾';
+        c.style.backgroundColor = AppState.colors[f];
+        c.title = txt.colorBtn; c.setAttribute('aria-label', txt.colorBtn + ': ' + f);
+        c.addEventListener('click', (e) => { e.stopPropagation(); openColorPopover(f, wrap); });
+        b.addEventListener('contextmenu', (e) => { e.preventDefault(); openColorPopover(f, wrap); });
+        wrap.append(b, c);
+        p.appendChild(wrap);
     });
     updateStatus();
+}
+
+// ---- Label colours: choose from the colour-blind-safe palette ----
+function isDarkColor(hex) { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n)) return false; return (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) < 140; }
+function findColorOwner(label, col) {
+    return AppState.functions.find(f => f !== label && (AppState.colors[f] || '').toLowerCase() === col.toLowerCase());
+}
+
+function counterpartLabel(label) {
+    // The same label in the other language (Subjekt <-> Subject), so a colour survives the language switch.
+    const other = AppState.lang === 'de' ? 'en' : 'de';
+    const cp = (LatinLabels.buildLabelMap()[other] || {})[label];
+    return cp && cp !== label ? cp : null;
+}
+
+function setLabelColor(label, col) {
+    const oldCol = AppState.colors[label];
+    if (!col || (oldCol || '').toLowerCase() === col.toLowerCase()) return;
+    AppState.saveToHistory();
+    const owner = findColorOwner(label, col); // a colour already in use is swapped, so no two labels share a colour
+    const apply = (l, c) => { AppState.colors[l] = c; const cp = counterpartLabel(l); if (cp) AppState.colors[cp] = c; };
+    apply(label, col);
+    if (owner && oldCol) apply(owner, oldCol);
+    renderPalette();
+    renderEditor();
+    StorageManager.debouncedAutoSave();
+}
+
+function openColorPopover(label, anchor) {
+    const pop = DOM.colorPopover; const txt = CONFIG.LANG_TEXT[AppState.lang];
+    const current = (AppState.colors[label] || '').toLowerCase();
+    pop.innerHTML = '';
+    const title = document.createElement('div'); title.className = 'color-pop-title'; title.textContent = txt.colorTitle + ' ' + label;
+    pop.appendChild(title);
+    const grid = document.createElement('div'); grid.className = 'color-pop-grid';
+    CONFIG.SAFE_COLORS.forEach(col => {
+        const sw = document.createElement('button'); sw.type = 'button'; sw.className = 'color-swatch';
+        sw.style.backgroundColor = col; sw.style.color = isDarkColor(col) ? '#fff' : '#111827';
+        if (col.toLowerCase() === current) sw.classList.add('current');
+        const owner = findColorOwner(label, col);
+        if (owner) { sw.textContent = '⇄'; sw.title = txt.colorSwap + owner; } else { sw.title = col; }
+        sw.setAttribute('aria-label', sw.title);
+        sw.addEventListener('click', () => { closeColorPopover(); setLabelColor(label, col); });
+        grid.appendChild(sw);
+    });
+    pop.appendChild(grid);
+    const def = CONFIG.SEMANTIC_COLORS[label];
+    if (def && def.toLowerCase() !== current) {
+        const reset = document.createElement('button'); reset.type = 'button'; reset.className = 'color-pop-reset';
+        reset.textContent = txt.colorReset;
+        reset.addEventListener('click', () => { closeColorPopover(); setLabelColor(label, def); });
+        pop.appendChild(reset);
+    }
+    pop.style.display = 'block';
+    const r = anchor.getBoundingClientRect();
+    pop.style.top = (r.bottom + 6) + 'px';
+    pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pop.offsetWidth - 8)) + 'px';
+    const first = pop.querySelector('.color-swatch.current') || pop.querySelector('.color-swatch');
+    if (first) first.focus({ preventScroll: true });
+}
+
+function closeColorPopover() {
+    if (DOM.colorPopover) DOM.colorPopover.style.display = 'none';
 }
 
 function renderEditor() {
@@ -1866,6 +2091,12 @@ function initEventListeners() {
     DOM.btnZoomOut.addEventListener('click', () => setTeacherZoom(-0.1));
     DOM.btnZoomReset.addEventListener('click', () => setTeacherZoom(0));
 
+    document.addEventListener('mousedown', (e) => {
+        if (!e.target.closest('#color-popover, .p-color')) closeColorPopover();
+    });
+    window.addEventListener('scroll', closeColorPopover, { passive: true });
+    window.addEventListener('resize', closeColorPopover);
+
     DOM.btnCancelGroup.addEventListener('click', closeGroupModal);
     DOM.btnSaveGroup.addEventListener('click', saveGroupFromModal);
     DOM.btnCancelWord.addEventListener('click', closeWordModal);
@@ -2016,6 +2247,10 @@ function initEventListeners() {
     document.addEventListener('keydown', function(e) {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         if (DOM.editorScreen.style.display !== 'block') return; // editor-only shortcuts (Undo, Escape, tool keys)
+        if (DOM.colorPopover.style.display === 'block') { // no tagging shortcuts while the colour picker is open
+            if (e.key === 'Escape') { e.preventDefault(); closeColorPopover(); }
+            return;
+        }
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); AppState.undo(); return; }
         
        if (e.key === 'Escape') {
@@ -2727,7 +2962,8 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             examResults: "Exam Results", copyResults: "Copy to Clipboard", copied: "Copied!", close: "Close",
             saveWarning: "⚠️ Note: Your progress is saved locally in this web browser. You must open this file on this exact same device and browser to resume your work later. Clearing your browser data will delete your progress. Do you want to save now?",
             resExercise: "Exercise: ", resDate: "Date: ", resScore: "Score: ",
-            markGen: "🖍️ Mark Genitive (G)", unmarkGen: "❌ Unmark Genitive (G)", notGenitive: "Not a genitive attribute!"
+            markGen: "🖍️ Mark Genitive (G)", unmarkGen: "❌ Unmark Genitive (G)", notGenitive: "Not a genitive attribute!",
+            colorsTitle: "Colours", colorsHint: "Choose your own colour for each label. Your choice is saved in this browser.", colorsSwap: "Swap with: ", colorsReset: "↺ Restore the teacher's colours"
         },
         de: {
             instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen. <br><br><strong>Wichtig:</strong> Du musst auch versteckte Genitivattribute aufspüren! Klicke dazu direkt auf das Genitivattribut innerhalb eines Wortblocks und nutze das <strong>🖍️ Genitiv markieren</strong> Werkzeug, um es hervorzuheben. Sobald du jede Wortgruppe korrekt analysiert und alle Genitive gefunden hast, erscheint ein Textfeld für deine Übersetzung.",
@@ -2743,7 +2979,8 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             examResults: "Prüfungsergebnisse", copyResults: "Ergebnisse kopieren", copied: "Kopiert!", close: "Schließen",
             saveWarning: "⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?",
             resExercise: "Übung: ", resDate: "Datum: ", resScore: "Ergebnis: ",
-            markGen: "🖍️ Genitiv markieren (G)", unmarkGen: "❌ Markierung aufheben (G)", notGenitive: "Kein Genitivattribut!"
+            markGen: "🖍️ Genitiv markieren (G)", unmarkGen: "❌ Markierung aufheben (G)", notGenitive: "Kein Genitivattribut!",
+            colorsTitle: "Farben", colorsHint: "Wähle für jede Kategorie deine eigene Farbe. Deine Auswahl wird in diesem Browser gespeichert.", colorsSwap: "Tauschen mit: ", colorsReset: "↺ Farben der Lehrkraft wiederherstellen"
         }
     };
 
@@ -2774,6 +3011,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
                 </div>
                 <button class="z-btn" onclick="togglePatterns()" title="${t.togglePat}">🏁</button>
                 <button class="z-btn" onclick="toggleContrast()" title="${t.toggleCon}">🌗</button>
+                <button class="z-btn" id="btn-colors" onclick="toggleColorPanel(event)" title="${t.colorsTitle}">🎨</button>
                 <span style="border-left: 1px solid #d1d5db; margin: 0 4px; height: 16px;"></span>
                 <button class="z-btn" onclick="setStudentZoom(0.1)" title="Zoom In">🔍 +</button>
                 <button class="z-btn" onclick="setStudentZoom(-0.1)" title="Zoom Out">🔍 -</button>
@@ -2806,8 +3044,10 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             </div>
         </div>
         <div id="toast-container"></div>
+        <div id="color-panel" class="color-panel" role="dialog"></div>
         <script>
             const SHORTCUTS = ${JSON.stringify(LatinLabels.SHORTCUTS)};
+            const SAFE_COLORS = ${JSON.stringify(CONFIG.SAFE_COLORS)};
             const colors = ${JSON.stringify(AppState.colors)}; const abbreviations = ${JSON.stringify(allAbbrevs)}; const labelMap = ${JSON.stringify(labelMap)};
             const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const titleInput = ${JSON.stringify(title).replace(/</g, '\\u003c')};
             const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + '${exerciseId}';
