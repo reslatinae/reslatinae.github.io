@@ -413,21 +413,23 @@
         
         .gen-btn { color: #ec4899; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 4px; display: none; }
 
-        .color-panel { display: none; position: absolute; z-index: 1100; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.15); width: 280px; max-height: 70vh; overflow-y: auto; line-height: 1.3; box-sizing: border-box; }
-        .color-panel-head { display: flex; justify-content: space-between; align-items: center; font-weight: 600; margin-bottom: 4px; color: #111827; }
-        .color-panel-close { border: none; background: transparent; cursor: pointer; font-size: 1rem; color: #4b5563; padding: 2px 6px; border-radius: 4px; }
-        .color-panel-close:hover { background: #f3f4f6; }
-        .color-panel-hint { font-size: 0.8rem; color: #6b7280; margin: 0 0 8px; }
-        .color-row { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: none; background: transparent; padding: 5px 6px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #374151; font-family: inherit; }
-        .color-row:hover, .color-row:focus-visible, .color-row.open { background: #f3f4f6; outline: none; }
-        .color-row:focus-visible { box-shadow: inset 2px 0 0 0 #3b82f6; }
-        .color-chip { width: 18px; height: 18px; border-radius: 4px; border: 1px solid rgba(17,24,39,0.25); flex-shrink: 0; }
-        .color-grid { display: grid; grid-template-columns: repeat(6, 30px); gap: 6px; padding: 6px 6px 10px 32px; }
-        .color-swatch { width: 30px; height: 30px; border-radius: 6px; border: 1px solid rgba(17,24,39,0.25); cursor: pointer; padding: 0; font-size: 0.75rem; color: #111827; }
+        .label-legend { position: sticky; top: 0; z-index: 60; background: rgba(255,255,255,0.97); border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px; margin: 0 0 16px; line-height: 1.3; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+        .legend-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-bottom: 8px; }
+        .legend-title { font-weight: 600; font-size: 0.85rem; color: #111827; }
+        .legend-hint { font-size: 0.8rem; color: #6b7280; }
+        .legend-list { display: flex; flex-wrap: wrap; gap: 6px; }
+        .legend-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e5e7eb; background: white; border-radius: 999px; padding: 3px 10px 3px 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; color: #374151; font-family: inherit; white-space: nowrap; transition: border-color 0.15s; }
+        .legend-chip:hover, .legend-chip:focus-visible, .legend-chip.open { border-color: #3b82f6; outline: none; }
+        .legend-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(17,24,39,0.25); flex-shrink: 0; }
+        .color-popover { display: none; position: fixed; z-index: 1100; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.15); width: max-content; max-width: 260px; line-height: 1.3; }
+        .color-pop-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; color: #111827; }
+        .color-pop-grid { display: grid; grid-template-columns: repeat(6, 30px); gap: 6px; }
+        .color-swatch { width: 30px; height: 30px; border-radius: 6px; border: 1px solid rgba(17,24,39,0.25); cursor: pointer; padding: 0; font-size: 0.85rem; color: #111827; }
         .color-swatch:hover, .color-swatch:focus-visible { outline: 2px solid #111827; outline-offset: 1px; }
         .color-swatch.current { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111827; }
-        .color-panel-reset { margin-top: 8px; width: 100%; padding: 6px; border: 1px solid #e5e7eb; background: #f9fafb; border-radius: 6px; cursor: pointer; font-size: 0.8rem; color: #374151; font-family: inherit; }
-        .color-panel-reset:hover { background: #f3f4f6; }
+        .color-pop-reset { display: block; margin-top: 8px; width: 100%; padding: 6px; border: 1px solid #e5e7eb; background: #f9fafb; border-radius: 6px; cursor: pointer; font-size: 0.8rem; color: #374151; font-family: inherit; }
+        .color-pop-reset:hover { background: #f3f4f6; }
+
 
         .footer-toolbar { margin-top: 40px; padding: 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
         .btn { padding: 10px 20px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font-weight: 500; color: white; background: #1f2937; transition: opacity 0.2s; }
@@ -473,12 +475,15 @@
         body.high-contrast #results-modal .results-textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
         body.high-contrast .tooltip-text { background-color: #fff; color: #000; border: 1px solid #ccc; }
         body.high-contrast .tooltip-text::after { border-color: #fff transparent transparent transparent; }
-        body.high-contrast .color-panel { background: #1e1e1e; border-color: #555; color: #fff; }
-        body.high-contrast .color-panel-head, body.high-contrast .color-row, body.high-contrast .color-panel-close { color: #fff; }
-        body.high-contrast .color-panel-hint { color: #d1d5db; }
-        body.high-contrast .color-row:hover, body.high-contrast .color-row:focus-visible, body.high-contrast .color-row.open, body.high-contrast .color-panel-close:hover { background: #333; }
+        body.high-contrast .label-legend { background: rgba(30,30,30,0.97); border-color: #444; }
+        body.high-contrast .legend-title { color: #fff; }
+        body.high-contrast .legend-hint { color: #d1d5db; }
+        body.high-contrast .legend-chip { background: #333; color: #fff; border-color: #555; }
+        body.high-contrast .legend-chip:hover, body.high-contrast .legend-chip:focus-visible, body.high-contrast .legend-chip.open { border-color: #fff; }
+        body.high-contrast .color-popover { background: #1e1e1e; border-color: #555; }
+        body.high-contrast .color-pop-title { color: #fff; }
         body.high-contrast .color-swatch.current { box-shadow: 0 0 0 2px #1e1e1e, 0 0 0 4px #fff; }
-        body.high-contrast .color-panel-reset { background: #333; color: #fff; border-color: #555; }
+        body.high-contrast .color-pop-reset { background: #333; color: #fff; border-color: #555; }
         
         @media (max-width: 768px) {
             body { margin: 15px; } .exercise-wrapper { padding: 20px; line-height: 4.5; }
@@ -486,9 +491,10 @@
             .s-group { padding-top: 24px; margin: 20px 2px 0 2px; } .sentence-container { padding: 20px 10px 10px 10px; }
             .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-radius: 8px; }
             .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f3f4f6; }
-            .color-panel { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-width: 340px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+            .legend-list { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+            .color-popover { top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         }
-        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal, #color-panel { display: none !important; } }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal, #color-popover, .legend-hint { display: none !important; } .label-legend { position: static; box-shadow: none; } }
     </script>
 
     <script type="text/template" id="template-student-js" data-ref="templateStudentJs">
@@ -498,10 +504,10 @@
         const totalGens = document.querySelectorAll('.s-text[data-u="true"]').length;
         const totalItems = totalPhrases + totalGens;
 
-        // ---- Colour choice (per label, saved in this browser for all exercises) ----
+        // ---- Legend of all syntactic functions; clicking one changes its colour (saved in this browser for all exercises) ----
         const COLOR_PREF_KEY = 'latin_student_colors';
         const teacherColors = Object.assign({}, colors); // the teacher's colours, before any student preference is applied
-        let colorPanelLabel = null;
+        let legendOpenLabel = null;
 
         function colorCounterpart(label) {
             const other = currentLang === 'de' ? 'en' : 'de';
@@ -518,84 +524,97 @@
         function recolorSolved() {
             document.querySelectorAll('.hover-word[data-done="true"]').forEach(el => { if (colors[el.dataset.ans]) el.style.backgroundColor = colors[el.dataset.ans]; });
         }
+        function isDarkColor(hex) { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n)) return false; return (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) < 140; }
         function findColorOwner(label, col) {
             return currentLabels().find(l => l !== label && (colors[l] || '').toLowerCase() === col.toLowerCase());
         }
-        function isDarkColor(hex) { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n)) return false; return (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) < 140; }
         function setStudentColor(label, col) {
             const old = colors[label];
-            if ((old || '').toLowerCase() === col.toLowerCase()) return;
-            const owner = findColorOwner(label, col); // a colour already in use is swapped, so no two labels share a colour
+            if (!col || (old || '').toLowerCase() === col.toLowerCase()) { closeColorPopover(true); return; }
+            // A function that already had this colour turns grey, so no two functions share a colour.
+            const owners = currentLabels().filter(l => l !== label && (colors[l] || '').toLowerCase() === col.toLowerCase());
             const prefs = readColorPrefs();
             const apply = (l, c) => { [l, colorCounterpart(l)].forEach(k => { if (k) { colors[k] = c; prefs[k] = c; } }); };
             apply(label, col);
-            if (owner && old) apply(owner, old);
-            writeColorPrefs(prefs); recolorSolved(); renderColorPanel();
-            const cur = document.querySelector('#color-panel .color-swatch.current'); if (cur) cur.focus();
+            owners.forEach(o => apply(o, NEUTRAL_COLOR));
+            writeColorPrefs(prefs); recolorSolved(); renderLegend(); closeColorPopover(true);
         }
         function resetStudentColors() {
+            const label = legendOpenLabel;
             try { localStorage.removeItem(COLOR_PREF_KEY); } catch(e) {}
             Object.keys(teacherColors).forEach(k => { colors[k] = teacherColors[k]; });
-            recolorSolved(); renderColorPanel();
+            recolorSolved(); renderLegend(); legendOpenLabel = label; closeColorPopover(true);
         }
-        function renderColorPanel() {
-            const panel = document.getElementById('color-panel'); const t = studentTexts[currentLang];
-            panel.innerHTML = '';
-            const head = document.createElement('div'); head.className = 'color-panel-head';
-            const ttl = document.createElement('span'); ttl.textContent = '🎨 ' + t.colorsTitle;
-            const x = document.createElement('button'); x.type = 'button'; x.className = 'color-panel-close'; x.textContent = '✕'; x.title = t.close; x.onclick = closeColorPanel;
-            head.append(ttl, x); panel.appendChild(head);
-            const hint = document.createElement('p'); hint.className = 'color-panel-hint'; hint.textContent = t.colorsHint; panel.appendChild(hint);
+        function legendChip(label) { return Array.from(document.querySelectorAll('#label-legend .legend-chip')).find(c => c.dataset.label === label); }
+        function renderLegend() {
+            const box = document.getElementById('label-legend'); if (!box) return;
+            const t = studentTexts[currentLang];
+            box.innerHTML = '';
+            const head = document.createElement('div'); head.className = 'legend-head';
+            const ttl = document.createElement('span'); ttl.className = 'legend-title'; ttl.textContent = t.legendTitle;
+            const hint = document.createElement('span'); hint.className = 'legend-hint'; hint.textContent = t.legendHint;
+            head.append(ttl, hint); box.appendChild(head);
+            const list = document.createElement('div'); list.className = 'legend-list';
             currentLabels().forEach(label => {
-                const row = document.createElement('button'); row.type = 'button'; row.className = 'color-row' + (label === colorPanelLabel ? ' open' : '');
-                row.setAttribute('aria-expanded', label === colorPanelLabel ? 'true' : 'false');
-                const chip = document.createElement('span'); chip.className = 'color-chip'; chip.style.backgroundColor = colors[label] || '#e5e7eb';
+                const chip = document.createElement('button'); chip.type = 'button'; chip.className = 'legend-chip'; chip.dataset.label = label;
+                chip.setAttribute('aria-haspopup', 'dialog'); chip.title = t.colorFor + ' ' + label;
+                const sw = document.createElement('span'); sw.className = 'legend-swatch'; sw.style.backgroundColor = colors[label] || NEUTRAL_COLOR;
                 const name = document.createElement('span'); name.textContent = label;
-                row.append(chip, name);
-                row.onclick = () => {
-                    colorPanelLabel = colorPanelLabel === label ? null : label; renderColorPanel();
-                    const again = Array.from(document.querySelectorAll('#color-panel .color-row')).find(r => r.lastChild.textContent === label);
-                    if (again) again.focus();
-                };
-                panel.appendChild(row);
-                if (label === colorPanelLabel) {
-                    const grid = document.createElement('div'); grid.className = 'color-grid';
-                    SAFE_COLORS.forEach(col => {
-                        const sw = document.createElement('button'); sw.type = 'button'; sw.className = 'color-swatch'; sw.style.backgroundColor = col; sw.style.color = isDarkColor(col) ? '#fff' : '#111827';
-                        if ((colors[label] || '').toLowerCase() === col.toLowerCase()) sw.classList.add('current');
-                        const owner = findColorOwner(label, col);
-                        if (owner) { sw.textContent = '⇄'; sw.title = t.colorsSwap + owner; } else { sw.title = col; }
-                        sw.setAttribute('aria-label', sw.title);
-                        sw.onclick = () => setStudentColor(label, col);
-                        grid.appendChild(sw);
-                    });
-                    panel.appendChild(grid);
-                }
+                chip.append(sw, name);
+                chip.onclick = (e) => { e.stopPropagation(); if (legendOpenLabel === label) closeColorPopover(true); else openColorPopover(label, chip); };
+                list.appendChild(chip);
             });
-            const reset = document.createElement('button'); reset.type = 'button'; reset.className = 'color-panel-reset'; reset.textContent = t.colorsReset; reset.onclick = resetStudentColors;
-            panel.appendChild(reset);
+            box.appendChild(list);
         }
-        function toggleColorPanel(e) {
-            if (e) e.stopPropagation();
-            const panel = document.getElementById('color-panel');
-            if (panel.style.display === 'block') { closeColorPanel(); return; }
-            colorPanelLabel = null; renderColorPanel(); panel.style.display = 'block';
-            if (window.innerWidth > 768) {
-                const r = document.getElementById('btn-colors').getBoundingClientRect();
-                panel.style.top = (r.bottom + window.scrollY + 6) + 'px';
-                panel.style.left = Math.max(8, r.right + window.scrollX - panel.offsetWidth) + 'px';
+        function openColorPopover(label, anchor) {
+            const pop = document.getElementById('color-popover'); const t = studentTexts[currentLang];
+            document.querySelectorAll('#label-legend .legend-chip.open').forEach(c => c.classList.remove('open'));
+            anchor.classList.add('open');
+            legendOpenLabel = label; pop.innerHTML = '';
+            const title = document.createElement('div'); title.className = 'color-pop-title'; title.textContent = t.colorFor + ' ' + label;
+            pop.appendChild(title);
+            const grid = document.createElement('div'); grid.className = 'color-pop-grid';
+            const current = (colors[label] || '').toLowerCase();
+            SAFE_COLORS.forEach(col => {
+                const sw = document.createElement('button'); sw.type = 'button'; sw.className = 'color-swatch';
+                sw.style.backgroundColor = col; sw.style.color = isDarkColor(col) ? '#fff' : '#111827';
+                if (col.toLowerCase() === current) sw.classList.add('current');
+                const owner = findColorOwner(label, col);
+                if (owner) { sw.textContent = '•'; sw.title = t.colorInUse.replace('{label}', owner); } else { sw.title = col; }
+                sw.setAttribute('aria-label', sw.title);
+                sw.onclick = () => setStudentColor(label, col);
+                grid.appendChild(sw);
+            });
+            pop.appendChild(grid);
+            const own = teacherColors[label];
+            if (own && own.toLowerCase() !== current) {
+                const r1 = document.createElement('button'); r1.type = 'button'; r1.className = 'color-pop-reset'; r1.textContent = t.colorResetOne;
+                r1.onclick = () => setStudentColor(label, own); pop.appendChild(r1);
             }
-            const first = panel.querySelector('.color-row'); if (first) first.focus();
+            if (Object.keys(readColorPrefs()).length) {
+                const r2 = document.createElement('button'); r2.type = 'button'; r2.className = 'color-pop-reset'; r2.textContent = t.colorsReset;
+                r2.onclick = resetStudentColors; pop.appendChild(r2);
+            }
+            pop.style.display = 'block';
+            if (window.innerWidth > 768) {
+                const r = anchor.getBoundingClientRect();
+                pop.style.top = (r.bottom + 6) + 'px';
+                pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pop.offsetWidth - 8)) + 'px';
+            }
+            const first = pop.querySelector('.color-swatch.current') || pop.querySelector('.color-swatch');
+            if (first) first.focus({ preventScroll: true });
         }
-        function closeColorPanel() {
-            const panel = document.getElementById('color-panel');
-            if (panel) panel.style.display = 'none';
-            colorPanelLabel = null;
+        function closeColorPopover(refocus) {
+            const pop = document.getElementById('color-popover');
+            if (pop) pop.style.display = 'none';
+            document.querySelectorAll('#label-legend .legend-chip.open').forEach(c => c.classList.remove('open'));
+            const label = legendOpenLabel; legendOpenLabel = null;
+            if (refocus && label) { const c = legendChip(label); if (c) c.focus({ preventScroll: true }); }
         }
         document.addEventListener('keydown', (e) => {
-            const panel = document.getElementById('color-panel');
-            if (e.key === 'Escape' && panel && panel.style.display === 'block') { e.preventDefault(); closeColorPanel(); document.getElementById('btn-colors').focus(); }
+            if (e.key === 'Escape' && legendOpenLabel !== null) { e.preventDefault(); closeColorPopover(true); }
         });
+        window.addEventListener('scroll', () => { if (legendOpenLabel !== null && window.innerWidth > 768) closeColorPopover(false); }, { passive: true });
 
         function updateStudentShortcuts() {
             labelShortcuts = {};
@@ -648,7 +667,7 @@
 
         document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            if (e.target.closest && e.target.closest('#color-panel')) return; // label shortcuts are off while choosing colours
+            if (e.target.closest && e.target.closest('#color-popover, #label-legend')) return; // label shortcuts are off while choosing colours
             let targetEl = hoveredStudentEl;
             if (!targetEl && document.activeElement && (document.activeElement.classList.contains('hover-word') || document.activeElement.classList.contains('g-label'))) { targetEl = document.activeElement; }
             if (!targetEl) return;
@@ -727,9 +746,7 @@
                 }
             });
             updateStudentShortcuts(); 
-            const colorsBtn = document.getElementById('btn-colors'); if (colorsBtn) colorsBtn.title = t.colorsTitle;
-            const colorPanel = document.getElementById('color-panel');
-            if (colorPanel && colorPanel.style.display === 'block') { colorPanelLabel = null; renderColorPanel(); }
+            closeColorPopover(false); renderLegend();
         }
 
         function setStudentZoom(delta) {
@@ -1103,12 +1120,13 @@ function dismissToastOnInteraction() {
         function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], {type: 'text/html'})); a.download = 'latin_exercise.html'; a.click(); }
         document.addEventListener('mousedown', (e) => { 
             if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; 
-            if(!e.target.closest('#color-panel, #btn-colors')) closeColorPanel();
+            if(!e.target.closest('#color-popover, .legend-chip')) closeColorPopover(false);
             if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
         });
 
         function initStudentPage() {
             applyStoredColors(); // before progress is restored, so restored answers already use the student's colours
+            renderLegend();
             let pendingMode = null;
             try { pendingMode = sessionStorage.getItem(saveKey + '_mode'); sessionStorage.removeItem(saveKey + '_mode'); } catch(e) {}
             if (pendingMode === 'practise' || pendingMode === 'exam') setMode(pendingMode);
@@ -2965,7 +2983,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             saveWarning: "⚠️ Note: Your progress is saved locally in this web browser. You must open this file on this exact same device and browser to resume your work later. Clearing your browser data will delete your progress. Do you want to save now?",
             resExercise: "Exercise: ", resDate: "Date: ", resScore: "Score: ",
             markGen: "🖍️ Mark Genitive (G)", unmarkGen: "❌ Unmark Genitive (G)", notGenitive: "Not a genitive attribute!",
-            colorsTitle: "Colours", colorsHint: "Choose your own colour for each label. Your choice is saved in this browser.", colorsSwap: "Swap with: ", colorsReset: "↺ Restore the teacher's colours"
+            legendTitle: "Syntactic functions:", legendHint: "Click a function to change its colour.", colorFor: "Colour for:", colorInUse: "Used by {label} (it will turn grey)", colorResetOne: "↺ Teacher's colour", colorsReset: "↺ All of the teacher's colours"
         },
         de: {
             instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen. <br><br><strong>Wichtig:</strong> Du musst auch versteckte Genitivattribute aufspüren! Klicke dazu direkt auf das Genitivattribut innerhalb eines Wortblocks und nutze das <strong>🖍️ Genitiv markieren</strong> Werkzeug, um es hervorzuheben. Sobald du jede Wortgruppe korrekt analysiert und alle Genitive gefunden hast, erscheint ein Textfeld für deine Übersetzung.",
@@ -2982,7 +3000,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             saveWarning: "⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?",
             resExercise: "Übung: ", resDate: "Datum: ", resScore: "Ergebnis: ",
             markGen: "🖍️ Genitiv markieren (G)", unmarkGen: "❌ Markierung aufheben (G)", notGenitive: "Kein Genitivattribut!",
-            colorsTitle: "Farben", colorsHint: "Wähle für jede Kategorie deine eigene Farbe. Deine Auswahl wird in diesem Browser gespeichert.", colorsSwap: "Tauschen mit: ", colorsReset: "↺ Farben der Lehrkraft wiederherstellen"
+            legendTitle: "Syntaktische Funktionen:", legendHint: "Klicke auf eine Funktion, um ihre Farbe zu ändern.", colorFor: "Farbe für:", colorInUse: "Belegt von {label} (wird dann grau)", colorResetOne: "↺ Farbe der Lehrkraft", colorsReset: "↺ Alle Farben der Lehrkraft"
         }
     };
 
@@ -3013,12 +3031,12 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
                 </div>
                 <button class="z-btn" onclick="togglePatterns()" title="${t.togglePat}">🏁</button>
                 <button class="z-btn" onclick="toggleContrast()" title="${t.toggleCon}">🌗</button>
-                <button class="z-btn" id="btn-colors" onclick="toggleColorPanel(event)" title="${t.colorsTitle}">🎨</button>
                 <span style="border-left: 1px solid #d1d5db; margin: 0 4px; height: 16px;"></span>
                 <button class="z-btn" onclick="setStudentZoom(0.1)" title="Zoom In">🔍 +</button>
                 <button class="z-btn" onclick="setStudentZoom(-0.1)" title="Zoom Out">🔍 -</button>
                 <button class="z-btn" onclick="setStudentZoom(0)" title="Reset Zoom">Reset</button>
             </div>
+            <div id="label-legend" class="label-legend"></div>
             <div id="exercise-container-wrapper">
                 <div id="exercise">${bodyContent}</div>
             </div>
@@ -3046,10 +3064,10 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             </div>
         </div>
         <div id="toast-container"></div>
-        <div id="color-panel" class="color-panel" role="dialog"></div>
+        <div id="color-popover" class="color-popover" role="dialog"></div>
         <script>
             const SHORTCUTS = ${JSON.stringify(LatinLabels.SHORTCUTS)};
-            const SAFE_COLORS = ${JSON.stringify(CONFIG.SAFE_COLORS)};
+            const SAFE_COLORS = ${JSON.stringify(CONFIG.SAFE_COLORS)}; const NEUTRAL_COLOR = ${JSON.stringify(CONFIG.NEUTRAL_COLOR)};
             const colors = ${JSON.stringify(AppState.colors)}; const abbreviations = ${JSON.stringify(allAbbrevs)}; const labelMap = ${JSON.stringify(labelMap)};
             const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const titleInput = ${JSON.stringify(title).replace(/</g, '\\u003c')};
             const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + '${exerciseId}';
