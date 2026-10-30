@@ -108,6 +108,9 @@
         .btn-action:hover { opacity: 0.9; }
         .btn-action:disabled { opacity: 0.6; cursor: wait; }
         .btn-action.active-mode { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); outline: 2px solid #111827; outline-offset: 2px; }
+        /* Compact tool buttons in the editor (Undo, Split, Break, Word group, Genitive, Export) */
+        .tool-row .btn-action { flex: 0 0 auto !important; padding: 6px 12px; font-size: 0.82rem; border-radius: 5px; }
+        .tool-row #btn-export { margin-left: auto; }
         #split-mode-btn.active-mode { outline-color: #ef4444; background: #dc2626 !important; }
         #group-mode-btn.active-mode { outline-color: #8b5cf6; background: #7c3aed !important; }
         #linebreak-mode-btn.active-mode { outline-color: #0ea5e9; background: #0284c7 !important; }
@@ -175,6 +178,7 @@
             .tag-word { font-size: 1rem; padding: 4px 6px; margin: var(--dynamic-margin-top, 24px) 1px 24px 1px; }
             .punct-span { margin: var(--dynamic-margin-top, 24px) 1px 24px 1px; } .tag-word::after { font-size: 0.55rem; top: 32px; }
             .btn-action { width: 100%; margin-bottom: 8px; font-size: 1rem; } .modal-box { width: 90%; }
+            .tool-row .btn-action { width: auto; margin-bottom: 0; font-size: 0.82rem; } .tool-row #btn-export { margin-left: 0; }
         }
         #autosave-status { position: fixed; bottom: 16px; right: 16px; font-size: 0.85rem; color: #6b7280; background: white; padding: 6px 12px; border-radius: 4px; box-shadow: var(--shadow); opacity: 0; transition: opacity 0.5s; pointer-events: none; }
     </style>
@@ -264,7 +268,7 @@
 
             <div class="palette-grid" id="label-palette" data-ref="labelPalette"></div>
             
-            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:20px;">
+            <div class="tool-row" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;">
                 <button class="btn-action" id="undo-btn" data-ref="undoBtn" style="background:#f59e0b; flex:0.5;">↶ Undo (Ctrl+Z)</button>
                 <button class="btn-action" id="split-mode-btn" data-ref="splitModeBtn" style="background:#ef4444; flex:1;">Manual Split (X)</button>
                 <button class="btn-action" id="linebreak-mode-btn" data-ref="linebreakModeBtn" style="background:#0ea5e9; flex:1;">Toggle Break (W)</button>
