@@ -1,197 +1,3580 @@
-// Latin Syntax Studio – the label system: which labels exist per level, their colours and abbreviations,
-// how a label from the AI (or an older exercise) is mapped onto a current one, and how labels translate
-// between German and English. Pure data and pure functions, shared by index.html and the tests.
-//
-// Genitive attributes deliberately have NO label of their own: they carry the label of the word they belong
-// to plus the marker "u": true, which the student page turns into the underline exercise.
-(function (root, factory) {
-    const api = factory();
-    if (typeof module !== 'undefined' && module.exports) module.exports = api;
-    root.LatinLabels = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
-    'use strict';
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title id="page-title" data-ref="pageTitleTag">Latin Syntax Studio</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <script src="src/latin-core.js"></script>
+    <script src="src/latin-labels.js"></script>
+    <script src="src/latin-prompt.js"></script>
+    <style>
+        :root { 
+            --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --bg-color: #f9fafb;
+            --container-bg: #ffffff;
+            --primary-color: #3b82f6;
+            --text-color: #1f2937;
+            --border-color: #e5e7eb;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        }
 
-    const PUNCT = 'Punct';
-    const OTHER = { en: 'Other', de: 'Sonstiges' };
-    const MAIN_CLAUSE = { en: 'Main clause', de: 'Hauptsatz' };
+        body, button, input, textarea, select { font-family: var(--main-font); }
 
-    // The lists per language are parallel: index i in "en" is the same label as index i in "de".
-    // Translation between the languages relies on that, so keep the order in step.
-    const PRESETS = {
+        body { 
+            margin: 2% auto; max-width: 1200px; padding: 0 20px;
+            background-color: var(--bg-color); color: var(--text-color); line-height: 1.5;
+        }
+
+        h1 { text-align: center; color: #111827; margin-bottom: 24px; font-weight: 600; letter-spacing: -0.025em; font-size: 1.8rem; }
+
+        .container { 
+            background: var(--container-bg); padding: 30px; border-radius: 8px; 
+            border: 1px solid var(--border-color); box-shadow: var(--shadow); 
+            margin-bottom: 24px; position: relative;
+        }
+        
+        .lang-switch { position: absolute; top: 24px; right: 24px; display: flex; gap: 6px; }
+        .lang-switch-inline { display: flex; gap: 6px; }
+        .lang-btn { background: #f3f4f6; border: 1px solid transparent; padding: 6px 12px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; color: #4b5563; transition: all 0.2s; font-weight: 500; }
+        .lang-btn.active { background: #eff6ff; color: var(--primary-color); border-color: #bfdbfe; font-weight: 600; }
+
+        .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 6px; margin-bottom: 24px; font-size: 0.95rem; color: #334155; }
+        .instruction-box h3 { margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; font-size: 1.05rem; font-weight: 600; color: #0f172a; }
+        .instruction-box a { color: var(--primary-color); text-decoration: none; font-weight: 500; cursor: pointer; }
+        .instruction-box a:hover { text-decoration: underline; }
+
+        .palette { position: sticky; top: 0; background: white; padding: 16px; border: 1px solid var(--border-color); border-radius: 6px; z-index: 1000; box-shadow: var(--shadow); margin-bottom: 20px; }
+        .palette-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .p-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: all 0.15s ease-in-out; color: #111827 !important; }
+        .p-btn.active { border-color: #111827; box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1); }
+        .p-btn u { text-decoration: underline; text-underline-offset: 2px; font-weight: 700; }
+        .p-wrap { display: inline-flex; align-items: stretch; }
+        .p-wrap .p-btn { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+        .p-color { border: 1px solid transparent; border-left: 1px solid rgba(17,24,39,0.2); border-radius: 0 6px 6px 0; padding: 0 7px; cursor: pointer; font-size: 0.7rem; color: #111827; }
+        .p-color:hover { filter: brightness(0.92); }
+        .p-color:focus-visible { outline: 2px solid #111827; outline-offset: 1px; }
+        .color-popover { display: none; position: fixed; z-index: 1500; background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.15); width: max-content; max-width: 260px; }
+        .color-pop-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; color: #111827; }
+        .color-pop-grid { display: grid; grid-template-columns: repeat(6, 30px); gap: 6px; }
+        .color-swatch { width: 30px; height: 30px; border-radius: 6px; border: 1px solid rgba(17,24,39,0.25); cursor: pointer; padding: 0; font-size: 0.75rem; color: #111827; }
+        .color-swatch:hover, .color-swatch:focus-visible { outline: 2px solid #111827; outline-offset: 1px; }
+        .color-swatch.current { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111827; }
+        .color-pop-reset { margin-top: 10px; width: 100%; padding: 6px; border: 1px solid #e5e7eb; background: #f9fafb; border-radius: 6px; cursor: pointer; font-size: 0.8rem; color: #374151; }
+        .color-pop-reset:hover { background: #f3f4f6; }
+        
+        .zoom-controls { display: flex; gap: 6px; align-items: center; background: #f3f4f6; padding: 4px 8px; border-radius: 6px; border: 1px solid #e5e7eb; }
+        .z-btn { background: white; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.9rem; font-weight: bold; color: #374151; transition: background 0.1s; }
+        .z-btn:hover { background: #e5e7eb; }
+
+        #tagging-container-wrapper { overflow-x: auto; border: 1px solid var(--border-color); border-radius: 6px; background: #fafafa; padding: 20px; min-height: 400px; }
+        #tagging-area { display: block; line-height: 1.6; transition: transform 0.2s ease-in-out; }
+        .editor-sentence-box { padding: 30px 20px 20px 20px; margin-bottom: 24px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); line-height: 1.6; }
+        
+        .tag-word { display: inline-block; margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; position: relative; font-size: 1.15rem; vertical-align: bottom; color: #111827; padding: 2px 8px; border-radius: 4px; cursor: pointer; border-bottom: 2px solid #e5e7eb; white-space: nowrap; height: 1.6rem; line-height: 1.6rem; user-select: none; transition: margin-top 0.3s ease; }
+        .tag-word:hover { filter: brightness(0.95); }
+        .hint-icon { position: relative; display: inline-block; cursor: pointer; font-size: 0.75rem; z-index: 20; filter: grayscale(0.2); transition: filter 0.2s; }
+        .hint-icon:hover { filter: grayscale(0); }
+        .tag-word .hint-icon { position: absolute; top: -12px; right: -8px; font-size: 0.7rem; }
+        .hint-icon .tooltip-text { visibility: hidden; width: max-content; max-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; position: absolute; z-index: 1000; bottom: 150%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.85rem; font-weight: normal; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none; white-space: normal; line-height: 1.4; }
+        .hint-icon .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #1f2937 transparent transparent transparent; }
+        .hint-icon.show-tooltip .tooltip-text { visibility: visible; opacity: 1; }
+        .punct-span { display: inline-block; margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; padding: 2px 2px; font-size: 1.15rem; vertical-align: bottom; color: #111827; position: relative; font-weight: 500; cursor: pointer; user-select: none; border-bottom: 2px solid transparent; height: 1.6rem; line-height: 1.6rem; transition: margin-top 0.3s ease, opacity 0.2s; }
+        .split-right { border-right: 3px dashed #ef4444 !important; margin-right: 12px !important; }
+        
+        /* Genitive Attribute Underline Feature */
+        .tag-word.attr-underline::before { content: ""; position: absolute; left: 3px; right: 3px; bottom: -2px; height: 3px; background: repeating-linear-gradient(90deg, var(--gen-main, #ec4899) 0 6px, var(--gen-alt, transparent) 6px 10px); pointer-events: none; }
+        .tag-word.attr-underline::after { content: attr(data-short) ' (GEN)'; color: #ec4899; font-weight: 800; background: #fdf2f8; border-color: #ec4899; }
+
+        .group-bracket { position: absolute; left: -2px; right: -2px; border-top-width: 4px; border-top-style: solid; pointer-events: none; z-index: 5; border-radius: 6px; }
+        .bracket-start { border-left-width: 5px; border-left-style: solid; border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+        .bracket-end { border-right-width: 5px; border-right-style: solid; border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+        
+        .bracket-badge { position: absolute; top: -24px; left: 0; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; color: #111827; pointer-events: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 4px; z-index: 10; white-space: nowrap; }
+        .clickable-label { margin: 0 4px; cursor: pointer; border-bottom: 1px dashed rgba(17,24,39,0.5); transition: opacity 0.2s; }
+        .clickable-label:hover { opacity: 0.7; }
+        .bracket-end-controls { position: absolute; top: -24px; right: 0; padding: 2px 4px; border-radius: 4px; pointer-events: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 2px; z-index: 10; }
+
+        .badge-adj { cursor: pointer; background: rgba(0,0,0,0.1); border-radius: 3px; padding: 1px 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.55rem; transition: background 0.2s; user-select: none; }
+        .badge-adj:hover { background: rgba(255,255,255,0.6); color: #111827; }
+        .badge-adj[draggable="true"] { cursor: grab; }
+        .badge-adj[draggable="true"]:active { cursor: grabbing; }
+        .badge-del { cursor: pointer; background: rgba(255,255,255,0.3); border-radius: 50%; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.6rem; transition: background 0.2s; }
+        .badge-del:hover { background: rgba(255,255,255,0.8); color: #7f1d1d; }
+
+        .tag-word::after { content: attr(data-short); display: block; position: absolute; top: 36px; left: 50%; transform: translateX(-50%); font-size: 0.65rem; color: #4b5563; font-weight: 600; text-transform: uppercase; pointer-events: none; background: #f9fafb; border: 1px solid #e5e7eb; padding: 2px 4px; line-height: 1; border-radius: 3px; white-space: nowrap; }
+        
+        .btn-action { padding: 10px 18px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; color: white; transition: opacity 0.2s; font-size: 0.9rem; }
+        .btn-action:hover { opacity: 0.9; }
+        .btn-action:disabled { opacity: 0.6; cursor: wait; }
+        .btn-action.active-mode { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); outline: 2px solid #111827; outline-offset: 2px; }
+        /* Compact tool buttons in the editor (Undo, Split, Break, Word group, Genitive, Export) */
+        .tool-row .btn-action { flex: 0 0 auto !important; padding: 6px 12px; font-size: 0.82rem; border-radius: 5px; }
+        .tool-row #btn-export { margin-left: auto; }
+        #split-mode-btn.active-mode { outline-color: #ef4444; background: #dc2626 !important; }
+        #group-mode-btn.active-mode { outline-color: #8b5cf6; background: #7c3aed !important; }
+        #linebreak-mode-btn.active-mode { outline-color: #0ea5e9; background: #0284c7 !important; }
+        #attr-mode-btn.active-mode { outline-color: #ec4899; background: #db2777 !important; }
+
+        .custom-label-row { display: flex; gap: 8px; align-items: center; }
+        .custom-input { flex-grow: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+        .custom-input:focus { border-color: var(--primary-color); }
+        .add-btn { background: #10b981; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+
+        .project-mini-row { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 12px; }
+        .subtle-btn { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; text-decoration: none; display: inline-block; font-weight: 500; }
+        .subtle-btn:hover { background: #e5e7eb; color: #111827; }
+        .setup-row { display: flex; gap: 16px; margin-bottom: 20px; }
+        .setup-input, textarea { padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+        .setup-input:focus, textarea:focus { border-color: var(--primary-color); }
+
+        .credits-link { text-align: center; margin-top: 32px; font-size: 0.85rem; }
+        .credits-link a { color: #6b7280; text-decoration: none; border-bottom: 1px dotted #9ca3af; cursor: pointer; }
+        .credits-link a:hover { color: #111827; border-bottom-style: solid; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.6); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-box { background: white; padding: 30px; border-radius: 8px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .modal-title { font-weight: 600; margin-bottom: 16px; font-size: 1.1rem; color: #111827; }
+        .modal-input { width: 100%; padding: 12px; margin-bottom: 24px; font-size: 1rem; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 6px; outline: none; }
+        .modal-input:focus { 
+			border-color: var(--primary-color); 
+			box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 10%, transparent); 
+		}
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; }
+        .modal-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #4b5563; }
+
+        /* --- VISUAL MODES FOR TEACHER PAGE --- */
+        body.pattern-mode .tag-word { background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.4) 5px, rgba(255,255,255,0.4) 10px) !important; box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.5) !important; }
+        body.pattern-mode .tag-word:nth-child(even) { background-image: radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%) !important; background-position: 0 0, 5px 5px !important; background-size: 10px 10px !important; }
+        body.pattern-mode .group-bracket { border-style: dashed !important; }
+
+        body.high-contrast { background-color: #121212; color: #ffffff; }
+        body.high-contrast .container, body.high-contrast .editor-sentence-box, body.high-contrast .palette, body.high-contrast .modal-box { background-color: #1e1e1e; color: #fff; border-color: #333; }
+        body.high-contrast .instruction-box { background-color: #332b00; border-color: #665500; color: #ffeb3b; }
+        body.high-contrast h1, body.high-contrast .instruction-box h3, body.high-contrast .modal-title, body.high-contrast .modal-label, body.high-contrast #lbl-level { color: #fff; }
+        body.high-contrast textarea, body.high-contrast input, body.high-contrast select { background: #2d2d2d; color: #fff; border-color: #555; }
+        body.high-contrast .tag-word { color: #000; font-weight: 600; border-bottom: 2px solid #555; }
+        body.high-contrast .tag-word::after { background: #000; color: #fff; border-color: #555; }
+        body.high-contrast .punct-span { color: #fff; }
+        body.high-contrast #tagging-container-wrapper { background: #121212; border-color: #333; }
+        body.high-contrast .zoom-controls { background: #1e1e1e; border-color: #555; }
+        body.high-contrast .z-btn { background: #333; color: #fff; border-color: #555; }
+        body.high-contrast .z-btn:hover { background: #444; }
+        body.high-contrast .subtle-btn, body.high-contrast .lang-btn { background: #333; color: #fff; border-color: #555; }
+        body.high-contrast .subtle-btn:hover, body.high-contrast .lang-btn:hover { background: #444; color: #fff; }
+        body.high-contrast .bracket-badge, body.high-contrast .bracket-end-controls { border: 1px solid #fff !important; }
+        body.high-contrast .tag-word.attr-underline::before { background: repeating-linear-gradient(90deg, var(--gen-main, #f472b6) 0 6px, var(--gen-alt, transparent) 6px 10px); }
+        body.high-contrast .tag-word.attr-underline::after { color: #f472b6; border-color: #f472b6; background: #000; }
+        body.high-contrast .color-popover { background: #1e1e1e; border-color: #555; }
+        body.high-contrast .color-pop-title { color: #fff; }
+        body.high-contrast .color-swatch.current { box-shadow: 0 0 0 2px #1e1e1e, 0 0 0 4px #fff; }
+        body.high-contrast .color-pop-reset { background: #333; color: #fff; border-color: #555; }
+
+        @media (max-width: 768px) {
+            body { margin: 10px; padding: 0; } .container { padding: 20px; } .setup-row { flex-direction: column; gap: 12px; }
+            .lang-switch { top: 16px; right: 16px; } .palette { position: relative; top: 0; padding: 16px; overflow-x: auto; }
+            .palette-grid { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px; } .p-btn { white-space: nowrap; padding: 10px 14px; } 
+            .editor-sentence-box { padding: 20px 10px 10px 10px; }
+            .tag-word { font-size: 1rem; padding: 4px 6px; margin: var(--dynamic-margin-top, 24px) 1px 24px 1px; }
+            .punct-span { margin: var(--dynamic-margin-top, 24px) 1px 24px 1px; } .tag-word::after { font-size: 0.55rem; top: 32px; }
+            .btn-action { width: 100%; margin-bottom: 8px; font-size: 1rem; } .modal-box { width: 90%; }
+            .tool-row .btn-action { width: auto; margin-bottom: 0; font-size: 0.82rem; } .tool-row #btn-export { margin-left: 0; }
+        }
+        #autosave-status { position: fixed; bottom: 16px; right: 16px; font-size: 0.85rem; color: #6b7280; background: white; padding: 6px 12px; border-radius: 4px; box-shadow: var(--shadow); opacity: 0; transition: opacity 0.5s; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <h1 id="app-heading" data-ref="appHeading">Latin Syntax Studio</h1>
+
+    <div id="setup-screen" class="container" data-ref="setupScreen">
+        <div class="lang-switch">
+            <button class="lang-btn" id="btn-setup-lang-en" data-lang="en">EN</button>
+            <button class="lang-btn active" id="btn-setup-lang-de" data-lang="de">DE</button>
+        </div>
+
+        <div class="instruction-box">        
+            <h3 id="instr-h3" data-ref="instrH3">Step 1: Setup Instruction</h3>
+            <div id="instr-body" data-ref="instrBody"></div>
+            <div style="margin-top:16px; font-style:italic;">
+                <span id="example-link-text" data-ref="exampleLinkText">Want to see what the final result looks like?</span> <a href="example_page_de.html" target="_blank" id="link-example" data-ref="linkExample">View Example</a>
+            </div>
+        </div>
+        
+        <div class="setup-row">
+            <input type="text" id="pagetitle" class="setup-input" data-ref="pageTitle" placeholder="Exercise Title" style="flex: 2;"/>
+            <input type="text" id="pageimage" class="setup-input" data-ref="pageImage" placeholder="Optional: Image URL" style="flex: 1;"/>
+        </div>
+        <textarea id="teachernotes" data-ref="teacherNotes" rows="3" style="width:100%; box-sizing:border-box; margin-bottom:20px;" placeholder="Optional: Context / Teacher Notes"></textarea>
+        <textarea id="entertext" data-ref="enterText" rows="6" style="width:100%; box-sizing: border-box;" placeholder="Paste Latin text here..."></textarea>
+        
+        <div style="background:#f8fafc; padding:24px; border-radius:8px; margin:24px 0; border:1px solid #e2e8f0;">
+            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+                <label id="lbl-level" data-ref="lblLevel" style="font-weight: 600; color: #0f172a;">Grammar Level:</label>
+                <select id="grammar-level-setup" class="setup-input" data-ref="grammarLevelSetup" style="width: auto; padding: 8px 12px; background-color: #fff;">
+                    <option value="beginner" id="opt-beg" data-ref="optBeg">Beginner</option>
+                    <option value="intermediate" id="opt-int" data-ref="optInt">Intermediate</option>
+                    <option value="advanced" id="opt-adv" data-ref="optAdv" selected>Advanced (All)</option>
+                </select>
+            </div>
+
+            <button class="btn-action" style="background:var(--primary-color);" id="btn-analyze-ai" data-ref="btnAnalyzeAi">✨ Analyze with AI</button>
+            <button class="subtle-btn" style="margin-left:8px;" id="btn-ai-key" data-ref="btnAiKey">🔑 API key</button>
+            <span style="margin: 0 16px; font-weight:600; color:#64748b; font-size: 0.9rem;" id="or-text" data-ref="orText">OR</span>
+            <label class="btn-action" style="background:#64748b; cursor: pointer; display:inline-block;">
+                <span id="btn-load" data-ref="btnLoad">Load Saved Project</span> <input type="file" style="display:none" accept=".json" id="file-load-setup" data-ref="fileLoadSetup">
+            </label>
+        </div>
+        <button class="btn-action" style="background:#1f2937; width:100%;" id="btn-manual" data-ref="btnManual">Start Manual Creation</button>
+
+        <div class="credits-link"><a id="btn-show-credits" data-ref="btnShowCredits">Credits</a></div>
+    </div>
+
+    <div id="credits-screen" class="container" data-ref="creditsScreen" style="display:none; text-align:center; padding: 50px;">
+        <h2 style="margin-top:0; color: #111827;">Credentials</h2>
+        <p style="font-size:1.1rem; line-height: 1.6; color: #4b5563; margin: 30px 0;">This tool was created by Anke Walter. I gratefully acknowledge the help of J. L., Dr Federico di Pasqua, Claude, ChatGPT and Gemini.</p>
+        <button class="btn-action" style="background:#64748b;" id="btn-hide-credits" data-ref="btnHideCredits">Back</button>
+    </div>
+
+    <div id="editor-screen" data-ref="editorScreen" style="display:none;">
+    <div style="margin-bottom: 20px; background: white; padding: 16px; border: 1px solid var(--border-color); border-radius: 6px; box-shadow: var(--shadow);">
+            <label id="lbl-editor-title" data-ref="lblEditorTitle" style="font-weight: 600; font-size: 0.9rem; color: #4b5563; display: block; margin-bottom: 8px;">Exercise Title:</label>
+            <input type="text" id="editor-pagetitle" class="setup-input" data-ref="editorPageTitle" style="width: 100%; box-sizing: border-box; font-size: 1.1rem; font-weight: bold;" placeholder="Exercise Title" />
+        </div>
+        <div class="instruction-box">
+            <h3 id="edit-h3" data-ref="editH3">Step 2: Editing Instruction</h3>
+            <div style="margin-bottom:0;" id="edit-body" data-ref="editBody"></div>
+        </div>
+
+        <div class="palette">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 12px; margin-bottom:16px;">
+                 <div id="mode-status" data-ref="modeStatus" style="font-weight:600; color:var(--primary-color); font-size:1rem;">Mode: Tagging</div>
+                 <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <div class="lang-switch-inline" style="margin-right: 8px;">
+                        <button class="lang-btn" id="btn-editor-lang-en" data-lang="en">EN</button>
+                        <button class="lang-btn active" id="btn-editor-lang-de" data-lang="de">DE</button>
+                    </div>
+                    <select id="grammar-level-editor" class="setup-input" data-ref="grammarLevelEditor" style="padding: 6px 10px; font-size: 0.85rem; height: 35px;">
+                        <option value="beginner" id="opt-beg-ed" data-ref="optBegEd">Beginner</option>
+                        <option value="intermediate" id="opt-int-ed" data-ref="optIntEd">Intermediate</option>
+                        <option value="advanced" id="opt-adv-ed" data-ref="optAdvEd" selected>Advanced (All)</option>
+                    </select>
+                    <div class="custom-label-row" style="margin:0; padding:0; border:none;">
+                        <input type="text" id="new-label-input" class="custom-input" data-ref="newLabelInput" placeholder="New Label" style="width:120px; height: 35px; box-sizing: border-box;">
+                        <button class="add-btn" id="btn-add-label" data-ref="btnAddLabel" style="height: 35px; display: flex; align-items: center; justify-content: center;">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="palette-grid" id="label-palette" data-ref="labelPalette"></div>
+            
+            <div class="tool-row" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;">
+                <button class="btn-action" id="undo-btn" data-ref="undoBtn" style="background:#f59e0b; flex:0.5;">↶ Undo (Ctrl+Z)</button>
+                <button class="btn-action" id="split-mode-btn" data-ref="splitModeBtn" style="background:#ef4444; flex:1;">Manual Split (X)</button>
+                <button class="btn-action" id="linebreak-mode-btn" data-ref="linebreakModeBtn" style="background:#0ea5e9; flex:1;">Toggle Break (W)</button>
+                <button class="btn-action" id="group-mode-btn" data-ref="groupModeBtn" style="background:#8b5cf6; flex:1;">Define Word Group (M)</button>
+                <button class="btn-action" id="attr-mode-btn" data-ref="attrModeBtn" style="background:#ec4899; flex:1;">Mark Genitive (G)</button>
+                <button class="btn-action" id="btn-export" data-ref="btnExport" style="background:#111827; flex:1;">Export Student Page</button>
+            </div>
+
+            <div class="project-mini-row">
+                <button class="subtle-btn" id="btn-reset-colors" data-ref="btnResetColors" style="margin-right:auto;">🎨 Default colours</button>
+                <button class="subtle-btn" id="btn-save-work" data-ref="btnSaveWork">💾 Save Work</button>
+                <label class="subtle-btn">
+                    <span id="btn-load-work" data-ref="btnLoadWork">📂 Load Work</span> <input type="file" accept=".json" style="display:none" id="file-load-editor" data-ref="fileLoadEditor">
+                </label>
+            </div>
+        </div>
+        
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 8px;">
+            <div style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Visual Editor</div>
+            <div class="zoom-controls">
+                <button class="z-btn" id="btn-toggle-pattern" data-ref="btnTogglePattern" title="Toggle Patterns">🏁</button>
+                <button class="z-btn" id="btn-toggle-contrast" data-ref="btnToggleContrast" title="Toggle High Contrast">🌗</button>
+                <span style="border-left: 1px solid #d1d5db; margin: 0 4px; height: 16px;"></span>
+                <button class="z-btn" id="btn-zoom-in" data-ref="btnZoomIn" title="Zoom In">🔍 +</button>
+                <button class="z-btn" id="btn-zoom-out" data-ref="btnZoomOut" title="Zoom Out">🔍 -</button>
+                <button class="z-btn" id="btn-zoom-reset" data-ref="btnZoomReset" title="Reset Zoom">Reset</button>
+            </div>
+        </div>
+
+        <div id="tagging-container-wrapper">
+            <div id="tagging-area" data-ref="taggingArea"></div>
+        </div>
+    </div>
+
+    <div id="group-modal" class="modal-overlay" data-ref="groupModal">
+        <div class="modal-box">
+            <label class="modal-label" id="lbl-group-name" data-ref="lblGroupName">Name of the syntactic group:</label>
+            <input type="text" id="group-name-input" class="modal-input" data-ref="groupNameInput" list="label-suggestions" placeholder="Type to search...">
+            <datalist id="label-suggestions" data-ref="labelSuggestions"></datalist>
+            <label class="modal-label" id="lbl-group-hint" data-ref="lblGroupHint">Hint (optional):</label>
+            <input type="text" id="group-hint-input" class="modal-input" data-ref="groupHintInput" placeholder="E.g. Look out for the ablative...">
+            <label class="modal-label" id="lbl-group-error-hint" data-ref="lblGroupErrorHint">Hint after wrong answer (optional):</label>
+            <input type="text" id="group-error-hint-input" class="modal-input" data-ref="groupErrorHintInput" placeholder="E.g. Think about what introduces this clause...">
+            <label class="modal-label" id="lbl-group-explain" data-ref="lblGroupExplain">Explanation after a correct answer (guided mode, optional):</label>
+            <input type="text" id="group-explain-input" class="modal-input" data-ref="groupExplainInput" placeholder="E.g. Expect a verb of its own at the end of the clause.">
+            <div class="modal-actions">
+                <button class="btn-action" style="background:#64748b;" id="btn-cancel-group" data-ref="btnCancelGroup">Cancel</button>
+                <button class="btn-action" style="background:var(--primary-color);" id="btn-save-group" data-ref="btnSaveGroup">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="word-modal" class="modal-overlay" data-ref="wordModal">
+        <div class="modal-box">
+            <div class="modal-title" id="word-modal-title" data-ref="wordModalTitle">Edit Word</div>
+            <label class="modal-label" id="lbl-word-text" data-ref="lblWordText">Word Text:</label>
+            <input type="text" id="word-text-input" class="modal-input" data-ref="wordTextInput">
+            <label class="modal-label" id="lbl-word-hint" data-ref="lblWordHint">Hint (optional):</label>
+            <input type="text" id="word-hint-input" class="modal-input" data-ref="wordHintInput" placeholder="E.g. Derived from...">
+            <label class="modal-label" id="lbl-word-error-hint" data-ref="lblWordErrorHint">Hint after wrong answer (optional):</label>
+            <input type="text" id="word-error-hint-input" class="modal-input" data-ref="wordErrorHintInput" placeholder="E.g. Check the case ending...">
+            <label class="modal-label" id="lbl-word-explain" data-ref="lblWordExplain">Explanation after a correct answer (guided mode, optional):</label>
+            <input type="text" id="word-explain-input" class="modal-input" data-ref="wordExplainInput" placeholder="E.g. The accusative points ahead to a verb that needs it.">
+            <div class="modal-actions">
+                <button class="btn-action" style="background:#ef4444; margin-right:auto;" id="btn-delete-word" data-ref="btnDeleteWord">Delete</button>
+                <button class="btn-action" style="background:#64748b;" id="btn-cancel-word" data-ref="btnCancelWord">Cancel</button>
+                <button class="btn-action" style="background:var(--primary-color);" id="btn-save-word" data-ref="btnSaveWord">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="ai-key-modal" class="modal-overlay" data-ref="aiKeyModal">
+        <div class="modal-box">
+            <div class="modal-title" id="ai-key-title" data-ref="aiKeyTitle">OpenAI API key</div>
+            <p id="ai-key-note" data-ref="aiKeyNote" style="font-size:0.85rem; color:#4b5563; margin:0 0 16px; line-height:1.4;"></p>
+            <label class="modal-label" id="lbl-ai-key" data-ref="lblAiKey">API key:</label>
+            <input type="password" id="ai-key-input" class="modal-input" data-ref="aiKeyInput" placeholder="sk-..." autocomplete="off" spellcheck="false">
+            <div class="modal-actions">
+                <button class="btn-action" style="background:#ef4444; margin-right:auto;" id="btn-ai-key-remove" data-ref="btnAiKeyRemove">Remove</button>
+                <button class="btn-action" style="background:#64748b;" id="btn-ai-key-cancel" data-ref="btnAiKeyCancel">Cancel</button>
+                <button class="btn-action" style="background:var(--primary-color);" id="btn-ai-key-save" data-ref="btnAiKeySave">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="autosave-status" data-ref="autosaveStatus">Autosaved</div>
+    <div id="color-popover" class="color-popover" data-ref="colorPopover" role="dialog"></div>
+<!-- ========================================== -->
+    <!-- STUDENT PAGE TEMPLATES -->
+    <!-- ========================================== -->
+    
+    <script type="text/template" id="template-student-css" data-ref="templateStudentCss">
+        :root { --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+		html { scrollbar-gutter: stable; }
+        body, button, input, textarea, select { font-family: var(--main-font); }
+        body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background-color: #f9fafb; color: #1f2937; line-height: 1.5; }
+        h1 { text-align: center; color: #111827; margin-bottom: 32px; font-weight: 600; letter-spacing: -0.025em; }
+        .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; color: #334155; }
+        .teacher-note { background: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 1rem; color: #1f2937; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .exercise-wrapper { background: #fafafa; padding: 40px; border-radius: 12px; border: 1px solid #e5e7eb; line-height: 4.2; }
+        .sentence-container { padding: 30px 20px 20px 20px; margin-bottom: 32px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .sentence-container:last-child { margin-bottom: 0; }
+        
+        .zoom-controls { display: flex; gap: 6px; align-items: center; justify-content: flex-end; margin-bottom: 16px; }
+        .z-btn { background: white; border: 1px solid #d1d5db; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 0.9rem; font-weight: bold; color: #374151; transition: background 0.1s; }
+        .z-btn:hover { background: #e5e7eb; }
+        body { position: relative; }
+        .lang-switch-top { position: absolute; top: 0; right: 20px; display: flex; gap: 6px; z-index: 5; }
+        @media (min-width: 769px) { h1 { padding: 0 110px; } } /* keep long titles clear of the language buttons */
+        .lang-btn { background: #f3f4f6; border: 1px solid transparent; padding: 6px 12px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; color: #4b5563; transition: all 0.2s; font-weight: 500; }
+        .lang-btn.active { background: #eff6ff; color: #3b82f6; border-color: #bfdbfe; font-weight: 600; }
+        body.high-contrast .lang-btn { background: #333; color: #fff; border-color: #555; }
+        body.high-contrast .lang-btn.active { background: #1e3a8a; color: #fff; border-color: #93c5fd; }
+        @media (max-width: 768px) { .lang-switch-top { position: static; justify-content: flex-end; margin-bottom: 8px; } }
+        @media print { .lang-switch-top { display: none !important; } }
+        
+        #exercise-container-wrapper { overflow-x: auto; padding-top: 30px; padding-bottom: 15px; margin-top: 10px; }
+        #exercise { transition: transform 0.2s ease-in-out; }
+
+        .hover-word { cursor: pointer; background: #f3f4f6; padding: 4px 10px; margin: 0 3px; border-radius: 6px; border-bottom: 2px solid #cbd5e1; font-size: 1.15rem; position: relative; display: inline-block; line-height: 1.3; transition: all 0.2s; color: #111827; }
+		.hover-word::before { content: ""; position: absolute; top: 0; bottom: 0; left: -4px; right: -4px; z-index: -1; }
+		.hover-word:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+        
+        /* Interactive Genitive Underline Elements */
+        .s-text { border-bottom: 3px dashed transparent; transition: border-color 0.2s, background-color 0.2s; border-radius: 2px; }
+        .s-text.marked-gen { background-image: repeating-linear-gradient(90deg, var(--gen-main, #ec4899) 0 6px, var(--gen-alt, transparent) 6px 10px); background-size: 100% 3px; background-repeat: no-repeat; background-position: left bottom; background-origin: border-box; }
+        .s-text.error-gen { border-bottom-color: #ef4444; background-color: #fef2f2; }
+        .s-text.missed-gen { border-bottom-color: #f59e0b; border-bottom-style: solid; background-color: #fffbeb; }
+
+        .guided-current { box-shadow: 0 0 0 3px #fff, 0 0 0 5px #3b82f6 !important; position: relative; z-index: 6; }
+        body.guided-mode .hover-word:not(.guided-current), body.guided-mode .g-label:not(.guided-current) { cursor: default; }
+        body.guided-mode .guided-current .s-text { cursor: pointer; }
+        .guide-panel { margin: -16px 0 32px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px 18px; line-height: 1.5; font-size: 0.95rem; color: #1f2937; }
+        .guide-head { font-size: 0.78rem; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+        .guide-prompt { margin-bottom: 10px; }
+        .guide-fb { border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; }
+        .guide-fb.ok { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+        .guide-fb.err { background: #fef2f2; border: 1px solid #fecaca; color: #7f1d1d; }
+        .guide-actions { display: flex; justify-content: flex-end; gap: 8px; }
+        .guide-continue { font-size: 0.85rem; color: #3b82f6; font-weight: 500; }
+        .guide-btn { padding: 8px 16px; border: none; border-radius: 6px; background: #3b82f6; color: #fff; font-weight: 500; cursor: pointer; font-size: 0.9rem; }
+        .guide-btn:hover { opacity: 0.9; }
+        .guide-btn.secondary { background: #e5e7eb; color: #1f2937; }
+        .btn-submit-exam { background: #10b981 !important; }
+        .btn-submit-exam:hover { background: #059669 !important; }
+
+        .s-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom:none; border-radius: 6px 6px 0 0; padding: 22px 6px 6px 6px; margin: 20px 4px 0 4px; vertical-align: bottom; transition: all 0.2s; z-index: 1; }
+        .s-group:hover, .s-group:focus-within { z-index: 10; }
+        
+        .g-label { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; background: white; border: 1px solid #94a3b8; border-radius: 4px; padding: 3px 8px; color: #475569; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 2px; z-index: 5; max-width: calc(100% + 40px); box-sizing: border-box; transition: max-width 0.2s, z-index 0.2s; }
+        .g-label:hover, .g-label:focus-visible { outline: 2px solid #3b82f6; max-width: max-content; z-index: 50; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .g-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
+
+        .punct { font-size: 1.15rem; margin: 0 2px; vertical-align: baseline; display:inline-block; font-weight: 500; }
+        
+        .trans-box { margin: 32px 0 10px; line-height: 1.5; border-top: 1px dashed #e5e7eb; padding-top: 24px; }
+        textarea { width: 100%; height: 80px; font-size: 1.1rem; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .ans-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; margin-top: 8px; white-space: nowrap; text-align: center; color: #059669; pointer-events: none; }
+        
+        .hint-icon { position: absolute; top: -12px; right: -8px; font-size: 0.75rem; cursor: pointer; text-decoration: none; filter: grayscale(0.2); transition: filter 0.2s; z-index: 20; }
+        .hint-icon:hover { filter: grayscale(0); }
+        .tooltip-text { visibility: hidden; width: max-content; max-width: 250px; background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; position: absolute; z-index: 1000; bottom: 150%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.85rem; font-weight: normal; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none; white-space: normal; line-height: 1.4; text-transform: none; }
+        .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #1f2937 transparent transparent transparent; }
+        .hint-icon.show-tooltip .tooltip-text { visibility: visible; opacity: 1; }
+
+        .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #e5e7eb; padding: 4px 0; z-index: 1000; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 85vh; overflow-y: auto; min-width: 150px; line-height: 1.2; }
+        .menu-btn { display: block; width: 100%; text-align: left; border: none; background: transparent; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #374151; transition: background-color 0.1s; font-family: inherit; }
+        .menu-btn:hover, .menu-btn:focus-visible { background-color: #f3f4f6; color: #111827; outline: none; }
+        .menu-btn:focus-visible { box-shadow: inset 2px 0 0 0 #3b82f6; }
+        
+        .gen-btn { color: #ec4899; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 4px; display: none; }
+
+        .exercise-layout { display: flex; gap: 24px; align-items: flex-start; }
+        .exercise-main { flex: 1; min-width: 0; }
+        .label-legend { order: -1; position: sticky; top: 16px; z-index: 60; width: 230px; flex-shrink: 0; margin-top: 30px; max-height: calc(100vh - 32px); overflow-y: auto; box-sizing: border-box; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; line-height: 1.3; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .legend-title { font-weight: 600; font-size: 0.9rem; color: #111827; margin-bottom: 2px; }
+        .legend-hint { font-size: 0.78rem; color: #6b7280; margin: 0 0 10px; }
+        .legend-list { display: flex; flex-direction: column; gap: 2px; }
+        .legend-chip { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 1px solid transparent; background: transparent; border-radius: 6px; padding: 5px 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #374151; font-family: inherit; }
+        .legend-chip:hover, .legend-chip:focus-visible, .legend-chip.open { background: #f3f4f6; border-color: #bfdbfe; outline: none; }
+        .legend-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(17,24,39,0.25); flex-shrink: 0; }
+        .legend-name { flex: 1; min-width: 0; }
+        .legend-name u { text-decoration: underline; text-underline-offset: 2px; font-weight: 700; }
+        .legend-key, .legend-keys kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.72rem; font-weight: 600; color: #374151; background: #f9fafb; border: 1px solid #d1d5db; border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; min-width: 9px; text-align: center; flex-shrink: 0; }
+        .legend-keys { margin-top: 12px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 0.78rem; color: #4b5563; }
+        .legend-keys-title { font-weight: 600; color: #111827; margin-bottom: 4px; font-size: 0.85rem; }
+        .legend-keys p { margin: 0 0 6px; }
+        .key-row { display: flex; align-items: center; gap: 6px; margin: 5px 0; }
+        .key-row .key-text { margin-left: 2px; }
+        .color-popover { display: none; position: fixed; z-index: 1100; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.15); width: max-content; max-width: 260px; line-height: 1.3; }
+        .color-pop-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; color: #111827; }
+        .color-pop-grid { display: grid; grid-template-columns: repeat(6, 30px); gap: 6px; }
+        .color-swatch { width: 30px; height: 30px; border-radius: 6px; border: 1px solid rgba(17,24,39,0.25); cursor: pointer; padding: 0; font-size: 0.85rem; color: #111827; }
+        .color-swatch:hover, .color-swatch:focus-visible { outline: 2px solid #111827; outline-offset: 1px; }
+        .color-swatch.current { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111827; }
+        .color-pop-reset { display: block; margin-top: 8px; width: 100%; padding: 6px; border: 1px solid #e5e7eb; background: #f9fafb; border-radius: 6px; cursor: pointer; font-size: 0.8rem; color: #374151; font-family: inherit; }
+        .color-pop-reset:hover { background: #f3f4f6; }
+
+
+        .footer-toolbar { margin-top: 40px; padding: 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font-weight: 500; color: white; background: #1f2937; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .ex-img { max-width: 100%; height: auto; display: block; margin: 30px auto 10px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 300px; object-fit: contain; }
+        #toast-container { visibility: hidden; min-width: 250px; max-width: min(90vw, 480px); background-color: #1f2937; color: #fff; text-align: center; border-radius: 6px; padding: 14px; position: fixed; z-index: 1001; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.95rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast-container.show { visibility: visible; opacity: 1; bottom: 40px; }
+        #toast-container.error { background-color: #7f1d1d; border: 1px solid #ef4444; }
+        #toast-container.success { background-color: #064e3b; border: 1px solid #10b981; }
+        
+        #results-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.8); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .results-content { background: white; padding: 40px; border-radius: 12px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .results-title { font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 16px; }
+        .results-score { font-size: 3rem; font-weight: 800; color: #3b82f6; margin-bottom: 24px; }
+        .results-textarea { width: 100%; height: 80px; padding: 12px; border-radius: 6px; border: 1px solid #d1d5db; box-sizing: border-box; resize: none; margin-bottom: 20px; font-family: monospace; font-size: 0.95rem; background: #f9fafb; color: #374151; outline: none; }
+        .results-textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .btn-copy { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; width: 100%; margin-bottom: 12px; }
+        .btn-copy:hover { background: #059669; }
+
+        body.pattern-mode .hover-word[data-done="true"] { background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.4) 5px, rgba(255,255,255,0.4) 10px); border: 2px solid #111827 !important; }
+        body.pattern-mode .hover-word[data-done="true"]:nth-child(even) { background-image: radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%), radial-gradient(rgba(255,255,255,0.5) 20%, transparent 20%); background-position: 0 0, 5px 5px; background-size: 10px 10px; }
+        body.pattern-mode .s-group { border-style: dashed !important; border-width: 2px !important; }
+
+        body.high-contrast { background-color: #121212; color: #ffffff; }
+        body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #121212; color: #fff; border: 1px solid #333; }
+        body.high-contrast .sentence-container { background-color: #1e1e1e; border: 1px solid #444; }
+        body.high-contrast .trans-box { border-top-color: #444; }
+        body.high-contrast .instruction-box { background-color: #332b00; border-color: #665500; color: #ffeb3b; }
+        body.high-contrast .teacher-note { background: #1e1e1e !important; border: 1px solid #444 !important; color: #e5e7eb !important; }
+        body.high-contrast .hover-word { background-color: #333; color: #fff; border-bottom: 2px solid #555; }
+        body.high-contrast .hover-word[data-done="true"] { border: 2px solid #fff !important; color: #000 !important; font-weight: 600; }
+        body.high-contrast .s-text.marked-gen { background-image: repeating-linear-gradient(90deg, var(--gen-main, #f472b6) 0 6px, var(--gen-alt, transparent) 6px 10px); }
+        body.high-contrast .s-text.missed-gen { border-bottom-color: #fbbf24 !important; background-color: #3a2f00 !important; }
+        body.high-contrast .s-group { border-color: #fff !important; }
+        body.high-contrast .g-label { background: #000 !important; color: #fff !important; border-color: #fff !important; }
+        body.high-contrast .punct { color: #fff; }
+        body.high-contrast textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
+        body.high-contrast #btn-practise[style*="background: white"] { background: #333 !important; color: #fff !important; }
+        body.high-contrast #btn-exam[style*="background: white"] { background: #333 !important; color: #fff !important; }
+        body.high-contrast #btn-guided[style*="background: white"] { background: #333 !important; color: #fff !important; }
+        body.high-contrast .guide-panel { background: #1e293b; border-color: #3b82f6; color: #fff; }
+        body.high-contrast .guide-head { color: #93c5fd; }
+        body.high-contrast .guided-current { box-shadow: 0 0 0 3px #121212, 0 0 0 5px #93c5fd !important; }
+        body.high-contrast .mode-toggle-bg { background: #1e1e1e !important; border: 1px solid #555; }
+        body.high-contrast #results-modal .results-content { background: #1e1e1e; color: #fff; border: 1px solid #555; }
+        body.high-contrast #results-modal .results-title { color: #fff; }
+        body.high-contrast #results-modal .results-textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
+        body.high-contrast .tooltip-text { background-color: #fff; color: #000; border: 1px solid #ccc; }
+        body.high-contrast .tooltip-text::after { border-color: #fff transparent transparent transparent; }
+        body.high-contrast .label-legend { background: #1e1e1e; border-color: #444; }
+        body.high-contrast .legend-title, body.high-contrast .legend-keys-title { color: #fff; }
+        body.high-contrast .legend-hint, body.high-contrast .legend-keys { color: #d1d5db; border-color: #444; }
+        body.high-contrast .legend-chip { color: #fff; }
+        body.high-contrast .legend-chip:hover, body.high-contrast .legend-chip:focus-visible, body.high-contrast .legend-chip.open { background: #333; border-color: #fff; }
+        body.high-contrast .legend-key, body.high-contrast .legend-keys kbd { background: #333; color: #fff; border-color: #777; }
+        body.high-contrast .color-popover { background: #1e1e1e; border-color: #555; }
+        body.high-contrast .color-pop-title { color: #fff; }
+        body.high-contrast .color-swatch.current { box-shadow: 0 0 0 2px #1e1e1e, 0 0 0 4px #fff; }
+        body.high-contrast .color-pop-reset { background: #333; color: #fff; border-color: #555; }
+        
+        @media (max-width: 900px) {
+            .exercise-layout { flex-direction: column; align-items: stretch; gap: 0; }
+            .label-legend { order: -1; position: sticky; top: 0; width: 100%; margin: 0 0 12px; max-height: none; padding: 10px 12px; }
+            .legend-hint { margin-bottom: 6px; }
+            .legend-list { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+            .legend-chip { width: auto; white-space: nowrap; border-color: #e5e7eb; background: #fff; border-radius: 999px; }
+            .legend-key, .legend-keys { display: none; }
+        }
+        @media (max-width: 768px) {
+            body { margin: 15px; } .exercise-wrapper { padding: 20px; line-height: 4.5; }
+            .hover-word { font-size: 1.1rem; padding: 6px 12px; } .g-label { top: -16px; font-size: 10px; padding: 2px 6px; }
+            .s-group { padding-top: 24px; margin: 20px 2px 0 2px; } .sentence-container { padding: 20px 10px 10px 10px; }
+            .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-radius: 8px; }
+            .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f3f4f6; }
+            .color-popover { top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal, #color-popover, #guide-panel, .legend-hint, .legend-keys, .legend-key { display: none !important; } .exercise-layout { display: block; } .label-legend { position: static; width: auto; max-height: none; margin: 0 0 16px; box-shadow: none; } .legend-list { flex-direction: row; flex-wrap: wrap; } .legend-chip { width: auto; } }
+    </script>
+
+    <script type="text/template" id="template-student-js" data-ref="templateStudentJs">
+        let activeEl = null; let activeSubWord = null; let mode = ""; const menu = document.getElementById('menu-common'); const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
+        let hideMenuTimeout; let toastHideTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1; let examFinalized = false;
+        const totalPhrases = document.querySelectorAll('.hover-word, .g-label').length;
+        const totalGens = document.querySelectorAll('.s-text[data-u="true"]').length;
+        const totalItems = totalPhrases + totalGens;
+
+        // ================= GUIDED MODE =================
+        // Leads the student block by block through each sentence (left to right): brackets first, then each block,
+        // then the genitive attributes inside it. Generic tips/explanations per function; the teacher's own
+        // error hint (data-errhint) and explanation (data-explain) take precedence where they exist.
+        const GUIDE = {
+            de: {
+                counter: (s, n) => `Geführter Modus · Satz ${s} von ${n}`,
+                promptLabel: 'Welche Funktion hat der <strong>blau umrandete Block</strong>? Klicke ihn an oder fahre mit der Maus darüber und wähle die Funktion aus dem Menü.',
+                promptGroup: 'Hier beginnt eine <strong>Klammer</strong>. Um welche Einheit handelt es sich? Klicke auf das <strong>?</strong> über der Klammer und wähle aus dem Menü.',
+                promptGen: (n) => `In diesem Block steckt ein <strong>Genitivattribut</strong>${n > 1 ? ` (${n} Wörter)` : ''}. Klicke direkt auf das Wort und wähle oben im Menü „🖍️ Genitiv markieren“.`,
+                correct: 'Richtig!', tipGeneric: 'Lies den Block noch einmal genau: Welche Frage beantwortet er?',
+                genProgress: (n) => `Richtig! Noch ${n} ${n === 1 ? 'Wort' : 'Wörter'} zu markieren.`,
+                genOk: 'Richtig! Das Genitivattribut beantwortet die Frage „Wessen?“ und gehört zum Block seines Bezugswortes.',
+                genAhead: 'In diesem Block steckt außerdem ein Genitivattribut. Das ist der nächste Schritt.',
+                notGen: 'Kein Genitivattribut! Gesucht ist ein Genitiv, der ein anderes Wort in diesem Block näher bestimmt.',
+                labelFirst: 'Bestimme zuerst die Funktion des blau umrandeten Blocks.',
+                locked: 'Im geführten Modus gehst du Block für Block vor. Bestimme zuerst den blau umrandeten Block.',
+                clickWord: 'Klicke direkt auf das Wort im Block, das du markieren willst.',
+                sentenceDone: 'Damit ist der Satz vollständig bestimmt. Das Übersetzungsfeld ist jetzt offen: Übersetze den Satz, bevor du weitergehst.',
+                cont: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Block zu gehen.', contSentence: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Satz zu gehen.', contEnd: 'Klicke irgendwo auf die Seite (oder drücke Enter), um abzuschließen.',
+                solution: 'Lösung zeigen', solutionShown: 'Die richtige Antwort ist',
+                end: '<strong>Geschafft!</strong> Du hast alle Sätze Schritt für Schritt bestimmt. Vergiss die Übersetzungen nicht.',
+                fn: {
+                    'Subjekt': ['Frage: Wer oder was? Achte auf den Nominativ und darauf, ob der Block in der Zahl zum Prädikat passt.', 'Das Subjekt sagt dir, wer oder was handelt. Prüfe beim Weiterlesen, ob das Prädikat in Person und Zahl dazu passt.'],
+                    'Prädikat': ['Achte auf eine Personalendung (-t, -nt, -mus, -tur …).', 'Das Prädikat sagt, was geschieht. Seine Personalendung verrät, wer handelt, und seine Bedeutung, welche Ergänzungen dazugehören.'],
+                    'Akkusativobjekt': ['Achte auf die Endung: Welcher Kasus ist das? Frage: Wen oder was?', 'Ein Akkusativobjekt beantwortet die Frage „Wen oder was?“. Erwarte ein Verb, das dieses Objekt braucht, falls es noch nicht da war.'],
+                    'Dativobjekt': ['Frage: Wem oder für wen? Achte auf die Dativ-Endungen (-ae, -ō, -ī, -īs, -ibus).', 'Ein Dativobjekt beantwortet die Frage „Wem?“ oder „Für wen?“. Im Plural sehen Dativ und Ablativ gleich aus; hier entscheidet der Sinn.'],
+                    'Genitivobjekt': ['Hier steht ein Genitiv, der von einem Verb oder Adjektiv abhängt (z.B. meminisse, cupidus).', 'Ein Genitivobjekt hängt von einem Verb oder Adjektiv ab, etwa bei Verben des Erinnerns. Übersetze oft mit „an“ oder „nach“.'],
+                    'Ablativ': ['Achte auf die Endung und darauf, ob eine Präposition davorsteht. Frage: Womit? Wodurch? Wo? Wann?', 'Ein Ablativ ohne Präposition gibt einen Umstand an: Mittel, Grund, Ort, Zeit oder Trennung. Übersetze mit „mit“, „durch“, „in“, „von“ …'],
+                    'Ablativus absolutus': ['Steht hier ein Substantiv zusammen mit einem Partizip im Ablativ?', 'Ein Ablativus absolutus: Substantiv und Partizip im Ablativ, losgelöst vom übrigen Satz. Übersetze ihn als Nebensatz (nachdem, weil, als …) oder mit einer Präposition.'],
+                    'Prädikativum': ['Sagt der Block, in welcher Rolle oder in welchem Zustand jemand handelt („als …“)? Oder bildet er zusammen mit esse die Aussage?', 'Ein Prädikativum stimmt mit Subjekt oder Objekt überein und sagt zugleich etwas über die Handlung: in welcher Rolle, in welchem Zustand. Übersetze oft mit „als …“.'],
+                    'Präpositionale Bestimmung': ['Achte auf das erste Wort des Blocks: Ist es eine Präposition?', 'Präposition und Substantiv bilden eine präpositionale Bestimmung. Achte auf den Kasus nach der Präposition und wähle eine passende Übersetzung.'],
+                    'Adverbiale Bestimmung': ['Hat das Wort eine Kasusendung, oder ist es unveränderlich? Frage: Wann? Wie? Wie sehr?', 'Eine adverbiale Bestimmung gibt einen Umstand an: wann, wie, wie oft, wie sehr.'],
+                    'Infinitiv': ['Achte auf die Endung -re, -ri, -isse: Ist das eine Grundform des Verbs?', 'Ein Infinitiv ergänzt oft ein Verb wie posse, velle oder audere. Übersetze mit „zu …“, bei Modalverben ohne „zu“.'],
+                    'AcI/NcI': ['Steht hier ein Akkusativ (oder Nominativ) zusammen mit einem Infinitiv, abhängig von einem Verb des Sagens oder Denkens?', 'Einen AcI übersetzt du als „dass“-Satz: Der Akkusativ wird Subjekt, der Infinitiv Prädikat. Beim NcI hilft „man sagt, dass …“ oder „soll …“.'],
+                    'Partizipialkonstruktion': ['Gibt es hier ein Partizip, das sich auf ein Substantiv im Satz bezieht?', 'Das Partizip bezieht sich auf ein Substantiv im Satz. Übersetze mit Relativsatz, Nebensatz oder „und“ und achte auf das Zeitverhältnis.'],
+                    'Relativsatz': ['Womit beginnt diese Einheit? Ist das ein Relativpronomen (qui, quae, quod …)?', 'Ein Relativsatz: Das Relativpronomen bezieht sich auf ein Wort davor. Bestimme die Wörter darin nach ihrer Aufgabe innerhalb des Relativsatzes.'],
+                    'Nebensatz': ['Womit beginnt diese Einheit? Ist das eine Subjunktion (cum, ut, quod, dum …)?', 'Ein Nebensatz hat ein eigenes Prädikat; erwarte es, oft am Ende. Bestimme die Wörter darin nach ihrer Aufgabe innerhalb des Nebensatzes.'],
+                    'Konjunktion': ['Verbindet das Wort gleichrangige Teile (und, aber, oder)?', 'Eine Konjunktion verbindet gleichrangige Teile. Erwarte danach einen Teil, der dem vorigen entspricht.'],
+                    'Subjunktion': ['Leitet das Wort einen Nebensatz ein (cum, ut, ne, quod, si, dum …)?', 'Eine Subjunktion leitet einen Nebensatz ein. Erwarte ein eigenes Prädikat, oft am Ende des Nebensatzes.'],
+                    'Vokativ': ['Wird hier jemand angesprochen?', 'Ein Vokativ: Hier wird jemand angesprochen.'],
+                    'Sonstiges': ['Hat das Wort überhaupt eine eigene Aufgabe im Satzbau?', 'Dieses Wort hat keine eigene Funktion im Satzbau.']
+                }
+            },
+            en: {
+                counter: (s, n) => `Guided mode · Sentence ${s} of ${n}`,
+                promptLabel: 'What function does the <strong>block outlined in blue</strong> have? Click it or move the mouse over it and choose the function from the menu.',
+                promptGroup: 'A <strong>bracket</strong> begins here. What kind of unit is it? Click the <strong>?</strong> above the bracket and choose from the menu.',
+                promptGen: (n) => `This block contains a <strong>genitive attribute</strong>${n > 1 ? ` (${n} words)` : ''}. Click directly on the word and choose “🖍️ Mark Genitive” at the top of the menu.`,
+                correct: 'Correct!', tipGeneric: 'Look at the block again carefully: which question does it answer?',
+                genProgress: (n) => `Correct! ${n} more ${n === 1 ? 'word' : 'words'} to mark.`,
+                genOk: 'Correct! The genitive attribute answers the question “Whose?” or “Of what?” and belongs to the block of the word it describes.',
+                genAhead: 'This block also contains a genitive attribute. That is the next step.',
+                notGen: 'Not a genitive attribute! You are looking for a genitive that describes another word in this block.',
+                labelFirst: 'First work out the function of the block outlined in blue.',
+                locked: 'In guided mode you go block by block. First work out the block outlined in blue.',
+                clickWord: 'Click directly on the word in the block that you want to mark.',
+                sentenceDone: 'The sentence is now fully analysed. The translation box is open: translate the sentence before you move on.',
+                cont: 'Click anywhere on the page (or press Enter) to go to the next block.', contSentence: 'Click anywhere on the page (or press Enter) to go to the next sentence.', contEnd: 'Click anywhere on the page (or press Enter) to finish.',
+                solution: 'Show answer', solutionShown: 'The correct answer is',
+                end: '<strong>Done!</strong> You have analysed every sentence step by step. Don’t forget the translations.',
+                fn: {
+                    'Subject': ['Ask: who or what? Look for the nominative and check whether the block agrees in number with the verb.', 'The subject tells you who or what acts. As you read on, check that the verb agrees with it in person and number.'],
+                    'Verb': ['Look for a personal ending (-t, -nt, -mus, -tur …).', 'The verb says what happens. Its personal ending tells you who acts, and its meaning which objects belong to it.'],
+                    'Accusative object': ['Look at the ending: which case is it? Ask: whom or what?', 'An accusative object answers the question “Whom or what?”. Expect a verb that needs this object, if it hasn’t come yet.'],
+                    'Dative object': ['Ask: to whom or for whom? Look for dative endings (-ae, -ō, -ī, -īs, -ibus).', 'A dative object answers the question “To whom?” or “For whom?”. In the plural, dative and ablative look the same; the meaning decides.'],
+                    'Genitive object': ['This is a genitive that depends on a verb or adjective (e.g. meminisse, cupidus).', 'A genitive object depends on a verb or adjective, e.g. with verbs of remembering. Translate as a direct object or with “of”.'],
+                    'Ablative': ['Look at the ending and check whether there is a preposition before it. Ask: with what? by what? where? when?', 'An ablative without a preposition states a circumstance: means, cause, place, time or separation. Translate with “with”, “by”, “in”, “from” …'],
+                    'Ablative absolute': ['Is there a noun together with a participle in the ablative?', 'An ablative absolute: noun and participle in the ablative, detached from the rest of the sentence. Translate it as a clause (when, after, because …) or with a preposition.'],
+                    'Predicative': ['Does the block say in what role or state someone acts (“as …”)? Or does it form the statement together with esse?', 'A predicative agrees with the subject or object and at the same time says something about the action: in what role or state. Often translated with “as …”.'],
+                    'Prepositional phrase': ['Look at the first word of the block: is it a preposition?', 'A preposition and its noun form a prepositional phrase. Check the case after the preposition and choose a fitting translation.'],
+                    'Adverb': ['Does the word have a case ending, or does it never change? Ask: when? how? how much?', 'An adverb states a circumstance: when, how, how often, how much.'],
+                    'Infinitive': ['Look at the ending -re, -ri, -isse: is this the basic form of a verb?', 'An infinitive often completes a verb such as posse, velle or audere. Translate with “to …”, after modal verbs without “to”.'],
+                    'Accusative/Nominative with infinitive': ['Is there an accusative (or nominative) together with an infinitive, depending on a verb of saying or thinking?', 'Translate an accusative with infinitive as a “that” clause: the accusative becomes the subject, the infinitive the verb. For the nominative version, “is said to …” often works.'],
+                    'Participial phrase': ['Is there a participle that refers to a noun in the sentence?', 'The participle refers to a noun in the sentence. Translate with a participle, a relative clause, a subordinate clause or “and”, and watch the time relation.'],
+                    'Relative clause': ['What does this unit begin with? Is it a relative pronoun (qui, quae, quod …)?', 'A relative clause: the relative pronoun refers to a word before it. Analyse the words inside according to their job within the relative clause.'],
+                    'Subordinate clause': ['What does this unit begin with? Is it a subjunction (cum, ut, quod, dum …)?', 'A subordinate clause has a verb of its own; expect it, often at the end. Analyse the words inside according to their job within the clause.'],
+                    'Conjunction': ['Does the word join parts of equal rank (and, but, or)?', 'A conjunction joins parts of equal rank. Expect a part after it that matches the one before.'],
+                    'Subjunction': ['Does the word introduce a subordinate clause (cum, ut, ne, quod, si, dum …)?', 'A subjunction introduces a subordinate clause. Expect a verb of its own, often at the end of the clause.'],
+                    'Vocative': ['Is someone being addressed here?', 'A vocative: someone is being addressed.'],
+                    'Other': ['Does the word have a job of its own in the structure of the sentence at all?', 'This word has no function of its own in the structure of the sentence.']
+                }
+            }
+        };
+        let guided = { hold: false, el: null, type: null };
+        // After a correct answer in guided mode, the next click anywhere (or Enter/Space) moves on. The listener runs in the
+        // capture phase, before the word/menu handlers: a click on the next block therefore moves on and opens its menu at once.
+        function guidedContinue() { if (exMode === 'guided' && guided.hold) { guided.hold = false; guidedRender(); return true; } return false; }
+        document.addEventListener('click', (e) => {
+            if (!(exMode === 'guided' && guided.hold)) return;
+            if (e.target.closest('textarea, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal')) return; // these keep working as usual
+            guidedContinue();
+        }, true);
+        document.addEventListener('keydown', (e) => {
+            if (!(exMode === 'guided' && guided.hold)) return;
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); guidedContinue(); }
+        });
+        let studentDirty = false; let allowUnload = false; // progress changed since "Save progress"; reloads the page itself triggers are allowed
+        window.addEventListener('beforeunload', (e) => { if (studentDirty && !allowUnload) { e.preventDefault(); e.returnValue = ''; } });
+        document.addEventListener('input', (e) => { if (e.target.tagName === 'TEXTAREA' && !e.target.classList.contains('results-textarea')) studentDirty = true; });
+        let guidePanel = null;
+        function gT() { return GUIDE[currentLang] || GUIDE.de; }
+        function gFn(label) { const f = gT().fn; return f[label] || f[(labelMap[currentLang] || {})[label]] || null; }
+        function guidedItems() { return Array.from(document.querySelectorAll('#exercise .hover-word, #exercise .g-label')); }
+        function guidedCompute() {
+            for (const el of guidedItems()) {
+                if (el.dataset.done !== 'true') return { type: el.classList.contains('g-label') ? 'group' : 'label', el };
+                if (el.classList.contains('hover-word') && el.querySelector('.s-text[data-u="true"]:not(.marked-gen)')) return { type: 'gen', el };
+            }
+            return { type: 'end', el: null };
+        }
+        function guidedAnswer(el) { return el.classList.contains('g-label') ? el.parentElement.dataset.ans : el.dataset.ans; }
+        function sentenceOf(el) { return el ? el.closest('.sentence-container') : null; }
+        function guidedStart() {
+            if (!guidePanel) { guidePanel = document.createElement('div'); guidePanel.id = 'guide-panel'; guidePanel.className = 'guide-panel'; guidePanel.setAttribute('aria-live', 'polite'); }
+            guided.hold = false; guidedRender();
+        }
+        function guidedStop() {
+            if (guidePanel) guidePanel.remove();
+            document.querySelectorAll('.guided-current').forEach(x => x.classList.remove('guided-current'));
+        }
+        function guidedRender(fbHtml, fbOk, showSolution) {
+            if (exMode !== 'guided' || !guidePanel) return;
+            const t = gT();
+            document.querySelectorAll('.guided-current').forEach(x => x.classList.remove('guided-current'));
+            if (!guided.hold) { const c = guidedCompute(); guided.el = c.el; guided.type = c.type; }
+            const el = guided.el;
+            const sentences = Array.from(document.querySelectorAll('#exercise .sentence-container'));
+            const sIdx = el ? sentences.indexOf(sentenceOf(el)) : sentences.length - 1;
+            const anchor = sentences[Math.max(0, sIdx)];
+            if (anchor && guidePanel.previousElementSibling !== anchor) anchor.after(guidePanel);
+
+            let prompt = '';
+            if (guided.type === 'end' && !guided.hold) prompt = t.end;
+            else if (!guided.hold) {
+                if (guided.type === 'group') prompt = t.promptGroup;
+                else if (guided.type === 'gen') prompt = t.promptGen(el.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').length);
+                else prompt = t.promptLabel;
+            }
+            let actions = '', cont = '';
+            if (guided.hold) {
+                // No "Next" button: after a correct answer, any click on the page (or Enter) moves on - see guidedContinue()
+                const nxt = guidedCompute();
+                cont = nxt.type === 'end' ? t.contEnd : (sentenceOf(nxt.el) !== sentenceOf(el) ? t.contSentence : t.cont);
+            } else if (showSolution) {
+                actions = `<button type="button" class="guide-btn secondary" id="guide-solution">${t.solution}</button>`;
+            }
+            guidePanel.innerHTML = `<div class="guide-head"><span>${t.counter(Math.max(1, sIdx + 1), sentences.length)}</span></div>
+                ${prompt ? `<div class="guide-prompt">${prompt}</div>` : ''}
+                ${fbHtml ? `<div class="guide-fb ${fbOk ? 'ok' : 'err'}">${fbHtml}</div>` : ''}
+                ${cont ? `<div class="guide-continue">${cont}</div>` : ''}
+                ${actions ? `<div class="guide-actions">${actions}</div>` : ''}`;
+            const sb = document.getElementById('guide-solution');
+            if (sb) sb.onclick = guidedShowSolution;
+
+            if (!guided.hold && el) {
+                el.classList.add('guided-current');
+                const r = el.getBoundingClientRect();
+                if (r.top < 60 || r.bottom > window.innerHeight - 220) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                if (guided.type !== 'gen' && !fbHtml) el.focus({ preventScroll: true });
+            }
+        }
+        function guidedNote(el) {
+            const nxt = guidedCompute(); const t = gT();
+            if (nxt.type === 'gen' && nxt.el === el) return '<br><br>' + t.genAhead;
+            if (!nxt.el || sentenceOf(nxt.el) !== sentenceOf(el)) return '<br><br>' + t.sentenceDone;
+            return '';
+        }
+        function guidedSolved(el, answer, byHelp) {
+            const t = gT();
+            const ex = el.dataset.explain || (gFn(answer) || [])[1] || '';
+            const head = byHelp ? `${t.solutionShown}: <strong>${answer}</strong>.` : '✓ ' + t.correct;
+            guided.hold = true; guided.el = el;
+            guidedRender(`${head} ${ex}${guidedNote(el)}`, true);
+        }
+        function guidedWrong(el, answer) {
+            const t = gT(); const n = parseInt(el.dataset.mistakes || 0);
+            const tip = el.dataset.errhint || (gFn(answer) || [])[0] || t.tipGeneric;
+            guidedRender('✗ ' + tip, false, n >= 3);
+        }
+        function guidedGenFound(blk) {
+            const t = gT(); const left = blk.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').length;
+            if (left > 0) { guidedRender('✓ ' + t.genProgress(left), true); return; }
+            guided.hold = true; guided.el = blk;
+            guidedRender('✓ ' + t.genOk + guidedNote(blk), true);
+        }
+        function guidedShowSolution() {
+            const el = guided.el; if (!el || guided.hold) return;
+            studentDirty = true;
+            if (guided.type === 'gen') {
+                el.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').forEach(st => st.classList.add('marked-gen'));
+                check(); guided.hold = true; guidedRender(`${gT().solutionShown}: ${gT().genOk.replace(/^\S+\s/, '')}${guidedNote(el)}`, true); return;
+            }
+            const m = el.classList.contains('hover-word') ? 'word' : 'group'; const ans = guidedAnswer(el);
+            solve(el, ans, m); answeredItems++; check(); guidedSolved(el, ans, true);
+        }
+
+        // ---- Legend of all syntactic functions; clicking one changes its colour (saved in this browser for this exercise) ----
+        const COLOR_PREF_KEY = saveKey + '_colors'; // per exercise: a new page always starts with the teacher's colours
+        const teacherColors = Object.assign({}, colors); // the teacher's colours, before any student preference is applied
+        let legendOpenLabel = null;
+
+        function colorCounterpart(label) {
+            const other = currentLang === 'de' ? 'en' : 'de';
+            const cp = (labelMap[other] || {})[label];
+            return cp && cp !== label ? cp : null;
+        }
+        function currentLabels() { return Array.from(document.querySelectorAll('.menu-btn:not(.gen-btn)')).map(b => b.dataset.val); }
+        function readColorPrefs() { try { return JSON.parse(localStorage.getItem(COLOR_PREF_KEY) || '{}') || {}; } catch(e) { return {}; } }
+        function writeColorPrefs(p) { try { localStorage.setItem(COLOR_PREF_KEY, JSON.stringify(p)); } catch(e) { console.warn("Could not save colours (storage blocked).", e); } }
+        function applyStoredColors() {
+            const p = readColorPrefs();
+            Object.keys(p).forEach(l => { if (typeof p[l] === 'string' && /^#[0-9a-f]{3,8}$/i.test(p[l])) colors[l] = p[l]; });
+        }
+        function recolorSolved() {
+            document.querySelectorAll('.hover-word[data-done="true"]').forEach(el => { if (colors[el.dataset.ans]) paintWord(el, colors[el.dataset.ans]); });
+        }
+        function genAltColor(bg) {
+            // Genitive underline colour: fully white on dark and medium colours (every red included); on light colours pink,
+            // with near-black gaps where pink alone would be too faint. Returns the gap colour; '#ffffff' means 'all white'.
+            const lum = (hex) => { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n) || f.length !== 6) return null; return [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0); };
+            const lb = lum(bg); if (lb === null) return 'transparent';
+            const ratio = (c) => { const l = lum(c); return (Math.max(l, lb) + 0.05) / (Math.min(l, lb) + 0.05); };
+            if (ratio('#ffffff') >= 3) return '#ffffff';
+            return ratio('#ec4899') >= 3 ? 'transparent' : '#111827';
+        }
+        function setGenUnderline(el, bg) {
+            // On dark colours the genitive underline turns fully white; elsewhere it stays pink (with dark gaps where pink alone is too faint).
+            const alt = genAltColor(bg);
+            el.style.setProperty('--gen-main', alt === '#ffffff' ? '#ffffff' : '');
+            el.style.setProperty('--gen-alt', alt === '#ffffff' ? 'transparent' : alt);
+        }
+        function paintWord(el, col) { el.style.backgroundColor = col; setGenUnderline(el, col); }
+        function isDarkColor(hex) { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n)) return false; return (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) < 140; }
+        function findColorOwner(label, col) {
+            return currentLabels().find(l => l !== label && (colors[l] || '').toLowerCase() === col.toLowerCase());
+        }
+        function setStudentColor(label, col) {
+            const old = colors[label];
+            if (!col || (old || '').toLowerCase() === col.toLowerCase()) { closeColorPopover(true); return; }
+            // A function that already had this colour turns grey, so no two functions share a colour.
+            const owners = currentLabels().filter(l => l !== label && (colors[l] || '').toLowerCase() === col.toLowerCase());
+            const prefs = readColorPrefs();
+            const apply = (l, c) => { [l, colorCounterpart(l)].forEach(k => { if (k) { colors[k] = c; prefs[k] = c; } }); };
+            apply(label, col);
+            owners.forEach(o => apply(o, NEUTRAL_COLOR));
+            writeColorPrefs(prefs); recolorSolved(); renderLegend(); closeColorPopover(true);
+        }
+        function resetStudentColors() {
+            const label = legendOpenLabel;
+            try { localStorage.removeItem(COLOR_PREF_KEY); } catch(e) {}
+            Object.keys(teacherColors).forEach(k => { colors[k] = teacherColors[k]; });
+            recolorSolved(); renderLegend(); legendOpenLabel = label; closeColorPopover(true);
+        }
+        function legendChip(label) { return Array.from(document.querySelectorAll('#label-legend .legend-chip')).find(c => c.dataset.label === label); }
+        function renderLegend() {
+            const box = document.getElementById('label-legend'); if (!box) return;
+            const t = studentTexts[currentLang];
+            box.innerHTML = '';
+            const ttl = document.createElement('div'); ttl.className = 'legend-title'; ttl.textContent = t.legendTitle;
+            const hint = document.createElement('p'); hint.className = 'legend-hint'; hint.textContent = t.legendHint;
+            box.append(ttl, hint);
+            const list = document.createElement('div'); list.className = 'legend-list';
+            currentLabels().forEach(label => {
+                const chip = document.createElement('button'); chip.type = 'button'; chip.className = 'legend-chip'; chip.dataset.label = label;
+                chip.setAttribute('aria-haspopup', 'dialog'); chip.title = t.colorFor + ' ' + label;
+                const sw = document.createElement('span'); sw.className = 'legend-swatch'; sw.style.backgroundColor = colors[label] || NEUTRAL_COLOR;
+                const name = document.createElement('span'); name.className = 'legend-name';
+                const key = labelShortcuts[label]; const at = key ? label.toLowerCase().indexOf(key) : -1;
+                if (at !== -1) {
+                    const u = document.createElement('u'); u.textContent = label[at];
+                    name.append(label.substring(0, at), u, label.substring(at + 1));
+                } else if (key) {
+                    const u = document.createElement('u'); u.textContent = key.toUpperCase();
+                    name.append('[', u, '] ' + label);
+                } else { name.textContent = label; }
+                chip.append(sw, name);
+                chip.onclick = (e) => { e.stopPropagation(); if (legendOpenLabel === label) closeColorPopover(true); else openColorPopover(label, chip); };
+                list.appendChild(chip);
+            });
+            box.appendChild(list);
+        }
+        function openColorPopover(label, anchor) {
+            const pop = document.getElementById('color-popover'); const t = studentTexts[currentLang];
+            document.querySelectorAll('#label-legend .legend-chip.open').forEach(c => c.classList.remove('open'));
+            anchor.classList.add('open');
+            legendOpenLabel = label; pop.innerHTML = '';
+            const title = document.createElement('div'); title.className = 'color-pop-title'; title.textContent = t.colorFor + ' ' + label;
+            pop.appendChild(title);
+            const grid = document.createElement('div'); grid.className = 'color-pop-grid';
+            const current = (colors[label] || '').toLowerCase();
+            SAFE_COLORS.forEach(col => {
+                const sw = document.createElement('button'); sw.type = 'button'; sw.className = 'color-swatch';
+                sw.style.backgroundColor = col; sw.style.color = isDarkColor(col) ? '#fff' : '#111827';
+                if (col.toLowerCase() === current) sw.classList.add('current');
+                const owner = findColorOwner(label, col);
+                if (owner) { sw.textContent = '•'; sw.title = t.colorInUse.replace('{label}', owner); } else { sw.title = col; }
+                sw.setAttribute('aria-label', sw.title);
+                sw.onclick = () => setStudentColor(label, col);
+                grid.appendChild(sw);
+            });
+            pop.appendChild(grid);
+            const own = teacherColors[label];
+            if (own && own.toLowerCase() !== current) {
+                const r1 = document.createElement('button'); r1.type = 'button'; r1.className = 'color-pop-reset'; r1.textContent = t.colorResetOne;
+                r1.onclick = () => setStudentColor(label, own); pop.appendChild(r1);
+            }
+            if (Object.keys(readColorPrefs()).length) {
+                const r2 = document.createElement('button'); r2.type = 'button'; r2.className = 'color-pop-reset'; r2.textContent = t.colorsReset;
+                r2.onclick = resetStudentColors; pop.appendChild(r2);
+            }
+            pop.style.display = 'block';
+            if (window.innerWidth > 768) {
+                // Open beside the sidebar entry (to its right); fall back to below it when there is no room.
+                const r = anchor.getBoundingClientRect(); const w = pop.offsetWidth; const h = pop.offsetHeight;
+                const side = document.getElementById('label-legend').getBoundingClientRect();
+                let left = Math.max(r.right, side.right) + 8; let top = r.top;
+                if (left + w > window.innerWidth - 8) { left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8)); top = r.bottom + 6; }
+                if (top + h > window.innerHeight - 8) top = Math.max(8, window.innerHeight - h - 8);
+                pop.style.left = left + 'px'; pop.style.top = top + 'px';
+            }
+            const first = pop.querySelector('.color-swatch.current') || pop.querySelector('.color-swatch');
+            if (first) first.focus({ preventScroll: true });
+        }
+        function closeColorPopover(refocus) {
+            const pop = document.getElementById('color-popover');
+            if (pop) pop.style.display = 'none';
+            document.querySelectorAll('#label-legend .legend-chip.open').forEach(c => c.classList.remove('open'));
+            const label = legendOpenLabel; legendOpenLabel = null;
+            if (refocus && label) { const c = legendChip(label); if (c) c.focus({ preventScroll: true }); }
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && legendOpenLabel !== null) { e.preventDefault(); closeColorPopover(true); }
+        });
+        window.addEventListener('scroll', () => { if (legendOpenLabel !== null && window.innerWidth > 768) closeColorPopover(false); }, { passive: true });
+
+        function updateStudentShortcuts() {
+            labelShortcuts = {};
+            let used = new Set(['x', 'm', 'w', 'g']); 
+            
+            const hardcoded = SHORTCUTS;
+            
+            const btns = Array.from(document.querySelectorAll('.menu-btn:not(.gen-btn)'));
+            
+            btns.forEach(btn => {
+                let f = btn.dataset.val;
+                if (hardcoded[f] && !used.has(hardcoded[f])) {
+                    labelShortcuts[f] = hardcoded[f];
+                    used.add(hardcoded[f]);
+                }
+            });
+
+            btns.forEach(btn => {
+                let f = btn.dataset.val;
+                let assigned = !!labelShortcuts[f];
+                
+                if (!assigned) {
+                    for (let i = 0; i < f.length; i++) {
+                        let char = f[i].toLowerCase();
+                        if (/[a-z]/.test(char) && !used.has(char)) { labelShortcuts[f] = char; used.add(char); assigned = true; break; }
+                    }
+                }
+                if (!assigned) {
+                    for (let code = 97; code <= 122; code++) {
+                        let char = String.fromCharCode(code);
+                        if (!used.has(char)) { labelShortcuts[f] = char; used.add(char); break; }
+                    }
+                }
+                
+                let shortcut = labelShortcuts[f]; let innerHTML = f;
+                if (shortcut) {
+                    let idx = f.toLowerCase().indexOf(shortcut);
+                    if (idx !== -1) { innerHTML = f.substring(0, idx) + '<u>' + f[idx] + '</u>' + f.substring(idx + 1); } 
+                    else { innerHTML = '[<u>' + shortcut.toUpperCase() + '</u>] ' + f; }
+                }
+                btn.innerHTML = innerHTML;
+            });
+        }
+        updateStudentShortcuts();
+
+        document.addEventListener('mouseover', (e) => { 
+            const el = e.target.closest('.hover-word, .g-label');
+            hoveredStudentEl = el ? el : null; 
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.target.closest && e.target.closest('#color-popover, #label-legend')) return; // label shortcuts are off while choosing colours
+            let targetEl = hoveredStudentEl;
+            if (!targetEl && document.activeElement && (document.activeElement.classList.contains('hover-word') || document.activeElement.classList.contains('g-label'))) { targetEl = document.activeElement; }
+            if (!targetEl) return;
+            if (exMode === 'guided' && (guided.hold || targetEl !== guided.el)) return;
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            if (e.key.length !== 1 || !/[a-zA-Z]/.test(e.key)) return;
+
+            let key = e.key.toLowerCase();
+            
+            if (key === 'g' && activeSubWord) {
+                e.preventDefault();
+                document.querySelector('.gen-btn').click();
+                return;
+            }
+
+            if (targetEl.dataset.done === "true") return; 
+
+            let matchedLabel = Object.keys(labelShortcuts).find(k => labelShortcuts[k] === key);
+            if (matchedLabel) {
+                e.preventDefault();
+                const btn = Array.from(document.querySelectorAll('.menu-btn:not(.gen-btn)')).find(b => b.dataset.val === matchedLabel);
+                if (btn) { activeEl = targetEl; mode = activeEl.classList.contains('hover-word') ? "word" : "group"; btn.click(); hoveredStudentEl = null; }
+            }
+        });
+
+        function switchStudentLang(newLang) {
+            if (newLang === currentLang) return;
+            currentLang = newLang; document.documentElement.lang = newLang; const t = studentTexts[newLang];
+            
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.lang-btn[onclick="switchStudentLang('${newLang}')"]`).classList.add('active');
+            
+            document.querySelector('.instruction-box').innerHTML = t.instr;
+            const tn = document.querySelector('.teacher-note span'); if(tn) tn.textContent = t.note;
+            
+            document.getElementById('btn-practise').textContent = t.practiseMode; document.getElementById('btn-exam').textContent = t.examMode;
+            const gb = document.getElementById('btn-guided'); if (gb) gb.textContent = t.guidedMode;
+            document.querySelector('button[onclick="togglePatterns()"]').title = t.togglePat; document.querySelector('button[onclick="toggleContrast()"]').title = t.toggleCon;
+            
+            const fBtns = document.querySelectorAll('.footer-toolbar .btn');
+            fBtns[0].textContent = t.btnSaveProg; fBtns[1].textContent = t.btnClearProg; fBtns[2].textContent = t.print; fBtns[3].textContent = t.download;
+            const submitBtn = document.getElementById('btn-submit-exam'); if (submitBtn) submitBtn.textContent = t.btnSubmitExam;
+            
+            document.querySelector('.results-title').textContent = t.examResults; document.querySelector('.btn-copy').textContent = t.copyResults;
+            document.querySelector('#results-modal .btn:not(.btn-copy)').textContent = t.close; document.querySelectorAll('textarea:not(.results-textarea)').forEach(ta => ta.placeholder = t.transPlaceholder);
+            
+            if (document.title === studentTexts.en.docTitle || document.title === studentTexts.de.docTitle) {
+                document.title = t.docTitle; document.querySelector('h1').textContent = t.docTitle;
+            }
+            
+            const map = labelMap[newLang] || {}; const translateLabel = (l) => map[l] || l;
+            
+            document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(btn => {
+                const newVal = translateLabel(btn.dataset.val); btn.dataset.val = newVal; btn.textContent = newVal;
+            });
+            
+            document.querySelectorAll('.hover-word, .s-group').forEach(el => {
+                if(el.dataset.ans) el.dataset.ans = translateLabel(el.dataset.ans);
+                let isDone = false;
+                if (el.classList.contains('hover-word')) { isDone = el.dataset.done === "true"; } 
+                else { const gLabel = el.querySelector('.g-label'); if (gLabel) isDone = gLabel.dataset.done === "true"; }
+                
+                if(isDone) {
+                    const ans = el.dataset.ans;
+                    if(el.classList.contains('hover-word')) {
+                        const s = el.querySelector('.ans-label');
+                        if(s) {
+                            s.textContent = ans;
+                            if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
+                        }
+                    } else {
+                        const tSpan = el.querySelector('.g-text'); const gLabel = el.querySelector('.g-label');
+                        if(tSpan && gLabel) {
+                            tSpan.textContent = ans;
+                            if (gLabel.offsetWidth > el.offsetWidth) { tSpan.textContent = abbreviations[newLang][ans] || ans.substring(0, 4) + '.'; gLabel.title = ans; }
+                        }
+                    }
+                }
+            });
+            updateStudentShortcuts(); 
+            closeColorPopover(false); renderLegend();
+            if (exMode === 'guided') guidedRender();
+        }
+
+        function setStudentZoom(delta) {
+            if (delta === 0) { sZoom = 1; } else { sZoom = Math.max(0.5, Math.min(2.5, sZoom + delta)); }
+            const area = document.getElementById('exercise');
+            if ('zoom' in area.style) { area.style.zoom = sZoom; } 
+            else { area.style.transform = 'scale(' + sZoom + ')'; area.style.transformOrigin = "top left"; area.style.width = (100 / sZoom) + '%'; }
+        }
+
+        function setMode(m) {
+            if (answeredItems > 0 || document.querySelector('.marked-gen')) {
+                const t = studentTexts[currentLang];
+                if(!confirm(t.resetWarn)) return;
+                try { localStorage.removeItem(saveKey); sessionStorage.setItem(saveKey + '_mode', m); } catch(e) { console.warn("Storage blocked", e); }
+                allowUnload = true; location.reload(); return;
+            }
+            exMode = m;
+            [['btn-guided', 'guided'], ['btn-practise', 'practise'], ['btn-exam', 'exam']].forEach(([id, val]) => {
+                const b = document.getElementById(id); if (!b) return;
+                b.style.background = m === val ? 'white' : 'transparent'; b.style.boxShadow = m === val ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'; b.style.color = m === val ? '#111827' : '#475569';
+            });
+            document.body.classList.toggle('guided-mode', m === 'guided');
+            if (m === 'guided') guidedStart(); else guidedStop();
+            const submitBtn = document.getElementById('btn-submit-exam');
+            if (submitBtn) submitBtn.style.display = (m === 'exam' && !examFinalized) ? 'inline-block' : 'none';
+        }
+
+        menu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
+        menu.addEventListener('mouseleave', () => { clearTimeout(hideMenuTimeout); hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150); });
+
+        const exerciseArea = document.getElementById('exercise');
+
+        // 1. Delegated Click handler
+        exerciseArea.addEventListener('click', (e) => {
+			const el = e.target.closest('.hover-word, .g-label');
+			if (!el) return;
+			dismissToastOnInteraction();
+			e.stopPropagation();
+            if (exMode === 'guided') {
+                const ok = !guided.hold && el === guided.el && (guided.type !== 'gen' || e.target.closest('.s-text'));
+                if (!ok) {
+                    menu.style.display = 'none';
+                    if (!guided.hold && guided.el) guidedRender(el === guided.el ? gT().clickWord : gT().locked, false);
+                    return;
+                }
+            }
+            
+            activeSubWord = (exMode === 'guided' && guided.type !== 'gen') ? null : e.target.closest('.s-text'); // guided: "Mark Genitive" only in its own step
+            const genBtn = document.querySelector('.gen-btn');
+            
+            if (activeSubWord) {
+                genBtn.style.display = "block";
+                const t = studentTexts[currentLang];
+                genBtn.textContent = activeSubWord.classList.contains('marked-gen') ? t.unmarkGen : t.markGen;
+            } else {
+                genBtn.style.display = "none";
+            }
+            
+            document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => {
+                b.style.display = el.dataset.done === "true" ? "none" : "block";
+            });
+            
+            if (el.dataset.done === "true" && !activeSubWord) return;
+            
+            activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
+            if(window.innerWidth > 768) { 
+                const rect = (activeSubWord || el).getBoundingClientRect();
+                menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
+            }
+            menu.style.display="block"; 
+            if (el.dataset.done !== "true") {
+                let firstNorm = menuBtns.find(b => !b.classList.contains('gen-btn'));
+                if(firstNorm) firstNorm.focus();
+            } else {
+                genBtn.focus();
+            }
+        });
+
+        // Shared logic to position and show the menu for a given word/group element.
+        // Used both by hover and by the automatic advance to the next word.
+        function openMenuFor(el) {
+            if (!el || el.dataset.done === "true") return;
+            activeEl = el; activeSubWord = null; mode = el.classList.contains('hover-word') ? "word" : "group";
+            document.querySelector('.gen-btn').style.display = "none";
+            document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => b.style.display = "block");
+
+            if(window.innerWidth > 768) {
+                const rect = el.getBoundingClientRect();
+                menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px";
+            }
+            menu.style.display="block";
+        }
+
+        // 2. Delegated Mouseover (handles what onmouseenter did)
+       exerciseArea.addEventListener('mouseover', (e) => {
+			const el = e.target.closest('.hover-word, .g-label');
+			if (!el) return;
+			dismissToastOnInteraction();
+			clearTimeout(hideMenuTimeout); // stop any pending hide as soon as the pointer lands on any word/group, done or not
+			if (exMode === 'guided' && (guided.hold || el !== guided.el || guided.type === 'gen')) return;
+			if (el.dataset.done === "true") return;
+			if (el === activeEl && menu.style.display === 'block') return; // keep the clicked sub-word (Mark Genitive) selected while the pointer stays on this phrase
+			openMenuFor(el);
+		});
+
+        // 3. Delegated Mouseout (handles what onmouseleave did)
+        exerciseArea.addEventListener('mouseout', (e) => {
+			const el = e.target.closest('.hover-word, .g-label');
+			if (!el) return;
+			clearTimeout(hideMenuTimeout); // never let two hide-timers run at once - the earlier one would otherwise survive and close a menu that gets reopened moments later
+			hideMenuTimeout = setTimeout(() => { menu.style.display = "none"; }, 150);
+		});
+
+        // 4. Delegated Keydown (Accessibility for Enter/Space)
+        exerciseArea.addEventListener('keydown', (e) => {
+            const el = e.target.closest('.hover-word, .g-label');
+            if (!el) return;
+            if(e.key === 'Enter' || e.key === ' ') { 
+                e.preventDefault(); 
+                el.click(); 
+            }
+        });
+
+        menuBtns.forEach((btn, index) => {
+            btn.onclick = (e) => {
+                studentDirty = true;
+                const t = studentTexts[currentLang];
+                
+            if (btn.classList.contains('gen-btn')) {
+                    if (!activeSubWord) return;
+                    if (exMode === 'guided') {
+                        menu.style.display = 'none';
+                        const blk = activeSubWord.closest('.hover-word');
+                        if (guided.hold || guided.type !== 'gen' || blk !== guided.el) { guidedRender(gT().labelFirst, false); return; }
+                        if (activeSubWord.classList.contains('marked-gen')) return;
+                        if (activeSubWord.dataset.u === "true") { activeSubWord.classList.add('marked-gen'); check(); guidedGenFound(blk); }
+                        else {
+                            const w = activeSubWord; w.classList.add('error-gen'); setTimeout(() => w.classList.remove('error-gen'), 800);
+                            blk.dataset.genMistakes = parseInt(blk.dataset.genMistakes || 0) + 1;
+                            guidedRender('✗ ' + gT().notGen, false, parseInt(blk.dataset.genMistakes) >= 3);
+                        }
+                        return;
+                    }
+                    const isCorrect = activeSubWord.dataset.u === "true";
+                    const isMarked = activeSubWord.classList.contains('marked-gen');
+                    
+                    if (!isMarked) {
+                        if (isCorrect) {
+                            activeSubWord.classList.add('marked-gen');
+                            showToast(t.correct, false);
+                        } else {
+                            const currentSubWord = activeSubWord; 
+                            currentSubWord.classList.add('error-gen');
+                            setTimeout(() => currentSubWord.classList.remove('error-gen'), 800);
+                            showToast(t.notGenitive, true);
+                        }
+                    } else {
+                        activeSubWord.classList.remove('marked-gen');
+                    }
+                    
+                    menu.style.display = "none"; 
+                    check();
+                    return;
+                }
+
+                const sel = btn.dataset.val; const correct = mode === "word" ? activeEl.dataset.ans : activeEl.parentElement.dataset.ans; 
+                if (exMode === 'guided') {
+                    menu.style.display = "none";
+                    if (guided.hold || activeEl !== guided.el) return;
+                    if (sel === correct) { solve(activeEl, correct, mode); answeredItems++; check(); guidedSolved(activeEl, correct, false); }
+                    else { activeEl.dataset.mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1; guidedWrong(activeEl, correct); }
+                    return;
+                }
+                
+                if (exMode === 'practise') {
+                    if(sel === correct) {
+                        solve(activeEl, correct, mode); showToast(t.correct, false); answeredItems++;
+                    } else { 
+                        let mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1; activeEl.dataset.mistakes = mistakes;
+                        if(mistakes >= 2) { showToast(t.incorrect + correct, true); solve(activeEl, correct, mode); answeredItems++; } 
+                        else { 
+                            const errHint = activeEl.dataset.errhint;
+                            if (errHint) { showToast(t.tryAgain + " 💡 " + errHint, true); }
+                            else { showToast(t.tryAgain, true); }
+                        }
+                    }
+                } else {
+                    if(sel === correct) { solve(activeEl, correct, mode); examScore++; } 
+                    else {
+                        solve(activeEl, correct, mode);
+                        if(mode === "word") { activeEl.style.border = "2px solid #ef4444"; } 
+                        else { activeEl.parentElement.style.borderColor = "#ef4444"; }
+                    }
+                    answeredItems++;
+                }
+                
+                menu.style.display = "none"; check();
+                if (activeEl && !activeEl.dataset.done) { activeEl.focus(); } 
+                else if (activeEl && activeEl.dataset.done) {
+                    const allItems = Array.from(document.querySelectorAll('.hover-word, .g-label')); const currentIndex = allItems.indexOf(activeEl); let nextEl = null;
+                    for(let i = currentIndex + 1; i < allItems.length; i++) { if(allItems[i].dataset.done !== "true") { nextEl = allItems[i]; break; } }
+						    if (!nextEl) {
+								for(let i = currentIndex - 1; i >= 0; i--) { if(allItems[i].dataset.done !== "true") { nextEl = allItems[i]; break; } }
+								}
+							if (nextEl) { nextEl.focus(); openMenuFor(nextEl); }
+						}
+            };
+            
+            btn.onkeydown = (e) => {
+                if (e.key === 'ArrowDown') { e.preventDefault(); menuBtns[(index + 1) % menuBtns.length].focus(); } 
+                else if (e.key === 'ArrowUp') { e.preventDefault(); menuBtns[(index - 1 + menuBtns.length) % menuBtns.length].focus(); } 
+                else if (e.key === 'Escape') { e.preventDefault(); dismissToastOnInteraction(); menu.style.display = "none"; if (activeEl) activeEl.focus(); }
+            };
+        });
+
+        function showToast(msg, isError, duration = 3000) {
+    const x = document.getElementById("toast-container"); x.textContent = msg; x.className = isError ? "show error" : "show success";
+    clearTimeout(toastHideTimeout);
+    document.removeEventListener('mousemove', dismissToastOnInteraction);
+    document.removeEventListener('click', dismissToastOnInteraction);
+    if (!isError) {
+    // Mistakes (especially ones showing a teacher hint) stay on screen until the
+    // student moves to or clicks another word/group - see dismissToastOnInteraction()
+    // calls in the exerciseArea mouseover/click handlers below.
+    toastHideTimeout = setTimeout(function(){ x.className = x.className.replace("show", ""); }, duration);
+}
+}
+function dismissToastOnInteraction() {
+    document.getElementById("toast-container").className = document.getElementById("toast-container").className.replace("show", "");
+}
+        function togglePatterns() { document.body.classList.toggle('pattern-mode'); }
+        function toggleContrast() { document.body.classList.toggle('high-contrast'); }
+
+        function solve(el, ans, m) {
+            if(m === "word") {
+                const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
+                paintWord(el, colors[ans]); el.dataset.done = "true"; el.removeAttribute('tabindex');
+                if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
+            } else { 
+                const tSpan = el.querySelector('.g-text'); if (tSpan) tSpan.textContent = ans; else el.textContent = ans; 
+                el.dataset.done = "true"; el.style.background = "#f0fdf4"; el.removeAttribute('tabindex');
+                if (el.offsetWidth > el.parentElement.offsetWidth) {
+                    if (tSpan) tSpan.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.';
+                    else el.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.';
+                    el.title = ans; 
+                }
+            }
+        }
+
+        function check() { 
+            document.querySelectorAll('.sentence-container').forEach((s, i) => { 
+                const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')];
+                const requiredGens = [...s.querySelectorAll('.s-text[data-u="true"]')];
+                
+                const allItemsDone = items.length === 0 || items.every(item => item.dataset.done === "true");
+                const allGensDone = requiredGens.every(gen => gen.classList.contains('marked-gen'));
+                
+                const translationReady = allItemsDone && allGensDone;
+                
+                if(items.length > 0 && translationReady) {
+                    const b = document.getElementById('t-container-' + i); if(b) b.style.display = 'block';
+                }
+            }); 
+            
+            const currentMarkedGens = document.querySelectorAll('.s-text[data-u="true"].marked-gen').length;
+			if (exMode === 'exam' && !examFinalized && answeredItems === totalPhrases && currentMarkedGens === totalGens && totalPhrases > 0) {
+                finalizeExam();
+            }
+        }
+
+        function finalizeExam() {
+            if (examFinalized) return;
+            examFinalized = true;
+            const t = studentTexts[currentLang];
+            let genScore = 0;
+            document.querySelectorAll('.s-text[data-u="true"]').forEach(st => {
+                if(st.classList.contains('marked-gen')) genScore++;
+            });
+            // Genitive attributes now weigh exactly like labelled phrases: 1 point if found, 0 if not.
+            // (No separate deduction for earlier wrong guesses while searching - matches how a wrong
+            // label only ever costs the single point of that task, never more.)
+            let finalScore = examScore + genScore;
+
+            const submitBtn = document.getElementById('btn-submit-exam');
+            if (submitBtn) submitBtn.style.display = 'none';
+
+            setTimeout(() => {
+                const pct = Math.round((finalScore / totalItems) * 100);
+                document.getElementById('final-score-display').textContent = finalScore + " / " + totalItems + " (" + pct + "%)";
+
+                /* Note: The newline here is handled via raw string \n now */
+                document.getElementById('results-text').value = t.resExercise + (titleInput || t.docTitle).replace(/["'\`]/g, "") + "\n" + t.resDate + new Date().toLocaleDateString() + "\n" + t.resScore + finalScore + " / " + totalItems + " (" + pct + "%)";                    document.getElementById('results-modal').style.display = 'flex';
+            }, 500);
+        }
+
+        function submitExam() {
+            if (exMode !== 'exam' || examFinalized) return;
+            const t = studentTexts[currentLang];
+            if (!confirm(t.confirmSubmit)) return;
+
+            // Reveal every translation box, even for sentences that were never fully solved.
+            document.querySelectorAll('.sentence-container').forEach((s, i) => {
+                const b = document.getElementById('t-container-' + i);
+                if (b) b.style.display = 'block';
+            });
+
+            // Any phrase/group left unanswered counts as an error: reveal the correct label so
+            // the student sees what was missing, same as an actively wrong guess would show.
+            document.querySelectorAll('.hover-word, .g-label').forEach(el => {
+                if (el.dataset.done !== "true") {
+                    const m = el.classList.contains('hover-word') ? "word" : "group";
+                    const correct = m === "word" ? el.dataset.ans : el.parentElement.dataset.ans;
+                    solve(el, correct, m);
+                    if (m === "word") { el.style.border = "2px solid #ef4444"; }
+                    else { el.parentElement.style.borderColor = "#ef4444"; }
+                    answeredItems++;
+                }
+            });
+
+            // Any required genitive attribute that was never found: highlight it so the student
+            // sees what was missing; it earns no point, same as an unanswered phrase.
+            document.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').forEach(st => {
+                st.classList.add('missed-gen');
+            });
+
+            finalizeExam();
+        }
+
+       function saveStudentProgress() {
+            const t = studentTexts[currentLang];
+            if(!confirm(t.saveWarning)) return;
+
+            const items = Array.from(document.querySelectorAll('.hover-word, .g-label'));
+            const state = items.map(el => ({ done: el.dataset.done === "true", ans: el.dataset.ans, mistakes: el.dataset.mistakes || 0 }));
+            
+            const subWords = Array.from(document.querySelectorAll('.s-text'));
+            const subState = subWords.map(el => el.classList.contains('marked-gen'));
+            
+            const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)')).map(ta => ta.value);
+            
+            const data = { items: state, subWords: subState, textareas: textareas, exMode: exMode, examScore: examScore, answeredItems: answeredItems };
+            
+            // --- NEW TRY/CATCH BLOCK ---
+            try {
+                localStorage.setItem(saveKey, JSON.stringify(data)); 
+                showToast(t.progSaved || "Progress saved!", false);
+                studentDirty = false;
+            } catch (e) {
+                console.warn("Save failed", e);
+                showToast("Save failed: Check your browser privacy settings.", true);
+            }
+        }
+
+        function loadStudentProgress() {
+            // --- MOVED getItem INSIDE THE EXISTING TRY BLOCK ---
+            try {
+                const saved = localStorage.getItem(saveKey); 
+                if (!saved) return;
+                
+                const data = JSON.parse(saved); 
+                const items = Array.from(document.querySelectorAll('.hover-word, .g-label')); 
+                const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)'));
+                
+                if (data.items && data.items.length !== items.length) { console.warn("Saved progress length does not match. Ignoring."); return; }
+                exMode = data.exMode || 'practise'; setMode(exMode); examScore = data.examScore || 0; answeredItems = data.answeredItems || 0;
+                
+                data.items.forEach((state, i) => {
+                    if (items[i] && state.done) {
+                        items[i].dataset.ans = state.ans; items[i].dataset.mistakes = state.mistakes; solve(items[i], state.ans, items[i].classList.contains('hover-word') ? 'word' : 'group');
+                    } else if (items[i]) { items[i].dataset.mistakes = state.mistakes; }
+                });
+                
+                if (data.subWords) {
+                    const subWords = Array.from(document.querySelectorAll('.s-text'));
+                    data.subWords.forEach((isMarked, i) => {
+                        if (subWords[i] && isMarked) subWords[i].classList.add('marked-gen');
+                    });
+                }
+                
+                data.textareas.forEach((val, i) => { if (textareas[i]) textareas[i].value = val; }); check(); 
+            } catch (e) { 
+                console.warn("Failed to load progress or storage is blocked.", e); 
+            }
+        }
+
+        function clearStudentProgress() {
+            const msg = currentLang === 'de' ? 'Fortschritt wirklich löschen?' : 'Really clear progress?';
+            if(confirm(msg)) { 
+                // --- NEW TRY/CATCH BLOCK ---
+                try {
+                    localStorage.removeItem(saveKey); 
+                } catch(e) {
+                    console.warn("Failed to clear local storage.", e);
+                }
+                allowUnload = true; location.reload(); 
+            }
+        }
+
+        function copyResults() {
+            const t = studentTexts[currentLang]; const copyText = document.getElementById("results-text");
+            copyText.select(); copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value).then(() => { showToast(t.copied, false); });
+        }
+
+        function closeResults() { document.getElementById('results-modal').style.display = 'none'; }
+        function downloadPage() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], {type: 'text/html'})); a.download = ((titleInput || studentTexts[currentLang].docTitle).replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '').replace(/\s+/g, ' ').trim().replace(/^\.+/, '') || 'Syntax-Studio Latein') + '.html'; a.click(); }
+        document.addEventListener('mousedown', (e) => { 
+            if(!e.target.closest('.radio-menu')) menu.style.display = 'none'; 
+            if(!e.target.closest('#color-popover, .legend-chip')) closeColorPopover(false);
+            if(!e.target.closest('.hint-icon')) document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
+        });
+
+        function initStudentPage() {
+            applyStoredColors(); // before progress is restored, so restored answers already use the student's colours
+            renderLegend();
+            let pendingMode = null;
+            try { pendingMode = sessionStorage.getItem(saveKey + '_mode'); sessionStorage.removeItem(saveKey + '_mode'); } catch(e) {}
+            if (pendingMode === 'practise' || pendingMode === 'exam' || pendingMode === 'guided') setMode(pendingMode);
+            loadStudentProgress();
+            if (exMode === 'guided') guidedStart();
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initStudentPage); else initStudentPage();
+    </script>
+<script>
+// ==========================================
+// 0. GLOBALS & HELPER FUNCTIONS
+// ==========================================
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+function escapeHTML(str) {
+    if (str == null) return '';
+    // Plain entity escaping, safe in text and attribute contexts.
+    // (Not DOMPurify: it returns strings without '<' unchanged, so quotes and '&' would leak into attributes.)
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function parseSimpleMarkdown(text) {
+    if (!text) return '';
+    let safeText = escapeHTML(text);
+    safeText = safeText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); 
+    safeText = safeText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Safely allow the strong/em tags we just generated
+    if (window.DOMPurify) {
+        return DOMPurify.sanitize(safeText, { ALLOWED_TAGS: ['strong', 'em'] });
+    }
+    return safeText;
+}
+
+function isTextTooLong(text, maxWords) {
+    if (!text.trim()) return false;
+    
+    // Count words by splitting the text by any whitespace
+    const wordCount = LatinCore.countWords(text);
+    
+    if (wordCount > maxWords) {
+        // Multi-language alert message
+        const msg = AppState.lang === 'de' 
+            ? `Dein Text enthält ${wordCount} Wörter. Bitte beschränke dich auf maximal ${maxWords} Wörter, damit die KI den Code vollständig generieren kann.`
+            : `Your text contains ${wordCount} words. Please limit it to a maximum of ${maxWords} words so the AI can generate the complete code.`;
+        
+        alert(msg);
+        return true; // Returns true if the limit is exceeded
+    }
+    return false; // Returns false if it's safe to proceed
+}
+
+// ==========================================
+// 1. CONFIGURATION (Constants & Setup)
+// ==========================================
+const CONFIG = {
+    STORAGE_KEY: 'latin_tool_autosave',
+    COLOR_PREF_KEY: 'latin_tool_label_colors', // the teacher's colour choices, reused for every new exercise in this browser
+    PUNCT: 'Punct',
+    OTHER_EN: 'Other',
+    OTHER_DE: 'Sonstiges',
+    MAIN_CLAUSE_EN: 'Main clause',
+    MAIN_CLAUSE_DE: 'Hauptsatz',
+    SENTENCE_ENDERS: ['.', '!', '?', '·'],
+    NEUTRAL_COLOR: '#e5e7eb', // grey given to a label whose colour was taken by another label
+    AI: {
+        ENDPOINT: 'https://api.openai.com/v1/responses',
+        PROXY_URL: 'https://latin-syntax-proxy.latin-syntax-proxy.workers.dev/',            // set to the deployed worker URL (see worker/README.md): requests then go there WITHOUT a key and the key button disappears
+        MODEL: 'gpt-5.6-luna',    // cheapest current tier (checked 2026-09-04); 'gpt-5.6-terra' is the next step up
+        EFFORT: 'low',            // reasoning effort: none | low | medium | high (reasoning tokens are billed as output)
+        TIMEOUT_MS: 60000,
+        KEY_STORAGE: 'latin_tool_openai_key'
+    },
+    SAFE_COLORS: LatinLabels.SAFE_COLORS,
+    SEMANTIC_COLORS: LatinLabels.SEMANTIC_COLORS,
+    PRESETS: LatinLabels.PRESETS,
+    GROUP_LABELS: LatinLabels.GROUP_LABELS,
+    ABBREVIATIONS: LatinLabels.ABBREVIATIONS,
+    LANG_TEXT: {
         en: {
-            beginner: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Prepositional phrase', 'Vocative', 'Other'],
-            intermediate: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other'],
-            advanced: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Accusative/Nominative with infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other']
+            heading: "Latin Syntax Studio", instrH3: "Step 1: Setup Instruction",
+            instrBody: "This page allows you to create your own sentences for syntactical analysis. The idea is that you give your students some support with the analysis and translation, e.g. by indicating which groups of words belong together, and that your students understand the syntax of a sentence before they start translating.<br><br>Enter a title, optional notes for the students, an optional picture for the student page and a Latin text of up to 300 words, choose the grammar level and click 'Analyze with AI'. The analysis is done by OpenAI.", instrKey: "For this you enter your own OpenAI API key once via the key button; it stays in this browser only.", instrBodyEnd: "Then check and refine the analysis in the editor and export the student page. You can also start a manual analysis without AI.",
+            exampleLink: "Want to see what the final result looks like?", linkText: "View Example",
+            phTitle: "Exercise Title", phImage: "Optional: Image URL", phNotes: "Optional: Context / Teacher Notes", phText: "Paste Latin text here...",
+            btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
+            lblLevel: "Grammar Level:", optBeg: "Beginner", optInt: "Intermediate", optAdv: "Advanced (All)",
+            editH3: "Step 2: Editing Instruction",
+            editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically. Use 'Manual Split' to separate. Use 'Define Word Group' to group phrases. You can use 'Mark Genitive' to draw an underline marking a genitive attribute inside a larger phrase group! Double-click any word or punctuation to edit it or add a hint, an error hint or an explanation for the guided mode. Shortcuts: 'X' for Split, 'M' for Word Group, 'G' for Genitive Underline, 'W' to Toggle Break, Ctrl+Z to Undo. Click ▾ next to a label (or right-click the label) to change its colour. At the end, hit 'Export Student Page'.",
+           	wordModalTitle: "Edit Word & Hint", wordTextLabel: "Word Text:", hintLabel: "Hint (optional):", groupHintLabel: "Group Hint (optional):",
+            errorHintLabel: "Hint after wrong answer (optional):",
+            explainLabel: "Explanation after a correct answer (guided mode, optional):", phWordExplain: "E.g. The accusative points ahead to a verb that needs it.", phGroupExplain: "E.g. Expect a verb of its own at the end of the clause.",
+            phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (W)", btnBracket: "Define Word Group (M)", btnAttr: "Mark Genitive (G)",
+            btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work", btnResetColors: "🎨 Restore default colours", confirmResetColors: "Reset all label colours to the default colours? (You can undo this with Ctrl+Z.)",
+            modalTitle: "Name of the syntactic group:", btnCancel: "Cancel", btnSaveGroup: "Save", btnDelete: "Delete", confirmDelete: "Are you sure you want to delete this word?",
+            modeTag: "Mode: Tagging", modeSplit: "Mode: Manual Split", modeLineBreak: "Mode: Toggle Break", modeBracket: "Mode: Define Word Group", modeAttr: "Mode: Mark Genitive",
+            togglePat: "Toggle Patterns", toggleCon: "Toggle High Contrast",
+            phWordHint: "E.g. Derived from...", phGroupHint: "E.g. Look out for the ablative...", phGroupSearch: "Type to search...",
+            btnAnalyze: "✨ Analyze with AI", btnAnalyzeBusy: "⏳ Analyzing…", btnAiKey: "🔑 API key",
+            aiKeyTitle: "OpenAI API key", aiKeyLabel: "API key:", aiKeyRemove: "Remove",
+            aiKeyNote: "Stored only in this browser (localStorage) and sent directly to OpenAI. Anyone using this browser profile can read it. Use a key with a spend limit and remove it when you are done.",
+            aiErrNoKey: "Please enter your OpenAI API key first.", aiErrNoText: "Please paste a Latin text first.",
+            aiErrAuth: "OpenAI rejected the API key (401). Please check the key.",
+            aiErrBilling: "Your OpenAI credit or spend limit is used up. Top up or raise the limit at platform.openai.com.",
+            aiErrRate: "OpenAI rate limit reached. Please wait a moment and try again.",
+            aiErrRefusal: "The model refused to analyze this text.", aiErrIncomplete: "The answer was cut off. Please try a shorter text.",
+            aiErrNetwork: "Could not reach OpenAI (network problem or timeout). Please check your connection and try again.",
+            aiErrOther: "OpenAI error: ",
+            aiCoverageWarn: "The AI's answer does not match the text word for word.", aiMissingWords: "Missing from the answer: ", aiExtraWords: "Not in the text: ", aiCoverageAsk: "Import anyway? (Cancel to try again.)",
+            phWordErrorHint: "E.g. Check the case ending...", phGroupErrorHint: "E.g. Think about what introduces this clause...",
+            colorBtn: "Change colour", colorTitle: "Colour for:", colorInUse: "Used by {label} (it will turn grey)", colorReset: "↺ Default colour"
         },
         de: {
-            beginner: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Vokativ', 'Sonstiges'],
-            intermediate: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverbiale Bestimmung', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges'],
-            advanced: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverbiale Bestimmung', 'Infinitiv', 'AcI/NcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges']
+            heading: "Syntax-Studio Latein", instrH3: "Schritt 1: Einrichtung",
+            instrBody: "Diese Seite ermöglicht es Ihnen, eigene Sätze für die syntaktische Analyse zu erstellen. Geben Sie einen Titel, optionale Hinweise für die Lernenden, ein Bild (optional) und den lateinischen Text (bis 300 Wörter) ein, wählen Sie die Grammatik-Stufe und klicken Sie auf 'Mit KI analysieren'. Die Analyse übernimmt OpenAI.", instrKey: "Dafür hinterlegen Sie einmalig Ihren eigenen OpenAI-API-Schlüssel über den Schlüssel-Button; er bleibt nur in diesem Browser.", instrBodyEnd: "Prüfen und verfeinern Sie die Analyse anschließend im Editor und exportieren Sie die Schülerseite. Ohne KI können Sie auch manuell starten.",
+            exampleLink: "Möchten Sie sehen, wie das Ergebnis aussieht?", linkText: "Beispiel ansehen",
+            phTitle: "Übungstitel (z.B. Ovid, Metamorphosen 1,1-4)", phImage: "Optional: Bild-URL", phNotes: "Optional: Kontext / Lehrerhinweise", phText: "Lateinischen Text hier einfügen...",
+            btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
+            lblLevel: "Grammatik-Level:", optBeg: "Anfänger", optInt: "Fortgeschritten", optAdv: "Profi (Alle)",
+            editH3: "Schritt 2: Bearbeitung",
+            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer größeren Gruppe durch Unterstreichung hervorheben! Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen und Erklärungen für den geführten Modus. Shortcuts: 'X' für Trennen, 'M' für Wortgruppe, 'G' für Genitiv-Unterstreichung, 'W' für Umbruch, Strg+Z für Rückgängig. Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe.",
+           	wordModalTitle: "Wort & Hinweis bearbeiten", wordTextLabel: "Worttext:", hintLabel: "Hinweis (optional):", groupHintLabel: "Gruppen-Hinweis (optional):",
+            errorHintLabel: "Hinweis nach falscher Antwort (optional):",
+            explainLabel: "Erklärung nach richtiger Antwort (geführter Modus, optional):", phWordExplain: "Z.B. Der Akkusativ kündigt ein Verb an, das ihn braucht.", phGroupExplain: "Z.B. Erwarte am Ende des Nebensatzes ein eigenes Prädikat.",
+            phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (W)", btnBracket: "Wortgruppe definieren (M)", btnAttr: "Genitiv markieren (G)",
+            btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden", btnResetColors: "🎨 Standardfarben wiederherstellen", confirmResetColors: "Alle Label-Farben auf die Standardfarben zurücksetzen? (Mit Strg+Z rückgängig zu machen.)",
+            modalTitle: "Name der syntaktischen Gruppe:", btnCancel: "Abbrechen", btnSaveGroup: "Speichern", btnDelete: "Löschen", confirmDelete: "Möchten Sie dieses Wort wirklich löschen?",
+            modeTag: "Modus: Markieren", modeSplit: "Modus: Manuell trennen", modeLineBreak: "Modus: Umbruch umschalten", modeBracket: "Modus: Wortgruppe definieren", modeAttr: "Modus: Genitiv markieren",
+            togglePat: "Muster umschalten", toggleCon: "Hoher Kontrast",
+            phWordHint: "Z.B. abgeleitet von...", phGroupHint: "Z.B. Achte auf den Ablativ...", phGroupSearch: "Tippen zum Suchen...",
+            btnAnalyze: "✨ Mit KI analysieren", btnAnalyzeBusy: "⏳ Analysiere…", btnAiKey: "🔑 API-Schlüssel",
+            aiKeyTitle: "OpenAI-API-Schlüssel", aiKeyLabel: "API-Schlüssel:", aiKeyRemove: "Entfernen",
+            aiKeyNote: "Wird nur in diesem Browser gespeichert (localStorage) und direkt an OpenAI gesendet. Jeder, der dieses Browserprofil nutzt, kann ihn auslesen. Verwenden Sie einen Schlüssel mit Ausgabenlimit und entfernen Sie ihn nach Gebrauch.",
+            aiErrNoKey: "Bitte zuerst den OpenAI-API-Schlüssel eingeben.", aiErrNoText: "Bitte zuerst einen lateinischen Text einfügen.",
+            aiErrAuth: "OpenAI hat den API-Schlüssel abgelehnt (401). Bitte Schlüssel prüfen.",
+            aiErrBilling: "Ihr OpenAI-Guthaben bzw. Ausgabenlimit ist aufgebraucht. Bitte auf platform.openai.com aufladen oder das Limit erhöhen.",
+            aiErrRate: "OpenAI-Ratenlimit erreicht. Bitte kurz warten und erneut versuchen.",
+            aiErrRefusal: "Das Modell hat die Analyse dieses Textes verweigert.", aiErrIncomplete: "Die Antwort wurde abgeschnitten. Bitte einen kürzeren Text versuchen.",
+            aiErrNetwork: "OpenAI nicht erreichbar (Netzwerkproblem oder Zeitüberschreitung). Bitte Verbindung prüfen und erneut versuchen.",
+            aiErrOther: "OpenAI-Fehler: ",
+            aiCoverageWarn: "Die Antwort der KI stimmt nicht Wort für Wort mit dem Text überein.", aiMissingWords: "In der Antwort fehlt: ", aiExtraWords: "Nicht im Text: ", aiCoverageAsk: "Trotzdem importieren? (Abbrechen, um es erneut zu versuchen.)",
+            phWordErrorHint: "Z.B. Achte auf die Kasusendung...", phGroupErrorHint: "Z.B. Überlege, was diesen Satz einleitet...",
+            colorBtn: "Farbe ändern", colorTitle: "Farbe für:", colorInUse: "Belegt von {label} (wird dann grau)", colorReset: "↺ Standardfarbe"
         }
-    };
-
-    // Labels for clause brackets ("Klammern"). Unlike PRESETS, which shrinks at lower levels, this list
-    // applies at every level: a beginner exercise can still carry a correctly labelled Relativsatz bracket
-    // even though that word never appears in the beginner word-label list (Anke's decision, 2026-09-06).
-    const GROUP_LABELS = {
-        en: ['Subordinate clause', 'Relative clause', 'Accusative/Nominative with infinitive', 'Participial phrase', 'Ablative absolute'],
-        de: ['Nebensatz', 'Relativsatz', 'AcI/NcI', 'Partizipialkonstruktion', 'Ablativus absolutus']
-    };
-
-    function isGroupLabel(label, lang) { return GROUP_LABELS[lang].indexOf(label) !== -1; }
-
-    // Rule 8 forbids "Genitivattribut" as a word's function, but a model may still send it. Spotting it in the
-    // raw answer lets the import recover the word's real function from its head noun instead of losing it.
-    function isGenitiveAttributeLabel(label) {
-        const l = String(label == null ? '' : label).trim().toLowerCase();
-        return l.indexOf('genitivattribut') !== -1 || l.indexOf('genitive attr') !== -1;
     }
+};
+const MODES = {
+    TAGGING: 'tagging',
+    SPLIT: 'split',
+    LINEBREAK: 'linebreak',
+    GROUP: 'group',
+    ATTR: 'attr'
+};
 
-    const SEMANTIC_COLORS = {
-        // --- Core sentence components ---
-        'Subject': '#4ade80', 'Subjekt': '#4ade80',                                   // Bright Green
-        'Verb': '#C76D72', 'Prädikat': '#C76D72',                                     // Dark Rose
-        'Accusative object': '#fde047', 'Akkusativobjekt': '#fde047',                 // Bright Yellow
-        'Dative object': '#fdba74', 'Dativobjekt': '#fdba74',                         // Soft Orange
-        'Prepositional phrase': '#c4b5fd', 'Präpositionale Bestimmung': '#c4b5fd',    // Light Violet
-        // --- Secondary elements and clauses ---
-        'Genitive object': '#fbcfe8', 'Genitivobjekt': '#fbcfe8',                     // Light Pink
-        'Ablative': '#93c5fd', 'Ablativ': '#93c5fd',                                  // Soft Blue
-        'Ablative absolute': '#60a5fa', 'Ablativus absolutus': '#60a5fa',             // Brighter Blue
-        'Adverb': '#ffedd5', 'Adverbiale Bestimmung': '#ffedd5',                      // Pale Peach
-        'Infinitive': '#e9d5ff', 'Infinitiv': '#e9d5ff',                              // Pale Lilac
-        'Predicative': '#fca5a5', 'Prädikativum': '#fca5a5',                          // Rose
-        'Conjunction': '#d6d3d1', 'Konjunktion': '#d6d3d1',                           // Warm Grey
-        'Subjunction': '#f3f4f6', 'Subjunktion': '#f3f4f6',                           // Light Grey
-        'Participial phrase': '#5eead4', 'Partizipialkonstruktion': '#5eead4',        // Teal
-        'Subordinate clause': '#818cf8', 'Nebensatz': '#818cf8',                      // Indigo
-        'Relative clause': '#a7f3d0', 'Relativsatz': '#a7f3d0',                       // Pale Mint
-        'Accusative/Nominative with infinitive': '#c084fc', 'AcI/NcI': '#c084fc',     // Bright Purple
-        'Vocative': '#a5f3fc', 'Vokativ': '#a5f3fc',                                  // Pale Cyan
-        'Other': '#e5e7eb', 'Sonstiges': '#e5e7eb'                                    // Neutral Grey
-    };
-
-    // Free colours for labels a teacher adds.
-    const SAFE_COLORS = ['#4ade80', '#C76D72', '#fde047', '#fdba74', '#c4b5fd', '#fbcfe8', '#f472b6', '#93c5fd', '#60a5fa', '#ffedd5', '#e9d5ff', '#fca5a5', '#d6d3d1', '#f3f4f6', '#5eead4', '#818cf8', '#a7f3d0', '#a5f3fc', '#e5e7eb', '#e9c46a', '#a3b18a', '#b5838d'];
-
-    const ABBREVIATIONS = {
-        en: { 'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Conjunction': 'Conj', 'Subjunction': 'Subjunc', 'Accusative/Nominative with infinitive': 'Acc/Nom+Inf', 'Vocative': 'Voc', 'Other': 'Other' },
-        de: { 'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverbiale Bestimmung': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'N.satz', 'Konjunktion': 'Konj', 'Subjunktion': 'Subjunk', 'AcI/NcI': 'AcI/NcI', 'Vokativ': 'Vok', 'Sonstiges': 'Sonst.' }
-    };
-
-    // Keyboard shortcuts in the editor and on the student page. Keys x, m, w, g are reserved for the tools.
-    const SHORTCUTS = {
-        'Subject': 's', 'Subjekt': 's',
-        'Verb': 'p', 'Prädikat': 'p',
-        'Accusative object': 'a', 'Akkusativobjekt': 'a',
-        'Dative object': 'd', 'Dativobjekt': 'd',
-        'Genitive object': 'v', 'Genitivobjekt': 'v',
-        'Ablative': 'l', 'Ablativ': 'l',
-        'Ablative absolute': 'b', 'Ablativus absolutus': 'b',
-        'Prepositional phrase': 'o', 'Präpositionale Bestimmung': 'o',
-        'Predicative': 'r', 'Prädikativum': 'r',
-        'Adverb': 'e', 'Adverbiale Bestimmung': 'e',
-        'Infinitive': 'i', 'Infinitiv': 'i',
-        'Accusative/Nominative with infinitive': 'c', 'AcI/NcI': 'c',
-        'Participial phrase': 'z', 'Partizipialkonstruktion': 'z',
-        'Relative clause': 't', 'Relativsatz': 't',
-        'Subordinate clause': 'n', 'Nebensatz': 'n',
-        'Conjunction': 'k', 'Konjunktion': 'k',
-        'Subjunction': 'u', 'Subjunktion': 'u',
-        'Vocative': 'f', 'Vokativ': 'f',
-        'Other': 'y', 'Sonstiges': 'y'
-    };
-
-    // Names used in exercises exported by earlier versions of the tool, mapped onto today's labels.
-    const LEGACY = {
-        en: { 'Accusative with infinitive': 'Accusative/Nominative with infinitive', 'AcI': 'Accusative/Nominative with infinitive' },
-        de: { 'Verb': 'Prädikat', 'AcI': 'AcI/NcI', 'Accusative with infinitive': 'AcI/NcI', 'Adverb': 'Adverbiale Bestimmung' }
-    };
-
-    const lower = (s) => String(s == null ? '' : s).trim().toLowerCase();
-
-    // Translate a label into `lang`. Preset labels are translated by position, everything else is left as it is.
-    function translateLabel(label, lang) {
-        const other = lang === 'en' ? 'de' : 'en';
-        const idx = PRESETS[other].advanced.indexOf(label);
-        if (idx !== -1) return PRESETS[lang].advanced[idx];
-        return label;
-    }
-
-    // Map any label the AI or an old exercise produced onto a label of `lang`.
-    // Unknown labels are returned capitalised, so a teacher's own category survives.
-    function normalizeLabel(label, lang) {
-        const l = lower(label);
-        if (!l) return OTHER[lang];
-
-        const exact = PRESETS[lang].advanced.find(f => f.toLowerCase() === l);
-        if (exact) return exact;
-
-        const other = lang === 'en' ? 'de' : 'en';
-        const crossIdx = PRESETS[other].advanced.findIndex(f => f.toLowerCase() === l);
-        if (crossIdx !== -1) return PRESETS[lang].advanced[crossIdx];
-
-        for (const from of Object.keys(LEGACY[lang])) if (from.toLowerCase() === l) return LEGACY[lang][from];
-        for (const from of Object.keys(LEGACY[other])) if (from.toLowerCase() === l) return translateLabel(LEGACY[other][from], lang);
-
-        if (l === lower(MAIN_CLAUSE.en) || l === lower(MAIN_CLAUSE.de)) return OTHER[lang];
-        // A genitive attribute is not a label of its own: it is marked with u:true on the word.
-        if (l.includes('genitivattribut') || l.includes('genitive attr')) return OTHER[lang];
-
-        if (lang === 'de') {
-            if (l.includes('dative') || l === 'dativ') return 'Dativobjekt';
-            if (l.includes('accusative') && l.includes('infinitive')) return 'AcI/NcI';
-            if (l.includes('accusative') || l === 'akkusativ') return 'Akkusativobjekt';
-            if (l.includes('genitive') || l === 'genitiv') return 'Genitivobjekt';
-            if (l.includes('prepositional')) return 'Präpositionale Bestimmung';
-            if (l.includes('ablative abs')) return 'Ablativus absolutus';
-            if (l.includes('relative')) return 'Relativsatz';
-            if (l.includes('subordinate')) return 'Nebensatz';
-            if (l.includes('conjunction') || l.includes('konjunktion')) return 'Konjunktion';
-            if (l.includes('subjunction')) return 'Subjunktion';
-            if (l.includes('participial')) return 'Partizipialkonstruktion';
-            if (l.includes('subject')) return 'Subjekt';
-            if (l.includes('infinitive') && !l.includes('with')) return 'Infinitiv';
-            if (l === 'verb') return 'Prädikat';
-            if (l.includes('vocative') || l.includes('vokativ')) return 'Vokativ';
-            if (l.includes('adverbial')) return 'Adverbiale Bestimmung';
-            if (l.includes('prädikatsnomen') || l.includes('predicate noun') || l.includes('predicate nominal')) return 'Prädikativum';
-        } else {
-            if (l.includes('dativ')) return 'Dative object';
-            if (l.includes('akkusativ')) return 'Accusative object';
-            if (l.includes('genitiv')) return 'Genitive object';
-            if (l.includes('präpositional')) return 'Prepositional phrase';
-            if (l.includes('ablativus abs')) return 'Ablative absolute';
-            if (l.includes('relativ')) return 'Relative clause';
-            if (l.includes('neben')) return 'Subordinate clause';
-            if (l.includes('konjunktion') || l.includes('conjunction')) return 'Conjunction';
-            if (l.includes('subjunktion')) return 'Subjunction';
-            if (l.includes('partizipial')) return 'Participial phrase';
-            if (l.includes('subjekt')) return 'Subject';
-            if (l.includes('infinitiv') && !l.includes('aci')) return 'Infinitive';
-            if (l.includes('vocative') || l.includes('vokativ')) return 'Vocative';
-            if (l.includes('adverbial')) return 'Adverb';
-            if (l.includes('prädikatsnomen') || l.includes('predicate noun') || l.includes('predicate nominal')) return 'Predicative';
-        }
-        const s = String(label).trim();
-        return s.charAt(0).toUpperCase() + s.slice(1);
-    }
-
-    // Map for the exported student page: labelMap[lang][anyLabel] = label in that language.
-    function buildLabelMap() {
-        const map = { en: {}, de: {} };
-        PRESETS.en.advanced.forEach((en, i) => {
-            const de = PRESETS.de.advanced[i];
-            map.en[en] = en; map.en[de] = en;
-            map.de[en] = de; map.de[de] = de;
+// ==========================================
+// 2. STATE MANAGEMENT
+// ==========================================
+const AppState = {
+    words: [],
+    groups: [],
+    functions: [],
+    colors: { ...CONFIG.SEMANTIC_COLORS },
+    lang: 'de',
+    level: 'advanced',
+    mode: MODES.TAGGING,
+    activeFunc: 'Sonstiges',
+    history: [],
+    ui: {
+        zoom: 1,
+        hoveredGroupIndex: null,
+        hoveredWord: null,
+        startIdx: null,
+        pendingGroupStart: null,
+        pendingGroupEnd: null,
+        editingGroupIndex: null,
+        editingWordNode: null,
+        labelShortcuts: {}
+    },
+    touch: {
+        swipeStartIdx: null,
+        swipeCurrentIdx: null,
+        isSwiping: false
+    },
+    
+    saveToHistory() {
+        this.history.push({ 
+            words: JSON.parse(JSON.stringify(this.words)), 
+            groups: JSON.parse(JSON.stringify(this.groups)),
+            colors: JSON.parse(JSON.stringify(this.colors))
         });
-        ['en', 'de'].forEach(lang => Object.keys(LEGACY[lang]).forEach(from => {
-            const to = LEGACY[lang][from];
-            map[lang][from] = to;
-            map[lang === 'en' ? 'de' : 'en'][from] = translateLabel(to, lang === 'en' ? 'de' : 'en');
-        }));
-        return map;
+        if (this.history.length > 50) this.history.shift();
+    },
+    
+    undo() {
+        if (this.history.length === 0) { alert("Nothing to undo!"); return false; }
+        const lastState = this.history.pop();
+        this.groups = lastState.groups;
+        this.words = lastState.words;
+        if (lastState.colors) {
+            const changed = JSON.stringify(lastState.colors) !== JSON.stringify(this.colors);
+            this.colors = lastState.colors;
+            if (changed) saveTeacherColors(); // undoing a colour change also updates the remembered colours
+        }
+        this.ui.startIdx = null;
+        
+        // Automatically trigger UI updates and save on undo
+        renderEditor();
+        renderPalette();
+        StorageManager.debouncedAutoSave();
+        return true;
+    },
+
+    getOtherLabel() {
+        return this.lang === 'de' ? CONFIG.OTHER_DE : CONFIG.OTHER_EN;
+    },
+
+    // --- STRICT MUTATION METHODS ---
+
+    mutateWord(index, updates, shouldRender = true) {
+        this.saveToHistory();
+        Object.assign(this.words[index], updates);
+        
+        StorageManager.debouncedAutoSave();
+        if (shouldRender) renderEditor();
+    },
+
+    addGroup(groupObj) {
+        this.saveToHistory();
+        this.groups.push(groupObj);
+        
+        StorageManager.debouncedAutoSave();
+        updateGroupUI();
+    },
+
+    removeGroup(index) {
+        this.saveToHistory();
+        this.groups.splice(index, 1);
+        
+        StorageManager.debouncedAutoSave();
+        updateGroupUI();
+    },
+    
+    splitWord(index) {
+        this.saveToHistory();
+        const wordObj = this.words[index];
+        const text = wordObj.w || "";
+
+        // Case 1: a multi-word token ("a Clodia") is split into its parts
+        const newItems = LatinCore.splitTokenParts(wordObj);
+        if (newItems) {
+            const shiftAmount = newItems.length - 1;
+            this.words.splice(index, 1, ...newItems);
+
+            // Shift all group boundaries to account for the newly inserted words
+            this.groups = this.groups.map(g => {
+                let newStart = g.start; 
+                let newEnd = g.end;
+                if (g.start > index) newStart += shiftAmount;
+                if (g.end >= index) newEnd += shiftAmount;
+                return { ...g, start: newStart, end: newEnd };
+            });
+        } 
+        // Case 2: Just a visual manual split line
+        else {
+            wordObj.isSplit = !wordObj.isSplit;
+        }
+
+        StorageManager.debouncedAutoSave();
+        renderEditor(); // This is a structural change, so we must re-render the whole editor
+    },  
+        
+    toggleLineBreak(index) {
+        let currentB = this.words[index].b || 0;
+        const wordText = this.words[index].w || "";
+        const isPunct = this.words[index].f === CONFIG.PUNCT;
+        
+        // Determine default break behavior based on punctuation
+        const defaultBreak = isPunct && CONFIG.SENTENCE_ENDERS.some(char => wordText.includes(char));
+        
+        let newB;
+        if (currentB === 1) newB = -1;       // Force break -> Suppress break
+        else if (currentB === -1) newB = 0;  // Suppress break -> Default
+        else newB = defaultBreak ? -1 : 1;   // Default -> Toggle opposite
+
+        this.mutateWord(index, { b: newB });
+    },  
+};
+
+// ==========================================
+// 3. STORAGE MANAGER
+// ==========================================
+const StorageManager = {
+
+    debouncedAutoSave(...args) {
+        if (DOM.editorScreen && DOM.editorScreen.style.display === 'block') AppState.dirty = true; // count the change at once, not only when the autosave runs
+        this._debouncedSave(...args);
+    },
+    _debouncedSave: debounce(function() {
+        StorageManager.triggerAutoSave();
+    }, 1500), // Saves 1.5 seconds AFTER the user stops making changes
+
+    triggerAutoSave() {
+        const textVal = DOM.enterText.value;
+        if (DOM.editorScreen.style.display === 'block') AppState.dirty = true; // changed since the project file was last saved
+        if(DOM.editorScreen.style.display === 'block' || textVal.length > 5) {
+            const saveData = {
+                lang: AppState.lang, level: AppState.level,
+                title: DOM.pageTitle.value, image: DOM.pageImage.value,
+                text: textVal, notes: DOM.teacherNotes.value,
+                groups: AppState.groups, funcs: AppState.functions, cols: AppState.colors, words: AppState.words,
+                timestamp: new Date().getTime()
+            };
+            
+            // --- NEW TRY/CATCH BLOCK ---
+            try {
+                localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(saveData));
+                
+                const status = DOM.autosaveStatus;
+                status.textContent = 'Autosaved';
+                status.style.color = '#6b7280'; // Default gray
+                status.style.opacity = '1';
+                setTimeout(() => { status.style.opacity = '0'; }, 2000);
+            } catch (e) {
+                console.warn("Autosave failed: LocalStorage may be full or blocked by browser settings.", e);
+                const status = DOM.autosaveStatus;
+                status.textContent = 'Autosave Failed (Storage Blocked)';
+                status.style.color = '#ef4444'; // Red error color
+                status.style.opacity = '1';
+                setTimeout(() => { status.style.opacity = '0'; }, 3000);
+            }
+        }
+    },
+
+    checkAutoSaveOnLoad() {
+        // --- NEW TRY/CATCH BLOCK ---
+        try {
+            const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
+            if(saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if(new Date().getTime() - data.timestamp < 24 * 60 * 60 * 1000) {
+                        if(confirm("Found an unsaved project from " + new Date(data.timestamp).toLocaleTimeString() + ". Restore it?")) {
+                            this.restoreData(data);
+                            AppState.dirty = true; // restored from the browser, not yet saved as a file
+                        }
+                    }
+                } catch(e) { console.error("Autosave Parse Error", e); }
+            }
+        } catch(e) {
+            console.warn("Could not check autosave: LocalStorage may be blocked.", e);
+        }
+    },
+
+    exportProject() {
+        const projectData = { 
+            lang: AppState.lang, level: AppState.level,
+            title: DOM.pageTitle.value, image: DOM.pageImage.value,
+            text: DOM.enterText.value,
+            notes: DOM.teacherNotes.value, 
+            words: AppState.words, groups: AppState.groups, 
+            customFunctions: AppState.functions, customColors: AppState.colors
+        };
+        const blob = new Blob([JSON.stringify(projectData, null, 2)], {type: "application/json"});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); 
+        a.download = (projectData.title || "latin_project").replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".json"; a.click();
+        AppState.dirty = false;
+    },
+
+    importProject(file) {
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try { 
+                this.restoreData(JSON.parse(e.target.result)); 
+                AppState.dirty = false; // just loaded from a saved file
+            } 
+            catch(err) { 
+                console.error("Restore Error:", err); 
+                alert("Error loading file. The JSON format might be incorrect or corrupted."); 
+            }
+        };
+        reader.readAsText(file);
+    },
+
+   restoreData(data) {
+        let safeLang = data.lang;
+        if (!safeLang || !CONFIG.LANG_TEXT[safeLang]) safeLang = 'de';
+        changeLanguage(safeLang);
+        
+        let safeLevel = data.level;
+        if (!safeLevel || !CONFIG.PRESETS[safeLang][safeLevel]) safeLevel = 'advanced';
+        changeLevel(safeLevel);
+
+        DOM.pageTitle.value = data.title || "";
+        if (DOM.editorPageTitle) DOM.editorPageTitle.value = data.title || "";
+        DOM.pageImage.value = data.image || "";
+        DOM.enterText.value = data.text || "";
+        DOM.teacherNotes.value = data.notes || "";
+        
+        AppState.functions = data.customFunctions || data.funcs || [...CONFIG.PRESETS[safeLang][safeLevel]];
+        if(data.customColors || data.cols) Object.assign(AppState.colors, data.customColors || data.cols);
+        AppState.groups = data.groups || [];
+        AppState.history = []; 
+        
+        const loadWords = data.words || data.tokens || [];
+        if(Array.isArray(loadWords) && loadWords.length > 0) {
+            AppState.words = loadWords.map(w => ({
+                ...w,
+                w: w.w || w.word || w.text || "",
+                f: w.f || w.func || w.function || CONFIG.PUNCT,
+                u: !!w.u
+            }));
+            showScreen('editor');
+            renderEditor();
+            renderPalette();
+        } else {
+            console.warn("No words found in the parsed data", data);
+            alert("This file loaded, but it doesn't contain any saved words to display.");
+        }
+    }
+};
+
+// ==========================================
+// 3.5 DOM CACHE
+// ==========================================
+const DOM = {};
+
+function cacheDOM() {
+    // Find every element in the HTML that has a 'data-ref' attribute
+    const elementsWithRefs = document.querySelectorAll('[data-ref]');
+    
+    // Loop through them and dynamically map them to the DOM object
+    elementsWithRefs.forEach(el => {
+        DOM[el.dataset.ref] = el;
+    });
+}
+
+// ==========================================
+// 4. CORE LOGIC & RENDERING
+// ==========================================
+
+function initApp() {
+    cacheDOM();
+    importKeyFromUrl();
+    CONFIG.PRESETS.en.advanced.forEach((f) => { if(!AppState.colors[f]) AppState.colors[f] = '#e5e7eb'; });
+    CONFIG.PRESETS.de.advanced.forEach((f) => { if(!AppState.colors[f]) AppState.colors[f] = '#e5e7eb'; });
+    loadTeacherColors(); // the teacher's earlier colour choices replace the standard colours (a loaded project still uses its own)
+    
+    changeLanguage('de'); 
+    changeLevel('advanced');
+    AppState.activeFunc = AppState.getOtherLabel();
+
+    initEventListeners();
+    StorageManager.checkAutoSaveOnLoad();    
+}
+
+function safeFileName(name) {
+    // Keep the title readable as a file name ("Syntax-Studio Latein.html"); only characters that file systems forbid are removed.
+    return String(name || '').replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '').replace(/\s+/g, ' ').trim().replace(/^\.+/, '') || 'Syntax-Studio Latein';
+}
+
+function getUnusedSafeColor() {
+    const usedColors = Object.values(AppState.colors).map(c => c.toLowerCase());
+    const availableColors = CONFIG.SAFE_COLORS.filter(c => !usedColors.includes(c.toLowerCase()));
+    if (availableColors.length > 0) return availableColors[Math.floor(Math.random() * availableColors.length)];
+    return CONFIG.SAFE_COLORS[Math.floor(Math.random() * CONFIG.SAFE_COLORS.length)];
+}
+
+function setTeacherZoom(delta) {
+    if (delta === 0) { AppState.ui.zoom = 1; } 
+    else { AppState.ui.zoom = Math.max(0.5, Math.min(2.0, AppState.ui.zoom + delta)); }
+    
+    const area = DOM.taggingArea;
+    if ('zoom' in area.style) { 
+        area.style.zoom = AppState.ui.zoom; 
+    } else { 
+        area.style.transform = 'scale(' + AppState.ui.zoom + ')'; 
+        area.style.transformOrigin = "top left"; 
+        area.style.width = (100 / AppState.ui.zoom) + '%'; 
+    }
+}
+
+function updateShortcuts() {
+    AppState.ui.labelShortcuts = {};
+    // Reserved Tool Keys
+    let used = new Set(['x', 'm', 'w', 'g']); 
+    
+    const hardcoded = LatinLabels.SHORTCUTS;
+
+    // First pass: Assign hardcoded shortcuts
+    AppState.functions.forEach(f => {
+        if (hardcoded[f] && !used.has(hardcoded[f])) {
+            AppState.ui.labelShortcuts[f] = hardcoded[f];
+            used.add(hardcoded[f]);
+        }
+    });
+
+    // Second pass: Dynamic fallback for custom labels
+    AppState.functions.forEach(f => {
+        if (AppState.ui.labelShortcuts[f]) return;
+        let assigned = false;
+        for (let i = 0; i < f.length; i++) {
+            let char = f[i].toLowerCase();
+            if (/[a-z]/.test(char) && !used.has(char)) { AppState.ui.labelShortcuts[f] = char; used.add(char); assigned = true; break; }
+        }
+        if (!assigned) {
+            for (let code = 97; code <= 122; code++) {
+                let char = String.fromCharCode(code);
+                if (!used.has(char)) { AppState.ui.labelShortcuts[f] = char; used.add(char); break; }
+            }
+        }
+    });
+}
+
+function showScreen(screen) {
+    DOM.setupScreen.style.display = 'none';
+    DOM.creditsScreen.style.display = 'none';
+    DOM.editorScreen.style.display = 'none';
+    if (screen === 'setup') DOM.setupScreen.style.display = 'block';
+    if (screen === 'editor') DOM.editorScreen.style.display = 'block';
+    if (screen === 'credits') DOM.creditsScreen.style.display = 'block';
+}
+
+function changeLanguage(lang) {
+    const oldLang = AppState.lang; 
+    AppState.lang = lang; 
+    const txt = CONFIG.LANG_TEXT[lang];
+
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll(`.lang-btn[data-lang="${lang}"]`).forEach(b => b.classList.add('active'));
+
+    DOM.appHeading.textContent = txt.heading; 
+    DOM.pageTitleTag.textContent = txt.heading;
+    DOM.instrH3.textContent = txt.instrH3; 
+    DOM.instrBody.innerHTML = txt.instrBody + (CONFIG.AI.PROXY_URL ? '' : ' ' + txt.instrKey) + ' ' + txt.instrBodyEnd;
+    DOM.exampleLinkText.textContent = txt.exampleLink; 
+    DOM.linkExample.textContent = txt.linkText;
+    DOM.pageTitle.placeholder = txt.phTitle; 
+    DOM.pageImage.placeholder = txt.phImage;
+    
+    if (DOM.lblEditorTitle && DOM.editorPageTitle) {
+        DOM.lblEditorTitle.textContent = lang === 'de' ? 'Übungstitel:' : 'Exercise Title:';
+        DOM.editorPageTitle.placeholder = txt.phTitle;
+    }
+    
+    DOM.teacherNotes.placeholder = txt.phNotes; 
+    DOM.enterText.placeholder = txt.phText;
+    DOM.orText.textContent = txt.or;
+    DOM.btnLoad.textContent = txt.btnLoad; 
+    DOM.btnManual.textContent = txt.btnManual;
+    if (!DOM.btnAnalyzeAi.disabled) DOM.btnAnalyzeAi.textContent = txt.btnAnalyze; // keep the busy label while a request runs
+    updateAiKeyButton();
+    DOM.aiKeyTitle.textContent = txt.aiKeyTitle; DOM.lblAiKey.textContent = txt.aiKeyLabel; DOM.aiKeyNote.textContent = txt.aiKeyNote;
+    DOM.btnAiKeyRemove.textContent = txt.aiKeyRemove; DOM.btnAiKeyCancel.textContent = txt.btnCancel; DOM.btnAiKeySave.textContent = txt.btnSaveGroup;
+    
+    DOM.lblLevel.textContent = txt.lblLevel; 
+    DOM.optBeg.textContent = txt.optBeg;
+    DOM.optInt.textContent = txt.optInt; 
+    DOM.optAdv.textContent = txt.optAdv;
+    DOM.optBegEd.textContent = txt.optBeg; 
+    DOM.optIntEd.textContent = txt.optInt;
+    DOM.optAdvEd.textContent = txt.optAdv;
+    
+    DOM.editH3.textContent = txt.editH3; 
+    DOM.editBody.innerHTML = txt.editBody;
+    DOM.newLabelInput.placeholder = txt.phLabel;
+    
+    DOM.wordHintInput.placeholder = txt.phWordHint;
+    DOM.groupHintInput.placeholder = txt.phGroupHint;
+    DOM.groupNameInput.placeholder = txt.phGroupSearch;
+    DOM.wordErrorHintInput.placeholder = txt.phWordErrorHint;
+    DOM.groupErrorHintInput.placeholder = txt.phGroupErrorHint;
+    DOM.lblWordErrorHint.textContent = txt.errorHintLabel;
+    DOM.lblGroupErrorHint.textContent = txt.errorHintLabel;
+    DOM.lblWordExplain.textContent = txt.explainLabel; DOM.lblGroupExplain.textContent = txt.explainLabel;
+    DOM.wordExplainInput.placeholder = txt.phWordExplain; DOM.groupExplainInput.placeholder = txt.phGroupExplain;
+    
+    DOM.undoBtn.textContent = txt.btnUndo; 
+    DOM.splitModeBtn.textContent = txt.btnSplit;
+    DOM.linebreakModeBtn.textContent = txt.btnLineBreak; 
+    DOM.groupModeBtn.textContent = txt.btnBracket;
+    DOM.attrModeBtn.textContent = txt.btnAttr;
+    DOM.btnExport.textContent = txt.btnExport; 
+    DOM.btnSaveWork.textContent = txt.btnSaveWork;
+    DOM.btnResetColors.textContent = txt.btnResetColors;
+    DOM.btnLoadWork.textContent = txt.btnLoadWork; 
+    DOM.btnTogglePattern.title = txt.togglePat;
+    DOM.btnToggleContrast.title = txt.toggleCon; 
+    DOM.lblGroupName.textContent = txt.modalTitle;
+    DOM.lblGroupHint.textContent = txt.groupHintLabel; 
+    DOM.btnCancelGroup.textContent = txt.btnCancel;
+    DOM.btnSaveGroup.textContent = txt.btnSaveGroup; 
+    DOM.wordModalTitle.textContent = txt.wordModalTitle;
+    DOM.lblWordText.textContent = txt.wordTextLabel; 
+    DOM.lblWordHint.textContent = txt.hintLabel;
+    DOM.btnCancelWord.textContent = txt.btnCancel; 
+    DOM.btnSaveWord.textContent = txt.btnSaveGroup;
+    DOM.btnDeleteWord.textContent = txt.btnDelete;
+
+    DOM.linkExample.href = lang === 'de' ? "example_page_de.html" : "example_page.html";
+
+    // Remap the active label on every switch (also on the setup screen), so the next click never applies a label from the old language.
+    const oldList = CONFIG.PRESETS[oldLang].advanced;
+    const newList = CONFIG.PRESETS[lang].advanced;
+    const idxActive = oldList.indexOf(AppState.activeFunc);
+    if(idxActive !== -1) AppState.activeFunc = newList[idxActive];
+
+    if(DOM.editorScreen.style.display === 'block') {
+        AppState.words.forEach(w => {
+            if (w.f === CONFIG.PUNCT) return;
+            const idx = oldList.indexOf(w.f);
+            if(idx !== -1) w.f = newList[idx];
+        });
+
+        AppState.groups.forEach(g => {
+            const idx = oldList.indexOf(g.label);
+            if(idx !== -1) g.label = newList[idx];
+        });
+        renderEditor(); 
     }
 
-    return { PUNCT, OTHER, MAIN_CLAUSE, PRESETS, GROUP_LABELS, SEMANTIC_COLORS, SAFE_COLORS, ABBREVIATIONS, SHORTCUTS, LEGACY, isGroupLabel, isGenitiveAttributeLabel, translateLabel, normalizeLabel, buildLabelMap };
+    AppState.functions = [...CONFIG.PRESETS[lang][AppState.level]];
+    
+    if(DOM.editorScreen.style.display === 'block') {
+        AppState.words.forEach(w => { if(w.f && w.f !== CONFIG.PUNCT && !AppState.functions.includes(w.f)) AppState.functions.push(w.f); });
+        AppState.groups.forEach(g => { if(g.label && !AppState.functions.includes(g.label)) AppState.functions.push(g.label); });
+        renderPalette(); updateStatus();
+    }
+}
+
+function changeLevel(level) {
+    AppState.level = level;
+    DOM.grammarLevelSetup.value = level;
+    DOM.grammarLevelEditor.value = level;
+    
+    AppState.functions = [...CONFIG.PRESETS[AppState.lang][level]];
+    
+    if (DOM.editorScreen.style.display === 'block') {
+        AppState.words.forEach(w => { if(w.f && w.f !== CONFIG.PUNCT && !AppState.functions.includes(w.f)) { AppState.functions.push(w.f); } });
+        AppState.groups.forEach(g => { if(g.label && !AppState.functions.includes(g.label)) { AppState.functions.push(g.label); } });
+        renderPalette();
+    }
+}
+
+function setMode(newMode) {
+    AppState.mode = newMode;
+    if (newMode !== MODES.TAGGING) {
+        AppState.activeFunc = AppState.getOtherLabel();
+    }
+    DOM.splitModeBtn.classList.toggle('active-mode', AppState.mode === MODES.SPLIT);
+    DOM.groupModeBtn.classList.toggle('active-mode', AppState.mode === MODES.GROUP);
+    DOM.linebreakModeBtn.classList.toggle('active-mode', AppState.mode === MODES.LINEBREAK);
+    DOM.attrModeBtn.classList.toggle('active-mode', AppState.mode === MODES.ATTR);
+    
+    document.querySelectorAll('.p-btn').forEach((b) => {
+        b.classList.toggle('active', AppState.mode === MODES.TAGGING && b.dataset.func === AppState.activeFunc);
+    });
+    updateStatus();
+}
+
+function updateStatus() {
+    const txt = CONFIG.LANG_TEXT[AppState.lang];
+    let modeText = "";
+    if (AppState.mode === MODES.SPLIT) modeText = txt.modeSplit; 
+    else if (AppState.mode === MODES.GROUP) modeText = txt.modeBracket; 
+    else if (AppState.mode === MODES.LINEBREAK) modeText = txt.modeLineBreak; 
+    else if (AppState.mode === MODES.ATTR) modeText = txt.modeAttr; 
+    else modeText = txt.modeTag + ` (${AppState.activeFunc})`;
+    DOM.modeStatus.textContent = modeText;
+}
+
+function renderPalette() {
+    closeColorPopover();
+    updateShortcuts();
+    const p = DOM.labelPalette; 
+    p.innerHTML = '';
+    const txt = CONFIG.LANG_TEXT[AppState.lang];
+    
+    AppState.functions.forEach((f) => {
+        const b = document.createElement('button');
+        b.className = 'p-btn' + (f === AppState.activeFunc && AppState.mode === MODES.TAGGING ? ' active' : '');
+        b.style.backgroundColor = AppState.colors[f]; b.dataset.func = f; 
+        
+        let shortcut = AppState.ui.labelShortcuts[f]; let innerHTML = escapeHTML(f);
+        if (shortcut) {
+            let idx = f.toLowerCase().indexOf(shortcut);
+            if (idx !== -1) { innerHTML = escapeHTML(f.substring(0, idx)) + '<u>' + escapeHTML(f[idx]) + '</u>' + escapeHTML(f.substring(idx + 1)); }
+            else { innerHTML = `[<u>${shortcut.toUpperCase()}</u>] ${escapeHTML(f)}`; }
+        }
+        b.innerHTML = innerHTML;
+        b.addEventListener('click', () => { AppState.activeFunc = f; setMode(MODES.TAGGING); });
+
+        const wrap = document.createElement('span'); wrap.className = 'p-wrap';
+        const c = document.createElement('button');
+        c.type = 'button'; c.className = 'p-color'; c.textContent = '▾';
+        c.style.backgroundColor = AppState.colors[f];
+        c.title = txt.colorBtn; c.setAttribute('aria-label', txt.colorBtn + ': ' + f);
+        c.addEventListener('click', (e) => { e.stopPropagation(); openColorPopover(f, wrap); });
+        b.addEventListener('contextmenu', (e) => { e.preventDefault(); openColorPopover(f, wrap); });
+        wrap.append(b, c);
+        p.appendChild(wrap);
+    });
+    updateStatus();
+}
+
+// ---- Label colours: choose from the colour-blind-safe palette ----
+function setGenUnderline(el, bg) {
+    // On dark colours the genitive underline turns fully white; elsewhere it stays pink (with dark gaps where pink alone is too faint).
+    const alt = genAltColor(bg);
+    el.style.setProperty('--gen-main', alt === '#ffffff' ? '#ffffff' : '');
+    el.style.setProperty('--gen-alt', alt === '#ffffff' ? 'transparent' : alt);
+}
+function genAltColor(bg) {
+    // Genitive underline colour: fully white on dark and medium colours (every red included); on light colours pink,
+    // with near-black gaps where pink alone would be too faint. Returns the gap colour; '#ffffff' means 'all white'.
+    const lum = (hex) => { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n) || f.length !== 6) return null; return [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0); };
+    const lb = lum(bg); if (lb === null) return 'transparent';
+    const ratio = (c) => { const l = lum(c); return (Math.max(l, lb) + 0.05) / (Math.min(l, lb) + 0.05); };
+    if (ratio('#ffffff') >= 3) return '#ffffff';
+    return ratio('#ec4899') >= 3 ? 'transparent' : '#111827';
+}
+function isDarkColor(hex) { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n)) return false; return (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) < 140; }
+function findColorOwner(label, col) {
+    return AppState.functions.find(f => f !== label && (AppState.colors[f] || '').toLowerCase() === col.toLowerCase());
+}
+
+function counterpartLabel(label) {
+    // The same label in the other language (Subjekt <-> Subject), so a colour survives the language switch.
+    const other = AppState.lang === 'de' ? 'en' : 'de';
+    const cp = (LatinLabels.buildLabelMap()[other] || {})[label];
+    return cp && cp !== label ? cp : null;
+}
+
+function saveTeacherColors() {
+    try { localStorage.setItem(CONFIG.COLOR_PREF_KEY, JSON.stringify(AppState.colors)); } catch (e) { console.warn("Could not save colours (storage blocked).", e); }
+}
+
+function loadTeacherColors() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(CONFIG.COLOR_PREF_KEY) || '{}') || {};
+        Object.keys(saved).forEach(l => { if (typeof saved[l] === 'string' && /^#[0-9a-f]{3,8}$/i.test(saved[l])) AppState.colors[l] = saved[l]; });
+    } catch (e) { console.warn("Could not read saved colours.", e); }
+}
+
+function restoreDefaultColors() {
+    if (!confirm(CONFIG.LANG_TEXT[AppState.lang].confirmResetColors)) return;
+    AppState.saveToHistory();
+    Object.keys(AppState.colors).forEach(l => { if (CONFIG.SEMANTIC_COLORS[l]) AppState.colors[l] = CONFIG.SEMANTIC_COLORS[l]; });
+    try { localStorage.removeItem(CONFIG.COLOR_PREF_KEY); } catch (e) {} // new exercises start with the default colours again
+    renderPalette();
+    renderEditor();
+    StorageManager.debouncedAutoSave();
+}
+
+function setLabelColor(label, col) {
+    const oldCol = AppState.colors[label];
+    if (!col || (oldCol || '').toLowerCase() === col.toLowerCase()) return;
+    AppState.saveToHistory();
+    // A label that already had this colour turns grey, so no two labels share a colour; the teacher can then give it a new one.
+    const owners = AppState.functions.filter(f => f !== label && (AppState.colors[f] || '').toLowerCase() === col.toLowerCase());
+    const apply = (l, c) => { AppState.colors[l] = c; const cp = counterpartLabel(l); if (cp) AppState.colors[cp] = c; };
+    apply(label, col);
+    owners.forEach(o => apply(o, CONFIG.NEUTRAL_COLOR));
+    renderPalette();
+    renderEditor();
+    saveTeacherColors();
+    StorageManager.debouncedAutoSave();
+}
+
+function openColorPopover(label, anchor) {
+    const pop = DOM.colorPopover; const txt = CONFIG.LANG_TEXT[AppState.lang];
+    const current = (AppState.colors[label] || '').toLowerCase();
+    pop.innerHTML = '';
+    const title = document.createElement('div'); title.className = 'color-pop-title'; title.textContent = txt.colorTitle + ' ' + label;
+    pop.appendChild(title);
+    const grid = document.createElement('div'); grid.className = 'color-pop-grid';
+    CONFIG.SAFE_COLORS.forEach(col => {
+        const sw = document.createElement('button'); sw.type = 'button'; sw.className = 'color-swatch';
+        sw.style.backgroundColor = col; sw.style.color = isDarkColor(col) ? '#fff' : '#111827';
+        if (col.toLowerCase() === current) sw.classList.add('current');
+        const owner = findColorOwner(label, col);
+        if (owner) { sw.textContent = '•'; sw.title = txt.colorInUse.replace('{label}', owner); } else { sw.title = col; }
+        sw.setAttribute('aria-label', sw.title);
+        sw.addEventListener('click', () => { closeColorPopover(); setLabelColor(label, col); });
+        grid.appendChild(sw);
+    });
+    pop.appendChild(grid);
+    const def = CONFIG.SEMANTIC_COLORS[label];
+    if (def && def.toLowerCase() !== current) {
+        const reset = document.createElement('button'); reset.type = 'button'; reset.className = 'color-pop-reset';
+        reset.textContent = txt.colorReset;
+        reset.addEventListener('click', () => { closeColorPopover(); setLabelColor(label, def); });
+        pop.appendChild(reset);
+    }
+    pop.style.display = 'block';
+    const r = anchor.getBoundingClientRect();
+    pop.style.top = (r.bottom + 6) + 'px';
+    pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pop.offsetWidth - 8)) + 'px';
+    const first = pop.querySelector('.color-swatch.current') || pop.querySelector('.color-swatch');
+    if (first) first.focus({ preventScroll: true });
+}
+
+function closeColorPopover() {
+    if (DOM.colorPopover) DOM.colorPopover.style.display = 'none';
+}
+
+function renderEditor() {
+    const area = DOM.taggingArea;
+    area.innerHTML = '';
+    
+    // 1. Create an off-screen fragment
+    const fragment = document.createDocumentFragment(); 
+    
+    let currentSentenceBox = document.createElement('div');
+    currentSentenceBox.className = 'editor-sentence-box';
+    // Do NOT append to 'area' yet!
+    
+    AppState.words.forEach((item, i) => {
+        const span = document.createElement('span');
+        const isPunct = item.f === CONFIG.PUNCT;
+        span.textContent = item.w;
+        span.className = isPunct ? 'punct-span' : 'tag-word';
+        if (item.isSplit) span.classList.add('split-right');
+        if (item.u && !isPunct) span.classList.add('attr-underline');
+        
+        span.dataset.idx = i;
+        span.id = `word-${i}`; 
+
+        if(!isPunct) {
+            let func = item.f || AppState.getOtherLabel();
+            if(func === CONFIG.MAIN_CLAUSE_EN || func === CONFIG.MAIN_CLAUSE_DE) func = AppState.getOtherLabel();
+            
+            if(!AppState.colors[func]) AppState.colors[func] = getUnusedSafeColor();
+            if(!AppState.functions.includes(func)) { AppState.functions.push(func); renderPalette(); }
+            
+            span.dataset.func = func;
+            const shortLabel = CONFIG.ABBREVIATIONS[AppState.lang][func] || (func.length > 6 ? func.substring(0,5)+"." : func);
+            span.dataset.short = shortLabel;
+            if(item.h) {
+                span.dataset.hint = item.h;
+                const hintIcon = document.createElement('span');
+                hintIcon.className = 'hint-icon';
+                hintIcon.title = 'Hint';
+                hintIcon.textContent = '💡';
+                hintIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (span.clickTimer) { clearTimeout(span.clickTimer); span.clickTimer = null; }
+                    document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => { if (el !== hintIcon) el.classList.remove('show-tooltip'); });
+                    hintIcon.classList.toggle('show-tooltip');
+                });
+                hintIcon.addEventListener('dblclick', (e) => e.stopPropagation());
+                const tooltipText = document.createElement('span');
+                tooltipText.className = 'tooltip-text';
+                tooltipText.innerHTML = parseSimpleMarkdown(item.h);
+                hintIcon.appendChild(tooltipText);
+                span.appendChild(hintIcon);
+            }
+            span.style.backgroundColor = AppState.colors[func]; setGenUnderline(span, AppState.colors[func]);
+        } else { 
+            span.dataset.func = CONFIG.PUNCT; 
+        }
+        
+        if (item.b === 1) {
+            span.style.borderRight = "3px double #0ea5e9";
+            span.style.paddingRight = "6px";
+        } else if (item.b === -1 && isPunct) {
+            span.style.opacity = "0.5";
+            span.title = "Sentence break suppressed";
+        }
+
+        currentSentenceBox.appendChild(span);
+
+        const wordText = item.w || "";
+        const defaultBreak = isPunct && CONFIG.SENTENCE_ENDERS.some(char => wordText.includes(char));
+        let shouldBreak = defaultBreak;
+        if (item.b === 1) shouldBreak = true;
+        if (item.b === -1) shouldBreak = false;
+
+        if (shouldBreak && i < AppState.words.length - 1) { 
+            // 2. Append the finished box to the fragment
+            fragment.appendChild(currentSentenceBox); 
+            
+            // Start a new box
+            currentSentenceBox = document.createElement('div');
+            currentSentenceBox.className = 'editor-sentence-box';
+        }
+    });
+    
+    // Append the final box to the fragment
+    fragment.appendChild(currentSentenceBox);
+    
+    // 3. Append EVERYTHING to the live DOM in one single operation!
+    area.appendChild(fragment); 
+    
+    updateGroupUI();
+}
+
+function updateWordVisuals(idx) {
+    const item = AppState.words[idx];
+    const span = document.getElementById(`word-${idx}`);
+    if(!span || span.classList.contains('punct-span')) return;
+    
+    let func = item.f || AppState.getOtherLabel();
+    if(!AppState.colors[func]) AppState.colors[func] = getUnusedSafeColor();
+    if(!AppState.functions.includes(func)) { AppState.functions.push(func); renderPalette(); }
+    
+    span.dataset.func = func;
+    const shortLabel = CONFIG.ABBREVIATIONS[AppState.lang][func] || (func.length > 6 ? func.substring(0,5)+"." : func);
+    span.dataset.short = shortLabel;
+    span.style.backgroundColor = AppState.colors[func]; setGenUnderline(span, AppState.colors[func]);
+    
+    if (item.u) span.classList.add('attr-underline');
+    else span.classList.remove('attr-underline');
+}
+
+function updateGroupUI() {
+    AppState.ui.hoveredGroupIndex = null; 
+    document.querySelectorAll('.group-bracket').forEach(e => e.remove());
+    
+    let sortedGroups = AppState.groups.map((g, i) => ({...g, originalIndex: i}));
+    sortedGroups.sort((a, b) => (a.end - a.start) - (b.end - b.start));
+    
+    let tiers = [];
+    sortedGroups.forEach(g => {
+        let placed = false;
+        for(let t = 0; t < tiers.length; t++) {
+            let overlaps = tiers[t].some(other => Math.max(g.start, other.start) <= Math.min(g.end, other.end));
+            if(!overlaps) { tiers[t].push(g); g.tier = t; placed = true; break; }
+        }
+        if(!placed) { tiers.push([g]); g.tier = tiers.length - 1; }
+    });
+
+    let maxTier = Math.max(-1, ...sortedGroups.map(g => g.tier));
+    let requiredMargin = maxTier >= 0 ? 65 + (maxTier * 38) : 24;
+    DOM.taggingArea.style.setProperty('--dynamic-margin-top', requiredMargin + 'px');
+
+    sortedGroups.forEach(g => {
+        let tierOffset = 28 + (g.tier * 38); let groupColor = AppState.colors[g.label] || '#8b5cf6';
+        
+        let actualStart = g.start;
+        while(actualStart <= g.end) {
+            if(AppState.words[actualStart] && AppState.words[actualStart].f !== CONFIG.PUNCT) break;
+            actualStart++;
+        }
+        
+        let actualEnd = g.end;
+        while(actualEnd >= actualStart) {
+            if(AppState.words[actualEnd] && AppState.words[actualEnd].f !== CONFIG.PUNCT) break;
+            actualEnd--;
+        }
+
+        if (actualStart > actualEnd) return; 
+
+        for(let j = actualStart; j <= actualEnd; j++) {
+            let el = document.getElementById(`word-${j}`);
+            if(!el || el.classList.contains('punct-span')) continue;
+            
+            let bracket = document.createElement('div');
+            bracket.className = 'group-bracket';
+            bracket.style.top = `-${tierOffset}px`; bracket.style.bottom = `-4px`;
+            bracket.style.borderTopColor = groupColor; bracket.style.backgroundColor = groupColor + '30';
+            
+            if(j === actualStart) {
+                bracket.classList.add('bracket-start');
+                bracket.style.left = `-${g.tier * 4}px`; bracket.style.borderLeftColor = groupColor;
+                
+                let badge = document.createElement('div');
+                badge.className = 'bracket-badge'; badge.dataset.groupIndex = g.originalIndex; badge.style.background = groupColor;
+                
+                let safeLabel = escapeHTML(g.label);
+                let labelHTML = `<span class="clickable-label" title="Rename group" data-action="rename-group" data-idx="${g.originalIndex}">${safeLabel}</span>`;
+                if(g.hint) labelHTML += ` <span class="hint-icon" title="Hint" data-action="toggle-hint" data-idx="${g.originalIndex}">💡<span class="tooltip-text">${parseSimpleMarkdown(g.hint)}</span></span>`;
+                
+                let startDrag = `draggable="true" data-drag-type="start" data-group-idx="${g.originalIndex}"`;
+                let endDrag = `draggable="true" data-drag-type="end" data-group-idx="${g.originalIndex}"`;
+
+                if (actualStart === actualEnd) {
+                    badge.innerHTML = `<span class="badge-adj" title="Resize left" ${startDrag} data-action="adj-start" data-dir="-1" data-idx="${g.originalIndex}">◀</span>${labelHTML}<span class="badge-adj" title="Resize right" ${endDrag} data-action="adj-end" data-dir="1" data-idx="${g.originalIndex}">▶</span><span class="badge-del" style="margin-left:4px;" title="Remove" data-action="del-group" data-idx="${g.originalIndex}">✖</span>`;
+                } else {
+                    badge.innerHTML = `<span class="badge-adj" title="Resize left" ${startDrag} data-action="adj-start" data-dir="-1" data-idx="${g.originalIndex}">◀</span><span class="badge-adj" title="Resize right" ${startDrag} data-action="adj-start" data-dir="1" data-idx="${g.originalIndex}">▶</span>${labelHTML}<span class="badge-del" title="Remove" data-action="del-group" data-idx="${g.originalIndex}">✖</span>`;
+                }
+                bracket.appendChild(badge);
+            }
+            if(j === actualEnd) {
+                bracket.classList.add('bracket-end');
+                bracket.style.right = `-${g.tier * 4}px`; bracket.style.borderRightColor = groupColor;
+                if(actualStart !== actualEnd) {
+                    let endControls = document.createElement('div'); endControls.className = 'bracket-end-controls'; endControls.style.background = groupColor;
+                    let endDrag = `draggable="true" data-drag-type="end" data-group-idx="${g.originalIndex}"`;
+                    endControls.innerHTML = `<span class="badge-adj" title="Resize left" ${endDrag} data-action="adj-end" data-dir="-1" data-idx="${g.originalIndex}">◀</span><span class="badge-adj" title="Resize right" ${endDrag} data-action="adj-end" data-dir="1" data-idx="${g.originalIndex}">▶</span>`;
+                    bracket.appendChild(endControls);
+                }
+            }
+            el.appendChild(bracket);
+        }
+    });
+}
+
+// ==========================================
+// 5. EVENT HANDLERS & DELEGATION
+// ==========================================
+function initEventListeners() {
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => changeLanguage(e.target.dataset.lang));
+    });
+    DOM.grammarLevelSetup.addEventListener('change', (e) => changeLevel(e.target.value));
+    DOM.grammarLevelEditor.addEventListener('change', (e) => changeLevel(e.target.value));
+    
+    DOM.btnAnalyzeAi.addEventListener('click', analyzeWithAI);
+    DOM.btnAiKey.addEventListener('click', openAiKeyModal);
+    DOM.btnAiKeyCancel.addEventListener('click', closeAiKeyModal);
+    DOM.btnAiKeySave.addEventListener('click', saveAiKeyFromModal);
+    DOM.btnAiKeyRemove.addEventListener('click', () => { DOM.aiKeyInput.value = ''; saveAiKeyFromModal(); });
+    DOM.aiKeyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveAiKeyFromModal(); else if (e.key === 'Escape') closeAiKeyModal(); });
+    
+    DOM.fileLoadSetup.addEventListener('change', (e) => {
+        if(e.target.files.length > 0) { StorageManager.importProject(e.target.files[0]); e.target.value = ''; }
+    });
+    DOM.fileLoadEditor.addEventListener('change', (e) => {
+        if(e.target.files.length > 0) { StorageManager.importProject(e.target.files[0]); e.target.value = ''; }
+    });
+    
+    DOM.btnManual.addEventListener('click', startManual);
+    DOM.btnShowCredits.addEventListener('click', () => showScreen('credits'));
+    DOM.btnHideCredits.addEventListener('click', () => showScreen('setup'));
+    
+    DOM.btnAddLabel.addEventListener('click', addCustomLabel);
+    DOM.undoBtn.addEventListener('click', () => AppState.undo());
+    DOM.splitModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.SPLIT ? MODES.TAGGING : MODES.SPLIT));
+	DOM.linebreakModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.LINEBREAK ? MODES.TAGGING : MODES.LINEBREAK));
+    DOM.groupModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.GROUP ? MODES.TAGGING : MODES.GROUP));
+    DOM.attrModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.ATTR ? MODES.TAGGING : MODES.ATTR));
+    DOM.btnExport.addEventListener('click', exportToStudent);
+    DOM.btnSaveWork.addEventListener('click', () => StorageManager.exportProject());
+    DOM.btnResetColors.addEventListener('click', restoreDefaultColors);
+
+    DOM.btnTogglePattern.addEventListener('click', () => document.body.classList.toggle('pattern-mode'));
+    DOM.btnToggleContrast.addEventListener('click', () => document.body.classList.toggle('high-contrast'));
+    DOM.btnZoomIn.addEventListener('click', () => setTeacherZoom(0.1));
+    DOM.btnZoomOut.addEventListener('click', () => setTeacherZoom(-0.1));
+    DOM.btnZoomReset.addEventListener('click', () => setTeacherZoom(0));
+
+    document.addEventListener('mousedown', (e) => {
+        if (!e.target.closest('#color-popover, .p-color')) closeColorPopover();
+    });
+    window.addEventListener('scroll', closeColorPopover, { passive: true });
+    window.addEventListener('resize', closeColorPopover);
+
+    DOM.btnCancelGroup.addEventListener('click', closeGroupModal);
+    DOM.btnSaveGroup.addEventListener('click', saveGroupFromModal);
+    DOM.btnCancelWord.addEventListener('click', closeWordModal);
+    DOM.btnSaveWord.addEventListener('click', saveWordFromModal);
+    DOM.btnDeleteWord.addEventListener('click', deleteWordFromModal);
+    
+    DOM.groupNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveGroupFromModal(); });
+    DOM.groupNameInput.addEventListener('keyup', (e) => { if (e.key === 'Escape') closeGroupModal(); });
+    DOM.groupHintInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveGroupFromModal(); });
+    
+    DOM.editorPageTitle.addEventListener('input', (e) => {
+        DOM.pageTitle.value = e.target.value;
+        StorageManager.triggerAutoSave();
+    });
+    
+    DOM.pageTitle.addEventListener('input', (e) => {
+        if(DOM.editorPageTitle) DOM.editorPageTitle.value = e.target.value;
+    });
+
+    document.addEventListener('mousedown', (e) => {
+        if (!e.target.closest('.hint-icon')) {
+            document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => el.classList.remove('show-tooltip'));
+        }
+    });
+
+    const taggingArea = DOM.taggingArea;
+
+    taggingArea.addEventListener('mouseover', (e) => {
+        const badge = e.target.closest('.bracket-badge');
+        AppState.ui.hoveredGroupIndex = badge ? parseInt(badge.dataset.groupIndex) : null;
+        const word = e.target.closest('.tag-word, .punct-span');
+        AppState.ui.hoveredWord = word ? word : null;
+    });
+
+    taggingArea.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (btn) {
+            e.stopPropagation();
+            const action = btn.dataset.action;
+            const idx = parseInt(btn.dataset.idx);
+            if (action === 'rename-group') editGroupLabel(idx);
+            else if (action === 'del-group') removeGroup(idx);
+            else if (action === 'adj-start') adjustGroupStart(idx, parseInt(btn.dataset.dir));
+            else if (action === 'adj-end') adjustGroupEnd(idx, parseInt(btn.dataset.dir));
+            else if (action === 'toggle-hint') {
+                document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => { if (el !== btn) el.classList.remove('show-tooltip'); });
+                btn.classList.toggle('show-tooltip');
+            }
+            return;
+        }
+
+        const el = e.target.closest('.tag-word, .punct-span');
+        if (!el) return;
+        if (el.clickTimer) clearTimeout(el.clickTimer);
+        el.clickTimer = setTimeout(() => { handleWordClick(el); el.clickTimer = null; }, 350);
+    });
+
+    taggingArea.addEventListener('dblclick', (e) => {
+        const el = e.target.closest('.tag-word, .punct-span');
+        if (!el) return;
+        if (el.clickTimer) { clearTimeout(el.clickTimer); el.clickTimer = null; }
+        handleWordDoubleClick(el, e);
+    });
+
+    taggingArea.addEventListener('dragstart', (e) => {
+        const dragEl = e.target.closest('[draggable="true"]');
+        if (dragEl) {
+            window.dragInfo = { groupIndex: parseInt(dragEl.dataset.groupIdx), type: dragEl.dataset.dragType };
+            e.dataTransfer.setData('text/plain', '');
+        }
+    });
+    
+    taggingArea.addEventListener('dragend', () => { window.dragInfo = null; });
+
+    taggingArea.addEventListener('dragover', (e) => {
+        if (window.dragInfo) {
+            const el = e.target.closest('.tag-word, .punct-span');
+            if (el) { e.preventDefault(); el.style.outline = "2px dashed #8b5cf6"; el.style.outlineOffset = "2px"; }
+        }
+    });
+
+    taggingArea.addEventListener('dragleave', (e) => {
+        if (window.dragInfo) {
+            const el = e.target.closest('.tag-word, .punct-span');
+            if (el) el.style.outline = "none";
+        }
+    });
+
+    taggingArea.addEventListener('drop', (e) => {
+        if (window.dragInfo) {
+            const el = e.target.closest('.tag-word, .punct-span');
+            if (el) {
+                e.preventDefault(); el.style.outline = "none";
+                handleBoundaryDrop(window.dragInfo.groupIndex, window.dragInfo.type, parseInt(el.dataset.idx));
+            }
+        }
+    });
+
+    taggingArea.addEventListener('touchstart', (e) => {
+        if (AppState.mode !== MODES.GROUP) return;
+        const word = e.target.closest('.tag-word');
+        if (word) { AppState.touch.swipeStartIdx = parseInt(word.dataset.idx); AppState.touch.swipeCurrentIdx = AppState.touch.swipeStartIdx; AppState.touch.isSwiping = false; }
+    }, {passive: true});
+
+    taggingArea.addEventListener('touchmove', (e) => {
+		if (AppState.mode !== MODES.GROUP || AppState.touch.swipeStartIdx === null) return;
+        AppState.touch.isSwiping = true;
+        if (e.cancelable) e.preventDefault(); 
+        const touch = e.touches[0];
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
+        
+        if (el && el.classList.contains('tag-word')) {
+            const domIdx = parseInt(el.dataset.idx);
+            if (domIdx !== AppState.touch.swipeCurrentIdx) {
+                AppState.touch.swipeCurrentIdx = domIdx;
+                document.querySelectorAll('#tagging-area span.tag-word').forEach(s => {
+                    if (AppState.ui.startIdx !== null && parseInt(s.dataset.idx) === AppState.ui.startIdx) { s.style.outline = "2px solid #8b5cf6"; } 
+                    else { s.style.outline = "none"; }
+                });
+                
+                const min = Math.min(AppState.touch.swipeStartIdx, AppState.touch.swipeCurrentIdx);
+                const max = Math.max(AppState.touch.swipeStartIdx, AppState.touch.swipeCurrentIdx);
+                for(let i = min; i <= max; i++) {
+                    const wEl = document.getElementById(`word-${i}`);
+                    if(wEl && !wEl.classList.contains('punct-span')) { wEl.style.outline = "2px dashed #8b5cf6"; wEl.style.outlineOffset = "2px"; }
+                }
+            }
+        }
+    }, {passive: false});
+
+    taggingArea.addEventListener('touchend', (e) => {
+        if (AppState.mode !== MODES.GROUP || AppState.touch.swipeStartIdx === null) return;
+        if (AppState.touch.isSwiping && AppState.touch.swipeCurrentIdx !== null && AppState.touch.swipeCurrentIdx !== AppState.touch.swipeStartIdx) {
+            if (e.cancelable) e.preventDefault(); 
+            AppState.ui.pendingGroupStart = Math.min(AppState.touch.swipeStartIdx, AppState.touch.swipeCurrentIdx);
+            AppState.ui.pendingGroupEnd = Math.max(AppState.touch.swipeStartIdx, AppState.touch.swipeCurrentIdx);
+            document.querySelectorAll('#tagging-area span.tag-word').forEach(s => s.style.outline = "none");
+            AppState.ui.startIdx = null; openGroupModal();
+        } else if (AppState.touch.isSwiping) {
+            document.querySelectorAll('#tagging-area span.tag-word').forEach(s => {
+                if (AppState.ui.startIdx !== null && parseInt(s.dataset.idx) === AppState.ui.startIdx) { s.style.outline = "2px solid #8b5cf6"; } 
+                else { s.style.outline = "none"; }
+            });
+        }
+        AppState.touch.swipeStartIdx = null; AppState.touch.swipeCurrentIdx = null; AppState.touch.isSwiping = false;
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (DOM.editorScreen.style.display !== 'block') return; // editor-only shortcuts (Undo, Escape, tool keys)
+        if (DOM.colorPopover.style.display === 'block') { // no tagging shortcuts while the colour picker is open
+            if (e.key === 'Escape') { e.preventDefault(); closeColorPopover(); }
+            return;
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); AppState.undo(); return; }
+        
+       if (e.key === 'Escape') {
+            if (DOM.groupModal.style.display === 'flex' || DOM.wordModal.style.display === 'flex') return;
+            setMode(MODES.TAGGING);
+            AppState.ui.startIdx = null; AppState.ui.pendingGroupStart = null; AppState.ui.pendingGroupEnd = null;
+            document.querySelectorAll('#tagging-area span.tag-word').forEach(s => s.style.outline = "none");
+            return;
+        }
+
+        if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
+            if (e.ctrlKey || e.metaKey || e.altKey) return; 
+            let key = e.key.toLowerCase();
+            let hw = AppState.ui.hoveredWord;
+            let hgi = AppState.ui.hoveredGroupIndex;
+            
+            if (key === 'x') { 
+                e.preventDefault(); 
+                if (hgi === null && hw && !hw.classList.contains('punct-span')) {
+                   let prevMode = AppState.mode; setMode(MODES.SPLIT); handleWordClick(hw, false); setMode(prevMode);
+			} else { setMode(AppState.mode === MODES.SPLIT ? MODES.TAGGING : MODES.SPLIT); }
+                return; 
+            }
+            if (key === 'm') { 
+                e.preventDefault(); 
+                if (hgi === null && hw && !hw.classList.contains('punct-span')) {
+                    if (AppState.mode !== MODES.GROUP) { setMode(MODES.GROUP); handleWordClick(hw, false); } 
+				else { handleWordClick(hw, false); setMode(MODES.TAGGING); }
+				} else { setMode(AppState.mode === MODES.GROUP ? MODES.TAGGING : MODES.GROUP); }
+                return; 
+            }
+            if (key === 'w') {
+                e.preventDefault();
+                if (hgi === null && hw) {
+                    let prevMode = AppState.mode; setMode(MODES.LINEBREAK); handleWordClick(hw, false); setMode(prevMode);
+                } else { setMode(AppState.mode === MODES.LINEBREAK ? MODES.TAGGING : MODES.LINEBREAK); }
+                return;
+            }
+            if (key === 'g') {
+                e.preventDefault();
+                if (hgi === null && hw && !hw.classList.contains('punct-span')) {
+                   let prevMode = AppState.mode; setMode(MODES.ATTR); handleWordClick(hw, false); setMode(prevMode);
+				} else { setMode(AppState.mode === MODES.ATTR ? MODES.TAGGING : MODES.ATTR); }
+                return;
+            }
+            
+            let matchedLabel = Object.keys(AppState.ui.labelShortcuts).find(k => AppState.ui.labelShortcuts[k] === key);
+            if (matchedLabel) {
+                e.preventDefault();
+                AppState.activeFunc = matchedLabel;
+				setMode(MODES.TAGGING);
+                
+                if (hgi !== null) {
+                    AppState.saveToHistory();
+                    AppState.groups[hgi].label = matchedLabel;
+                    updateGroupUI();
+                    StorageManager.triggerAutoSave();
+                } else if (hw && !hw.classList.contains('punct-span')) {
+                    handleWordClick(hw, false);
+                }
+            }
+        }
+    });
+}
+
+// ==========================================
+// 6. EDITOR ACTIONS
+// ==========================================
+
+function handleBoundaryDrop(gIndex, type, targetIdx) {
+    let g = AppState.groups[gIndex];
+    if (!g) return;
+
+    if (AppState.words[targetIdx] && AppState.words[targetIdx].f === CONFIG.PUNCT) {
+        let searchDir = type === 'start' ? 1 : -1;
+        let current = targetIdx;
+        let maxIdx = AppState.words.length - 1;
+        let found = false;
+        
+        while(current >= 0 && current <= maxIdx) {
+            if (AppState.words[current] && AppState.words[current].f !== CONFIG.PUNCT) {
+                targetIdx = current; found = true; break;
+            }
+            current += searchDir;
+        }
+        
+        if (!found) {
+            current = targetIdx; searchDir = searchDir * -1;
+            while(current >= 0 && current <= maxIdx) {
+                if (AppState.words[current] && AppState.words[current].f !== CONFIG.PUNCT) {
+                    targetIdx = current; break;
+                }
+                current += searchDir;
+            }
+        }
+    }
+
+    AppState.saveToHistory();
+    if (type === 'start') { g.start = Math.min(targetIdx, g.end); } 
+    else { g.end = Math.max(targetIdx, g.start); }
+    updateGroupUI();
+    StorageManager.triggerAutoSave();
+}
+
+function handleWordClick(el) {
+    const domIdx = parseInt(el.dataset.idx);
+
+   if (AppState.mode === MODES.LINEBREAK) {
+        AppState.toggleLineBreak(domIdx);
+        return;
+    }
+    
+    if(AppState.mode === MODES.SPLIT) { 
+        // 👇 Look how clean this is now!
+        AppState.splitWord(domIdx);
+    } 
+    else if(AppState.mode === MODES.GROUP) {
+        if(AppState.ui.startIdx === null) { 
+            AppState.ui.startIdx = domIdx; el.style.outline = "2px solid #8b5cf6"; el.style.outlineOffset = "2px";
+        } else {
+            AppState.ui.pendingGroupStart = Math.min(AppState.ui.startIdx, domIdx); 
+            AppState.ui.pendingGroupEnd = Math.max(AppState.ui.startIdx, domIdx);
+            openGroupModal(); AppState.ui.startIdx = null; 
+            document.querySelectorAll('#tagging-area span.tag-word').forEach(s => s.style.outline = "none");
+        }
+    } 
+   else if(AppState.mode === MODES.ATTR) {
+        AppState.mutateWord(domIdx, { u: !AppState.words[domIdx].u });
+    }
+    else { 
+        if (AppState.words[domIdx].f !== AppState.activeFunc) {
+            // We pass false for shouldRender here because updateWordVisuals 
+            // is faster than re-rendering the whole editor for a simple color change.
+            AppState.mutateWord(domIdx, { f: AppState.activeFunc }, false);
+            updateWordVisuals(domIdx);
+        }
+    }
+}
+
+function handleWordDoubleClick(el, e) {
+    e.stopPropagation();
+    AppState.ui.editingWordNode = el;
+    const domIdx = parseInt(el.dataset.idx);
+    DOM.wordTextInput.value = AppState.words[domIdx].w || "";
+    DOM.wordHintInput.value = AppState.words[domIdx].h || "";
+    DOM.wordErrorHintInput.value = AppState.words[domIdx].eh || "";
+    DOM.wordExplainInput.value = AppState.words[domIdx].ex || "";
+    DOM.wordModal.style.display = 'flex';
+    DOM.wordTextInput.focus();
+}
+
+function closeWordModal() { 
+    DOM.wordModal.style.display = 'none'; 
+    AppState.ui.editingWordNode = null; 
+}
+
+function saveWordFromModal() {
+    if (AppState.ui.editingWordNode) {
+        const domIdx = parseInt(AppState.ui.editingWordNode.dataset.idx);
+        const newText = DOM.wordTextInput.value.trim();
+        const newHint = DOM.wordHintInput.value.trim();
+        const newErrorHint = DOM.wordErrorHintInput.value.trim();
+        const newExplain = DOM.wordExplainInput.value.trim();
+        
+        if (newText) {
+            AppState.mutateWord(domIdx, { w: newText, h: newHint, eh: newErrorHint, ex: newExplain });
+        }
+    }
+    closeWordModal();
+}
+
+function deleteWordFromModal() {
+    if (AppState.ui.editingWordNode) {
+        const domIdx = parseInt(AppState.ui.editingWordNode.dataset.idx);
+        const t = CONFIG.LANG_TEXT[AppState.lang];
+        
+        if (confirm(t.confirmDelete)) {
+            AppState.saveToHistory();
+            
+            // Remove the word
+            AppState.words.splice(domIdx, 1);
+            
+            // Shift group boundaries backward to account for the missing word
+            AppState.groups = AppState.groups.map(g => {
+                let newStart = g.start > domIdx ? g.start - 1 : g.start;
+                let newEnd = g.end >= domIdx ? g.end - 1 : g.end;
+                return { ...g, start: newStart, end: newEnd };
+            }).filter(g => g.start <= g.end && g.end >= 0);
+            
+            StorageManager.debouncedAutoSave();
+            renderEditor();
+            closeWordModal();
+        }
+    }
+}
+
+function openGroupModal() {
+    DOM.labelSuggestions.innerHTML = '';
+    // Suggest the level's word labels PLUS the fixed clause labels (these are valid for brackets
+    // at every level, even where they aren't part of the level's own word-label list).
+    const suggestions = [...new Set([...AppState.functions, ...CONFIG.GROUP_LABELS[AppState.lang]])];
+    suggestions.forEach(f => { 
+        const opt = document.createElement('option'); 
+        opt.value = f; 
+        DOM.labelSuggestions.appendChild(opt); 
+    });
+    DOM.groupNameInput.value = ''; 
+    DOM.groupHintInput.value = ''; 
+    DOM.groupErrorHintInput.value = '';
+    DOM.groupExplainInput.value = '';
+    DOM.groupModal.style.display = 'flex'; 
+    DOM.groupNameInput.focus();
+}
+
+function editGroupLabel(index) {
+    AppState.ui.editingGroupIndex = index;
+    DOM.labelSuggestions.innerHTML = '';
+    const suggestions = [...new Set([...AppState.functions, ...CONFIG.GROUP_LABELS[AppState.lang]])];
+    suggestions.forEach(f => { 
+        const opt = document.createElement('option'); 
+        opt.value = f; 
+        DOM.labelSuggestions.appendChild(opt); 
+    });
+    DOM.groupNameInput.value = AppState.groups[index].label; 
+    DOM.groupHintInput.value = AppState.groups[index].hint || "";
+    DOM.groupErrorHintInput.value = AppState.groups[index].errorHint || "";
+    DOM.groupExplainInput.value = AppState.groups[index].explain || "";
+    DOM.groupModal.style.display = 'flex'; 
+    DOM.groupNameInput.focus();
+}
+
+function closeGroupModal() { 
+    DOM.groupModal.style.display = 'none'; 
+    AppState.ui.editingGroupIndex = null; 
+    AppState.ui.pendingGroupStart = null; 
+    AppState.ui.pendingGroupEnd = null; 
+}
+
+function saveGroupFromModal() {
+    const label = DOM.groupNameInput.value.trim();
+    const hint = DOM.groupHintInput.value.trim();
+    const errorHint = DOM.groupErrorHintInput.value.trim();
+    const explain = DOM.groupExplainInput.value.trim();
+    
+    if(label) {
+        AppState.saveToHistory(); 
+        if(!AppState.functions.includes(label)) {
+            AppState.functions.push(label); if(!AppState.colors[label]) AppState.colors[label] = getUnusedSafeColor();
+            CONFIG.ABBREVIATIONS[AppState.lang][label] = label.substring(0,4) + '.'; renderPalette(); 
+        }
+        if(AppState.ui.editingGroupIndex !== null) {
+            AppState.groups[AppState.ui.editingGroupIndex].label = label;
+            if(hint) AppState.groups[AppState.ui.editingGroupIndex].hint = hint; else delete AppState.groups[AppState.ui.editingGroupIndex].hint;
+            if(errorHint) AppState.groups[AppState.ui.editingGroupIndex].errorHint = errorHint; else delete AppState.groups[AppState.ui.editingGroupIndex].errorHint;
+            if(explain) AppState.groups[AppState.ui.editingGroupIndex].explain = explain; else delete AppState.groups[AppState.ui.editingGroupIndex].explain;
+        } else if(AppState.ui.pendingGroupStart !== null) {
+            let newGroup = { start: AppState.ui.pendingGroupStart, end: AppState.ui.pendingGroupEnd, label: label };
+            if(hint) newGroup.hint = hint; 
+            if(errorHint) newGroup.errorHint = errorHint;
+            if(explain) newGroup.explain = explain;
+            AppState.addGroup(newGroup); // This automatically saves and updates the UI!
+        }
+        updateGroupUI(); StorageManager.triggerAutoSave();
+    }
+    closeGroupModal();
+}
+
+function removeGroup(index) { 
+    AppState.removeGroup(index); 
+}
+
+function adjustGroupStart(groupIndex, delta) {
+    let g = AppState.groups[groupIndex]; let newStart = g.start + delta;
+    while(newStart >= 0 && newStart <= g.end) {
+        if (AppState.words[newStart] && AppState.words[newStart].f !== CONFIG.PUNCT) break;
+        newStart += delta;
+    }
+    if (newStart >= 0 && newStart <= g.end && AppState.words[newStart] && AppState.words[newStart].f !== CONFIG.PUNCT) {
+        AppState.saveToHistory(); g.start = newStart; updateGroupUI(); StorageManager.triggerAutoSave();
+    }
+}
+
+function adjustGroupEnd(groupIndex, delta) {
+    let g = AppState.groups[groupIndex]; let newEnd = g.end + delta; const maxIdx = AppState.words.length - 1;
+    while(newEnd >= g.start && newEnd <= maxIdx) {
+        if (AppState.words[newEnd] && AppState.words[newEnd].f !== CONFIG.PUNCT) break;
+        newEnd += delta;
+    }
+    if (newEnd >= g.start && newEnd <= maxIdx && AppState.words[newEnd] && AppState.words[newEnd].f !== CONFIG.PUNCT) {
+        AppState.saveToHistory(); g.end = newEnd; updateGroupUI(); StorageManager.triggerAutoSave();
+    }
+}
+
+function addCustomLabel() {
+    const input = DOM.newLabelInput; const name = input.value.trim();
+    if(!name) return;
+    if(AppState.functions.includes(name)) { alert("Label already exists!"); return; }
+    AppState.functions.push(name); AppState.colors[name] = getUnusedSafeColor();
+    CONFIG.ABBREVIATIONS[AppState.lang][name] = name.substring(0,4) + '.';
+    renderPalette(); input.value = ''; 
+}
+
+// ==========================================
+// 7. IMPORT / EXPORT / PARSING LOGIC
+// ==========================================
+
+function getSanitizedSourceText() {
+    // Shared by Copy Prompt, Analyze with AI and Manual Creation: word-limit guard plus the same light clean-up
+    // (rejoin words hyphenated across line breaks, straight double quotes -> single quotes). Returns null when too long.
+    const txtEl = DOM.enterText;
+    if (isTextTooLong(txtEl.value, 300)) return null;
+    const sanitizedText = LatinCore.sanitizeText(txtEl.value);
+    txtEl.value = sanitizedText;
+    return sanitizedText;
+}
+
+function buildAIPrompt(txt) {
+    return LatinPrompt.buildPrompt(AppState.lang, txt, AppState.functions);
+}
+
+function applyPrepositionMerging(tokens) {
+    const prepLabel = AppState.lang === 'de' ? 'Präpositionale Bestimmung' : 'Prepositional phrase';
+    return LatinCore.weldPrepositions(tokens, prepLabel);
+}
+
+function processTokens(rawTokens) {
+    const prepLabel = AppState.lang === 'de' ? 'Präpositionale Bestimmung' : 'Prepositional phrase';
+    return LatinCore.processTokens(rawTokens, AppState.getOtherLabel(), prepLabel);
+}
+
+function normalizeLabel(label) {
+    return LatinLabels.normalizeLabel(label, AppState.lang);
+}
+
+function importAI(raw) {
+    try {
+        
+        let cleanJson = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+        const jsonMatch = cleanJson.match(/\{[\s\S]*"words"[\s\S]*\}/);
+        if (jsonMatch) {
+            cleanJson = jsonMatch[0];
+        } else {
+            alert("Could not find a valid JSON object containing 'words'. Please check the AI's output.");
+            return;
+        }
+
+        cleanJson = cleanJson.replace(/,\s*([\]}])/g, '$1');
+
+        let d;
+        try {
+            d = JSON.parse(cleanJson);
+        } catch (parseErr) {
+            console.error("JSON Parsing failed.", cleanJson);
+            alert("The AI generated invalid JSON (e.g., unescaped quotes). Check the browser console (F12) to see exactly where the AI messed up.");
+            return;
+        }
+
+        if (!d || !Array.isArray(d.words)) {
+            alert("The AI's response is missing the 'words' array. Please generate the prompt again.");
+            return;
+        }
+		// Ensure every word object at least has the required properties to prevent UI crashes
+        d.words = d.words.filter(w => typeof w === 'object' && w !== null && 'w' in w);
+        
+        // Fallback for groups if AI generated something weird
+        if (d.groups && !Array.isArray(d.groups)) {
+            console.warn("AI generated invalid 'groups' format. Ignoring groups.");
+            d.groups = [];
+        }
+        
+        let rawGroups = (d.groups || []).filter(g => g.label && g.label.toLowerCase() !== CONFIG.MAIN_CLAUSE_EN.toLowerCase() && g.label.toLowerCase() !== CONFIG.MAIN_CLAUSE_DE.toLowerCase() && g.start != null && g.end != null && g.start <= g.end);
+        
+        rawGroups.forEach(g => { 
+            let norm = normalizeLabel(g.label);
+            // Groups may use either the current level's word labels or the fixed, level-independent
+            // clause labels (Nebensatz, Relativsatz, AcI/NcI, Partizipialkonstruktion, Ablativus
+            // absolutus) - so a correctly-labelled clause never gets silently downgraded to "Sonstiges"
+            // just because the exercise is set to Beginner/Anfänger.
+            g.label = (AppState.functions.includes(norm) || CONFIG.GROUP_LABELS[AppState.lang].includes(norm)) ? norm : AppState.getOtherLabel();
+        });
+
+        d.words.forEach(w => { w.w = LatinCore.joinHyphenation(w.w || ""); });
+
+        // Pass 1: resolve every word's function/underline flag, except words the model wrongly labelled
+        // "Genitivattribut"; those are deferred so they can borrow a resolved neighbour's label below.
+        const resolved = d.words.map(w => {
+            const func = w.f || "";
+            if (!LatinCore.hasLetters(w.w)) return { f: CONFIG.PUNCT, u: false, isPunct: true };
+            if (LatinLabels.isGenitiveAttributeLabel(func)) return { f: null, u: true, isPunct: false, isGenAttr: true };
+            if (func.toLowerCase() === CONFIG.MAIN_CLAUSE_EN.toLowerCase() || func.toLowerCase() === CONFIG.MAIN_CLAUSE_DE.toLowerCase()) {
+                return { f: AppState.getOtherLabel(), u: !!w.u, isPunct: false };
+            }
+            const norm = normalizeLabel(func);
+            return { f: AppState.functions.includes(norm) ? norm : AppState.getOtherLabel(), u: !!w.u, isPunct: false };
+        });
+
+        // Pass 2: a word wrongly labelled "Genitivattribut"/"Genitive attribute" inherits its actual
+        // function from the nearest neighbouring word (preferring the preceding word, since the
+        // genitive attribute typically follows its head noun, e.g. "Aurum Metelli" - "Metelli"
+        // should copy "Aurum"'s label) - matching the "EXACT SAME label as the head word" rule
+        // instead of collapsing to "Sonstiges"/"Other".
+        resolved.forEach((r, i) => {
+            if (!r.isGenAttr) return;
+            const prev = resolved[i - 1];
+            const next = resolved[i + 1];
+            if (prev && !prev.isPunct && !prev.isGenAttr) r.f = prev.f;
+            else if (next && !next.isPunct && !next.isGenAttr) r.f = next.f;
+            else r.f = AppState.getOtherLabel();
+        });
+
+        d.words.forEach((w, i) => {
+            w.f = resolved[i].f;
+            w.b = w.b || 0;
+            w.u = resolved[i].u;
+        });
+        
+        const mergeResult = applyPrepositionMerging(d.words);
+        AppState.groups = [];
+        rawGroups.forEach(g => {
+            let newStart = mergeResult.map[g.start] !== undefined ? mergeResult.map[g.start] : g.start;
+            let newEnd = mergeResult.map[g.end] !== undefined ? mergeResult.map[g.end] : g.end;
+            for (let i = newStart; i < newEnd; i++) {
+                let token = mergeResult.welded[i];
+                if (token && token.f === CONFIG.PUNCT && CONFIG.SENTENCE_ENDERS.some(char => token.w.includes(char))) { newEnd = i - 1; break; }
+            }
+            while(newStart <= newEnd && mergeResult.welded[newStart] && mergeResult.welded[newStart].f === CONFIG.PUNCT) newStart++;
+            while(newEnd >= newStart && mergeResult.welded[newEnd] && mergeResult.welded[newEnd].f === CONFIG.PUNCT) newEnd--;
+            
+            if (newStart <= newEnd && newStart >= 0 && newEnd < mergeResult.welded.length) {
+                AppState.groups.push({ start: newStart, end: newEnd, label: g.label });
+            }
+        });
+
+        // Completeness: the software owns the text, the model only the labels. A dropped, altered or invented
+        // word must not slip into an exercise unnoticed.
+        const coverage = LatinCore.compareCoverage(DOM.enterText.value, mergeResult.welded);
+        if (!coverage.ok) {
+            const t = CONFIG.LANG_TEXT[AppState.lang];
+            const lines = [t.aiCoverageWarn];
+            if (coverage.missing.length) lines.push(t.aiMissingWords + coverage.missing.join(', '));
+            if (coverage.extra.length) lines.push(t.aiExtraWords + coverage.extra.join(', '));
+            lines.push('', t.aiCoverageAsk);
+            if (!confirm(lines.join('\n'))) return;
+        }
+
+        initEditor(mergeResult.welded);
+    } catch(e) { 
+        console.error("Unhandled import error:", e); 
+        alert("An unexpected error occurred during import. Check the browser console (F12) for more details."); 
+    }	
+}
+
+// ==========================================
+// 7b. OPENAI CALL (the analysis pipeline; manual creation stays as the no-AI alternative)
+// ==========================================
+
+// A link of the form index.html#key=sk-... stores the key in this browser once and drops it from the address bar,
+// so people who receive that link (e.g. via QR code at a presentation) never see the key dialog.
+function importKeyFromUrl() {
+    const m = (location.hash || '').match(/[#&]key=([^&]+)/);
+    if (!m) return;
+    try { localStorage.setItem(CONFIG.AI.KEY_STORAGE, decodeURIComponent(m[1]).trim()); } catch (e) { console.warn("Could not store the API key (storage blocked).", e); }
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+}
+
+function getAiKey() {
+    try { return (localStorage.getItem(CONFIG.AI.KEY_STORAGE) || '').trim(); } catch (e) { return ''; }
+}
+
+function openAiKeyModal() {
+    DOM.aiKeyInput.value = getAiKey();
+    DOM.aiKeyModal.style.display = 'flex';
+    DOM.aiKeyInput.focus();
+}
+
+function closeAiKeyModal() {
+    DOM.aiKeyModal.style.display = 'none';
+    DOM.aiKeyInput.value = '';
+}
+
+function updateAiKeyButton() {
+    DOM.btnAiKey.textContent = CONFIG.LANG_TEXT[AppState.lang].btnAiKey + (getAiKey() ? ' ✓' : '');
+    DOM.btnAiKey.style.display = CONFIG.AI.PROXY_URL ? 'none' : '';
+}
+
+function saveAiKeyFromModal() {
+    const key = DOM.aiKeyInput.value.trim();
+    try {
+        if (key) localStorage.setItem(CONFIG.AI.KEY_STORAGE, key);
+        else localStorage.removeItem(CONFIG.AI.KEY_STORAGE);
+    } catch (e) { console.warn("Could not store the API key (storage blocked).", e); }
+    closeAiKeyModal();
+    updateAiKeyButton();
+}
+
+// Strict schema for OpenAI Structured Outputs: every object is closed (additionalProperties:false, all keys required)
+// and labels are restricted to exactly the strings importAI() accepts for the current language and level.
+function buildAISchema() {
+    const labels = [...AppState.functions];
+    const obj = (props) => ({ type: 'object', additionalProperties: false, required: Object.keys(props), properties: props });
+    return obj({
+        words: { type: 'array', items: obj({ w: { type: 'string' }, f: { type: 'string', enum: labels.concat(CONFIG.PUNCT) }, u: { type: 'boolean' } }) },
+        groups: { type: 'array', items: obj({ start: { type: 'integer' }, end: { type: 'integer' }, label: { type: 'string', enum: labels } }) }
+    });
+}
+
+async function analyzeWithAI() {
+    const t = CONFIG.LANG_TEXT[AppState.lang];
+    const useProxy = !!CONFIG.AI.PROXY_URL;
+    const key = useProxy ? '' : getAiKey();
+    if (!useProxy && !key) { alert(t.aiErrNoKey); openAiKeyModal(); return; }
+    const txt = getSanitizedSourceText();
+    if (txt === null) return;
+    if (!txt.trim()) { alert(t.aiErrNoText); return; }
+
+    const btn = DOM.btnAnalyzeAi;
+    btn.disabled = true; btn.textContent = t.btnAnalyzeBusy;
+    DOM.grammarLevelSetup.disabled = true; // the label list is part of the request
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), CONFIG.AI.TIMEOUT_MS);
+    try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (!useProxy) headers['Authorization'] = 'Bearer ' + key; // the proxy adds the key itself
+        const res = await fetch(useProxy ? CONFIG.AI.PROXY_URL : CONFIG.AI.ENDPOINT, {
+            method: 'POST',
+            signal: ctrl.signal,
+            headers: headers,
+            body: JSON.stringify({
+                model: CONFIG.AI.MODEL,
+                input: buildAIPrompt(txt),
+                reasoning: { effort: CONFIG.AI.EFFORT },
+                text: { format: { type: 'json_schema', name: 'latin_analysis', schema: buildAISchema(), strict: true } }
+            })
+        });
+        const data = await res.json().catch(() => ({}));
+        const err = (data && data.error) || {};
+        if (!res.ok) {
+            const billingCodes = ['credit_balance_exhausted', 'organization_spend_limit_exceeded', 'project_spend_limit_exceeded', 'insufficient_quota'];
+            if (res.status === 401) alert(t.aiErrAuth);
+            else if (res.status === 429 && billingCodes.includes(err.code)) alert(t.aiErrBilling);
+            else if (res.status === 429) alert(t.aiErrRate);
+            else alert(t.aiErrOther + (err.message || ('HTTP ' + res.status)));
+            return;
+        }
+        // Responses API: the text sits in the "message" output item (not necessarily output[0]) as an "output_text" part.
+        const message = (data.output || []).find(o => o.type === 'message');
+        const parts = (message && message.content) || [];
+        const refusal = parts.find(p => p.type === 'refusal');
+        const textPart = parts.find(p => p.type === 'output_text');
+        if (refusal) { alert(t.aiErrRefusal); return; }
+        if (data.status === 'incomplete') { alert(t.aiErrIncomplete); return; }
+        if (data.status !== 'completed' || !textPart) { alert(t.aiErrOther + (err.message || data.status || 'empty response')); return; }
+        importAI(textPart.text);
+    } catch (e) {
+        console.error("OpenAI request failed:", e); // AbortError (timeout) or TypeError (network / CORS)
+        alert(t.aiErrNetwork);
+    } finally {
+        clearTimeout(timer);
+        btn.disabled = false; btn.textContent = CONFIG.LANG_TEXT[AppState.lang].btnAnalyze;
+        DOM.grammarLevelSetup.disabled = false;
+    }
+}
+
+function startManual() {
+    const rawInput = getSanitizedSourceText();
+    if (rawInput === null) return;
+    const tokens = LatinCore.tokenize(rawInput);
+    if (!tokens.length) return;
+    initEditor(processTokens(tokens));
+}
+
+function initEditor(words) {
+    AppState.dirty = true; // a new analysis that has not been saved yet
+    AppState.functions = [...CONFIG.PRESETS[AppState.lang][AppState.level]];
+    // Fixed clause labels (see GROUP_LABELS) can be used in "groups" at any level, so they may not
+    // be part of the level's own word-label preset. Without this, a beginner-level exercise that
+    // correctly has a "Relativsatz" bracket would lose that label from the palette right here, and
+    // it would then be missing from the exported student page's answer choices for that bracket.
+    AppState.groups.forEach(g => { if (g.label && !AppState.functions.includes(g.label)) AppState.functions.push(g.label); });
+    AppState.history = [];
+    AppState.words = words;
+    DOM.editorPageTitle.value = DOM.pageTitle.value;
+    renderEditor();
+    showScreen('editor');
+    renderPalette();
+}
+
+window.addEventListener('DOMContentLoaded', initApp);
+
+// Ask before leaving the editor with changes that are not saved in a project file (browsers show their own standard message).
+window.addEventListener('beforeunload', (e) => {
+    if (AppState.dirty && DOM.editorScreen && DOM.editorScreen.style.display === 'block') { e.preventDefault(); e.returnValue = ''; }
 });
+
+// ==========================================
+// ==========================================
+// 8. STUDENT EXPORT GENERATION
+// ==========================================
+
+function exportToStudent() {
+    // Dynamic fetching of the templates from cache directly upon export
+    const STUDENT_PAGE_CSS = DOM.templateStudentCss.textContent;
+    const STUDENT_PAGE_JS = DOM.templateStudentJs.textContent;
+
+    let tempTokens = JSON.parse(JSON.stringify(AppState.words));
+
+    tempTokens.forEach((token, index) => {
+        token.idx = index;
+        if(token.f !== CONFIG.PUNCT) {
+            token.activeGroups = AppState.groups
+                .filter(g => token.idx >= g.start && token.idx <= g.end)
+                .map(g => AppState.groups.indexOf(g)).sort().join(',');
+        } else { token.activeGroups = ""; }
+    });
+
+    for(let i = 1; i < tempTokens.length - 1; i++) {
+        let curr = tempTokens[i];
+        if(curr.f === CONFIG.PUNCT) {
+            let prev = tempTokens[i-1]; let nextIdx = i + 1;
+            while(nextIdx < tempTokens.length && tempTokens[nextIdx].f === CONFIG.PUNCT) { nextIdx++; }
+            if(nextIdx < tempTokens.length) {
+                let next = tempTokens[nextIdx];
+                if(prev.f !== CONFIG.PUNCT && prev.f !== AppState.getOtherLabel() && prev.f === next.f && !prev.isSplit && prev.activeGroups === next.activeGroups && prev.b === 0) {
+                    curr.f = prev.f; curr.activeGroups = prev.activeGroups;
+                }
+            }
+        }
+    }
+
+    let merged = []; let current = null;
+    tempTokens.forEach((token, i) => {
+        const isMergeableType = ![CONFIG.PUNCT, CONFIG.OTHER_EN, CONFIG.OTHER_DE].includes(token.f);
+        const prevToken = i > 0 ? tempTokens[i-1] : null;
+        const splitExists = prevToken && prevToken.isSplit;
+        const sameGroups = current && current.activeGroups === token.activeGroups;
+        const hasBreak = prevToken && prevToken.b === 1;
+        
+        const canMerge = current && current.f === token.f && isMergeableType && !splitExists && sameGroups && !hasBreak;
+        
+        if (canMerge) {
+            current.segments.push({
+                w: token.w,
+                u: token.u,
+                space: (['.', ',', ';', ':', '!', '?'].includes(token.w) ? '' : ' ')
+            });
+            current.originalIndices.push(token.idx);
+            if(token.h) current.hint = current.hint ? current.hint + " | " + token.h : token.h;
+            if(token.eh) current.eh = current.eh ? current.eh + " | " + token.eh : token.eh;
+            if(token.ex) current.ex = current.ex ? current.ex + " " + token.ex : token.ex;
+            current.b = token.b; 
+        } else {
+            if (current) merged.push(current);
+            current = { 
+                f: token.f, 
+                originalIndices: [token.idx], 
+                activeGroups: token.activeGroups, 
+                hint: token.h, 
+                eh: token.eh,
+                ex: token.ex,
+                b: token.b,
+                segments: [{ w: token.w, u: token.u, space: '' }]
+            };
+        }
+    });
+    if (current) merged.push(current);
+
+    const updatedGroups = AppState.groups.map(g => {
+        const newStart = merged.findIndex(m => m.originalIndices.includes(g.start));
+        let newEnd = merged.findIndex(m => m.originalIndices.includes(g.end));
+        if(newEnd === -1) newEnd = newStart; 
+        return { ...g, start: newStart, end: newEnd, label: g.label, hint: g.hint };
+    }).sort((a, b) => {
+        if (a.start !== b.start) return a.start - b.start; return b.end - a.end; 
+    });
+
+    const defaultTitle = AppState.lang === 'en' ? 'Latin Syntax Studio' : 'Syntax-Studio Latein';
+    const titleInput = DOM.pageTitle.value || defaultTitle;
+    const filename = safeFileName(titleInput) + ".html";
+    const imgUrl = DOM.pageImage.value; const teacherNotes = DOM.teacherNotes.value;
+    // Creates a simple, stable hash from a string
+	const generateStableId = (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0; 
+    }
+    return Math.abs(hash).toString(36);
+};
+
+// Use the title + the first 50 chars of the text to ensure uniqueness per exercise, 
+// but stability across re-exports of the same exercise.
+const baseText = AppState.words.slice(0, 10).map(w => w.w).join('');
+const exerciseId = generateStableId(titleInput + baseText);
+    
+    // The student's answer menu offers the standard labels of this level plus the fixed clause labels, and any
+    // extra label the teacher actually used. Scratch labels that were added but never used are left out, so the
+    // menu neither gives the answer away nor puts stray entries like "1" and "2" in front of the class.
+    const usedLabels = new Set();
+    merged.forEach(m => { if (m.f && m.f !== CONFIG.PUNCT) usedLabels.add(m.f); });
+    updatedGroups.forEach(g => { if (g.label) usedLabels.add(g.label); });
+    const standardLabels = CONFIG.PRESETS[AppState.lang][AppState.level].concat(CONFIG.GROUP_LABELS[AppState.lang]);
+    const exportLabels = AppState.functions.filter(l => standardLabels.indexOf(l) !== -1 || usedLabels.has(l));
+
+    const blob = new Blob([generateStudentHTML(merged, updatedGroups, titleInput, exportLabels, imgUrl, teacherNotes, AppState.lang, CONFIG.ABBREVIATIONS, CONFIG.PRESETS, exerciseId, STUDENT_PAGE_CSS, STUDENT_PAGE_JS)], {type: 'text/html'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+}
+
+function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lang, allAbbrevs, allPresets, exerciseId, STUDENT_PAGE_CSS, STUDENT_PAGE_JS) {
+    const filteredLabels = allLabels.filter(l => l !== CONFIG.MAIN_CLAUSE_EN && l !== CONFIG.MAIN_CLAUSE_DE);
+    const labelMap = LatinLabels.buildLabelMap();
+    
+    const studentTexts = {
+        en: {
+            instr: "This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words to select their syntactical function. <br><br><strong>Important:</strong> You must also locate hidden Genitive Attributes! Click directly on a genitive word inside a phrase box and use the <strong>🖍️ Mark Genitive</strong> tool to reveal it. Once you have correctly analyzed every phrase and found all genitives, a textbox will appear into which you can write your translation. <br><br><strong>Tip:</strong> In <strong>Guided Mode</strong> the page leads you block by block through each sentence, with an explanation after every step.",
+            note: "Note:", togglePat: "Toggle Patterns", toggleCon: "High Contrast", print: "Print Analysis",
+            download: "Download HTML", btnSaveProg: "💾 Save Progress", btnClearProg: "🗑️ Clear Progress",
+            progSaved: "Progress saved!", progCleared: "Progress cleared!", correct: "Correct!",
+            incorrect: "Incorrect. The correct answer is: ", tryAgain: "Incorrect label, try again!",
+            transPlaceholder: "Enter translation...", docTitle: "Latin Syntax Studio",
+            practiseMode: "Practise Mode", examMode: "Exam Mode", guidedMode: "Guided Mode",
+            resetWarn: "Changing the mode will reload the page and reset your progress. Continue?",
+            btnSubmitExam: "✅ Submit Exam",
+            confirmSubmit: "Submit the exam now? Any unanswered phrases and any genitive attributes you haven't found yet will be counted as errors.",
+            examResults: "Exam Results", copyResults: "Copy to Clipboard", copied: "Copied!", close: "Close",
+            saveWarning: "⚠️ Note: Your progress is saved locally in this web browser. You must open this file on this exact same device and browser to resume your work later. Clearing your browser data will delete your progress. Do you want to save now?",
+            resExercise: "Exercise: ", resDate: "Date: ", resScore: "Score: ",
+            markGen: "🖍️ Mark Genitive (G)", unmarkGen: "❌ Unmark Genitive (G)", notGenitive: "Not a genitive attribute!",
+            legendTitle: "Syntactic functions", legendHint: "Click a function to change its colour.",
+            keysTitle: "Keyboard shortcuts", keysHint: "Point at a word with the mouse (or select it with Tab) and press the underlined letter of the function.", keysGen: "Mark genitive (click the word first)", colorFor: "Colour for:", colorInUse: "Used by {label} (it will turn grey)", colorResetOne: "↺ Teacher's colour", colorsReset: "↺ All of the teacher's colours"
+        },
+        de: {
+            instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen. <br><br><strong>Wichtig:</strong> Du musst auch versteckte Genitivattribute aufspüren! Klicke dazu direkt auf das Genitivattribut innerhalb eines Wortblocks und nutze das <strong>🖍️ Genitiv markieren</strong> Werkzeug, um es hervorzuheben. Sobald du jede Wortgruppe korrekt analysiert und alle Genitive gefunden hast, erscheint ein Textfeld für deine Übersetzung. <br><br><strong>Tipp:</strong> Im <strong>Geführten Modus</strong> führt dich die Seite Block für Block durch jeden Satz, mit einer Erklärung nach jedem Schritt.",
+            note: "Hinweis:", togglePat: "Muster umschalten", toggleCon: "Hoher Kontrast", print: "Drucken",
+            download: "HTML herunterladen", btnSaveProg: "💾 Fortschritt speichern", btnClearProg: "🗑️ Fortschritt löschen",
+            progSaved: "Fortschritt gespeichert!", progCleared: "Fortschritt gelöscht!", correct: "Richtig!",
+            incorrect: "Falsch. Die richtige Antwort ist: ", tryAgain: "Falsches Label, versuch es nochmal!",
+            transPlaceholder: "Übersetzung eingeben...", docTitle: "Syntax-Studio Latein",
+            practiseMode: "Übungsmodus", examMode: "Prüfungsmodus", guidedMode: "Geführter Modus",
+            resetWarn: "Ein Moduswechsel lädt die Seite neu und setzt deinen Fortschritt zurück. Fortfahren?",
+            btnSubmitExam: "✅ Prüfung abgeben",
+            confirmSubmit: "Prüfung jetzt abgeben? Unbeantwortete Wortgruppen und noch nicht gefundene Genitivattribute werden als Fehler gewertet.",
+            examResults: "Prüfungsergebnisse", copyResults: "Ergebnisse kopieren", copied: "Kopiert!", close: "Schließen",
+            saveWarning: "⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?",
+            resExercise: "Übung: ", resDate: "Datum: ", resScore: "Ergebnis: ",
+            markGen: "🖍️ Genitiv markieren (G)", unmarkGen: "❌ Markierung aufheben (G)", notGenitive: "Kein Genitivattribut!",
+            legendTitle: "Syntaktische Funktionen", legendHint: "Klicke auf eine Funktion, um ihre Farbe zu ändern.",
+            keysTitle: "Tastenkürzel", keysHint: "Zeige mit der Maus auf ein Wort (oder wähle es mit Tab) und drücke den unterstrichenen Buchstaben der Funktion.", keysGen: "Genitiv markieren (vorher auf das Wort klicken)", colorFor: "Farbe für:", colorInUse: "Belegt von {label} (wird dann grau)", colorResetOne: "↺ Farbe der Lehrkraft", colorsReset: "↺ Alle Farben der Lehrkraft"
+        }
+    };
+
+    const t = studentTexts[lang]; const pageTitle = title ? title : t.docTitle;
+    const bodyContent = generateExerciseHTML(words, groups, t.transPlaceholder, lang);
+    
+    const safeTitle = escapeHTML(pageTitle);
+    const safeNotes = notes ? escapeHTML(notes).replace(/\n/g, '<br>') : '';
+
+    return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${safeTitle}</title>
+    <style>${STUDENT_PAGE_CSS}</style></head>
+    <body>
+        <div class="lang-switch-top">
+            <button class="lang-btn ${lang === 'en' ? 'active' : ''}" onclick="switchStudentLang('en')">EN</button>
+            <button class="lang-btn ${lang === 'de' ? 'active' : ''}" onclick="switchStudentLang('de')">DE</button>
+        </div>
+        <h1>${safeTitle}</h1>
+        <div class="instruction-box">${t.instr}</div>
+        ${safeNotes ? `<div class="teacher-note"><span style="font-weight: 500;">${t.note}</span> ${safeNotes}</div>` : ''}
+        <div class="exercise-wrapper">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div class="mode-toggle-bg" style="display: inline-flex; background: #e2e8f0; border-radius: 8px; padding: 4px;">
+                    <button id="btn-guided" onclick="setMode('guided')" style="background: transparent; border: none; padding: 6px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; color: #475569; font-size: 0.9rem;">${t.guidedMode}</button>
+                    <button id="btn-practise" onclick="setMode('practise')" style="background: white; border: none; padding: 6px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #111827; font-size: 0.9rem;">${t.practiseMode}</button>
+                    <button id="btn-exam" onclick="setMode('exam')" style="background: transparent; border: none; padding: 6px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; color: #475569; font-size: 0.9rem;">${t.examMode}</button>
+                </div>
+            </div>
+            <div class="zoom-controls">
+                <button class="z-btn" onclick="togglePatterns()" title="${t.togglePat}">🏁</button>
+                <button class="z-btn" onclick="toggleContrast()" title="${t.toggleCon}">🌗</button>
+                <span style="border-left: 1px solid #d1d5db; margin: 0 4px; height: 16px;"></span>
+                <button class="z-btn" onclick="setStudentZoom(0.1)" title="Zoom In">🔍 +</button>
+                <button class="z-btn" onclick="setStudentZoom(-0.1)" title="Zoom Out">🔍 -</button>
+                <button class="z-btn" onclick="setStudentZoom(0)" title="Reset Zoom">Reset</button>
+            </div>
+            <div class="exercise-layout">
+                <div class="exercise-main">
+                    <div id="exercise-container-wrapper">
+                        <div id="exercise">${bodyContent}</div>
+                    </div>
+                </div>
+                <aside id="label-legend" class="label-legend"></aside>
+            </div>
+        </div>
+        ${imgUrl ? `<img src="${escapeHTML(imgUrl)}" class="ex-img" alt="Exercise Image">` : ''}
+        
+        <div class="footer-toolbar">
+            <button class="btn" onclick="saveStudentProgress()" id="btn-save-progress">${t.btnSaveProg}</button>
+            <button class="btn" onclick="clearStudentProgress()" id="btn-clear-progress">${t.btnClearProg}</button>
+            <button class="btn" onclick="window.print()">${t.print}</button> 
+            <button class="btn" onclick="downloadPage()">${t.download}</button>
+            <button class="btn btn-submit-exam" onclick="submitExam()" id="btn-submit-exam" style="display:none;">${t.btnSubmitExam}</button>
+        </div>
+        <div id="menu-common" class="radio-menu">
+            <button type="button" class="menu-btn gen-btn" data-action="toggle-gen">🖍️ Mark Genitive (G)</button>
+            ${filteredLabels.map(l => `<button type="button" class="menu-btn" data-val="${escapeHTML(l)}">${escapeHTML(l)}</button>`).join('')}
+        </div>
+        <div id="results-modal">
+            <div class="results-content">
+                <div class="results-title">${t.examResults}</div>
+                <div id="final-score-display" class="results-score"></div>
+                <textarea id="results-text" class="results-textarea" readonly></textarea>
+                <button class="btn-copy" onclick="copyResults()">${t.copyResults}</button>
+                <button class="btn" style="width: 100%;" onclick="closeResults()">${t.close}</button>
+            </div>
+        </div>
+        <div id="toast-container"></div>
+        <div id="color-popover" class="color-popover" role="dialog"></div>
+        <script>
+            const SHORTCUTS = ${JSON.stringify(LatinLabels.SHORTCUTS)};
+            const SAFE_COLORS = ${JSON.stringify(CONFIG.SAFE_COLORS)}; const NEUTRAL_COLOR = ${JSON.stringify(CONFIG.NEUTRAL_COLOR)};
+            const colors = ${JSON.stringify(AppState.colors)}; const abbreviations = ${JSON.stringify(allAbbrevs)}; const labelMap = ${JSON.stringify(labelMap)};
+            const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const titleInput = ${JSON.stringify(title).replace(/</g, '\\u003c')};
+            const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + '${exerciseId}';
+        <\/script>
+        <script>
+            ${STUDENT_PAGE_JS}
+        <\/script>
+    </body></html>`;
+}
+
+function generateExerciseHTML(words, groups, placeholder, lang) {
+    let sIdx = 0;
+    let containerOpen = true;
+    const sentenceEnders = ['.', '!', '?', '·'];
+    let pendingClosers = "";
+    
+    // We use an array to collect our HTML chunks, which is faster and cleaner
+    // than constantly concatenating a massive string.
+    let htmlParts = ['<div class="sentence-container">'];
+
+    // One click handler for word and group hints (group hints had none and could never be opened).
+    const hintToggle = "event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');";
+    const hintIconHtml = (safeHint) => `<span class="hint-icon" title="Hint" onclick="${hintToggle}">💡<span class="tooltip-text">${safeHint}</span></span>`;
+
+    words.forEach((word, idx) => {
+        const isPunct = word.f === CONFIG.PUNCT;
+        const nextWord = words[idx + 1];
+        const nextIsPunct = nextWord && (!LatinCore.hasLetters(nextWord.segments ? nextWord.segments[0].w : "") || nextWord.f === CONFIG.PUNCT);
+        
+        const safeWordHint = parseSimpleMarkdown(word.hint);
+        
+        // Template literals allow multi-line strings and easy variable injection
+        const hintHtml = word.hint ? hintIconHtml(safeWordHint) : '';
+
+        // Using .map() and .join('') for the segments instead of manual loops
+        const safeWordHtml = word.segments.map(seg => `${seg.space ? ' ' : ''}<span class="s-text" data-u="${seg.u ? 'true' : 'false'}">${escapeHTML(seg.w)}</span>`).join('');
+
+        const safeFunc = escapeHTML(word.f);
+        const errHintAttr = (word.eh ? ` data-errhint="${escapeHTML(word.eh)}"` : '') + (word.ex ? ` data-explain="${escapeHTML(word.ex)}"` : '');
+        const content = isPunct 
+            ? `<span class="punct">${safeWordHtml}</span>` 
+            : `<span class="hover-word" tabindex="0" data-ans="${safeFunc}"${errHintAttr}>${safeWordHtml}${hintHtml}</span>`;
+
+        let openDivs = "";
+        let closeDivs = "";
+
+        groups.forEach(g => {
+            const safeGroupHint = parseSimpleMarkdown(g.hint);
+            const gHintHtml = g.hint ? hintIconHtml(safeGroupHint) : '';
+            const safeLabel = escapeHTML(g.label);
+            const gErrHintAttr = (g.errorHint ? ` data-errhint="${escapeHTML(g.errorHint)}"` : '') + (g.explain ? ` data-explain="${escapeHTML(g.explain)}"` : '');
+            
+            if (idx === g.start) {
+                openDivs += `<div class="s-group" data-ans="${safeLabel}"><span class="g-label" tabindex="0"${gErrHintAttr}><span class="g-text">?</span>${gHintHtml}</span>`;
+            }
+            if (idx === g.end) {
+                closeDivs += `</div>`;
+            }
+        });
+
+        const spacing = nextIsPunct ? "" : " ";
+
+        // Push the assembled pieces into our array
+        if (isPunct) {
+            htmlParts.push(`${openDivs}${content}${pendingClosers}${closeDivs}${spacing}`);
+            pendingClosers = ""; 
+        } else {
+            htmlParts.push(`${openDivs}${content}`);
+            if (closeDivs && nextIsPunct) {
+                pendingClosers = closeDivs;
+            } else {
+                htmlParts.push(closeDivs);
+            }
+            htmlParts.push(spacing);
+        }
+
+        // Translation box logic
+        const defaultBreak = isPunct && word.segments && sentenceEnders.some(end => word.segments[0].w.includes(end));
+        const shouldBreak = word.b === 1 || (defaultBreak && word.b !== -1);
+
+        if (shouldBreak) {
+            htmlParts.push(`
+                <div id="t-container-${sIdx}" class="trans-box" style="display:none;">
+                    <textarea placeholder="${escapeHTML(placeholder)}"></textarea>
+                </div>
+            </div>`); // Closes the sentence-container
+            
+            sIdx++;
+            containerOpen = false;
+            
+            if (idx < words.length - 1) {
+                htmlParts.push(`<div class="sentence-container">`);
+                containerOpen = true;
+            }
+        }
+    });
+    
+    // Close up the final container if it was left open
+    if (containerOpen) {
+        htmlParts.push(`
+            <div id="t-container-${sIdx}" class="trans-box" style="display:none;">
+                <textarea placeholder="${escapeHTML(placeholder)}"></textarea>
+            </div>
+        </div>`);
+    }
+
+    // Finally, glue the array together into one solid HTML string
+    return htmlParts.join('');
+}
+</script>
+</body>
+</html>
