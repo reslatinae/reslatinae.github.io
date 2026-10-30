@@ -83,7 +83,7 @@
         .split-right { border-right: 3px dashed #ef4444 !important; margin-right: 12px !important; }
         
         /* Genitive Attribute Underline Feature */
-        .attr-underline { border-bottom: 3px dashed #ec4899 !important; padding-bottom: 2px; }
+        .tag-word.attr-underline::before { content: ""; position: absolute; left: 3px; right: 3px; bottom: -2px; height: 3px; background: repeating-linear-gradient(90deg, #ec4899 0 6px, var(--gen-alt, transparent) 6px 10px); pointer-events: none; }
         .tag-word.attr-underline::after { content: attr(data-short) ' (GEN)'; color: #ec4899; font-weight: 800; background: #fdf2f8; border-color: #ec4899; }
 
         .group-bracket { position: absolute; left: -2px; right: -2px; border-top-width: 4px; border-top-style: solid; pointer-events: none; z-index: 5; border-radius: 6px; }
@@ -160,7 +160,7 @@
         body.high-contrast .subtle-btn, body.high-contrast .lang-btn { background: #333; color: #fff; border-color: #555; }
         body.high-contrast .subtle-btn:hover, body.high-contrast .lang-btn:hover { background: #444; color: #fff; }
         body.high-contrast .bracket-badge, body.high-contrast .bracket-end-controls { border: 1px solid #fff !important; }
-        body.high-contrast .attr-underline { border-bottom-color: #f472b6 !important; }
+        body.high-contrast .tag-word.attr-underline::before { background: repeating-linear-gradient(90deg, #f472b6 0 6px, var(--gen-alt, transparent) 6px 10px); }
         body.high-contrast .tag-word.attr-underline::after { color: #f472b6; border-color: #f472b6; background: #000; }
         body.high-contrast .color-popover { background: #1e1e1e; border-color: #555; }
         body.high-contrast .color-pop-title { color: #fff; }
@@ -379,7 +379,7 @@
         
         /* Interactive Genitive Underline Elements */
         .s-text { border-bottom: 3px dashed transparent; transition: border-color 0.2s, background-color 0.2s; border-radius: 2px; }
-        .s-text.marked-gen { border-bottom-color: #ec4899; }
+        .s-text.marked-gen { background-image: repeating-linear-gradient(90deg, #ec4899 0 6px, var(--gen-alt, transparent) 6px 10px); background-size: 100% 3px; background-repeat: no-repeat; background-position: left bottom; background-origin: border-box; }
         .s-text.error-gen { border-bottom-color: #ef4444; background-color: #fef2f2; }
         .s-text.missed-gen { border-bottom-color: #f59e0b; border-bottom-style: solid; background-color: #fffbeb; }
 
@@ -413,14 +413,22 @@
         
         .gen-btn { color: #ec4899; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 4px; display: none; }
 
-        .label-legend { position: sticky; top: 0; z-index: 60; background: rgba(255,255,255,0.97); border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px; margin: 0 0 16px; line-height: 1.3; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-        .legend-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-bottom: 8px; }
-        .legend-title { font-weight: 600; font-size: 0.85rem; color: #111827; }
-        .legend-hint { font-size: 0.8rem; color: #6b7280; }
-        .legend-list { display: flex; flex-wrap: wrap; gap: 6px; }
-        .legend-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e5e7eb; background: white; border-radius: 999px; padding: 3px 10px 3px 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; color: #374151; font-family: inherit; white-space: nowrap; transition: border-color 0.15s; }
-        .legend-chip:hover, .legend-chip:focus-visible, .legend-chip.open { border-color: #3b82f6; outline: none; }
+        .exercise-layout { display: flex; gap: 24px; align-items: flex-start; }
+        .exercise-main { flex: 1; min-width: 0; }
+        .label-legend { position: sticky; top: 16px; z-index: 60; width: 230px; flex-shrink: 0; margin-top: 30px; max-height: calc(100vh - 32px); overflow-y: auto; box-sizing: border-box; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; line-height: 1.3; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .legend-title { font-weight: 600; font-size: 0.9rem; color: #111827; margin-bottom: 2px; }
+        .legend-hint { font-size: 0.78rem; color: #6b7280; margin: 0 0 10px; }
+        .legend-list { display: flex; flex-direction: column; gap: 2px; }
+        .legend-chip { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 1px solid transparent; background: transparent; border-radius: 6px; padding: 5px 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #374151; font-family: inherit; }
+        .legend-chip:hover, .legend-chip:focus-visible, .legend-chip.open { background: #f3f4f6; border-color: #bfdbfe; outline: none; }
         .legend-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(17,24,39,0.25); flex-shrink: 0; }
+        .legend-name { flex: 1; min-width: 0; }
+        .legend-key, .legend-keys kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.72rem; font-weight: 600; color: #374151; background: #f9fafb; border: 1px solid #d1d5db; border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; min-width: 9px; text-align: center; flex-shrink: 0; }
+        .legend-keys { margin-top: 12px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 0.78rem; color: #4b5563; }
+        .legend-keys-title { font-weight: 600; color: #111827; margin-bottom: 4px; font-size: 0.85rem; }
+        .legend-keys p { margin: 0 0 6px; }
+        .key-row { display: flex; align-items: center; gap: 6px; margin: 5px 0; }
+        .key-row .key-text { margin-left: 2px; }
         .color-popover { display: none; position: fixed; z-index: 1100; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.15); width: max-content; max-width: 260px; line-height: 1.3; }
         .color-pop-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; color: #111827; }
         .color-pop-grid { display: grid; grid-template-columns: repeat(6, 30px); gap: 6px; }
@@ -461,7 +469,7 @@
         body.high-contrast .teacher-note { background: #1e1e1e !important; border: 1px solid #444 !important; color: #e5e7eb !important; }
         body.high-contrast .hover-word { background-color: #333; color: #fff; border-bottom: 2px solid #555; }
         body.high-contrast .hover-word[data-done="true"] { border: 2px solid #fff !important; color: #000 !important; font-weight: 600; }
-        body.high-contrast .s-text.marked-gen { border-bottom-color: #f472b6 !important; }
+        body.high-contrast .s-text.marked-gen { background-image: repeating-linear-gradient(90deg, #f472b6 0 6px, var(--gen-alt, transparent) 6px 10px); }
         body.high-contrast .s-text.missed-gen { border-bottom-color: #fbbf24 !important; background-color: #3a2f00 !important; }
         body.high-contrast .s-group { border-color: #fff !important; }
         body.high-contrast .g-label { background: #000 !important; color: #fff !important; border-color: #fff !important; }
@@ -475,26 +483,34 @@
         body.high-contrast #results-modal .results-textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
         body.high-contrast .tooltip-text { background-color: #fff; color: #000; border: 1px solid #ccc; }
         body.high-contrast .tooltip-text::after { border-color: #fff transparent transparent transparent; }
-        body.high-contrast .label-legend { background: rgba(30,30,30,0.97); border-color: #444; }
-        body.high-contrast .legend-title { color: #fff; }
-        body.high-contrast .legend-hint { color: #d1d5db; }
-        body.high-contrast .legend-chip { background: #333; color: #fff; border-color: #555; }
-        body.high-contrast .legend-chip:hover, body.high-contrast .legend-chip:focus-visible, body.high-contrast .legend-chip.open { border-color: #fff; }
+        body.high-contrast .label-legend { background: #1e1e1e; border-color: #444; }
+        body.high-contrast .legend-title, body.high-contrast .legend-keys-title { color: #fff; }
+        body.high-contrast .legend-hint, body.high-contrast .legend-keys { color: #d1d5db; border-color: #444; }
+        body.high-contrast .legend-chip { color: #fff; }
+        body.high-contrast .legend-chip:hover, body.high-contrast .legend-chip:focus-visible, body.high-contrast .legend-chip.open { background: #333; border-color: #fff; }
+        body.high-contrast .legend-key, body.high-contrast .legend-keys kbd { background: #333; color: #fff; border-color: #777; }
         body.high-contrast .color-popover { background: #1e1e1e; border-color: #555; }
         body.high-contrast .color-pop-title { color: #fff; }
         body.high-contrast .color-swatch.current { box-shadow: 0 0 0 2px #1e1e1e, 0 0 0 4px #fff; }
         body.high-contrast .color-pop-reset { background: #333; color: #fff; border-color: #555; }
         
+        @media (max-width: 900px) {
+            .exercise-layout { flex-direction: column; align-items: stretch; gap: 0; }
+            .label-legend { order: -1; position: sticky; top: 0; width: 100%; margin: 0 0 12px; max-height: none; padding: 10px 12px; }
+            .legend-hint { margin-bottom: 6px; }
+            .legend-list { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+            .legend-chip { width: auto; white-space: nowrap; border-color: #e5e7eb; background: #fff; border-radius: 999px; }
+            .legend-key, .legend-keys { display: none; }
+        }
         @media (max-width: 768px) {
             body { margin: 15px; } .exercise-wrapper { padding: 20px; line-height: 4.5; }
             .hover-word { font-size: 1.1rem; padding: 6px 12px; } .g-label { top: -16px; font-size: 10px; padding: 2px 6px; }
             .s-group { padding-top: 24px; margin: 20px 2px 0 2px; } .sentence-container { padding: 20px 10px 10px 10px; }
             .radio-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-radius: 8px; }
             .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f3f4f6; }
-            .legend-list { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
             .color-popover { top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         }
-        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal, #color-popover, .legend-hint { display: none !important; } .label-legend { position: static; box-shadow: none; } }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal, #color-popover, .legend-hint, .legend-keys, .legend-key { display: none !important; } .exercise-layout { display: block; } .label-legend { position: static; width: auto; max-height: none; margin: 0 0 16px; box-shadow: none; } .legend-list { flex-direction: row; flex-wrap: wrap; } .legend-chip { width: auto; } }
     </script>
 
     <script type="text/template" id="template-student-js" data-ref="templateStudentJs">
@@ -522,8 +538,18 @@
             Object.keys(p).forEach(l => { if (typeof p[l] === 'string' && /^#[0-9a-f]{3,8}$/i.test(p[l])) colors[l] = p[l]; });
         }
         function recolorSolved() {
-            document.querySelectorAll('.hover-word[data-done="true"]').forEach(el => { if (colors[el.dataset.ans]) el.style.backgroundColor = colors[el.dataset.ans]; });
+            document.querySelectorAll('.hover-word[data-done="true"]').forEach(el => { if (colors[el.dataset.ans]) paintWord(el, colors[el.dataset.ans]); });
         }
+        function genAltColor(bg) {
+            // Colour for the gaps of the pink genitive underline: none on very light backgrounds (pink alone is clearly visible),
+            // otherwise white or near-black, whichever contrasts more, so the line stays visible on any label colour.
+            const lum = (hex) => { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n) || f.length !== 6) return null; return [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0); };
+            const lb = lum(bg); if (lb === null) return 'transparent';
+            const ratio = (c) => { const l = lum(c); return (Math.max(l, lb) + 0.05) / (Math.min(l, lb) + 0.05); };
+            if (ratio('#ec4899') >= 3 && lb >= 0.1) return 'transparent';
+            return ratio('#ffffff') >= ratio('#111827') ? '#ffffff' : '#111827';
+        }
+        function paintWord(el, col) { el.style.backgroundColor = col; el.style.setProperty('--gen-alt', genAltColor(col)); el.style.color = isDarkColor(col) ? '#fff' : ''; }
         function isDarkColor(hex) { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n)) return false; return (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) < 140; }
         function findColorOwner(label, col) {
             return currentLabels().find(l => l !== label && (colors[l] || '').toLowerCase() === col.toLowerCase());
@@ -550,21 +576,37 @@
             const box = document.getElementById('label-legend'); if (!box) return;
             const t = studentTexts[currentLang];
             box.innerHTML = '';
-            const head = document.createElement('div'); head.className = 'legend-head';
-            const ttl = document.createElement('span'); ttl.className = 'legend-title'; ttl.textContent = t.legendTitle;
-            const hint = document.createElement('span'); hint.className = 'legend-hint'; hint.textContent = t.legendHint;
-            head.append(ttl, hint); box.appendChild(head);
+            const ttl = document.createElement('div'); ttl.className = 'legend-title'; ttl.textContent = t.legendTitle;
+            const hint = document.createElement('p'); hint.className = 'legend-hint'; hint.textContent = t.legendHint;
+            box.append(ttl, hint);
             const list = document.createElement('div'); list.className = 'legend-list';
             currentLabels().forEach(label => {
                 const chip = document.createElement('button'); chip.type = 'button'; chip.className = 'legend-chip'; chip.dataset.label = label;
                 chip.setAttribute('aria-haspopup', 'dialog'); chip.title = t.colorFor + ' ' + label;
                 const sw = document.createElement('span'); sw.className = 'legend-swatch'; sw.style.backgroundColor = colors[label] || NEUTRAL_COLOR;
-                const name = document.createElement('span'); name.textContent = label;
+                const name = document.createElement('span'); name.className = 'legend-name'; name.textContent = label;
                 chip.append(sw, name);
+                if (labelShortcuts[label]) { const k = document.createElement('kbd'); k.className = 'legend-key'; k.textContent = labelShortcuts[label].toUpperCase(); chip.appendChild(k); }
                 chip.onclick = (e) => { e.stopPropagation(); if (legendOpenLabel === label) closeColorPopover(true); else openColorPopover(label, chip); };
                 list.appendChild(chip);
             });
             box.appendChild(list);
+            // Keyboard shortcuts
+            const keys = document.createElement('div'); keys.className = 'legend-keys';
+            const kt = document.createElement('div'); kt.className = 'legend-keys-title'; kt.textContent = t.keysTitle;
+            const kh = document.createElement('p'); kh.textContent = t.keysHint;
+            keys.append(kt, kh);
+            const keyRow = (labels, text) => {
+                const row = document.createElement('div'); row.className = 'key-row';
+                labels.forEach(l => { const k = document.createElement('kbd'); k.textContent = l; row.appendChild(k); });
+                const span = document.createElement('span'); span.className = 'key-text'; span.textContent = text; row.appendChild(span);
+                keys.appendChild(row);
+            };
+            if (totalGens > 0) keyRow(['G'], t.keysGen);
+            keyRow([t.keyEnter], t.keysEnter);
+            keyRow(['↑', '↓'], t.keysArrows);
+            keyRow([t.keyEsc], t.keysEsc);
+            box.appendChild(keys);
         }
         function openColorPopover(label, anchor) {
             const pop = document.getElementById('color-popover'); const t = studentTexts[currentLang];
@@ -597,9 +639,13 @@
             }
             pop.style.display = 'block';
             if (window.innerWidth > 768) {
-                const r = anchor.getBoundingClientRect();
-                pop.style.top = (r.bottom + 6) + 'px';
-                pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pop.offsetWidth - 8)) + 'px';
+                // Open beside the sidebar entry (to its left); fall back to below it when there is no room.
+                const r = anchor.getBoundingClientRect(); const w = pop.offsetWidth; const h = pop.offsetHeight;
+                const side = document.getElementById('label-legend').getBoundingClientRect();
+                let left = Math.min(r.left, side.left) - w - 8; let top = r.top;
+                if (left < 8) { left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8)); top = r.bottom + 6; }
+                if (top + h > window.innerHeight - 8) top = Math.max(8, window.innerHeight - h - 8);
+                pop.style.left = left + 'px'; pop.style.top = top + 'px';
             }
             const first = pop.querySelector('.color-swatch.current') || pop.querySelector('.color-swatch');
             if (first) first.focus({ preventScroll: true });
@@ -949,7 +995,7 @@ function dismissToastOnInteraction() {
         function solve(el, ans, m) {
             if(m === "word") {
                 const s = document.createElement('span'); s.className = 'ans-label'; s.textContent = ans; el.appendChild(s);
-                el.style.backgroundColor = colors[ans]; el.dataset.done = "true"; el.removeAttribute('tabindex');
+                paintWord(el, colors[ans]); el.dataset.done = "true"; el.removeAttribute('tabindex');
                 if (s.offsetWidth > el.offsetWidth + 8) { s.textContent = abbreviations[currentLang][ans] || ans.substring(0, 4) + '.'; s.title = ans; }
             } else { 
                 const tSpan = el.querySelector('.g-text'); if (tSpan) tSpan.textContent = ans; else el.textContent = ans; 
@@ -1813,6 +1859,15 @@ function renderPalette() {
 }
 
 // ---- Label colours: choose from the colour-blind-safe palette ----
+function genAltColor(bg) {
+    // Colour for the gaps of the pink genitive underline: none on very light backgrounds (pink alone is clearly visible),
+    // otherwise white or near-black, whichever contrasts more, so the line stays visible on any label colour.
+    const lum = (hex) => { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n) || f.length !== 6) return null; return [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0); };
+    const lb = lum(bg); if (lb === null) return 'transparent';
+    const ratio = (c) => { const l = lum(c); return (Math.max(l, lb) + 0.05) / (Math.min(l, lb) + 0.05); };
+    if (ratio('#ec4899') >= 3 && lb >= 0.1) return 'transparent';
+    return ratio('#ffffff') >= ratio('#111827') ? '#ffffff' : '#111827';
+}
 function isDarkColor(hex) { const h = (hex || '').replace('#', ''); const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6); const n = parseInt(f, 16); if (isNaN(n)) return false; return (0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) < 140; }
 function findColorOwner(label, col) {
     return AppState.functions.find(f => f !== label && (AppState.colors[f] || '').toLowerCase() === col.toLowerCase());
@@ -1927,7 +1982,7 @@ function renderEditor() {
                 hintIcon.appendChild(tooltipText);
                 span.appendChild(hintIcon);
             }
-            span.style.backgroundColor = AppState.colors[func];
+            span.style.backgroundColor = AppState.colors[func]; span.style.setProperty('--gen-alt', genAltColor(AppState.colors[func])); span.style.color = isDarkColor(AppState.colors[func]) ? '#fff' : '';
         } else { 
             span.dataset.func = CONFIG.PUNCT; 
         }
@@ -1979,7 +2034,7 @@ function updateWordVisuals(idx) {
     span.dataset.func = func;
     const shortLabel = CONFIG.ABBREVIATIONS[AppState.lang][func] || (func.length > 6 ? func.substring(0,5)+"." : func);
     span.dataset.short = shortLabel;
-    span.style.backgroundColor = AppState.colors[func];
+    span.style.backgroundColor = AppState.colors[func]; span.style.setProperty('--gen-alt', genAltColor(AppState.colors[func])); span.style.color = isDarkColor(AppState.colors[func]) ? '#fff' : '';
     
     if (item.u) span.classList.add('attr-underline');
     else span.classList.remove('attr-underline');
@@ -2983,7 +3038,8 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             saveWarning: "⚠️ Note: Your progress is saved locally in this web browser. You must open this file on this exact same device and browser to resume your work later. Clearing your browser data will delete your progress. Do you want to save now?",
             resExercise: "Exercise: ", resDate: "Date: ", resScore: "Score: ",
             markGen: "🖍️ Mark Genitive (G)", unmarkGen: "❌ Unmark Genitive (G)", notGenitive: "Not a genitive attribute!",
-            legendTitle: "Syntactic functions:", legendHint: "Click a function to change its colour.", colorFor: "Colour for:", colorInUse: "Used by {label} (it will turn grey)", colorResetOne: "↺ Teacher's colour", colorsReset: "↺ All of the teacher's colours"
+            legendTitle: "Syntactic functions", legendHint: "Click a function to change its colour.",
+            keysTitle: "Keyboard shortcuts", keysHint: "Point at a word with the mouse (or select it with Tab) and press the key shown next to the function.", keysGen: "Mark genitive (click the word first)", keyEnter: "Enter", keysEnter: "Open the menu", keysArrows: "Move within the menu", keyEsc: "Esc", keysEsc: "Close the menu", colorFor: "Colour for:", colorInUse: "Used by {label} (it will turn grey)", colorResetOne: "↺ Teacher's colour", colorsReset: "↺ All of the teacher's colours"
         },
         de: {
             instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen. <br><br><strong>Wichtig:</strong> Du musst auch versteckte Genitivattribute aufspüren! Klicke dazu direkt auf das Genitivattribut innerhalb eines Wortblocks und nutze das <strong>🖍️ Genitiv markieren</strong> Werkzeug, um es hervorzuheben. Sobald du jede Wortgruppe korrekt analysiert und alle Genitive gefunden hast, erscheint ein Textfeld für deine Übersetzung.",
@@ -3000,7 +3056,8 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             saveWarning: "⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?",
             resExercise: "Übung: ", resDate: "Datum: ", resScore: "Ergebnis: ",
             markGen: "🖍️ Genitiv markieren (G)", unmarkGen: "❌ Markierung aufheben (G)", notGenitive: "Kein Genitivattribut!",
-            legendTitle: "Syntaktische Funktionen:", legendHint: "Klicke auf eine Funktion, um ihre Farbe zu ändern.", colorFor: "Farbe für:", colorInUse: "Belegt von {label} (wird dann grau)", colorResetOne: "↺ Farbe der Lehrkraft", colorsReset: "↺ Alle Farben der Lehrkraft"
+            legendTitle: "Syntaktische Funktionen", legendHint: "Klicke auf eine Funktion, um ihre Farbe zu ändern.",
+            keysTitle: "Tastenkürzel", keysHint: "Zeige mit der Maus auf ein Wort (oder wähle es mit Tab) und drücke die Taste neben der Funktion.", keysGen: "Genitiv markieren (vorher auf das Wort klicken)", keyEnter: "Enter", keysEnter: "Auswahlmenü öffnen", keysArrows: "Im Menü auswählen", keyEsc: "Esc", keysEsc: "Menü schließen", colorFor: "Farbe für:", colorInUse: "Belegt von {label} (wird dann grau)", colorResetOne: "↺ Farbe der Lehrkraft", colorsReset: "↺ Alle Farben der Lehrkraft"
         }
     };
 
@@ -3036,9 +3093,13 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
                 <button class="z-btn" onclick="setStudentZoom(-0.1)" title="Zoom Out">🔍 -</button>
                 <button class="z-btn" onclick="setStudentZoom(0)" title="Reset Zoom">Reset</button>
             </div>
-            <div id="label-legend" class="label-legend"></div>
-            <div id="exercise-container-wrapper">
-                <div id="exercise">${bodyContent}</div>
+            <div class="exercise-layout">
+                <div class="exercise-main">
+                    <div id="exercise-container-wrapper">
+                        <div id="exercise">${bodyContent}</div>
+                    </div>
+                </div>
+                <aside id="label-legend" class="label-legend"></aside>
             </div>
         </div>
         ${imgUrl ? `<img src="${escapeHTML(imgUrl)}" class="ex-img" alt="Exercise Image">` : ''}
