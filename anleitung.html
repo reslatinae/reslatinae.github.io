@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Syntax-Studio Latein – Anleitung</title>
+<script>try { var l = new URLSearchParams(location.search).get('lang') || localStorage.getItem('syntax_guide_lang'); if (l === 'en' || l === 'de') { document.documentElement.dataset.lang = l; document.documentElement.lang = l; } } catch (e) {}</script>
+<style>
+    :root {
+        --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --primary: #3b82f6;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #e5e7eb;
+        --shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+        --gen: #ec4899;
+    }
+    html { scrollbar-gutter: stable; scroll-behavior: smooth; }
+    body, button { font-family: var(--main-font); }
+    body { margin: 2% auto; max-width: 1200px; padding: 0 20px; background: #f9fafb; color: var(--text); line-height: 1.55; }
+    h1 { text-align: center; color: #111827; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.025em; }
+    .subtitle { text-align: center; color: var(--muted); margin: 0 0 32px; font-size: 1.05rem; }
+    h2 { font-size: 1.35rem; font-weight: 600; color: #111827; margin: 0 0 16px; letter-spacing: -0.01em; scroll-margin-top: 16px; }
+    h3 { font-size: 1.05rem; font-weight: 600; color: #0f172a; margin: 28px 0 10px; }
+    .la { font-style: italic; }
+    .tr { color: #475569; }
+
+    .layout { display: flex; gap: 28px; align-items: flex-start; }
+    .content { flex: 1; min-width: 0; }
+
+    /* Sidebar navigation (same look as the sidebar on the student page) */
+    .toc { position: sticky; top: 16px; width: 220px; flex-shrink: 0; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.88rem; }
+    .toc-title { font-weight: 600; color: #111827; margin-bottom: 6px; }
+    .toc a { display: block; color: #374151; text-decoration: none; padding: 5px 8px; border-radius: 6px; }
+    .toc a:hover, .toc a:focus-visible { background: #f3f4f6; outline: none; }
+    .toc a.sub { padding-left: 20px; font-size: 0.82rem; color: var(--muted); }
+
+    .card { background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); padding: 28px; margin-bottom: 24px; }
+    .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 18px 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.97rem; color: #334155; }
+    .instruction-box p { margin: 0 0 10px; } .instruction-box p:last-child { margin-bottom: 0; }
+
+    /* Method */
+    .steps { counter-reset: step; list-style: none; padding: 0; margin: 0; }
+    .steps li { counter-increment: step; position: relative; padding: 0 0 16px 46px; }
+    .steps li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+    .steps li strong { color: #111827; }
+    .note { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px 18px; font-size: 0.93rem; color: #78350f; margin-top: 8px; }
+    .note-title { font-weight: 600; margin-bottom: 6px; color: #78350f; }
+    .note ul { margin: 0; padding-left: 20px; } .note li { margin: 3px 0; }
+
+    /* Function reference */
+    .fn-group-title { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 22px 0 8px; }
+    .fn-group-title:first-of-type { margin-top: 0; }
+    .fn-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    details.fn { border: 1px solid var(--border); border-radius: 8px; background: #fff; overflow: hidden; }
+    details.fn[open] { grid-column: 1 / -1; box-shadow: var(--shadow); }
+    details.fn summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
+    details.fn summary::-webkit-details-marker { display: none; }
+    details.fn summary:hover, details.fn summary:focus-visible { background: #f9fafb; outline: none; }
+    details.fn summary::after { content: "▸"; margin-left: auto; color: #9ca3af; transition: transform 0.15s; }
+    details.fn[open] summary::after { transform: rotate(90deg); }
+    .swatch { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(17,24,39,0.25); flex-shrink: 0; }
+    .swatch.gen { background: transparent; border-radius: 0; height: 8px; margin-bottom: 8px; border: none; border-bottom: 3px dashed var(--gen); }
+    .fn-name { font-weight: 600; color: #111827; }
+    .fn-short { color: var(--muted); font-size: 0.88rem; }
+    .fn-body { padding: 4px 18px 16px 42px; font-size: 0.94rem; }
+    .fn-body dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 6px 14px; }
+    .fn-body dt { font-weight: 600; color: #374151; }
+    .fn-body dd { margin: 0; }
+    .ex { background: #f8fafc; border-left: 3px solid #cbd5e1; padding: 6px 10px; border-radius: 0 6px 6px 0; }
+    .fn-tools { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }
+    .subtle-btn { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; cursor: pointer; font-weight: 500; }
+    .subtle-btn:hover { background: #e5e7eb; color: #111827; }
+
+    table.endings { border-collapse: collapse; width: 100%; font-size: 0.92rem; margin-top: 6px; }
+    table.endings th, table.endings td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    table.endings th { background: #f8fafc; font-weight: 600; color: #374151; }
+    table.endings td:first-child { font-weight: 700; font-style: italic; white-space: nowrap; color: #111827; }
+
+    /* Guided examples: same look as the exercise on the student page */
+    .wt { background: #fafafa; border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+    .wt-source { font-size: 0.85rem; color: var(--muted); margin-bottom: 10px; }
+    .wt-sentence { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 22px 18px 40px; line-height: 3.6; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 18px; }
+    .wt-chip { position: relative; display: inline-block; font: inherit; font-size: 1.15rem; line-height: 1.3; color: #111827; background: #f3f4f6; border: none; border-bottom: 2px solid #cbd5e1; padding: 4px 10px; margin: 0 2px; border-radius: 6px; cursor: default; transition: background-color 0.2s, box-shadow 0.2s; }
+    .wt.clickable .wt-chip:not(.done):not(.gen-found) { cursor: pointer; }
+    .wt.clickable .wt-chip:not(.done):hover { background: #e5e7eb; }
+    .wt-chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .wt-chip.focus { box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--primary); }
+    .wt-chip.wrong { animation: shake 0.35s; box-shadow: 0 0 0 2px #ef4444; }
+    .wt-label { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 6px; font-size: 10px; font-weight: 700; color: #059669; white-space: nowrap; pointer-events: none; line-height: 1; }
+    .wt-text { border-bottom: 3px dashed transparent; }
+    .wt-chip.gen-found .wt-text { border-bottom-color: var(--gen); }
+    .wt-chip.picked { box-shadow: 0 0 0 2px #10b981; }
+    .res-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom: none; border-radius: 6px 6px 0 0; padding: 22px 6px 2px; margin: 18px 2px 0; vertical-align: bottom; line-height: 3.2; }
+    .res-group-label { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; background: #fff; border: 1px solid #94a3b8; border-radius: 4px; padding: 2px 8px; color: #475569; text-transform: uppercase; line-height: 1.3; white-space: nowrap; }
+    .wt-punct { font-size: 1.15rem; font-weight: 500; margin: 0 2px 0 -2px; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+    .wt-panel { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; }
+    .wt-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .wt-counter { font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.04em; }
+    .wt-progress { flex: 1; max-width: 220px; height: 6px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+    .wt-progress span { display: block; height: 100%; background: var(--primary); width: 0; transition: width 0.3s; }
+    .wt-prompt { font-size: 1rem; color: #111827; margin-bottom: 14px; }
+    .wt-options { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .wt-options:empty { display: none; margin: 0; }
+    .opt { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #d1d5db; border-radius: 999px; padding: 6px 14px 6px 6px; font-size: 0.9rem; font-weight: 500; color: #374151; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+    .opt:hover, .opt:focus-visible { border-color: var(--primary); outline: none; }
+    .opt.wrong-opt { border-color: #fca5a5; background: #fef2f2; color: #991b1b; }
+    .opt.right { border-color: #10b981; background: #ecfdf5; color: #065f46; }
+    .opt.text { border-radius: 8px; padding: 10px 14px; text-align: left; width: 100%; display: block; line-height: 1.45; }
+    .wt-feedback { border-radius: 6px; padding: 12px 14px; font-size: 0.94rem; margin-bottom: 14px; display: none; }
+    .wt-feedback.ok { display: block; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+    .wt-feedback.err { display: block; background: #fef2f2; border: 1px solid #fecaca; color: #7f1d1d; }
+    .wt-feedback ul { margin: 6px 0 0; padding-left: 20px; }
+    .wt-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .btn { padding: 9px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; color: #fff; background: #1f2937; font-size: 0.92rem; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn.primary { background: var(--primary); }
+    .wt-result { margin-top: 12px; }
+    .result-row { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px 14px 34px; line-height: 3.2; }
+
+    .footer { text-align: center; margin: 32px 0 16px; }
+
+    @media (max-width: 900px) {
+        .layout { flex-direction: column; align-items: stretch; gap: 0; }
+        .toc { position: static; width: auto; margin-bottom: 20px; }
+        .fn-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+        body { margin: 12px; padding: 0; }
+        .card { padding: 20px 16px; }
+        .fn-body { padding: 4px 14px 14px; }
+        .fn-body dl { grid-template-columns: 1fr; gap: 2px; }
+        .fn-body dd { margin-bottom: 8px; }
+        .wt { padding: 14px; }
+        .wt-chip { font-size: 1.05rem; padding: 4px 8px; }
+    }
+    @media print {
+        body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .toc, .fn-tools, .footer, .wt-actions { display: none !important; }
+        .layout { display: block; }
+        .card { box-shadow: none; break-inside: avoid-page; }
+        details.fn { break-inside: avoid; }
+    }
+    /* Tool-like sentence: blocks, single words, bracket, menu */
+    .wt[data-mode="choose"] .wt-chip:not(.done), .wt[data-mode="label"] .wt-chip:not(.done) { cursor: pointer; }
+    .wt[data-mode="choose"] .wt-chip:not(.done):hover, .wt[data-mode="label"] .wt-chip:not(.done):hover { filter: brightness(0.95); }
+    .wt-w { border-bottom: 3px dashed transparent; border-radius: 2px; transition: background-color 0.2s; }
+    .wt[data-mode="word"] .wt-w, .wt[data-mode="gen"] .wt-w { cursor: pointer; }
+    .wt[data-mode="word"] .wt-w:hover, .wt[data-mode="gen"] .wt-w:hover { background: rgba(59,130,246,0.15); }
+    .wt-w:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+    .wt-w.gen-found { border-bottom-color: var(--gen); }
+    .wt-w.hl { background: #fef3c7; }
+    .wt-w.picked { background: #d1fae5; box-shadow: 0 0 0 2px #10b981; }
+    .wt-w.wrong { background: #fee2e2; animation: shake 0.35s; }
+    .wt-sentence.has-groups { line-height: 4.2; padding-top: 30px; }
+    .wt-group { display: inline-block; position: relative; border: 1px solid #94a3b8; border-bottom: none; border-radius: 6px 6px 0 0; padding: 22px 6px 6px; margin: 20px 4px 0; vertical-align: bottom; line-height: 3.6; }
+    .wt-glabel { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; background: #fff; border: 1px solid #94a3b8; border-radius: 4px; padding: 3px 8px; color: #475569; text-transform: uppercase; line-height: 1.3; white-space: nowrap; }
+    .wt[data-mode="label"] .wt-glabel:not(.done) { cursor: pointer; }
+    .wt-glabel.done { background: #f0fdf4; }
+    .wt-glabel.focus { box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--primary); }
+    .wt-glabel.wrong { animation: shake 0.35s; box-shadow: 0 0 0 2px #ef4444; }
+    .wt-glabel:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .wt-howto { font-size: 0.86rem; color: var(--muted); margin-top: 6px; }
+    .wt-menu { display: none; position: absolute; z-index: 1000; background: #fff; border: 1px solid var(--border); padding: 4px 0; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); max-height: 60vh; overflow-y: auto; min-width: 190px; line-height: 1.2; }
+    .wt-menu .menu-btn { display: block; width: 100%; text-align: left; border: none; background: transparent; padding: 5px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #374151; font-family: inherit; }
+    .wt-menu .menu-btn:hover, .wt-menu .menu-btn:focus-visible { background: #f3f4f6; color: #111827; outline: none; }
+    .wt-menu .menu-btn:focus-visible { box-shadow: inset 2px 0 0 0 var(--primary); }
+    .wt-menu .menu-btn u { text-decoration: underline; text-underline-offset: 2px; font-weight: 700; }
+    .wt-menu .gen-btn { color: var(--gen); font-weight: 700; border-bottom: 2px solid var(--border); padding-bottom: 6px; margin-bottom: 4px; }
+    @media (max-width: 600px) { .wt-menu { position: fixed; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); } }
+    @media print { .wt-menu, .wt-howto { display: none !important; } }
+
+    /* Language switch (same buttons as in the tool) */
+    html[data-lang="de"] .l-en, html[data-lang="en"] .l-de { display: none !important; }
+    .lang-switch { display: flex; gap: 6px; margin-bottom: 12px; }
+    .lang-btn { background: #f3f4f6; border: 1px solid transparent; padding: 4px 10px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; color: #4b5563; font-weight: 500; transition: all 0.2s; }
+    .lang-btn.active { background: #eff6ff; color: var(--primary); border-color: #bfdbfe; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1><span class="l-de" lang="de">Syntax-Studio Latein</span><span class="l-en" lang="en">Latin Syntax Studio</span></h1>
+<p class="subtitle"><span class="l-de" lang="de">Anleitung: Satzglieder erkennen, bestimmen und übersetzen</span><span class="l-en" lang="en">Guide: recognising, analysing and translating sentence functions</span></p>
+
+<div class="layout">
+    <nav class="toc" aria-label="Inhalt / Contents">
+        <div class="lang-switch">
+            <button type="button" class="lang-btn" data-lang="en">EN</button>
+            <button type="button" class="lang-btn" data-lang="de">DE</button>
+        </div>
+        <div class="l-de" lang="de">
+            <div class="toc-title">Inhalt</div>
+            <a href="#vorgehen">1. So gehst du vor</a>
+            <a href="#funktionen">2. Die Funktionen</a>
+            <a href="#endungen">3. Mehrdeutige Endungen</a>
+            <a href="#beispiel1">4. Schritt für Schritt: Caesar</a>
+            <a href="#beispiel2">5. Genitivattribute: Caesar</a>
+        </div>
+        <div class="l-en" lang="en">
+            <div class="toc-title">Contents</div>
+            <a href="#vorgehen">1. How to approach a sentence</a>
+            <a href="#funktionen">2. The functions</a>
+            <a href="#endungen">3. Ambiguous endings</a>
+            <a href="#beispiel1">4. Step by step: Caesar</a>
+            <a href="#beispiel2">5. Genitive attributes: Caesar</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <div class="instruction-box">
+            <div class="l-de" lang="de">
+            <p>Im Syntax-Studio bestimmst du nicht in erster Linie einzelne Formen. Du fragst vielmehr: <strong>Welche Aufgabe erfüllt ein Wort oder eine Wortgruppe im ganzen Satz?</strong> Was geschieht? Wer handelt? Wen oder was betrifft es? Unter welchen Umständen?</p>
+            <p>Wenn du diese Fragen beantworten kannst, verstehst du den Bau des Satzes, und die Übersetzung fällt dir viel leichter. Am besten folgst du dabei dem Satz so, wie er geschrieben ist: von links nach rechts, Block für Block. Diese Anleitung erklärt dir alle Funktionen, die im Tool vorkommen, und führt dich an zwei Sätzen Schritt für Schritt durch die Analyse.</p>
+            </div>
+            <div class="l-en" lang="en">
+            <p>In Latin Syntax Studio, the main task is not to identify individual forms. Instead, you ask: <strong>What job does a word or a group of words do in the sentence as a whole?</strong> What happens? Who acts? Whom or what does it affect? Under what circumstances?</p>
+            <p>Once you can answer these questions, you understand how the sentence is built, and translating becomes much easier. The best way is to follow the sentence as it is written: from left to right, block by block. This guide explains every function used in the tool and takes you step by step through the analysis of two sentences.</p>
+            </div>
+        </div>
+
+        <!-- ============ 1. METHOD ============ -->
+        <section class="card" id="vorgehen">
+            <div class="l-de" lang="de">
+            <h2>1. So gehst du vor</h2>
+            <ol class="steps">
+                <li><strong>Den Satz überblicken.</strong> Lies den Satz einmal bis zum Punkt. Achte auf Satzzeichen und auf Wörter wie <span class="la">qui, cum, ut, dum</span>: Sie zeigen dir, wo ein Nebensatz beginnt. So weißt du ungefähr, wie viele Teilsätze dich erwarten.</li>
+                <li><strong>Von links nach rechts lesen.</strong> Geh den Satz dann in seiner Reihenfolge durch, Wort für Wort oder Wortgruppe für Wortgruppe. Springe nicht hin und her: Der lateinische Satz baut seine Bedeutung Schritt für Schritt auf, und du kannst ihm dabei folgen.</li>
+                <li><strong>Bei jedem Block fragen: Was kann das sein?</strong> Bestimme die Funktion mit den passenden Fragen:
+                    <em>Was geschieht?</em> (Prädikat) · <em>Wer oder was?</em> (Subjekt) · <em>Wen oder was? Wem? Wessen?</em> (Ergänzungen) · <em>Wo? Wann? Wie? Womit? Warum?</em> (Umstände).
+                    Das Subjekt steht im Nominativ; fehlt es, steckt es in der Personalendung: <span class="la">venit</span> <span class="tr">„er kam“</span>.</li>
+                <li><strong>Erwartungen bilden.</strong> Jeder Block kündigt etwas an. Ein Akkusativ am Anfang verlangt nach einem Verb, das ihn braucht. Ein <span class="la">cum</span> oder <span class="la">ut</span> öffnet einen Nebensatz, der ein eigenes Prädikat haben muss. Ein Adjektiv wartet auf sein Bezugswort. Halte diese Erwartungen im Kopf und prüfe, ob der Satz sie erfüllt.</li>
+                <li><strong>Mehrdeutiges offen lassen.</strong> Manche Formen kannst du nicht sofort eindeutig bestimmen: Ist <span class="la">-a</span> ein Nominativ oder ein Ablativ? Lass die Frage offen und entscheide, sobald der weitere Satz es dir verrät. Das ist kein Fehler, sondern genau die Art, wie man Latein liest.</li>
+                <li><strong>Das Prädikat als Anker.</strong> Du musst das Prädikat nicht zuerst suchen. Wenn du aber unsicher bist oder den Faden verlierst, hilft dir ein Blick darauf: Seine Personalendung (<span class="la">-t, -nt, -mus, -tur …</span>) verrät, wer handelt, und seine Bedeutung, welche Ergänzungen es braucht. Oft steht es am Ende und bestätigt dann deine Erwartungen.</li>
+                <li><strong>Nebensätze und Konstruktionen als Wortgruppe erfassen.</strong> Relativsätze, Nebensätze, AcI/NcI, Partizipialkonstruktionen und der Ablativus absolutus bilden eigene Einheiten. Im Tool stehen sie unter einer Klammer. Die Wörter darin bestimmst du nach ihrer Aufgabe <em>innerhalb</em> dieser Einheit: Im Relativsatz <span class="la">qui … appellantur</span> ist <span class="la">qui</span> das Subjekt.</li>
+                <li><strong>Genitivattribute markieren.</strong> Ein Genitiv, der ein Substantiv näher bestimmt (<span class="tr">„die Wogen Neptuns“</span>), gehört zum Block seines Bezugswortes. Im Tool klickst du ihn an und unterstreichst ihn mit <strong>🖍️ Genitiv markieren</strong>.</li>
+                <li><strong>Übersetzen.</strong> Oft kannst du der lateinischen Reihenfolge auch im Deutschen weitgehend folgen. Wo das Deutsche es verlangt, stellst du um: Das Prädikat rückt nach vorn, Nebensätze bekommen ihre deutsche Wortstellung. Ziel ist ein natürlicher deutscher Satz, in dem Subjekt, Objekte und Umstände stimmen.</li>
+            </ol>
+
+            <div class="note">
+                <div class="note-title">Gut zu wissen: So fasst das Tool Wörter zusammen</div>
+                <ul>
+                    <li><strong>Adjektive und Attribute</strong> erhalten dieselbe Funktion wie ihr Bezugswort: <span class="la">Hi omnes</span> bilden zusammen das Subjekt, <span class="la">in partes tres</span> zusammen eine präpositionale Bestimmung.</li>
+                    <li><strong>Eine Präposition</strong> bildet mit ihrem Substantiv einen Block: <span class="la">ab Aquitanis</span>.</li>
+                    <li><strong>Durch <span class="la">et, -que, atque</span> verbundene Teile</strong> derselben Funktion gehören in einen Block: <span class="la">Matrona et Sequana</span> ist ein Subjekt.</li>
+                    <li><strong>Eine Apposition</strong>, also eine nähere Erklärung im selben Kasus, gehört zu ihrem Bezugswort: <span class="la">Garumna flumen</span> <span class="tr">„der Fluss Garonne“</span>.</li>
+                    <li><strong>Zusammengesetzte Verbformen</strong> bilden gemeinsam das Prädikat: <span class="la">divisa est, ausi sunt</span>. Fehlt <span class="la">est</span> oder <span class="la">sunt</span>, ergänzt du es beim Übersetzen: <span class="la">iactatus</span> [<span class="la">est</span>].</li>
+                </ul>
+            </div>
+            </div>
+            <div class="l-en" lang="en">
+            <h2>1. How to approach a sentence</h2>
+            <ol class="steps">
+                <li><strong>Survey the sentence.</strong> Read the sentence once, up to the full stop. Look out for punctuation and for words such as <span class="la">qui, cum, ut, dum</span>: they show you where a subordinate clause begins. This gives you a rough idea of how many clauses to expect.</li>
+                <li><strong>Read from left to right.</strong> Then work through the sentence in its own order, word by word or word group by word group. Don’t jump back and forth: a Latin sentence builds up its meaning step by step, and you can follow it as it does.</li>
+                <li><strong>For each block, ask: what could this be?</strong> Work out its function with the right questions:
+                    <em>What happens?</em> (verb) · <em>Who or what?</em> (subject) · <em>Whom or what? To whom? Whose?</em> (objects) · <em>Where? When? How? With what? Why?</em> (circumstances).
+                    The subject is in the nominative; if there isn’t one, it is contained in the personal ending of the verb: <span class="la">venit</span> <span class="tr">‘he came’</span>.</li>
+                <li><strong>Form expectations.</strong> Every block points ahead. An accusative at the start calls for a verb that needs it. A <span class="la">cum</span> or <span class="la">ut</span> opens a subordinate clause that must have a verb of its own. An adjective waits for the noun it belongs to. Keep these expectations in mind and check whether the sentence fulfils them.</li>
+                <li><strong>Leave ambiguities open.</strong> Some forms can’t be identified straight away: is <span class="la">-a</span> nominative or ablative? Leave the question open and decide as soon as the rest of the sentence tells you. That isn’t a mistake – it is exactly how Latin is read.</li>
+                <li><strong>Use the verb as an anchor.</strong> You don’t have to look for the verb first. But if you are unsure or lose the thread, a look at it helps: its personal ending (<span class="la">-t, -nt, -mus, -tur …</span>) tells you who is acting, and its meaning tells you which objects it needs. It often comes at the end and then confirms your expectations.</li>
+                <li><strong>Treat subordinate clauses and constructions as word groups.</strong> Relative clauses, subordinate clauses, accusative/nominative with infinitive, participial phrases and the ablative absolute each form a unit of their own. In the tool they are marked with a bracket. You analyse the words inside according to their job <em>within</em> that unit: in the relative clause <span class="la">qui … appellantur</span>, <span class="la">qui</span> is the subject.</li>
+                <li><strong>Mark genitive attributes.</strong> A genitive that describes a noun more closely (<span class="tr">‘the waves of Neptune’</span>) belongs to the block of that noun. In the tool you click on it and underline it with <strong>🖍️ Mark Genitive</strong>.</li>
+                <li><strong>Translate.</strong> English word order is stricter than Latin: the subject usually comes before the verb and the object after it. So you will often rearrange the blocks – but only once you have understood the sentence in its Latin order. Aim for natural English in which subject, objects and circumstances are all correct.</li>
+            </ol>
+
+            <div class="note">
+                <div class="note-title">Good to know: how the tool groups words</div>
+                <ul>
+                    <li><strong>Adjectives and attributes</strong> get the same function as the word they belong to: <span class="la">Hi omnes</span> together form the subject, <span class="la">in partes tres</span> together form a prepositional phrase.</li>
+                    <li><strong>A preposition</strong> forms one block with its noun: <span class="la">ab Aquitanis</span>.</li>
+                    <li><strong>Parts joined by <span class="la">et, -que, atque</span></strong> that have the same function belong in one block: <span class="la">Matrona et Sequana</span> is one subject.</li>
+                    <li><strong>An apposition</strong> – a further explanation in the same case – belongs to the word it explains: <span class="la">Garumna flumen</span> <span class="tr">‘the river Garonne’</span>.</li>
+                    <li><strong>Compound verb forms</strong> together form the verb: <span class="la">divisa est, ausi sunt</span>. If <span class="la">est</span> or <span class="la">sunt</span> is missing, add it when you translate: <span class="la">iactatus</span> [<span class="la">est</span>].</li>
+                </ul>
+            </div>
+            </div>
+        </section>
+
+        <!-- ============ 2. FUNCTIONS ============ -->
+        <section class="card" id="funktionen">
+            <div class="l-de" lang="de">
+            <h2>2. Die Funktionen im Überblick</h2>
+            <p style="margin-top:0">Klicke auf eine Funktion, um zu sehen, woran du sie erkennst, wonach du fragst und wie du sie übersetzt. Die Farben entsprechen der Voreinstellung im Tool; deine Lehrkraft kann sie geändert haben.</p>
+            <div class="fn-tools">
+                <button type="button" class="subtle-btn btn-open-all">Alle aufklappen</button>
+                <button type="button" class="subtle-btn btn-close-all">Alle zuklappen</button>
+            </div>
+            <div id="fn-list-de"></div>
+            </div>
+            <div class="l-en" lang="en">
+            <h2>2. The functions at a glance</h2>
+            <p style="margin-top:0">Click on a function to see how to recognise it, which question to ask and how to translate it. The colours are the tool’s defaults; your teacher may have changed them.</p>
+            <div class="fn-tools">
+                <button type="button" class="subtle-btn btn-open-all">Expand all</button>
+                <button type="button" class="subtle-btn btn-close-all">Collapse all</button>
+            </div>
+            <div id="fn-list-en"></div>
+            </div>
+        </section>
+
+        <!-- ============ 3. ENDINGS ============ -->
+        <section class="card" id="endungen">
+            <div class="l-de" lang="de">
+            <h2>3. Vorsicht bei mehrdeutigen Endungen</h2>
+            <p style="margin-top:0">Viele Endungen können mehrere Fälle bezeichnen. Entscheide dann nach dem Zusammenhang: Welche Form passt zum Prädikat, zu einer Präposition oder zu einem Bezugswort?</p>
+            <table class="endings">
+                <thead><tr><th>Endung</th><th>Mögliche Formen</th><th>Beispiel</th></tr></thead>
+                <tbody>
+                    <tr><td>-a</td><td>Nominativ Singular (a-Deklination); Ablativ Singular <span class="la">-ā</span>; Nominativ/Akkusativ Plural Neutrum</td><td><span class="la">Gallia</span> (Nom.), <span class="la">lingua</span> (Abl.), <span class="la">arma</span> (Akk. Pl.)</td></tr>
+                    <tr><td>-ae</td><td>Genitiv oder Dativ Singular; Nominativ Plural (a-Deklination)</td><td><span class="la">Romae</span> (Gen.), <span class="la">Belgae</span> (Nom. Pl.)</td></tr>
+                    <tr><td>-ī</td><td>Genitiv Singular und Nominativ Plural (o-Deklination); Dativ Singular (3. Deklination); Infinitiv Passiv</td><td><span class="la">Neptuni</span> (Gen.), <span class="la">Galli</span> (Nom. Pl.)</td></tr>
+                    <tr><td>-īs</td><td>Dativ oder Ablativ Plural (a- und o-Deklination)</td><td><span class="la">palmis, terris, institutis</span></td></tr>
+                    <tr><td>-is</td><td>Genitiv Singular (3. Deklination); aber auch Verbform der 2. Person Singular</td><td><span class="la">Iunonis</span> (Gen.)</td></tr>
+                    <tr><td>-um</td><td>Akkusativ Singular; Nominativ/Akkusativ Singular Neutrum; Genitiv Plural (3. Deklination, in der Dichtung auch statt <span class="la">-orum</span>)</td><td><span class="la">virum</span> (Akk.), <span class="la">superum</span> = <span class="la">superorum</span> (Gen. Pl.)</td></tr>
+                    <tr><td>-e</td><td>Ablativ Singular (3. Deklination); Vokativ (o-Deklination); Infinitiv auf <span class="la">-re</span></td><td><span class="la">vertice</span> (Abl.), <span class="la">Marce</span> (Vok.)</td></tr>
+                    <tr><td>-ēs</td><td>Nominativ oder Akkusativ Plural (3. Deklination)</td><td><span class="la">iuvenes, fines</span></td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="l-en" lang="en">
+            <h2>3. Watch out for ambiguous endings</h2>
+            <p style="margin-top:0">Many endings can stand for more than one case. Decide from the context: which form fits the verb, a preposition or the word it belongs to?</p>
+            <table class="endings">
+                <thead><tr><th>Ending</th><th>Possible forms</th><th>Example</th></tr></thead>
+                <tbody>
+                    <tr><td>-a</td><td>nominative singular (1st declension); ablative singular <span class="la">-ā</span>; nominative/accusative plural neuter</td><td><span class="la">Gallia</span> (nom.), <span class="la">lingua</span> (abl.), <span class="la">arma</span> (acc. pl.)</td></tr>
+                    <tr><td>-ae</td><td>genitive or dative singular; nominative plural (1st declension)</td><td><span class="la">Romae</span> (gen.), <span class="la">Belgae</span> (nom. pl.)</td></tr>
+                    <tr><td>-ī</td><td>genitive singular and nominative plural (2nd declension); dative singular (3rd declension); passive infinitive</td><td><span class="la">Neptuni</span> (gen.), <span class="la">Galli</span> (nom. pl.)</td></tr>
+                    <tr><td>-īs</td><td>dative or ablative plural (1st and 2nd declension)</td><td><span class="la">palmis, terris, institutis</span></td></tr>
+                    <tr><td>-is</td><td>genitive singular (3rd declension); but also a verb form in the 2nd person singular</td><td><span class="la">Iunonis</span> (gen.)</td></tr>
+                    <tr><td>-um</td><td>accusative singular; nominative/accusative singular neuter; genitive plural (3rd declension, in poetry also instead of <span class="la">-orum</span>)</td><td><span class="la">virum</span> (acc.), <span class="la">superum</span> = <span class="la">superorum</span> (gen. pl.)</td></tr>
+                    <tr><td>-e</td><td>ablative singular (3rd declension); vocative (2nd declension); infinitive in <span class="la">-re</span></td><td><span class="la">vertice</span> (abl.), <span class="la">Marce</span> (voc.)</td></tr>
+                    <tr><td>-ēs</td><td>nominative or accusative plural (3rd declension)</td><td><span class="la">iuvenes, fines</span></td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- ============ 4. GUIDED EXAMPLE 1 ============ -->
+        <section class="card" id="beispiel1">
+            <div class="l-de" lang="de">
+            <h2>4. Schritt für Schritt: ein Satz aus Caesar</h2>
+            <p style="margin-top:0">Jetzt bist du dran. Wir lesen den Satz von links nach rechts, Block für Block. Klicke wie im Tool auf den jeweiligen Block und wähle seine Funktion aus dem Menü. Achte darauf, was du nach jedem Block erwartest. Weiter geht es erst, wenn deine Antwort stimmt. Bei einem Fehler bekommst du einen Tipp.</p>
+            <div class="wt" id="wt1-de"></div>
+            </div>
+            <div class="l-en" lang="en">
+            <h2>4. Step by step: a sentence from Caesar</h2>
+            <p style="margin-top:0">Now it’s your turn. We read the sentence from left to right, block by block. As in the tool, click on each block and choose its function from the menu. Notice what you expect after each block. You can only move on once your answer is correct. If you make a mistake, you get a hint.</p>
+            <div class="wt" id="wt1-en"></div>
+            </div>
+        </section>
+
+        <!-- ============ 5. GUIDED EXAMPLE 2 ============ -->
+        <section class="card" id="beispiel2">
+            <div class="l-de" lang="de">
+            <h2>5. Genitivattribute aufspüren: noch einmal Caesar</h2>
+            <p style="margin-top:0">Ein Genitivattribut bestimmt ein anderes Wort näher und beantwortet die Frage <em>Wessen?</em>. Du erkennst es an Endungen wie <span class="la">-i, -ae, -is, -orum, -arum, -um</span>. Viele dieser Endungen sind aber mehrdeutig. Entscheidend ist deshalb: Gibt es im Satz ein Wort, das der Genitiv näher bestimmt? Ein Genitiv kündigt also ein Bezugswort an, genau wie ein Akkusativ ein Verb ankündigt. Wir lesen wieder von links nach rechts.</p>
+            <div class="wt" id="wt2-de"></div>
+            </div>
+            <div class="l-en" lang="en">
+            <h2>5. Tracking down genitive attributes: Caesar again</h2>
+            <p style="margin-top:0">A genitive attribute describes another word more closely and answers the question <em>Whose?</em> or <em>Of what?</em>. You can recognise it by endings such as <span class="la">-i, -ae, -is, -orum, -arum, -um</span>. But many of these endings are ambiguous. So the deciding question is: is there a word in the sentence that the genitive describes? A genitive points ahead to the word it belongs to, just as an accusative points ahead to a verb. Again, we read from left to right.</p>
+            <div class="wt" id="wt2-en"></div>
+            </div>
+        </section>
+
+        <div class="footer"><button type="button" class="btn" onclick="window.print()"><span class="l-de" lang="de">Anleitung drucken</span><span class="l-en" lang="en">Print guide</span></button></div>
+    </main>
+</div>
+
+<script>
+// Colours as in the tool's example page
+const COLORS = {
+    'Subjekt': '#4ade80', 'Prädikat': '#C76D72', 'Akkusativobjekt': '#fde047', 'Dativobjekt': '#fdba74', 'Genitivobjekt': '#fbcfe8',
+    'Ablativ': '#93c5fd', 'Ablativus absolutus': '#60a5fa', 'Prädikativum': '#fca5a5', 'Präpositionale Bestimmung': '#c4b5fd',
+    'Adverbiale Bestimmung': '#ffedd5', 'Infinitiv': '#e9d5ff', 'AcI/NcI': '#c084fc', 'Partizipialkonstruktion': '#5eead4',
+    'Relativsatz': '#a7f3d0', 'Nebensatz': '#818cf8', 'Konjunktion': '#d6d3d1', 'Subjunktion': '#f3f4f6', 'Vokativ': '#a5f3fc', 'Sonstiges': '#e5e7eb'
+};
+
+// ================= 2. Function reference =================
+// e = erkennen, f = fragen, u = übersetzen, x = Beispiel [Latein, Übersetzung]
+// The tool's English label names share the colours of their German counterparts
+const EN_NAMES = { 'Subject': 'Subjekt', 'Verb': 'Prädikat', 'Accusative object': 'Akkusativobjekt', 'Dative object': 'Dativobjekt', 'Genitive object': 'Genitivobjekt',
+    'Ablative': 'Ablativ', 'Ablative absolute': 'Ablativus absolutus', 'Predicative': 'Prädikativum', 'Prepositional phrase': 'Präpositionale Bestimmung', 'Adverb': 'Adverbiale Bestimmung',
+    'Infinitive': 'Infinitiv', 'Accusative/Nominative with infinitive': 'AcI/NcI', 'Participial phrase': 'Partizipialkonstruktion', 'Relative clause': 'Relativsatz',
+    'Subordinate clause': 'Nebensatz', 'Conjunction': 'Konjunktion', 'Subjunction': 'Subjunktion', 'Vocative': 'Vokativ', 'Other': 'Sonstiges' };
+Object.keys(EN_NAMES).forEach(k => { COLORS[k] = COLORS[EN_NAMES[k]]; });
+
+// Interface texts of the guided examples
+const UI = {
+    de: { step: (i, n) => `Schritt ${i} von ${n}`, next: 'Weiter →', finish: 'Abschließen ✓', restart: 'Von vorn', done: 'Geschafft!',
+          tryAgain: 'Noch nicht. Versuch es noch einmal.', progress: (f, n) => `Richtig, ${f} von ${n} gefunden. Such weiter!`, soFar: (f, n) => `Bisher gefunden: ${f} von ${n}.`,
+          labelProgress: (f, n) => `${f} von ${n} bestimmt. Weiter so!`,
+          howLabel: 'Klicke wie im Tool auf den markierten Block und wähle seine Funktion aus dem Menü. Schneller geht es mit der Tastatur: Zeige mit der Maus auf den Block und drücke den unterstrichenen Buchstaben der Funktion.',
+          howGen: 'Klicke wie im Tool direkt auf ein Wort im Block und wähle oben im Menü „🖍️ Genitiv markieren“ oder drücke <strong>G</strong>.',
+          markGen: 'Genitiv markieren (G)', notGen: 'Kein Genitivattribut!', notThis: 'Dieser Block ist gerade nicht dran. Achte auf die blau umrandeten Stellen.',
+          markNow: 'Hier geht es ums Markieren des Genitivs: Wähle oben im Menü „🖍️ Genitiv markieren“.', clickWord: 'Klicke direkt auf ein einzelnes Wort im Block.',
+          menu: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverbiale Bestimmung', 'Infinitiv', 'AcI/NcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges'] },
+    en: { step: (i, n) => `Step ${i} of ${n}`, next: 'Next →', finish: 'Finish ✓', restart: 'Start again', done: 'Done!',
+          tryAgain: 'Not quite. Try again.', progress: (f, n) => `Correct, ${f} of ${n} found. Keep looking!`, soFar: (f, n) => `Found so far: ${f} of ${n}.`,
+          labelProgress: (f, n) => `${f} of ${n} done. Keep going!`,
+          howLabel: 'As in the tool, click the highlighted block and choose its function from the menu. It is quicker with the keyboard: point at the block with the mouse and press the underlined letter of the function.',
+          howGen: 'As in the tool, click directly on a word inside the block and choose “🖍️ Mark Genitive” at the top of the menu, or press <strong>G</strong>.',
+          markGen: 'Mark Genitive (G)', notGen: 'Not a genitive attribute!', notThis: 'It isn’t this block’s turn yet. Look for the parts outlined in blue.',
+          markNow: 'This step is about marking the genitive: choose “🖍️ Mark Genitive” at the top of the menu.', clickWord: 'Click directly on a single word inside the block.',
+          menu: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Accusative/Nominative with infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other'] }
+};
+
+const FUNCTIONS_DE = [
+  { group: 'Der Satzkern', items: [
+    { n: 'Prädikat', s: 'Was geschieht? Das Verb mit Personalendung',
+      e: 'Verbform mit Personalendung, dazu auch zusammengesetzte Formen wie <span class="la">divisa est</span>. Im Lateinischen steht das Prädikat oft am Satzende.',
+      f: 'Was geschieht? Was tut jemand?',
+      u: 'Person, Zahl, Zeit, Modus (Indikativ/Konjunktiv) und Aktiv/Passiv genau übernehmen. Das Passiv bildest du mit „werden“: <span class="la">appellantur</span> „sie werden genannt“.',
+      x: ['Hi omnes lingua, institutis, legibus inter se <b>differunt</b>.', '„Diese alle <b>unterscheiden sich</b> in Sprache, Einrichtungen und Gesetzen voneinander.“'] },
+    { n: 'Subjekt', s: 'Wer oder was?',
+      e: 'Steht im Nominativ und stimmt in der Zahl mit dem Prädikat überein. Oft steckt es nur in der Personalendung: <span class="la">venit</span> „er kam“.',
+      f: 'Wer oder was tut etwas oder wird etwas?',
+      u: 'Als Subjekt im Nominativ. Steckt es nur in der Endung, setzt du ein Pronomen ein (er, sie, es, wir …).',
+      x: ['Gallos ab Aquitanis <b>Garumna flumen</b> … dividit.', '„<b>Der Fluss Garonne</b> trennt die Gallier von den Aquitaniern.“'] }
+  ]},
+  { group: 'Ergänzungen: Was das Verb braucht', items: [
+    { n: 'Akkusativobjekt', s: 'Wen oder was?',
+      e: 'Ein Akkusativ (<span class="la">-um, -am, -em, -os, -as, -es</span> …), den das Verb verlangt. Vorsicht: Ein Akkusativ nach einer Präposition gehört zur präpositionalen Bestimmung. Ein Akkusativ zusammen mit einem Infinitiv kann ein AcI sein.',
+      f: 'Wen oder was?',
+      u: 'Meist als Akkusativobjekt. Manche Verben verlangen im Deutschen einen anderen Fall: <span class="la">iuvare aliquem</span> „jemandem helfen“.',
+      x: ['<b>Arma virumque</b> cano.', '„<b>Die Waffen und den Mann</b> besinge ich.“'] },
+    { n: 'Dativobjekt', s: 'Wem? Für wen?',
+      e: 'Ein Dativ (<span class="la">-ae, -ō, -ī, -īs, -ibus</span>), oft bei Verben des Gebens, Sagens, Helfens und Gehorchens. Achtung: Im Plural sehen Dativ und Ablativ immer gleich aus. Entscheide nach dem Sinn.',
+      f: 'Wem? Für wen? In der Dichtung auch: Wohin?',
+      u: 'Mit dem Dativ oder mit „für“; in der Dichtung auch als Richtung „nach“.',
+      x: ['inferretque deos <b>Latio</b>', '„und die Götter <b>nach Latium</b> brächte“'] },
+    { n: 'Genitivobjekt', s: 'Wessen? Bei bestimmten Verben',
+      e: 'Ein Genitiv, den ein Verb oder Adjektiv verlangt, vor allem bei Verben des Erinnerns und Vergessens (<span class="la">meminisse, oblivisci</span>) und bei Adjektiven wie <span class="la">cupidus, memor, peritus</span>. Nicht verwechseln mit dem Genitivattribut, das ein <em>Substantiv</em> näher bestimmt.',
+      f: 'Wessen? Woran? Wonach?',
+      u: 'Oft mit einer Präposition: „an“, „nach“, „auf“.',
+      x: ['Memento <b>mortis</b>!', '„Denk <b>an den Tod</b>!“'] },
+    { n: 'Infinitiv', s: 'Grundform: „zu …“',
+      e: 'Die Grundform des Verbs (<span class="la">-re, -ri, -i, -isse</span>). Er steht oft als Ergänzung bei Verben wie <span class="la">audere, cupere, posse, velle, debere</span>.',
+      f: 'Was wagt, will, kann oder soll jemand?',
+      u: 'Mit „zu“ und Infinitiv, bei Modalverben (können, wollen, müssen) ohne „zu“.',
+      x: ['vada salsa cita <b>decurrere</b> puppi ausi sunt', '„sie wagten es, mit schnellem Schiff die salzigen Fluten <b>zu durcheilen</b>“'] }
+  ]},
+  { group: 'Umstände: Wo, wann, wie, womit, warum?', items: [
+    { n: 'Ablativ', s: 'Womit? Wodurch? Wo? Wann? Woher?',
+      e: 'Ein Ablativ <em>ohne</em> Präposition (<span class="la">-ā, -ō, -e, -ī, -īs, -ibus</span>). Im Tool bekommt jeder solche Ablativ dieses Label, ganz gleich, welche Sinnrichtung er hat.',
+      f: 'Womit? Wodurch? (Mittel, Grund) · Wo? Wann? (Ort, Zeit) · Woher? Wovon? (Trennung, Herkunft) · In welcher Hinsicht?',
+      u: 'Mit einer passenden Präposition: mit, durch, in, an, aus, von, wegen, hinsichtlich.',
+      x: ['Hi omnes <b>lingua, institutis, legibus</b> inter se differunt.', '„Diese alle unterscheiden sich <b>in Sprache, Einrichtungen und Gesetzen</b> voneinander.“'] },
+    { n: 'Präpositionale Bestimmung', s: 'Präposition und Substantiv',
+      e: 'Eine Präposition (<span class="la">in, ad, ab, ex, cum, per, ob, inter</span> …) mit ihrem Substantiv und dessen Attributen. Achte auf den Kasus: <span class="la">in</span> mit Akkusativ heißt „in … hinein“, mit Ablativ „in, auf“. Dichter stellen oft Wörter zwischen Präposition und Substantiv.',
+      f: 'Wo? Wohin? Woher? Warum? Mit wem?',
+      u: 'Die Präposition passend zum Zusammenhang übersetzen.',
+      x: ['Gallia est omnis divisa <b>in partes tres</b>.', '„Gallien als Ganzes ist <b>in drei Teile</b> geteilt.“'] },
+    { n: 'Adverbiale Bestimmung', s: 'Wann? Wie? Wie sehr?',
+      e: 'Adverbien und andere unveränderliche Wörter, die einen Umstand angeben: <span class="la">quondam, saepe, iam, multum, quoque, tandem</span>.',
+      f: 'Wann? Wie? Wie oft? Wie sehr?',
+      u: 'Meist als Adverb.',
+      x: ['<b>multum</b> ille et terris iactatus et alto', '„er, <b>viel</b> umhergeworfen zu Lande und auf hoher See“'] },
+    { n: 'Prädikativum', s: 'Als was? In welcher Rolle?',
+      e: 'Ein Substantiv oder Adjektiv, das mit dem Subjekt oder Objekt in Kasus, Numerus und Genus übereinstimmt, aber zugleich etwas über die Handlung sagt: in welchem Zustand oder welcher Rolle jemand handelt. Typisch sind <span class="la">primus, solus, totus, omnis, laetus, invitus</span>, außerdem Substantive bei Verben wie <span class="la">appellari</span> „genannt werden“ oder <span class="la">fieri</span> „werden“.',
+      f: 'Als was? Wie? In welcher Rolle?',
+      u: 'Mit „als“ („als Erster“) oder als Adverb („gern“, „ungern“).',
+      x: ['Troiae qui <b>primus</b> ab oris … venit', '„der <b>als Erster</b> von den Küsten Trojas kam“'] },
+    { n: 'Vokativ', s: 'Die Anrede',
+      e: 'Eine angesprochene Person, oft zwischen Kommas, manchmal mit <span class="la">o</span>. Meist sieht er aus wie der Nominativ; nur <span class="la">-us</span> wird zu <span class="la">-e</span> (<span class="la">Marce</span>) und <span class="la">-ius</span> zu <span class="la">-i</span> (<span class="la">Gai</span>).',
+      f: 'Wer wird angesprochen?',
+      u: 'Als Anrede, im Deutschen oft weiter vorn im Satz.',
+      x: ['Quo usque tandem abutere, <b>Catilina</b>, patientia nostra?', '„Wie lange noch, <b>Catilina</b>, wirst du unsere Geduld missbrauchen?“'] }
+  ]},
+  { group: 'Konstruktionen', items: [
+    { n: 'AcI/NcI', s: 'Akkusativ bzw. Nominativ mit Infinitiv',
+      e: '<b>AcI:</b> Nach Verben des Sagens, Denkens, Wahrnehmens und Fühlens (<span class="la">dicere, putare, videre, gaudere</span>) steht ein Akkusativ zusammen mit einem Infinitiv. <b>NcI:</b> Bei passiven Verben wie <span class="la">dicitur, videtur, putatur</span> steht dafür ein Nominativ mit Infinitiv.',
+      f: 'Was wird gesagt, gedacht oder wahrgenommen?',
+      u: 'Den AcI übersetzt du mit einem „dass“-Satz: Der Akkusativ wird zum Subjekt, der Infinitiv zum Prädikat. Zeitverhältnis: Infinitiv Präsens = gleichzeitig, Infinitiv Perfekt = vorzeitig, Infinitiv Futur = nachzeitig. Den NcI übersetzt du mit „man sagt, dass …“ oder mit „soll/sollen“.',
+      x: ['Peliaco quondam prognatae vertice pinus / dicuntur <b>liquidas Neptuni nasse per undas</b>', '„Fichten, einst auf dem Gipfel des Pelion gewachsen, <b>sollen durch die klaren Wogen Neptuns geschwommen sein</b>.“ (<span class="la">nasse</span> = <span class="la">navisse</span>, Infinitiv Perfekt: vorzeitig)'] },
+    { n: 'Partizipialkonstruktion', s: 'Partizip, das sich auf ein Substantiv bezieht',
+      e: 'Ein Partizip stimmt in Kasus, Numerus und Genus mit einem Substantiv im Satz überein und hat oft eigene Ergänzungen. Im Tool steht die Konstruktion unter einer Klammer; das Partizip erhält die Funktion seines Bezugswortes.',
+      f: 'Was tut jemand gleichzeitig? Was ist vorher geschehen?',
+      u: 'Als Relativsatz („der …“), als Nebensatz („indem, nachdem, weil, obwohl“) oder mit „und“ beigeordnet. Partizip Präsens Aktiv (<span class="la">-ns, -ntis</span>) = gleichzeitig; Partizip Perfekt Passiv (<span class="la">-tus, -sus</span>) = vorzeitig und passiv; Partizip Futur Aktiv (<span class="la">-urus</span>) = nachzeitig.',
+      x: ['<b>caerula verrentes abiegnis aequora palmis</b>', '„<b>indem sie mit Rudern aus Tannenholz über die blauen Fluten fegten</b>“'] },
+    { n: 'Ablativus absolutus', s: 'Substantiv und Partizip im Ablativ',
+      e: 'Ein Substantiv oder Pronomen steht zusammen mit einem Partizip im Ablativ. Die Gruppe ist grammatisch vom übrigen Satz losgelöst („absolut“). Statt des Partizips kann auch ein Substantiv stehen: <span class="la">Cicerone consule</span> „unter dem Konsulat Ciceros“.',
+      f: 'Unter welchen Umständen geschieht die Handlung?',
+      u: 'Als Nebensatz mit „nachdem, als, weil, während, obwohl“, wobei das Substantiv im Ablativ zum Subjekt wird, oder knapper mit einer Präposition (nach, bei, wegen, trotz). Das Zeitverhältnis richtet sich nach dem Partizip.',
+      x: ['<b>His rebus cognitis</b> Caesar castra movit.', '„<b>Nachdem Caesar dies erfahren hatte</b>, brach er mit dem Lager auf.“'] }
+  ]},
+  { group: 'Sätze und Verbindungen', items: [
+    { n: 'Relativsatz', s: 'Eingeleitet durch qui, quae, quod',
+      e: 'Beginnt mit einer Form des Relativpronomens (<span class="la">qui, quae, quod, cuius, cui, quem, quarum</span> …). Das Pronomen richtet sich in Genus und Numerus nach seinem Bezugswort, sein Kasus aber nach seiner Aufgabe im Relativsatz.',
+      f: 'Auf welches Wort bezieht sich das Pronomen? Welche Aufgabe hat es im Relativsatz?',
+      u: 'Mit „der, die, das“ oder „welcher“. Steht ein Relativpronomen nach einem Punkt am Satzanfang (relativischer Satzanschluss), übersetzt du es mit „dieser“.',
+      x: ['…, <b>qui ipsorum lingua Celtae, nostra Galli appellantur</b>.', '„…, <b>die in ihrer eigenen Sprache Kelten, in unserer Gallier genannt werden</b>.“'] },
+    { n: 'Nebensatz', s: 'Eingeleitet durch eine Subjunktion',
+      e: 'Beginnt mit einer Subjunktion (<span class="la">cum, ut, ne, quod, si, dum, postquam</span> …) oder einem Fragewort und hat ein eigenes Prädikat. Achte darauf, ob dieses Prädikat im Konjunktiv steht: Das entscheidet oft über die Bedeutung der Subjunktion.',
+      f: 'Wann? Warum? Wozu? Unter welcher Bedingung?',
+      u: 'Mit der passenden deutschen Konjunktion; das Prädikat rückt ans Ende.',
+      x: ['multa quoque et bello passus, <b>dum conderet urbem</b>', '„er erlitt auch viel im Krieg, <b>bis er die Stadt gründete</b>“'] },
+    { n: 'Subjunktion', s: 'Unterordnend: cum, ut, dum …',
+      e: 'Leitet einen Nebensatz ein. Häufig sind <span class="la">cum</span> (als, weil, obwohl), <span class="la">ut</span> (dass, damit, sodass, wie), <span class="la">ne</span> (damit nicht, dass), <span class="la">quod</span> (weil, dass), <span class="la">si</span> (wenn, falls), <span class="la">postquam</span> (nachdem) und <span class="la">dum</span> (während, solange, bis).',
+      f: 'Welche Sinnrichtung hat der Nebensatz?',
+      u: 'Die passende Bedeutung wählen. Oft entscheidet erst der Modus des Prädikats.',
+      x: ['<b>cum</b> lecti iuvenes … ausi sunt', '„<b>als</b> auserlesene junge Männer es wagten …“'] },
+    { n: 'Konjunktion', s: 'Beiordnend: et, -que, sed …',
+      e: 'Verbindet gleichrangige Wörter oder Sätze: <span class="la">et, -que, atque/ac, sed, aut, nam, enim, autem</span>. Verbindet sie zwei Teile derselben Funktion, gehört sie im Tool mit in deren Block (<span class="la">Matrona et Sequana</span>). Verbindet sie ganze Sätze, erhält sie dieses Label.',
+      f: 'Was wird miteinander verbunden?',
+      u: 'Mit „und, aber, oder, denn“. Das angehängte <span class="la">-que</span> übersetzt du vor dem Wort, an dem es hängt: <span class="la">virumque</span> „und den Mann“.',
+      x: ['Arma <b>virumque</b> cano.', '„Die Waffen <b>und</b> den Mann besinge ich.“'] }
+  ]},
+  { group: 'Außerdem', items: [
+    { n: 'Genitivattribut', gen: true, s: 'Wessen? Wird unterstrichen',
+      e: 'Ein Genitiv (<span class="la">-i, -ae, -is, -orum, -arum, -um</span>), der ein Substantiv näher bestimmt. Er gehört zum Block seines Bezugswortes und erhält dessen Funktion. Im Tool unterstreichst du ihn zusätzlich mit <strong>🖍️ Genitiv markieren</strong>.',
+      f: 'Wessen …?',
+      u: 'Mit dem Genitiv („der Zorn Junos“) oder mit „von“. Bezeichnet er ein Ganzes, von dem ein Teil genommen wird, übersetzt du „von“: <span class="la">quarum unam</span> „von denen einen“.',
+      x: ['<b>quarum</b> unam incolunt Belgae', '„<b>von denen</b> die Belger einen bewohnen“'] },
+    { n: 'Sonstiges', s: 'Alles andere',
+      e: 'Wörter ohne eigene Funktion im Satzbau, zum Beispiel Ausrufe (<span class="la">o, heu</span>) oder Fragepartikeln (<span class="la">-ne, num, nonne</span>).',
+      f: 'Hat das Wort eine Aufgabe im Satz, oder zeigt es nur etwas an (eine Frage, ein Gefühl)?',
+      u: 'Je nach Wort. Fragepartikeln zeigen nur an, dass eine Frage folgt: <span class="la">Videsne?</span> „Siehst du?“',
+      x: ['<b>Num</b> dubitas?', '„Zweifelst du <b>etwa</b>?“ (<span class="la">num</span> erwartet die Antwort „nein“)'] }
+  ]}
+];
+
+function renderFunctions(rootId, data, dt) {
+    const root = document.getElementById(rootId);
+    data.forEach(g => {
+        const t = document.createElement('div'); t.className = 'fn-group-title'; t.textContent = g.group; root.appendChild(t);
+        const grid = document.createElement('div'); grid.className = 'fn-grid';
+        g.items.forEach(it => {
+            const d = document.createElement('details'); d.className = 'fn';
+            const sw = it.gen ? '<span class="swatch gen"></span>' : `<span class="swatch" style="background:${COLORS[it.n]}"></span>`;
+            d.innerHTML = `<summary>${sw}<span><span class="fn-name">${it.n}</span><br><span class="fn-short">${it.s}</span></span></summary>
+                <div class="fn-body"><dl>
+                    <dt>${dt[0]}</dt><dd>${it.e}</dd>
+                    <dt>${dt[1]}</dt><dd>${it.f}</dd>
+                    <dt>${dt[2]}</dt><dd>${it.u}</dd>
+                    <dt>${dt[3]}</dt><dd><div class="ex"><span class="la">${it.x[0]}</span><br><span class="tr">${it.x[1]}</span></div></dd>
+                </dl></div>`;
+            grid.appendChild(d);
+        });
+        root.appendChild(grid);
+    });
+}
+renderFunctions('fn-list-de', FUNCTIONS_DE, ['Erkennen', 'Fragen', 'Übersetzen', 'Beispiel']);
+document.querySelectorAll('.btn-open-all').forEach(b => b.onclick = () => document.querySelectorAll('details.fn').forEach(d => d.open = true));
+document.querySelectorAll('.btn-close-all').forEach(b => b.onclick = () => document.querySelectorAll('details.fn').forEach(d => d.open = false));
+
+// ================= Guided examples =================
+// Like the tool: a label wider than its word is shortened (full name on hover)
+const ABBR = { 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverbiale Bestimmung': 'Adv', 'Prädikativum': 'Präd', 'Subjekt': 'Subj', 'Prädikat': 'Prädikat', 'Ablativ': 'Abl',
+    'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Predicative': 'Pred', 'Subject': 'Subj', 'Verb': 'Verb', 'Ablative': 'Abl', 'Subjunction': 'Subjunc' };
+function fitLabel(chip, l, label) {
+    if (l.offsetWidth > chip.offsetWidth - 6) { l.textContent = ABBR[label] || label.substring(0, 4) + '.'; chip.title = label; }
+}
+
+// The tool's fixed shortcut letters (from src/latin-labels.js); other labels get the first free letter, exactly as in the tool.
+const TOOL_SHORTCUTS = {
+    'Subject': 's', 'Subjekt': 's', 'Verb': 'p', 'Prädikat': 'p', 'Accusative object': 'a', 'Akkusativobjekt': 'a',
+    'Dative object': 'd', 'Dativobjekt': 'd', 'Genitive object': 'v', 'Genitivobjekt': 'v', 'Ablative': 'l', 'Ablativ': 'l',
+    'Ablative absolute': 'b', 'Ablativus absolutus': 'b', 'Prepositional phrase': 'o', 'Präpositionale Bestimmung': 'o',
+    'Predicative': 'r', 'Prädikativum': 'r', 'Adverb': 'e', 'Adverbiale Bestimmung': 'e', 'Infinitive': 'i', 'Infinitiv': 'i',
+    'Accusative/Nominative with infinitive': 'c', 'AcI/NcI': 'c', 'Participial phrase': 'z', 'Partizipialkonstruktion': 'z',
+    'Relative clause': 't', 'Relativsatz': 't', 'Subordinate clause': 'n', 'Nebensatz': 'n', 'Conjunction': 'k', 'Konjunktion': 'k',
+    'Subjunction': 'u', 'Subjunktion': 'u', 'Vocative': 'f', 'Vokativ': 'f', 'Other': 'y', 'Sonstiges': 'y'
+};
+
+function makeWalkthrough(root, cfg, ui) {
+    // Looks and works like the student page: words sit in blocks, clauses under a bracket,
+    // a click on a block opens the function menu, a click on a word inside a block offers "Mark Genitive".
+    root.innerHTML = `<div class="wt-source">${cfg.source}</div>
+        <div class="wt-sentence"></div>
+        <div class="wt-panel">
+            <div class="wt-head"><span class="wt-counter"></span><div class="wt-progress"><span></span></div></div>
+            <div class="wt-prompt"></div>
+            <div class="wt-options"></div>
+            <div class="wt-feedback" aria-live="polite"></div>
+            <div class="wt-actions"><button type="button" class="btn wt-restart">${ui.restart}</button><button type="button" class="btn primary wt-next" disabled>${ui.next}</button></div>
+        </div>`;
+    const $ = (sel) => root.querySelector(sel);
+    const sentence = $('.wt-sentence'), counter = $('.wt-counter'), bar = $('.wt-progress span'), prompt = $('.wt-prompt'),
+          opts = $('.wt-options'), fb = $('.wt-feedback'), next = $('.wt-next'), restart = $('.wt-restart');
+    const menu = document.createElement('div'); menu.className = 'wt-menu'; menu.setAttribute('role', 'menu'); document.body.appendChild(menu);
+    const menuLabels = cfg.menuLabels || ui.menu;
+    const shortcuts = {}; // label -> letter
+    (() => {
+        const used = new Set(['x', 'm', 'w', 'g']);
+        menuLabels.forEach(f => { const k = TOOL_SHORTCUTS[f]; if (k && !used.has(k)) { shortcuts[f] = k; used.add(k); } }); // the tool's fixed letters first
+        menuLabels.forEach(f => {
+            if (shortcuts[f]) return;
+            for (const ch of f.toLowerCase()) { if (/[a-z]/.test(ch) && !used.has(ch)) { shortcuts[f] = ch; used.add(ch); return; } }
+            for (let c = 97; c <= 122; c++) { const ch = String.fromCharCode(c); if (!used.has(ch)) { shortcuts[f] = ch; used.add(ch); return; } }
+        });
+    })();
+    const labelForKey = (k) => Object.keys(shortcuts).find(l => shortcuts[l] === k);
+    function labelHtml(f) {
+        const k = shortcuts[f]; if (!k) return f;
+        const at = f.toLowerCase().indexOf(k);
+        return at !== -1 ? f.substring(0, at) + '<u>' + f[at] + '</u>' + f.substring(at + 1) : '[<u>' + k.toUpperCase() + '</u>] ' + f;
+    }
+    let menuState = null, hover = null; // what the open menu belongs to; what the mouse is over
+    const layout = cfg.layout || cfg.words.map(w => w.punct ? { punct: w.text } : { block: w.id, words: w.text.split(' ').map((t, k) => ({ id: w.id + '_' + k, text: t })) });
+    let blocks = {}, words = {}, groups = {};
+    let i = 0, solved = false, found = [], done = {}, notes = [];
+
+    // ---------- building the sentence ----------
+    function buildItems(items, parent) {
+        items.forEach(it => {
+            if (it.punct) { const p = document.createElement('span'); p.className = 'wt-punct'; p.textContent = it.punct; parent.append(p, ' '); return; }
+            if (it.group) {
+                const g = document.createElement('span'); g.className = 'wt-group';
+                const gl = document.createElement('span'); gl.className = 'wt-glabel'; gl.tabIndex = 0; gl.textContent = '?';
+                gl.addEventListener('click', (e) => { e.stopPropagation(); onTarget(it.group, gl); });
+                gl.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTarget(it.group, gl); } });
+                g.appendChild(gl); buildItems(it.items, g);
+                groups[it.group] = { el: g, label: gl }; parent.append(g, ' '); return;
+            }
+            const b = document.createElement('span'); b.className = 'wt-chip'; b.tabIndex = 0; b.dataset.id = it.block;
+            it.words.forEach((w, k) => {
+                if (k) b.append(' ');
+                const ws = document.createElement('span'); ws.className = 'wt-w'; ws.dataset.id = w.id; ws.textContent = w.text;
+                ws.addEventListener('click', (e) => onWord(e, w.id, ws));
+                ws.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onWord(e, w.id, ws); } });
+                words[w.id] = ws; b.appendChild(ws);
+            });
+            b.addEventListener('click', () => onTarget(it.block, b));
+            b.addEventListener('keydown', (e) => { if (e.target === b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onTarget(it.block, b); } });
+            blocks[it.block] = b; parent.append(b, ' ');
+        });
+    }
+    function build() {
+        sentence.innerHTML = ''; blocks = {}; words = {}; groups = {};
+        buildItems(layout, sentence);
+        sentence.classList.toggle('has-groups', Object.keys(groups).length > 0);
+    }
+    function setLabel(id, label) {
+        if (groups[id]) { const gl = groups[id].label; gl.textContent = label; gl.classList.add('done'); groups[id].el.classList.add('done'); return; }
+        const b = blocks[id]; b.style.backgroundColor = COLORS[label]; b.classList.add('done');
+        const l = document.createElement('span'); l.className = 'wt-label'; l.textContent = label; b.appendChild(l);
+        fitLabel(b, l, label);
+    }
+
+    // ---------- menu (like the drop-down menu on the student page) ----------
+    function openMenu(anchor, withGen, withLabels, pick) {
+        menu.innerHTML = '';
+        if (withGen) {
+            const g = document.createElement('button'); g.type = 'button'; g.className = 'menu-btn gen-btn'; g.textContent = '🖍️ ' + ui.markGen;
+            g.addEventListener('click', () => { closeMenu(); pick('GEN'); }); menu.appendChild(g);
+        }
+        if (withLabels) menuLabels.forEach(l => {
+            const m = document.createElement('button'); m.type = 'button'; m.className = 'menu-btn'; m.innerHTML = labelHtml(l);
+            m.addEventListener('click', () => { closeMenu(); pick(l); }); menu.appendChild(m);
+        });
+        const btns = Array.from(menu.querySelectorAll('.menu-btn'));
+        btns.forEach((m, k) => m.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') { e.preventDefault(); btns[(k + 1) % btns.length].focus(); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); btns[(k - 1 + btns.length) % btns.length].focus(); }
+            else if (e.key === 'Escape') { e.preventDefault(); closeMenu(); anchor.focus(); }
+        }));
+        menu.style.display = 'block'; menuState = { pick, gen: withGen, labels: withLabels };
+        const r = anchor.getBoundingClientRect();
+        if (window.innerWidth > 600) {
+            menu.style.left = Math.max(8, Math.min(r.left + window.scrollX, window.scrollX + window.innerWidth - menu.offsetWidth - 8)) + 'px';
+            menu.style.top = (r.bottom + window.scrollY + 4) + 'px';
+        }
+        if (btns[0]) btns[0].focus({ preventScroll: true });
+    }
+    function closeMenu() { menu.style.display = 'none'; menuState = null; }
+    document.addEventListener('mousedown', (e) => { if (!menu.contains(e.target)) closeMenu(); });
+
+    // ---------- feedback ----------
+    function feedback(html, ok) { fb.className = 'wt-feedback ' + (ok ? 'ok' : 'err'); fb.innerHTML = html; }
+    function flash(el) { el.classList.remove('wrong'); void el.offsetWidth; el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 700); }
+    function succeed(html) {
+        solved = true; feedback(html, true); next.disabled = false;
+        next.textContent = i === cfg.steps.length - 1 ? ui.finish : ui.next;
+        root.querySelectorAll('.focus').forEach(el => el.classList.remove('focus'));
+        next.focus({ preventScroll: true });
+    }
+    function itemsOf(s) { return s.type === 'choose' ? { [s.word]: { correct: s.correct, hints: s.hints, success: s.success } } : s.items; }
+
+    function show() {
+        const s = cfg.steps[i]; solved = false; found = []; done = {}; notes = []; closeMenu();
+        counter.textContent = ui.step(i + 1, cfg.steps.length);
+        bar.style.width = (i / cfg.steps.length * 100) + '%';
+        const how = (s.type === 'choose' || s.type === 'label') ? ui.howLabel : s.type === 'gen' ? ui.howGen : '';
+        prompt.innerHTML = s.prompt + (how ? `<div class="wt-howto">${how}</div>` : '');
+        opts.innerHTML = ''; fb.className = 'wt-feedback'; fb.innerHTML = '';
+        next.disabled = true; next.textContent = ui.next; next.style.display = '';
+        root.querySelectorAll('.focus, .wrong, .picked, .hl').forEach(el => el.classList.remove('focus', 'wrong', 'picked', 'hl'));
+        root.dataset.mode = s.type;
+        Object.values(words).forEach(w => { w.tabIndex = (s.type === 'word' || s.type === 'gen') ? 0 : -1; });
+        (s.highlight || []).forEach(id => words[id].classList.add('hl'));
+        if (s.type === 'choose' || s.type === 'label') {
+            Object.keys(itemsOf(s)).forEach(id => (groups[id] ? groups[id].label : blocks[id]).classList.add('focus'));
+        } else if (s.type === 'mc') {
+            s.options.forEach(op => {
+                const o = document.createElement('button'); o.type = 'button'; o.className = 'opt text'; o.innerHTML = op.text;
+                o.addEventListener('click', () => {
+                    if (solved) return;
+                    if (op.correct) { o.classList.add('right'); succeed('✓ ' + s.success); }
+                    else { o.classList.add('wrong-opt'); feedback('✗ ' + op.feedback, false); }
+                });
+                opts.appendChild(o);
+            });
+        }
+    }
+
+    // a click on a block or bracket label: choose its function
+    function onTarget(id, el, preset) {
+        const s = cfg.steps[i];
+        if (!s || solved) return;
+        if (s.type === 'gen') { feedback('✗ ' + ui.clickWord, false); return; }
+        if (s.type !== 'choose' && s.type !== 'label') return;
+        const items = itemsOf(s);
+        if (!(id in items)) { flash(el); feedback('✗ ' + ui.notThis, false); return; }
+        if (done[id]) return;
+        const choose = (label) => {
+            const it = items[id];
+            if (label !== it.correct) { flash(el); feedback('✗ ' + ((it.hints && it.hints[label]) || ui.tryAgain), false); return; }
+            setLabel(id, label); done[id] = true; el.classList.remove('focus'); notes.push(it.success);
+            const total = Object.keys(items).length, n = Object.keys(done).length;
+            if (n === total) succeed(total === 1 ? '✓ ' + it.success : `✓ ${s.success}<ul>${notes.map(x => `<li>${x}</li>`).join('')}</ul>`);
+            else feedback(`✓ ${it.success}<br><br>${ui.labelProgress(n, total)}`, true);
+        };
+        if (preset) choose(preset); else openMenu(el, false, true, choose);
+    }
+
+    // a click on a single word inside a block
+    function onWord(e, id, el, preset) {
+        const s = cfg.steps[i];
+        if (!s || solved || (s.type !== 'word' && s.type !== 'gen')) return; // otherwise the click counts for the whole block
+        if (e) e.stopPropagation();
+        const targets = [].concat(s.target);
+        if (s.type === 'gen') {
+            const choose = (choice) => {
+                if (choice !== 'GEN') { feedback('✗ ' + ui.markNow, false); return; }
+                if (!targets.includes(id)) { flash(el); feedback(`✗ ${ui.notGen} ${(s.hints && s.hints[id]) || ''}`, false); return; }
+                if (found.includes(id)) return;
+                found.push(id); el.classList.add('gen-found'); progress(s, targets);
+            };
+            if (preset) choose(preset); else openMenu(el, true, true, choose);
+            return;
+        }
+        if (!targets.includes(id)) {
+            flash(el);
+            const keep = s.multi && found.length ? `<br><br>${ui.soFar(found.length, targets.length)}` : '';
+            feedback('✗ ' + ((s.hints && s.hints[id]) || s.generic || ui.tryAgain) + keep, false); return;
+        }
+        if (!s.multi) { el.classList.add('picked'); succeed('✓ ' + s.success); return; }
+        if (found.includes(id)) return;
+        found.push(id); el.classList.add('picked'); progress(s, targets);
+    }
+    function progress(s, targets) {
+        const items = s.found ? `<ul>${found.map(f => `<li>${s.found[f]}</li>`).join('')}</ul>` : '';
+        if (found.length === targets.length) succeed(`✓ ${s.success}${items}`);
+        else feedback(`✓ ${ui.progress(found.length, targets.length)}${items}`, true);
+    }
+
+    next.addEventListener('click', () => {
+        if (!solved) return;
+        if (i < cfg.steps.length - 1) { i++; show(); return; }
+        counter.textContent = ui.done; bar.style.width = '100%'; root.dataset.mode = 'done';
+        prompt.innerHTML = cfg.done; opts.innerHTML = ''; fb.className = 'wt-feedback'; fb.innerHTML = '';
+        next.style.display = 'none';
+        root.querySelectorAll('.focus, .wrong, .picked, .hl').forEach(el => el.classList.remove('focus', 'wrong', 'picked', 'hl'));
+    });
+    sentence.addEventListener('mouseover', (e) => {
+        const gl = e.target.closest('.wt-glabel'), b = e.target.closest('.wt-chip');
+        hover = gl ? { id: Object.keys(groups).find(k => groups[k].label === gl), el: gl } : b ? { id: b.dataset.id, el: b } : null;
+    });
+    sentence.addEventListener('mouseleave', () => { hover = null; });
+    document.addEventListener('keydown', (e) => {
+        if (!root.offsetParent) return;                                   // the exercise of the other language is hidden
+        if (e.target.closest && e.target.closest('input, textarea')) return;
+        if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1 || !/[a-z]/i.test(e.key)) return;
+        const key = e.key.toLowerCase(), s = cfg.steps[i];
+        if (!s || solved) return;
+        if (menuState) {
+            if (!root.contains(document.activeElement) && !menu.contains(document.activeElement)) return;
+            const pick = menuState.pick;
+            if (key === 'g' && menuState.gen) { e.preventDefault(); closeMenu(); pick('GEN'); return; }
+            const lab = menuState.labels && labelForKey(key);
+            if (lab) { e.preventDefault(); closeMenu(); pick(lab); }
+            return;
+        }
+        const act = document.activeElement;
+        if (s.type === 'choose' || s.type === 'label') {
+            let t = hover;
+            if (!t && act && root.contains(act)) {
+                if (act.classList.contains('wt-chip')) t = { id: act.dataset.id, el: act };
+                else if (act.classList.contains('wt-glabel')) t = { id: Object.keys(groups).find(k => groups[k].label === act), el: act };
+            }
+            const lab = labelForKey(key);
+            if (t && t.id && lab) { e.preventDefault(); onTarget(t.id, t.el, lab); }
+        } else if (s.type === 'gen' && key === 'g' && act && act.classList.contains('wt-w') && root.contains(act)) {
+            e.preventDefault(); onWord(null, act.dataset.id, act, 'GEN');
+        }
+    });
+    restart.addEventListener('click', () => { i = 0; build(); show(); });
+    build(); show();
+}
+
+// ---------- Example 1: Caesar, De bello Gallico 1,1 ----------
+const ALL_LABELS_DE = ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Adverbiale Bestimmung', 'Prädikativum'];
+makeWalkthrough(document.getElementById('wt1-de'), {
+    source: 'Caesar, <em>De bello Gallico</em> 1,1',
+    words: [
+        { id: 'g', text: 'Gallos' }, { id: 'aq', text: 'ab Aquitanis' }, { id: 'gf', text: 'Garumna flumen' }, { punct: true, text: ',' },
+        { id: 'bel', text: 'a Belgis' }, { id: 'ms', text: 'Matrona et Sequana' }, { id: 'div', text: 'dividit' }, { punct: true, text: '.' }
+    ],
+    steps: [
+        { type: 'choose', word: 'g', correct: 'Akkusativobjekt', options: ALL_LABELS_DE,
+          prompt: '<strong>Der erste Block: <span class="la">Gallos</span>.</strong> Welche Funktion hat er wahrscheinlich? Achte auf die Endung.',
+          hints: { 'Subjekt': 'Die Endung <span class="la">-os</span> zeigt den Akkusativ Plural. Als Subjekt stünde hier der Nominativ <span class="la">Galli</span>.',
+                   'Dativobjekt': 'Der Dativ Plural der o-Deklination endet auf <span class="la">-īs</span>, nicht auf <span class="la">-os</span>.',
+                   'Ablativ': 'Der Ablativ Plural der o-Deklination endet auf <span class="la">-īs</span>, nicht auf <span class="la">-os</span>.',
+                   'Präpositionale Bestimmung': 'Vor <span class="la">Gallos</span> steht keine Präposition.',
+                   'Prädikat': '<span class="la">Gallos</span> ist ein Substantiv, keine Verbform.',
+                   'Adverbiale Bestimmung': '<span class="la">Gallos</span> ist ein Substantiv mit Kasusendung, kein Adverb.',
+                   'Prädikativum': 'Ein Prädikativum gibt eine Rolle oder einen Zustand an („als …“). Achte einfach auf den Kasus.' },
+          success: 'Richtig! <span class="la">-os</span> ist Akkusativ Plural: „die Gallier“. Damit weißt du schon: Jemand tut etwas <em>mit</em> den Galliern. Wer und was, verrät der Satz noch. Behalte diese Frage im Kopf.' },
+        { type: 'choose', word: 'aq', correct: 'Präpositionale Bestimmung', options: ALL_LABELS_DE,
+          prompt: '<strong>Weiter mit <span class="la">ab Aquitanis</span>.</strong> Welche Funktion hat dieser Block?',
+          hints: { 'Ablativ': '<span class="la">Aquitanis</span> steht zwar im Ablativ, aber zusammen mit der Präposition <span class="la">ab</span>. Dann bilden beide eine andere Funktion.',
+                   'Dativobjekt': '<span class="la">-īs</span> könnte ein Dativ sein, aber achte auf das Wort davor.',
+                   'Akkusativobjekt': '<span class="la">-īs</span> ist Dativ oder Ablativ Plural, kein Akkusativ.',
+                   'Subjekt': 'Das Subjekt steht im Nominativ, nie nach einer Präposition.',
+                   'Prädikat': 'Hier steht keine Verbform.',
+                   'Adverbiale Bestimmung': 'Fast: Es geht um einen Umstand. Aber hier steht eine Präposition mit ihrem Substantiv. Dafür gibt es ein eigenes Label.',
+                   'Prädikativum': 'Ein Prädikativum steht ohne Präposition und stimmt mit Subjekt oder Objekt überein.' },
+          success: 'Richtig! <span class="la">ab</span> mit Ablativ: „von den Aquitaniern“. Zusammen ergibt das: „die Gallier … von den Aquitaniern“. Das klingt nach Trennen oder Unterscheiden. Eine erste Erwartung an das Verb!' },
+        { type: 'choose', word: 'gf', correct: 'Subjekt', options: ALL_LABELS_DE,
+          prompt: '<strong>Jetzt <span class="la">Garumna flumen</span>.</strong> Welche Funktion hat dieser Block?',
+          hints: { 'Akkusativobjekt': '<span class="la">flumen</span> könnte ein Akkusativ sein, <span class="la">Garumna</span> aber nicht. Der Akkusativ hieße <span class="la">Garumnam</span>.',
+                   'Ablativ': '<span class="la">Garumna</span> könnte ein Ablativ sein, <span class="la">flumen</span> aber nicht. Der Ablativ hieße <span class="la">flumine</span>.',
+                   'Dativobjekt': 'Der Dativ hieße <span class="la">Garumnae flumini</span>.',
+                   'Präpositionale Bestimmung': 'Vor <span class="la">Garumna</span> steht keine Präposition.',
+                   'Prädikat': 'Hier steht keine Verbform.',
+                   'Adverbiale Bestimmung': 'Das sind Substantive, keine Adverbien.',
+                   'Prädikativum': 'Ein Prädikativum sagt, in welcher Rolle jemand handelt. Hier geht es darum, <em>wer</em> handelt.' },
+          success: 'Richtig! Beide Wörter passen nur im Nominativ zusammen: „der Fluss Garonne“. <span class="la">flumen</span> ist eine Apposition, eine nähere Erklärung zu <span class="la">Garumna</span>, und gehört mit in den Block. Jetzt hast du schon fast den ganzen Gedanken: „Der Fluss Garonne … die Gallier … von den Aquitaniern“. Es fehlt nur noch das Verb.' },
+        { type: 'choose', word: 'bel', correct: 'Präpositionale Bestimmung', options: ALL_LABELS_DE,
+          prompt: '<strong>Nach dem Komma: <span class="la">a Belgis</span>.</strong> Welche Funktion hat dieser Block?',
+          hints: { 'Ablativ': 'Wie eben: Der Ablativ steht hier nach der Präposition <span class="la">a</span>.',
+                   'Dativobjekt': 'Achte auf das kleine Wort vor <span class="la">Belgis</span>.',
+                   'Akkusativobjekt': '<span class="la">-īs</span> ist Dativ oder Ablativ Plural, kein Akkusativ.',
+                   'Subjekt': 'Das Subjekt steht im Nominativ, nie nach einer Präposition.',
+                   'Prädikat': 'Hier steht keine Verbform.',
+                   'Adverbiale Bestimmung': 'Präposition und Substantiv bilden zusammen ein eigenes Label.',
+                   'Prädikativum': 'Ein Prädikativum steht ohne Präposition.' },
+          success: 'Genau! <span class="la">a</span> ist dieselbe Präposition wie <span class="la">ab</span>; vor Konsonanten steht oft die kurze Form. „Von den Belgern“ wiederholt das Muster von <span class="la">ab Aquitanis</span>. Du kannst also erwarten, dass gleich wieder jemand genannt wird, der trennt.' },
+        { type: 'choose', word: 'ms', correct: 'Subjekt', options: ALL_LABELS_DE,
+          prompt: '<strong><span class="la">Matrona et Sequana</span>.</strong> Erfüllt sich deine Erwartung? Welche Funktion hat dieser Block?',
+          hints: { 'Akkusativobjekt': 'Ein Akkusativ der a-Deklination endet auf <span class="la">-am</span>, nicht auf <span class="la">-a</span>.',
+                   'Ablativ': '<span class="la">-a</span> kann zwar ein Ablativ sein. Aber der zweite Teil braucht, genau wie der erste, jemanden, der trennt. Vergleiche mit <span class="la">Garumna flumen</span>.',
+                   'Präpositionale Bestimmung': 'Vor <span class="la">Matrona</span> steht keine Präposition; das <span class="la">a</span> gehört zu <span class="la">Belgis</span>.',
+                   'Dativobjekt': 'Der Dativ der a-Deklination endet auf <span class="la">-ae</span>.',
+                   'Prädikat': 'Hier steht keine Verbform.',
+                   'Adverbiale Bestimmung': 'Das sind Substantive, keine Adverbien.',
+                   'Prädikativum': 'Ein Prädikativum sagt, in welcher Rolle jemand handelt. Hier geht es darum, <em>wer</em> handelt.' },
+          success: 'Richtig! „Die Marne und die Seine“ entsprechen <span class="la">Garumna flumen</span> im ersten Teil: Sie sind das Subjekt des zweiten Teils. Weil <span class="la">et</span> zwei Teile derselben Funktion verbindet, gehört es mit in den Block.' },
+        { type: 'choose', word: 'div', correct: 'Prädikat', options: ALL_LABELS_DE,
+          prompt: '<strong>Zum Schluss: <span class="la">dividit</span>.</strong> Welche Funktion hat das letzte Wort, und bestätigt es deine Erwartung?',
+          hints: { 'Subjekt': '<span class="la">dividit</span> hat eine Personalendung (<span class="la">-t</span>): Es ist eine Verbform.',
+                   'Akkusativobjekt': '<span class="la">dividit</span> hat eine Personalendung (<span class="la">-t</span>): Es ist eine Verbform.',
+                   'Dativobjekt': '<span class="la">dividit</span> hat eine Personalendung (<span class="la">-t</span>): Es ist eine Verbform.',
+                   'Ablativ': '<span class="la">dividit</span> hat eine Personalendung (<span class="la">-t</span>): Es ist eine Verbform.',
+                   'Präpositionale Bestimmung': 'Hier steht keine Präposition.',
+                   'Adverbiale Bestimmung': 'Achte auf die Endung <span class="la">-t</span>: Das ist eine Personalendung.',
+                   'Prädikativum': 'Achte auf die Endung <span class="la">-t</span>: Das ist eine Personalendung.' },
+          success: 'Richtig! <span class="la">dividit</span> „trennt“: Deine Erwartung vom Anfang bestätigt sich. Das Verb steht nur einmal, gilt aber für beide Teile; im ersten Teil spart Caesar es ein (<strong>Ellipse</strong>). Dass es im Singular steht, obwohl Marne und Seine zwei sind, ist im Lateinischen möglich: Das Verb richtet sich oft nach dem nächststehenden Subjekt.' },
+        { type: 'mc',
+          prompt: '<strong>Jetzt übersetzen.</strong> Welche Übersetzung gibt den Satz richtig wieder?',
+          options: [
+              { text: 'Die Gallier trennen den Fluss Garonne von den Aquitaniern und die Marne und die Seine von den Belgern.',
+                feedback: 'Hier sind die Gallier zum Subjekt geworden. <span class="la">Gallos</span> ist aber ein Akkusativ, und <span class="la">dividit</span> steht im Singular.' },
+              { text: 'Der Fluss Garonne trennt die Gallier von den Aquitaniern, die Marne und die Seine trennen sie von den Belgern.', correct: true },
+              { text: 'Der Fluss Garonne trennt die Aquitanier von den Galliern, die Marne und die Seine trennen die Belger.',
+                feedback: 'Sieh dir die Präpositionen an: Getrennt werden die Gallier (Akkusativobjekt), und zwar <em>von</em> den Aquitaniern und <em>von</em> den Belgern. <span class="la">a Belgis</span> ist kein Objekt.' }
+          ],
+          success: 'Richtig! Das eingesparte Prädikat ergänzt du im Deutschen: „… trennen sie von den Belgern“. Du kannst auch Caesars Reihenfolge nachahmen: „Von den Aquitaniern trennt die Gallier der Fluss Garonne, von den Belgern die Marne und die Seine.“ Wichtig ist nur, dass Subjekt und Objekt stimmen.' }
+    ],
+    done: '<strong>Geschafft!</strong> Du hast den Satz vollständig analysiert und übersetzt, und zwar in seiner eigenen Reihenfolge: Block für Block, mit Erwartungen, die sich am Ende bestätigt haben. Genau so kannst du auch im Tool vorgehen.'
+}, UI.de);
+
+// ================= English function reference =================
+const FUNCTIONS_EN = [
+  { group: 'The core of the sentence', items: [
+    { n: 'Verb', s: 'What happens? The verb with a personal ending',
+      e: 'A verb form with a personal ending, including compound forms such as <span class="la">divisa est</span>. In Latin the verb often comes at the end of the sentence. (In grammar books it is also called the predicate.)',
+      f: 'What happens? What does someone do?',
+      u: 'Keep person, number, tense, mood (indicative/subjunctive) and voice (active/passive) exactly. The passive is formed with “be”: <span class="la">appellantur</span> ‘they are called’.',
+      x: ['Hi omnes lingua, institutis, legibus inter se <b>differunt</b>.', '‘All these <b>differ</b> from one another in language, institutions and laws.’'] },
+    { n: 'Subject', s: 'Who or what?',
+      e: 'It is in the nominative and agrees in number with the verb. Often it is only contained in the personal ending: <span class="la">venit</span> ‘he came’.',
+      f: 'Who or what does something or is something?',
+      u: 'As the subject. If it is only contained in the ending, add a pronoun (he, she, it, we …).',
+      x: ['Gallos ab Aquitanis <b>Garumna flumen</b> … dividit.', '‘<b>The river Garonne</b> separates the Gauls from the Aquitani.’'] }
+  ]},
+  { group: 'Objects: what the verb needs', items: [
+    { n: 'Accusative object', s: 'Whom or what?',
+      e: 'An accusative (<span class="la">-um, -am, -em, -os, -as, -es</span> …) required by the verb. Careful: an accusative after a preposition belongs to the prepositional phrase. An accusative together with an infinitive may be an accusative with infinitive.',
+      f: 'Whom or what?',
+      u: 'Usually as the direct object. Some verbs need a different construction in English: <span class="la">persuadere alicui</span> ‘to persuade someone’ takes a dative in Latin.',
+      x: ['<b>Arma virumque</b> cano.', '‘<b>Arms and the man</b> I sing.’'] },
+    { n: 'Dative object', s: 'To whom? For whom?',
+      e: 'A dative (<span class="la">-ae, -ō, -ī, -īs, -ibus</span>), often with verbs of giving, saying, helping and obeying. Careful: in the plural, dative and ablative always look the same. Decide by the meaning.',
+      f: 'To whom? For whom? In poetry also: where to?',
+      u: 'With “to” or “for”, or as an indirect object (“he gave <em>me</em> the book”); in poetry also as a direction: “to”.',
+      x: ['inferretque deos <b>Latio</b>', '‘and brought his gods <b>to Latium</b>’'] },
+    { n: 'Genitive object', s: 'Of what? With certain verbs',
+      e: 'A genitive required by a verb or adjective, especially with verbs of remembering and forgetting (<span class="la">meminisse, oblivisci</span>) and with adjectives such as <span class="la">cupidus, memor, peritus</span>. Don’t confuse it with the genitive attribute, which describes a <em>noun</em>.',
+      f: 'Of what? Of whom?',
+      u: 'Often as a direct object (“remember”, “forget”) or with “of” (“desirous of”, “mindful of”).',
+      x: ['Memento <b>mortis</b>!', '‘Remember <b>death</b>!’'] },
+    { n: 'Infinitive', s: 'The basic form: “to …”',
+      e: 'The basic form of the verb (<span class="la">-re, -ri, -i, -isse</span>). It often completes verbs such as <span class="la">audere, cupere, posse, velle, debere</span>.',
+      f: 'What does someone dare, want, manage or have to do?',
+      u: 'With “to”; after modal verbs (can, must, may) without “to”.',
+      x: ['vada salsa cita <b>decurrere</b> puppi ausi sunt', '‘they dared <b>to run</b> over the salt waters in a swift ship’'] }
+  ]},
+  { group: 'Circumstances: where, when, how, with what, why?', items: [
+    { n: 'Ablative', s: 'With what? By what? Where? When? From where?',
+      e: 'An ablative <em>without</em> a preposition (<span class="la">-ā, -ō, -e, -ī, -īs, -ibus</span>). In the tool every such ablative gets this label, whatever its meaning.',
+      f: 'With what? By what? (means, cause) · Where? When? (place, time) · From where? From what? (separation, origin) · In what respect?',
+      u: 'With a suitable preposition: with, by, in, on, from, out of, because of, in respect of.',
+      x: ['Hi omnes <b>lingua, institutis, legibus</b> inter se differunt.', '‘All these differ from one another <b>in language, institutions and laws</b>.’'] },
+    { n: 'Prepositional phrase', s: 'Preposition and noun',
+      e: 'A preposition (<span class="la">in, ad, ab, ex, cum, per, ob, inter</span> …) with its noun and the noun’s attributes. Watch the case: <span class="la">in</span> with the accusative means “into”, with the ablative “in, on”. Poets often put words between the preposition and its noun.',
+      f: 'Where? Where to? Where from? Why? With whom?',
+      u: 'Choose the English preposition that fits the context.',
+      x: ['Gallia est omnis divisa <b>in partes tres</b>.', '‘Gaul as a whole is divided <b>into three parts</b>.’'] },
+    { n: 'Adverb', s: 'When? How? How much?',
+      e: 'Adverbs and other words that do not change their form and state a circumstance: <span class="la">quondam, saepe, iam, multum, quoque, tandem</span>. (Also called adverbial.)',
+      f: 'When? How? How often? How much?',
+      u: 'Usually as an adverb.',
+      x: ['<b>multum</b> ille et terris iactatus et alto', '‘he, tossed about <b>much</b> on land and sea’'] },
+    { n: 'Predicative', s: 'As what? In what role?',
+      e: 'A noun or adjective that agrees with the subject or object in case, number and gender but at the same time says something about the action: in what state or role someone acts. Typical examples are <span class="la">primus, solus, totus, omnis, laetus, invitus</span>, as well as nouns with verbs such as <span class="la">appellari</span> ‘to be called’ or <span class="la">fieri</span> ‘to become’.',
+      f: 'As what? How? In what role?',
+      u: 'With “as” or “the first to …”, or as an adverb (“gladly”, “unwillingly”).',
+      x: ['Troiae qui <b>primus</b> ab oris … venit', '‘who <b>was the first</b> to come from the shores of Troy’'] },
+    { n: 'Vocative', s: 'Addressing someone',
+      e: 'A person who is addressed, often between commas, sometimes with <span class="la">o</span>. It usually looks like the nominative; only <span class="la">-us</span> becomes <span class="la">-e</span> (<span class="la">Marce</span>) and <span class="la">-ius</span> becomes <span class="la">-i</span> (<span class="la">Gai</span>).',
+      f: 'Who is being addressed?',
+      u: 'As a form of address.',
+      x: ['Quo usque tandem abutere, <b>Catilina</b>, patientia nostra?', '‘How long, <b>Catiline</b>, will you abuse our patience?’'] }
+  ]},
+  { group: 'Constructions', items: [
+    { n: 'Accusative/Nominative with infinitive', s: 'AcI/NcI: accusative or nominative with infinitive',
+      e: '<b>Accusative with infinitive (AcI):</b> after verbs of saying, thinking, perceiving and feeling (<span class="la">dicere, putare, videre, gaudere</span>) there is an accusative together with an infinitive. <b>Nominative with infinitive (NcI):</b> with passive verbs such as <span class="la">dicitur, videtur, putatur</span>, a nominative takes its place.',
+      f: 'What is said, thought or perceived?',
+      u: 'Translate the AcI with a “that” clause: the accusative becomes the subject, the infinitive the verb. Time: present infinitive = at the same time, perfect infinitive = before, future infinitive = after. English can often keep the NcI: “they are said to …”.',
+      x: ['Peliaco quondam prognatae vertice pinus / dicuntur <b>liquidas Neptuni nasse per undas</b>', '‘Pines, once grown on the summit of Pelion, are said <b>to have swum through the clear waves of Neptune</b>.’ (<span class="la">nasse</span> = <span class="la">navisse</span>, perfect infinitive: before)'] },
+    { n: 'Participial phrase', s: 'A participle referring to a noun',
+      e: 'A participle agrees in case, number and gender with a noun in the sentence and often has objects of its own. In the tool the construction is marked with a bracket; the participle gets the function of the word it refers to.',
+      f: 'What is someone doing at the same time? What has happened before?',
+      u: 'English can often keep the participle (“sweeping …”). Otherwise use a relative clause (“who …”), a subordinate clause (“while, after, because, although”) or “and”. Present active participle (<span class="la">-ns, -ntis</span>) = at the same time; perfect passive participle (<span class="la">-tus, -sus</span>) = before, passive; future active participle (<span class="la">-urus</span>) = after.',
+      x: ['<b>caerula verrentes abiegnis aequora palmis</b>', '‘<b>sweeping the blue waters with oars of fir</b>’'] },
+    { n: 'Ablative absolute', s: 'Noun and participle in the ablative',
+      e: 'A noun or pronoun stands together with a participle in the ablative. The group is grammatically detached from the rest of the sentence (“absolute”). Instead of the participle there may be a noun: <span class="la">Cicerone consule</span> ‘in the consulship of Cicero’.',
+      f: 'Under what circumstances does the action happen?',
+      u: 'As a subordinate clause with “when, after, because, while, although”, with the noun in the ablative becoming the subject; or more briefly with a preposition (after, with, because of, despite). The time relation depends on the participle.',
+      x: ['<b>His rebus cognitis</b> Caesar castra movit.', '‘<b>When Caesar had learned this</b>, he moved camp.’'] }
+  ]},
+  { group: 'Clauses and connections', items: [
+    { n: 'Relative clause', s: 'Introduced by qui, quae, quod',
+      e: 'Begins with a form of the relative pronoun (<span class="la">qui, quae, quod, cuius, cui, quem, quarum</span> …). The pronoun takes its gender and number from the word it refers to, but its case from its job in the relative clause.',
+      f: 'Which word does the pronoun refer to? What job does it do in the relative clause?',
+      u: 'With “who, which, that”. If a relative pronoun begins a sentence after a full stop (connecting relative), translate it with “this” or “he/she/it”.',
+      x: ['…, <b>qui ipsorum lingua Celtae, nostra Galli appellantur</b>.', '‘…, <b>who are called Celts in their own language and Gauls in ours</b>.’'] },
+    { n: 'Subordinate clause', s: 'Introduced by a subjunction',
+      e: 'Begins with a subjunction (<span class="la">cum, ut, ne, quod, si, dum, postquam</span> …) or a question word and has a verb of its own. Check whether this verb is in the subjunctive: that often decides the meaning of the subjunction.',
+      f: 'When? Why? For what purpose? On what condition?',
+      u: 'With the matching English conjunction.',
+      x: ['multa quoque et bello passus, <b>dum conderet urbem</b>', '‘he also suffered much in war, <b>until he founded the city</b>’'] },
+    { n: 'Subjunction', s: 'Subordinating: cum, ut, dum …',
+      e: 'Introduces a subordinate clause. Common ones are <span class="la">cum</span> (when, because, although), <span class="la">ut</span> (that, so that, as), <span class="la">ne</span> (so that … not, that), <span class="la">quod</span> (because, that), <span class="la">si</span> (if), <span class="la">postquam</span> (after) and <span class="la">dum</span> (while, as long as, until).',
+      f: 'What kind of meaning does the subordinate clause have?',
+      u: 'Choose the fitting meaning. Often the mood of the verb decides.',
+      x: ['<b>cum</b> lecti iuvenes … ausi sunt', '‘<b>when</b> chosen young men dared …’'] },
+    { n: 'Conjunction', s: 'Coordinating: et, -que, sed …',
+      e: 'Joins words or clauses of equal rank: <span class="la">et, -que, atque/ac, sed, aut, nam, enim, autem</span>. If it joins two parts with the same function, it belongs to their block in the tool (<span class="la">Matrona et Sequana</span>). If it joins whole clauses, it gets this label.',
+      f: 'What is being joined?',
+      u: 'With “and, but, or, for”. The attached <span class="la">-que</span> is translated before the word it is attached to: <span class="la">virumque</span> ‘and the man’.',
+      x: ['Arma <b>virumque</b> cano.', '‘Arms <b>and</b> the man I sing.’'] }
+  ]},
+  { group: 'Also', items: [
+    { n: 'Genitive attribute', gen: true, s: 'Whose? Of what? Gets underlined',
+      e: 'A genitive (<span class="la">-i, -ae, -is, -orum, -arum, -um</span>) that describes a noun more closely. It belongs to the block of that noun and gets its function. In the tool you also underline it with <strong>🖍️ Mark Genitive</strong>.',
+      f: 'Whose …? Of what …?',
+      u: 'With “of” or with “’s” (“Juno’s anger”). If it names a whole from which a part is taken, use “of”: <span class="la">quarum unam</span> ‘one of which’.',
+      x: ['<b>quarum</b> unam incolunt Belgae', '‘one <b>of which</b> the Belgae inhabit’'] },
+    { n: 'Other', s: 'Everything else',
+      e: 'Words without a function of their own in the structure of the sentence, for example exclamations (<span class="la">o, heu</span>) or question particles (<span class="la">-ne, num, nonne</span>).',
+      f: 'Does the word have a job in the sentence, or does it just signal something (a question, a feeling)?',
+      u: 'Depends on the word. Question particles only show that a question follows: <span class="la">Videsne?</span> ‘Do you see?’',
+      x: ['<b>Num</b> dubitas?', '‘You <b>don’t</b> doubt, <b>do you</b>?’ (<span class="la">num</span> expects the answer “no”)'] }
+  ]}
+];
+
+const ALL_LABELS_EN = ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Ablative', 'Prepositional phrase', 'Adverb', 'Predicative'];
+const NOT_VERB = '<span class="la">dividit</span> has a personal ending (<span class="la">-t</span>): it is a verb form.';
+
+// ---------- Example 1 (English): Caesar, De bello Gallico 1,1 ----------
+makeWalkthrough(document.getElementById('wt1-en'), {
+    source: 'Caesar, <em>De bello Gallico</em> 1.1',
+    words: [
+        { id: 'g', text: 'Gallos' }, { id: 'aq', text: 'ab Aquitanis' }, { id: 'gf', text: 'Garumna flumen' }, { punct: true, text: ',' },
+        { id: 'bel', text: 'a Belgis' }, { id: 'ms', text: 'Matrona et Sequana' }, { id: 'div', text: 'dividit' }, { punct: true, text: '.' }
+    ],
+    steps: [
+        { type: 'choose', word: 'g', correct: 'Accusative object', options: ALL_LABELS_EN,
+          prompt: '<strong>The first block: <span class="la">Gallos</span>.</strong> What is its most likely function? Look at the ending.',
+          hints: { 'Subject': 'The ending <span class="la">-os</span> shows the accusative plural. As the subject, the nominative <span class="la">Galli</span> would be used.',
+                   'Dative object': 'The dative plural of the 2nd declension ends in <span class="la">-īs</span>, not in <span class="la">-os</span>.',
+                   'Ablative': 'The ablative plural of the 2nd declension ends in <span class="la">-īs</span>, not in <span class="la">-os</span>.',
+                   'Prepositional phrase': 'There is no preposition before <span class="la">Gallos</span>.',
+                   'Verb': '<span class="la">Gallos</span> is a noun, not a verb form.',
+                   'Adverb': '<span class="la">Gallos</span> is a noun with a case ending, not an adverb.',
+                   'Predicative': 'A predicative states a role or a state (“as …”). Just look at the case.' },
+          success: 'Correct! <span class="la">-os</span> is accusative plural: ‘the Gauls’. So you already know: someone is doing something <em>to</em> the Gauls. Who and what, the sentence will tell you. Keep that question in mind.' },
+        { type: 'choose', word: 'aq', correct: 'Prepositional phrase', options: ALL_LABELS_EN,
+          prompt: '<strong>Next: <span class="la">ab Aquitanis</span>.</strong> What function does this block have?',
+          hints: { 'Ablative': '<span class="la">Aquitanis</span> is in the ablative, but together with the preposition <span class="la">ab</span>. Then the two form a different function.',
+                   'Dative object': '<span class="la">-īs</span> could be a dative, but look at the word before it.',
+                   'Accusative object': '<span class="la">-īs</span> is dative or ablative plural, not accusative.',
+                   'Subject': 'The subject is in the nominative, never after a preposition.',
+                   'Verb': 'There is no verb form here.',
+                   'Adverb': 'Nearly: it is about a circumstance. But here a preposition stands with its noun, and that has a label of its own.',
+                   'Predicative': 'A predicative stands without a preposition and agrees with the subject or object.' },
+          success: 'Correct! <span class="la">ab</span> with the ablative: ‘from the Aquitani’. Together: ‘the Gauls … from the Aquitani’. That sounds like separating or distinguishing – a first expectation of the verb!' },
+        { type: 'choose', word: 'gf', correct: 'Subject', options: ALL_LABELS_EN,
+          prompt: '<strong>Now <span class="la">Garumna flumen</span>.</strong> What function does this block have?',
+          hints: { 'Accusative object': '<span class="la">flumen</span> could be accusative, but <span class="la">Garumna</span> could not. The accusative would be <span class="la">Garumnam</span>.',
+                   'Ablative': '<span class="la">Garumna</span> could be ablative, but <span class="la">flumen</span> could not. The ablative would be <span class="la">flumine</span>.',
+                   'Dative object': 'The dative would be <span class="la">Garumnae flumini</span>.',
+                   'Prepositional phrase': 'There is no preposition before <span class="la">Garumna</span>.',
+                   'Verb': 'There is no verb form here.',
+                   'Adverb': 'These are nouns, not adverbs.',
+                   'Predicative': 'A predicative says in what role someone acts. Here the question is <em>who</em> acts.' },
+          success: 'Correct! The two words only fit together in the nominative: ‘the river Garonne’. <span class="la">flumen</span> is an apposition, a further explanation of <span class="la">Garumna</span>, and belongs in the same block. Now you have almost the whole thought: ‘the river Garonne … the Gauls … from the Aquitani’. Only the verb is missing.' },
+        { type: 'choose', word: 'bel', correct: 'Prepositional phrase', options: ALL_LABELS_EN,
+          prompt: '<strong>After the comma: <span class="la">a Belgis</span>.</strong> What function does this block have?',
+          hints: { 'Ablative': 'As before: here the ablative comes after the preposition <span class="la">a</span>.',
+                   'Dative object': 'Look at the little word before <span class="la">Belgis</span>.',
+                   'Accusative object': '<span class="la">-īs</span> is dative or ablative plural, not accusative.',
+                   'Subject': 'The subject is in the nominative, never after a preposition.',
+                   'Verb': 'There is no verb form here.',
+                   'Adverb': 'A preposition and its noun together have a label of their own.',
+                   'Predicative': 'A predicative stands without a preposition.' },
+          success: 'Exactly! <span class="la">a</span> is the same preposition as <span class="la">ab</span>; before consonants the short form is common. ‘From the Belgae’ repeats the pattern of <span class="la">ab Aquitanis</span>. So you can expect someone else who separates to be named next.' },
+        { type: 'choose', word: 'ms', correct: 'Subject', options: ALL_LABELS_EN,
+          prompt: '<strong><span class="la">Matrona et Sequana</span>.</strong> Is your expectation fulfilled? What function does this block have?',
+          hints: { 'Accusative object': 'An accusative of the 1st declension ends in <span class="la">-am</span>, not in <span class="la">-a</span>.',
+                   'Ablative': '<span class="la">-a</span> can be an ablative. But the second part, just like the first, needs someone who does the separating. Compare <span class="la">Garumna flumen</span>.',
+                   'Prepositional phrase': 'There is no preposition before <span class="la">Matrona</span>; the <span class="la">a</span> belongs to <span class="la">Belgis</span>.',
+                   'Dative object': 'The dative of the 1st declension ends in <span class="la">-ae</span>.',
+                   'Verb': 'There is no verb form here.',
+                   'Adverb': 'These are nouns, not adverbs.',
+                   'Predicative': 'A predicative says in what role someone acts. Here the question is <em>who</em> acts.' },
+          success: 'Correct! ‘The Marne and the Seine’ match <span class="la">Garumna flumen</span> in the first part: they are the subject of the second part. Because <span class="la">et</span> joins two parts with the same function, it belongs in the block.' },
+        { type: 'choose', word: 'div', correct: 'Verb', options: ALL_LABELS_EN,
+          prompt: '<strong>Finally: <span class="la">dividit</span>.</strong> What function does the last word have, and does it confirm your expectation?',
+          hints: { 'Subject': NOT_VERB, 'Accusative object': NOT_VERB, 'Dative object': NOT_VERB, 'Ablative': NOT_VERB,
+                   'Prepositional phrase': 'There is no preposition here.',
+                   'Adverb': 'Look at the ending <span class="la">-t</span>: that is a personal ending.',
+                   'Predicative': 'Look at the ending <span class="la">-t</span>: that is a personal ending.' },
+          success: 'Correct! <span class="la">dividit</span> ‘separates’: your expectation from the beginning is confirmed. The verb appears only once but applies to both parts; Caesar leaves it out in the first part (<strong>ellipsis</strong>). It is singular even though the Marne and the Seine are two – that is possible in Latin: the verb often agrees with the nearest subject.' },
+        { type: 'mc',
+          prompt: '<strong>Now translate.</strong> Which translation renders the sentence correctly?',
+          options: [
+              { text: 'The Gauls separate the river Garonne from the Aquitani, and the Marne and the Seine from the Belgae.',
+                feedback: 'Here the Gauls have become the subject. But <span class="la">Gallos</span> is an accusative, and <span class="la">dividit</span> is singular.' },
+              { text: 'The river Garonne separates the Gauls from the Aquitani; the Marne and the Seine separate them from the Belgae.', correct: true },
+              { text: 'The river Garonne separates the Aquitani from the Gauls; the Marne and the Seine separate the Belgae.',
+                feedback: 'Look at the prepositions: it is the Gauls (accusative object) who are separated – <em>from</em> the Aquitani and <em>from</em> the Belgae. <span class="la">a Belgis</span> is not an object.' }
+          ],
+          success: 'Correct! In English you add the verb that Caesar leaves out: ‘… separate them from the Belgae’. And you put the subject first, as English requires – but you had already understood the sentence in its Latin order.' }
+    ],
+    done: '<strong>Done!</strong> You have analysed and translated the whole sentence – in its own order: block by block, with expectations that were confirmed at the end. You can work in exactly the same way in the tool.'
+}, UI.en);
+
+// Sentence layout shared by both languages: blocks and the bracket as on the student page
+const WT2_LAYOUT = [
+    { block: 'b1', words: [{ id: 'hor', text: 'Horum' }, { id: 'omn', text: 'omnium' }, { id: 'for', text: 'fortissimi' }] },
+    { block: 'bsunt', words: [{ id: 'sunt', text: 'sunt' }] },
+    { block: 'bbel', words: [{ id: 'bel', text: 'Belgae' }] },
+    { punct: ',' },
+    { group: 'g1', items: [
+        { block: 'bpq', words: [{ id: 'prop', text: 'propterea' }, { id: 'quod', text: 'quod' }] },
+        { block: 'bpp', words: [{ id: 'a', text: 'a' }, { id: 'cul', text: 'cultu' }, { id: 'atq', text: 'atque' }, { id: 'hum', text: 'humanitate' }, { id: 'prov', text: 'provinciae' }] },
+        { block: 'blon', words: [{ id: 'lon', text: 'longissime' }] },
+        { block: 'babs', words: [{ id: 'abs', text: 'absunt' }] }
+    ]},
+    { punct: '.' }
+];
+
+// ---------- Example 2 (German) ----------
+const SPAETER = 'So weit musst du nicht lesen: Das Bezugswort steht noch vor dem Komma.';
+makeWalkthrough(document.getElementById('wt2-de'), {
+    source: 'Caesar, <em>De bello Gallico</em> 1,1, direkt im Anschluss an den Satz aus Abschnitt 4',
+    layout: WT2_LAYOUT,
+    steps: [
+        { type: 'mc', highlight: ['hor', 'omn'],
+          prompt: '<strong>Der erste Block beginnt mit <span class="la">Horum omnium</span>.</strong> In welchem Kasus stehen diese beiden Wörter? Achte auf die Endungen <span class="la">-orum</span> und <span class="la">-ium</span>.',
+          options: [
+              { text: 'Nominativ Plural', feedback: 'Der Nominativ Plural hieße <span class="la">hi omnes</span>, wie im Satz <span class="la">Hi omnes lingua … differunt</span>.' },
+              { text: 'Genitiv Plural', correct: true },
+              { text: 'Akkusativ Plural', feedback: 'Der Akkusativ Plural hieße <span class="la">hos omnes</span>.' }
+          ],
+          success: 'Richtig! <span class="la">-orum</span> und <span class="la">-ium</span> sind Endungen des Genitiv Plural: „dieser aller“. Ein Genitiv bestimmt meist ein anderes Wort näher. Halte also die Frage im Kopf: <em>Wessen …?</em> Das Bezugswort kommt noch.' },
+        { type: 'word', target: 'for',
+          prompt: '<strong>Lies weiter.</strong> Auf welches Wort bezieht sich <span class="la">horum omnium</span>? Klicke es an.',
+          hints: { hor: 'Das ist ein Teil des Genitivs selbst. Gesucht ist das Wort, das er näher bestimmt.', omn: 'Das ist ein Teil des Genitivs selbst. Gesucht ist das Wort, das er näher bestimmt.',
+                   sunt: '<span class="la">sunt</span> ist eine Verbform. Ein Genitivattribut bestimmt ein Substantiv oder ein Adjektiv näher.',
+                   bel: 'Fast! Aber vorher steht schon ein Wort, das nach einem Genitiv geradezu verlangt: ein Superlativ (<span class="la">-issimus</span>).',
+                   prop: SPAETER, quod: SPAETER, a: SPAETER, cul: SPAETER, atq: SPAETER, hum: SPAETER, prov: SPAETER, lon: SPAETER, abs: SPAETER },
+          success: 'Richtig! <span class="la">fortissimi</span> „die tapfersten“ ist ein Superlativ. Die tapfersten von wem? <span class="la">Horum omnium</span>: „von diesen allen“. Ein solcher Genitiv heißt <strong>Genitivus partitivus</strong>; du übersetzt ihn mit „von“. Deshalb stehen die drei Wörter im Tool in <em>einem</em> Block.' },
+        { type: 'gen', target: ['hor', 'omn'],
+          prompt: '<strong>Den Genitiv markieren.</strong> Markiere jetzt <span class="la">horum</span> und <span class="la">omnium</span> als Genitivattribut, eines nach dem anderen.',
+          hints: { for: '<span class="la">fortissimi</span> ist das Bezugswort, nicht der Genitiv.' },
+          found: { hor: '<span class="la">horum</span> ist unterstrichen.', omn: '<span class="la">omnium</span> ist unterstrichen.' },
+          success: 'Beide Wörter sind unterstrichen. Im Tool markierst du jedes Wort des Genitivattributs einzeln.' },
+        { type: 'label', items: { b1: { correct: 'Prädikativum',
+              hints: { 'Subjekt': '<span class="la">fortissimi</span> sagt, <em>was</em> jemand ist, nicht <em>wer</em>. Das Subjekt kommt noch.',
+                       'Prädikat': 'In diesem Block steht keine Verbform. Das Prädikat ist <span class="la">sunt</span>.',
+                       'Akkusativobjekt': '<span class="la">fortissimi</span> steht im Nominativ Plural, nicht im Akkusativ.',
+                       'Adverbiale Bestimmung': '<span class="la">fortissimi</span> ist ein Adjektiv mit Kasusendung, kein Adverb.',
+                       'Genitivobjekt': 'Der Genitiv ist nur ein Teil des Blocks. Es geht um die Funktion des Bezugswortes <span class="la">fortissimi</span>.' },
+              success: 'Richtig! <span class="la">fortissimi</span> bildet zusammen mit <span class="la">sunt</span> die Aussage „sind die tapfersten“ (ein Prädikatsnomen). Im Tool heißt diese Funktion <em>Prädikativum</em>.' } },
+          prompt: '<strong>Die Funktion des ganzen Blocks.</strong> Welche Funktion hat <span class="la">horum omnium fortissimi</span>? Tipp: Zusammen mit dem nächsten Wort <span class="la">sunt</span> sagt <span class="la">fortissimi</span>, <em>was</em> jemand ist.' },
+        { type: 'label', items: {
+              bsunt: { correct: 'Prädikat', hints: { 'Subjekt': '<span class="la">sunt</span> hat eine Personalendung (<span class="la">-nt</span>): Es ist eine Verbform.' }, success: '<span class="la">sunt</span> ist das Prädikat: „sie sind“.' },
+              bbel: { correct: 'Subjekt', hints: { 'Prädikativum': '<span class="la">Belgae</span> sagt, <em>wer</em> gemeint ist.', 'Akkusativobjekt': '<span class="la">-ae</span> ist hier Nominativ Plural.', 'Dativobjekt': '<span class="la">-ae</span> ist hier Nominativ Plural: Wer ist am tapfersten?' }, success: '<span class="la">Belgae</span> ist das Subjekt: „die Belger“.' } },
+          prompt: '<strong>Weiter mit <span class="la">sunt</span> und <span class="la">Belgae</span>.</strong> Bestimme beide Blöcke.',
+          success: 'Der Hauptsatz ist fertig: „Die Belger sind die tapfersten von diesen allen.“' },
+        { type: 'label', items: {
+              g1: { correct: 'Nebensatz', hints: { 'Relativsatz': 'Ein Relativsatz beginnt mit einem Relativpronomen (<span class="la">qui, quae, quod</span> …). <span class="la">propterea quod</span> ist aber eine Subjunktion: „weil“.', 'AcI/NcI': 'In diesem Satzteil steht kein Infinitiv.', 'Partizipialkonstruktion': 'Hier steht kein Partizip; der Satzteil hat ein eigenes Prädikat (<span class="la">absunt</span>).', 'Ablativus absolutus': 'Hier steht kein Partizip im Ablativ; der Satzteil hat ein eigenes Prädikat (<span class="la">absunt</span>).' }, success: 'Die Klammer ist ein <strong>Nebensatz</strong>.' },
+              bpq: { correct: 'Subjunktion', hints: { 'Konjunktion': '<span class="la">propterea quod</span> verbindet nicht gleichrangig, sondern ordnet unter: Es leitet einen Nebensatz ein.', 'Adverbiale Bestimmung': '<span class="la">propterea</span> allein wäre ein Adverb („deswegen“). Zusammen mit <span class="la">quod</span> leitet es aber einen Nebensatz ein.' }, success: '<span class="la">propterea quod</span> „weil“ ist eine <strong>Subjunktion</strong>.' } },
+          prompt: '<strong>Nach dem Komma</strong> beginnt mit <span class="la">propterea quod</span> „weil“ ein Nebensatz. Im Tool steht er unter einer Klammer mit einem <strong>?</strong>. Bestimme die Klammer (Klick auf das <strong>?</strong>) und den Block <span class="la">propterea quod</span>.',
+          success: 'Alle Wörter unter der Klammer bestimmst du nun nach ihrer Aufgabe <em>innerhalb</em> des Nebensatzes.' },
+        { type: 'gen', target: ['prov'],
+          prompt: '<strong>Lies im Nebensatz weiter.</strong> Darin steckt wieder ein Genitivattribut. Finde und markiere es.',
+          hints: { a: '<span class="la">a</span> ist eine Präposition; sie verlangt den Ablativ.',
+                   cul: '<span class="la">cultu</span> ist Ablativ Singular (u-Deklination), abhängig von <span class="la">a</span>.',
+                   atq: '<span class="la">atque</span> ist eine Konjunktion: „und“.',
+                   hum: '<span class="la">humanitate</span> ist Ablativ Singular (3. Deklination), ebenfalls abhängig von <span class="la">a</span>.',
+                   lon: '<span class="la">longissime</span> ist ein Adverb im Superlativ: „am weitesten“.',
+                   abs: '<span class="la">absunt</span> ist eine Verbform: „sie sind entfernt“.',
+                   prop: '<span class="la">propterea quod</span> leitet den Nebensatz ein.', quod: '<span class="la">propterea quod</span> leitet den Nebensatz ein.',
+                   hor: 'Diesen Genitiv hast du schon markiert. Gesucht ist einer im Nebensatz.', omn: 'Diesen Genitiv hast du schon markiert. Gesucht ist einer im Nebensatz.' },
+          found: { prov: '<span class="la">provinciae</span>: Die Endung <span class="la">-ae</span> könnte auch Dativ Singular oder Nominativ Plural sein. Hier aber bestimmt das Wort etwas näher, und das macht es zum Genitiv: „der Provinz“.' },
+          success: 'Richtig!' },
+        { type: 'word', multi: true, target: ['cul', 'hum'],
+          prompt: '<strong>Das Bezugswort.</strong> Welche Substantive bestimmt <span class="la">provinciae</span> näher? Es sind zwei. Klicke beide an.',
+          hints: { a: '<span class="la">a</span> ist die Präposition.', atq: '<span class="la">atque</span> verbindet die beiden gesuchten Wörter.',
+                   lon: '<span class="la">longissime</span> ist ein Adverb.', abs: '<span class="la">absunt</span> ist das Prädikat des Nebensatzes.',
+                   prov: 'Das ist das Genitivattribut selbst.' },
+          generic: 'Die gesuchten Wörter stehen im selben Block, direkt vor <span class="la">provinciae</span>.',
+          found: { cul: '<span class="la">cultu</span>: „von der Lebensweise der Provinz“.', hum: '<span class="la">humanitate</span>: „von der Kultur der Provinz“.' },
+          success: 'Beide gefunden! Das Genitivattribut gilt für beide Substantive, die mit <span class="la">atque</span> verbunden sind. Deshalb stehen Präposition, beide Substantive und <span class="la">provinciae</span> in einem einzigen Block.' },
+        { type: 'label', items: { bpp: { correct: 'Präpositionale Bestimmung',
+              hints: { 'Ablativ': '<span class="la">cultu</span> und <span class="la">humanitate</span> stehen zwar im Ablativ, aber nach der Präposition <span class="la">a</span>.',
+                       'Genitivobjekt': 'Der Genitiv ist nur ein Teil des Blocks. Achte auf das erste Wort.',
+                       'Dativobjekt': 'Achte auf das erste Wort des Blocks.',
+                       'Subjekt': 'Nach einer Präposition steht nie das Subjekt.' },
+              success: 'Richtig! <span class="la">a cultu atque humanitate provinciae</span> ist eine <strong>präpositionale Bestimmung</strong>: „von der Lebensweise und Kultur der Provinz“.' } },
+          prompt: '<strong>Die Funktion des ganzen Blocks.</strong> Welche Funktion hat <span class="la">a cultu atque humanitate provinciae</span>?' },
+        { type: 'label', items: {
+              blon: { correct: 'Adverbiale Bestimmung', hints: { 'Prädikativum': '<span class="la">longissime</span> ist ein Adverb: Die Endung <span class="la">-issime</span> zeigt den Superlativ eines Adverbs.', 'Ablativ': '<span class="la">longissime</span> ist kein Substantiv, sondern ein Adverb.' }, success: '<span class="la">longissime</span> „am weitesten“ ist eine <strong>adverbiale Bestimmung</strong>.' },
+              babs: { correct: 'Prädikat', hints: { 'Subjekt': '<span class="la">absunt</span> hat eine Personalendung (<span class="la">-nt</span>): Es ist eine Verbform. Das Subjekt steckt darin: „sie“.' }, success: '<span class="la">absunt</span> „sie sind entfernt“ ist das <strong>Prädikat</strong> des Nebensatzes.' } },
+          prompt: '<strong>Die letzten beiden Blöcke:</strong> <span class="la">longissime</span> und <span class="la">absunt</span>.',
+          success: 'Damit ist jeder Block bestimmt.' },
+        { type: 'mc',
+          prompt: '<strong>Jetzt übersetzen.</strong> Welche Übersetzung ist richtig?',
+          options: [
+              { text: 'Die Belger sind tapferer als diese alle, weil sie von der Provinz, ihrer Lebensweise und Kultur am weitesten entfernt sind.',
+                feedback: '<span class="la">fortissimi</span> ist ein Superlativ („die tapfersten“), kein Komparativ. Und <span class="la">provinciae</span> ist kein eigenes Glied einer Aufzählung, sondern ein Genitivattribut zu <span class="la">cultu atque humanitate</span>: „der Provinz“.' },
+              { text: 'Von diesen allen sind die Belger die tapfersten, weil sie von der Lebensweise und Kultur der Provinz am weitesten entfernt sind.', correct: true },
+              { text: 'Die tapfersten von allen sind die Belger, weil die Provinz am weitesten von ihrer Lebensweise und Kultur entfernt ist.',
+                feedback: '<span class="la">provinciae</span> ist hier nicht das Subjekt, sondern ein Genitivattribut („der Provinz“). Das Subjekt des Nebensatzes steckt in <span class="la">absunt</span>: „sie“, also die Belger.' }
+          ],
+          success: 'Richtig! Beide Genitive übersetzt du so, dass ihr Bezugswort deutlich wird: „die tapfersten <em>von diesen allen</em>“ und „die Lebensweise und Kultur <em>der Provinz</em>“.' }
+    ],
+    done: '<strong>Geschafft!</strong> Genau so sieht der fertig bearbeitete Satz auch im Tool aus: Jeder Block hat seine Funktion, die Genitivattribute sind unterstrichen, und der Nebensatz steht unter seiner Klammer.'
+}, UI.de);
+
+// ---------- Example 2 (English) ----------
+const LATER_EN = 'You don’t need to read that far: the word it belongs to comes before the comma.';
+makeWalkthrough(document.getElementById('wt2-en'), {
+    source: 'Caesar, <em>De bello Gallico</em> 1.1, directly after the sentence from section 4',
+    layout: WT2_LAYOUT,
+    steps: [
+        { type: 'mc', highlight: ['hor', 'omn'],
+          prompt: '<strong>The first block begins with <span class="la">Horum omnium</span>.</strong> What case are these two words in? Look at the endings <span class="la">-orum</span> and <span class="la">-ium</span>.',
+          options: [
+              { text: 'Nominative plural', feedback: 'The nominative plural would be <span class="la">hi omnes</span>, as in the sentence <span class="la">Hi omnes lingua … differunt</span>.' },
+              { text: 'Genitive plural', correct: true },
+              { text: 'Accusative plural', feedback: 'The accusative plural would be <span class="la">hos omnes</span>.' }
+          ],
+          success: 'Correct! <span class="la">-orum</span> and <span class="la">-ium</span> are genitive plural endings: ‘of all these’. A genitive usually describes another word. So keep the question in mind: <em>whose …? of what …?</em> The word it belongs to is still to come.' },
+        { type: 'word', target: 'for',
+          prompt: '<strong>Read on.</strong> Which word does <span class="la">horum omnium</span> belong to? Click on it.',
+          hints: { hor: 'That is part of the genitive itself. You are looking for the word it describes.', omn: 'That is part of the genitive itself. You are looking for the word it describes.',
+                   sunt: '<span class="la">sunt</span> is a verb form. A genitive attribute describes a noun or an adjective.',
+                   bel: 'Nearly! But before it there is already a word that practically calls for a genitive: a superlative (<span class="la">-issimus</span>).',
+                   prop: LATER_EN, quod: LATER_EN, a: LATER_EN, cul: LATER_EN, atq: LATER_EN, hum: LATER_EN, prov: LATER_EN, lon: LATER_EN, abs: LATER_EN },
+          success: 'Correct! <span class="la">fortissimi</span> ‘the bravest’ is a superlative. The bravest of whom? <span class="la">Horum omnium</span>: ‘of all these’. Such a genitive is called a <strong>partitive genitive</strong>; you translate it with “of”. That is why the three words form <em>one</em> block in the tool.' },
+        { type: 'gen', target: ['hor', 'omn'],
+          prompt: '<strong>Mark the genitive.</strong> Now mark <span class="la">horum</span> and <span class="la">omnium</span> as a genitive attribute, one after the other.',
+          hints: { for: '<span class="la">fortissimi</span> is the word it belongs to, not the genitive.' },
+          found: { hor: '<span class="la">horum</span> is underlined.', omn: '<span class="la">omnium</span> is underlined.' },
+          success: 'Both words are underlined. In the tool you mark each word of the genitive attribute separately.' },
+        { type: 'label', items: { b1: { correct: 'Predicative',
+              hints: { 'Subject': '<span class="la">fortissimi</span> says <em>what</em> someone is, not <em>who</em>. The subject is still to come.',
+                       'Verb': 'There is no verb form in this block. The verb is <span class="la">sunt</span>.',
+                       'Accusative object': '<span class="la">fortissimi</span> is nominative plural, not accusative.',
+                       'Adverb': '<span class="la">fortissimi</span> is an adjective with a case ending, not an adverb.',
+                       'Genitive object': 'The genitive is only part of the block. It is about the function of the word it belongs to, <span class="la">fortissimi</span>.' },
+              success: 'Correct! <span class="la">fortissimi</span> together with <span class="la">sunt</span> makes the statement ‘are the bravest’ (a predicate complement). In the tool this function is called <em>Predicative</em>.' } },
+          prompt: '<strong>The function of the whole block.</strong> What function does <span class="la">horum omnium fortissimi</span> have? Tip: together with the next word, <span class="la">sunt</span>, <span class="la">fortissimi</span> says <em>what</em> someone is.' },
+        { type: 'label', items: {
+              bsunt: { correct: 'Verb', hints: { 'Subject': '<span class="la">sunt</span> has a personal ending (<span class="la">-nt</span>): it is a verb form.' }, success: '<span class="la">sunt</span> is the verb: ‘they are’.' },
+              bbel: { correct: 'Subject', hints: { 'Predicative': '<span class="la">Belgae</span> says <em>who</em> is meant.', 'Accusative object': '<span class="la">-ae</span> is nominative plural here.', 'Dative object': '<span class="la">-ae</span> is nominative plural here: who are the bravest?' }, success: '<span class="la">Belgae</span> is the subject: ‘the Belgae’.' } },
+          prompt: '<strong>Next: <span class="la">sunt</span> and <span class="la">Belgae</span>.</strong> Work out the function of both blocks.',
+          success: 'The main clause is complete: ‘The Belgae are the bravest of all these.’' },
+        { type: 'label', items: {
+              g1: { correct: 'Subordinate clause', hints: { 'Relative clause': 'A relative clause begins with a relative pronoun (<span class="la">qui, quae, quod</span> …). But <span class="la">propterea quod</span> is a subjunction: ‘because’.', 'Accusative/Nominative with infinitive': 'There is no infinitive in this part of the sentence.', 'Participial phrase': 'There is no participle here; this part has a verb of its own (<span class="la">absunt</span>).', 'Ablative absolute': 'There is no participle in the ablative here; this part has a verb of its own (<span class="la">absunt</span>).' }, success: 'The bracket is a <strong>subordinate clause</strong>.' },
+              bpq: { correct: 'Subjunction', hints: { 'Conjunction': '<span class="la">propterea quod</span> does not join two equal parts; it subordinates: it introduces a subordinate clause.', 'Adverb': '<span class="la">propterea</span> on its own would be an adverb (‘therefore’). But together with <span class="la">quod</span> it introduces a subordinate clause.' }, success: '<span class="la">propterea quod</span> ‘because’ is a <strong>subjunction</strong>.' } },
+          prompt: '<strong>After the comma</strong>, a subordinate clause begins with <span class="la">propterea quod</span> ‘because’. In the tool it stands under a bracket marked <strong>?</strong>. Work out the function of the bracket (click the <strong>?</strong>) and of the block <span class="la">propterea quod</span>.',
+          success: 'You now analyse all the words under the bracket according to their job <em>within</em> the subordinate clause.' },
+        { type: 'gen', target: ['prov'],
+          prompt: '<strong>Read on in the subordinate clause.</strong> It contains another genitive attribute. Find it and mark it.',
+          hints: { a: '<span class="la">a</span> is a preposition; it takes the ablative.',
+                   cul: '<span class="la">cultu</span> is ablative singular (4th declension), depending on <span class="la">a</span>.',
+                   atq: '<span class="la">atque</span> is a conjunction: ‘and’.',
+                   hum: '<span class="la">humanitate</span> is ablative singular (3rd declension), also depending on <span class="la">a</span>.',
+                   lon: '<span class="la">longissime</span> is an adverb in the superlative: ‘furthest’.',
+                   abs: '<span class="la">absunt</span> is a verb form: ‘they are away’.',
+                   prop: '<span class="la">propterea quod</span> introduces the subordinate clause.', quod: '<span class="la">propterea quod</span> introduces the subordinate clause.',
+                   hor: 'You have already marked this genitive. You are looking for one in the subordinate clause.', omn: 'You have already marked this genitive. You are looking for one in the subordinate clause.' },
+          found: { prov: '<span class="la">provinciae</span>: the ending <span class="la">-ae</span> could also be dative singular or nominative plural. But here the word describes something else more closely, and that makes it a genitive: ‘of the province’.' },
+          success: 'Correct!' },
+        { type: 'word', multi: true, target: ['cul', 'hum'],
+          prompt: '<strong>The word it belongs to.</strong> Which nouns does <span class="la">provinciae</span> describe? There are two. Click on both.',
+          hints: { a: '<span class="la">a</span> is the preposition.', atq: '<span class="la">atque</span> joins the two words you are looking for.',
+                   lon: '<span class="la">longissime</span> is an adverb.', abs: '<span class="la">absunt</span> is the verb of the subordinate clause.',
+                   prov: 'That is the genitive attribute itself.' },
+          generic: 'The words you are looking for are in the same block, directly before <span class="la">provinciae</span>.',
+          found: { cul: '<span class="la">cultu</span>: ‘from the way of life of the province’.', hum: '<span class="la">humanitate</span>: ‘from the culture of the province’.' },
+          success: 'Both found! The genitive attribute applies to both nouns joined by <span class="la">atque</span>. That is why the preposition, both nouns and <span class="la">provinciae</span> form a single block.' },
+        { type: 'label', items: { bpp: { correct: 'Prepositional phrase',
+              hints: { 'Ablative': '<span class="la">cultu</span> and <span class="la">humanitate</span> are in the ablative, but after the preposition <span class="la">a</span>.',
+                       'Genitive object': 'The genitive is only part of the block. Look at the first word.',
+                       'Dative object': 'Look at the first word of the block.',
+                       'Subject': 'The subject never comes after a preposition.' },
+              success: 'Correct! <span class="la">a cultu atque humanitate provinciae</span> is a <strong>prepositional phrase</strong>: ‘from the way of life and culture of the province’.' } },
+          prompt: '<strong>The function of the whole block.</strong> What function does <span class="la">a cultu atque humanitate provinciae</span> have?' },
+        { type: 'label', items: {
+              blon: { correct: 'Adverb', hints: { 'Predicative': '<span class="la">longissime</span> is an adverb: the ending <span class="la">-issime</span> shows the superlative of an adverb.', 'Ablative': '<span class="la">longissime</span> is not a noun but an adverb.' }, success: '<span class="la">longissime</span> ‘furthest’ is an <strong>adverb</strong>.' },
+              babs: { correct: 'Verb', hints: { 'Subject': '<span class="la">absunt</span> has a personal ending (<span class="la">-nt</span>): it is a verb form. The subject is contained in it: ‘they’.' }, success: '<span class="la">absunt</span> ‘they are away’ is the <strong>verb</strong> of the subordinate clause.' } },
+          prompt: '<strong>The last two blocks:</strong> <span class="la">longissime</span> and <span class="la">absunt</span>.',
+          success: 'Now every block has its function.' },
+        { type: 'mc',
+          prompt: '<strong>Now translate.</strong> Which translation is correct?',
+          options: [
+              { text: 'The Belgae are braver than all these, because they are furthest away from the province, its way of life and culture.',
+                feedback: '<span class="la">fortissimi</span> is a superlative (‘the bravest’), not a comparative. And <span class="la">provinciae</span> is not a separate item in a list, but a genitive attribute to <span class="la">cultu atque humanitate</span>: ‘of the province’.' },
+              { text: 'Of all these, the Belgae are the bravest, because they are furthest away from the way of life and culture of the province.', correct: true },
+              { text: 'The bravest of all are the Belgae, because the province is furthest away from their way of life and culture.',
+                feedback: '<span class="la">provinciae</span> is not the subject here but a genitive attribute (‘of the province’). The subject of the subordinate clause is contained in <span class="la">absunt</span>: ‘they’, i.e. the Belgae.' }
+          ],
+          success: 'Correct! Translate both genitives so that the word they belong to is clear: ‘the bravest <em>of all these</em>’ and ‘the way of life and culture <em>of the province</em>’.' }
+    ],
+    done: '<strong>Done!</strong> This is exactly how the finished sentence looks in the tool: every block has its function, the genitive attributes are underlined, and the subordinate clause stands under its bracket.'
+}, UI.en);
+
+renderFunctions('fn-list-en', FUNCTIONS_EN, ['Recognise', 'Ask', 'Translate', 'Example']);
+// the expand/collapse buttons also cover the English cards
+document.querySelectorAll('.btn-open-all').forEach(b => b.onclick = () => document.querySelectorAll('details.fn').forEach(d => d.open = true));
+document.querySelectorAll('.btn-close-all').forEach(b => b.onclick = () => document.querySelectorAll('details.fn').forEach(d => d.open = false));
+
+// ================= Language switch =================
+function setLang(lang) {
+    document.documentElement.dataset.lang = lang; document.documentElement.lang = lang;
+    document.title = lang === 'en' ? 'Latin Syntax Studio – Guide' : 'Syntax-Studio Latein – Anleitung';
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    try { localStorage.setItem('syntax_guide_lang', lang); } catch (e) {}
+}
+document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+setLang(document.documentElement.dataset.lang || 'de');
+</script>
+</body>
+</html>
