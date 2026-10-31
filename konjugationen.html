@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Syntax-Studio Latein – Konjugationen</title>
+<style>
+    :root {
+        --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --primary: #3b82f6; --text: #1f2937; --muted: #6b7280; --border: #e5e7eb;
+        --shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+        --ending: #1d4ed8; --marker: #b45309;
+    }
+    html { scrollbar-gutter: stable; scroll-behavior: smooth; }
+    html[data-lang="de"] .l-en, html[data-lang="en"] .l-de { display: none !important; }
+    body, button, select { font-family: var(--main-font); }
+    body { position: relative; margin: 2% auto; max-width: 1240px; padding: 0 20px; background: #f9fafb; color: var(--text); line-height: 1.55; }
+    .brand { text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--primary); letter-spacing: 0.03em; text-transform: uppercase; margin-bottom: 4px; }
+    h1 { text-align: center; color: #111827; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.025em; padding: 0 110px; }
+    .subtitle { text-align: center; color: var(--muted); margin: 0 0 18px; font-size: 1.05rem; }
+    .lang-switch-top { position: absolute; top: 0; right: 20px; display: flex; gap: 6px; z-index: 5; }
+    .lang-btn { background: #f3f4f6; border: 1px solid transparent; padding: 6px 12px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; color: #4b5563; font-weight: 500; transition: all 0.2s; }
+    .lang-btn.active { background: #eff6ff; color: var(--primary); border-color: #bfdbfe; font-weight: 600; }
+    .page-nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+    .page-nav a { text-decoration: none; font-size: 0.9rem; font-weight: 500; color: #475569; background: #e2e8f0; padding: 6px 14px; border-radius: 999px; }
+    .page-nav a:hover { background: #cbd5e1; color: #111827; }
+    .page-nav a.current { background: #fff; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+
+    .layout { display: flex; gap: 22px; align-items: flex-start; }
+    .content { flex: 1; min-width: 0; }
+    .toc { position: sticky; top: 16px; width: 210px; flex-shrink: 0; max-height: calc(100vh - 32px); overflow-y: auto; box-sizing: border-box; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.87rem; }
+    .toc-title { font-weight: 600; color: #111827; margin-bottom: 6px; }
+    .toc a { display: block; color: #374151; text-decoration: none; padding: 4px 8px; border-radius: 6px; }
+    .toc a:hover, .toc a:focus-visible { background: #f3f4f6; outline: none; }
+    .toc a.sub { padding-left: 20px; font-size: 0.82rem; color: var(--muted); }
+    .toc-options { border-top: 1px solid var(--border); margin-top: 10px; padding-top: 10px; }
+    .toc-options label { display: flex; align-items: center; gap: 8px; padding: 3px 4px; cursor: pointer; color: #374151; }
+    .legend { margin-top: 10px; font-size: 0.8rem; color: var(--muted); line-height: 1.7; }
+    .legend .s { color: var(--text); }
+
+    .card { background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); padding: 24px 26px; margin-bottom: 24px; scroll-margin-top: 16px; }
+    .card h2 { font-size: 1.3rem; font-weight: 600; color: #111827; margin: 0 0 6px; letter-spacing: -0.01em; }
+    .card h3 { font-size: 1.05rem; font-weight: 600; color: #0f172a; margin: 26px 0 4px; scroll-margin-top: 16px; }
+    .card h3:first-of-type { margin-top: 14px; }
+    .lead { margin: 0 0 14px; color: #374151; }
+    .meta { font-size: 0.88rem; color: var(--muted); margin: 0 0 8px; }
+    .meta b { color: #374151; font-weight: 600; }
+    .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; color: #334155; }
+    .instruction-box p { margin: 0 0 8px; } .instruction-box p:last-child { margin: 0; }
+
+    .tables { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+    .tbl-wrap { overflow-x: auto; max-width: 100%; }
+    table.forms { border-collapse: separate; border-spacing: 0; font-size: 0.92rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    table.forms caption { caption-side: top; text-align: left; font-weight: 600; font-size: 0.9rem; color: #374151; padding: 0 0 6px; }
+    table.forms th, table.forms td { padding: 6px 9px; border-bottom: 1px solid #f1f5f9; text-align: left; white-space: nowrap; vertical-align: top; }
+    table.forms thead th { background: #f8fafc; font-weight: 600; color: #111827; border-bottom: 1px solid var(--border); }
+    table.forms thead th .hsub { display: block; font-weight: 400; font-size: 0.78rem; color: var(--muted); white-space: normal; min-width: 72px; }
+    table.forms th.rowh { background: #fcfcfd; font-weight: 600; color: #475569; font-size: 0.85rem; border-right: 1px solid #f1f5f9; }
+    table.forms th.rowh .pron { display: block; font-weight: 400; font-size: 0.75rem; color: #9ca3af; }
+    table.forms tr.section th { background: #eff6ff; color: #1e40af; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 12px; }
+    table.forms tbody tr:last-child td, table.forms tbody tr:last-child th { border-bottom: none; }
+    table.forms td.empty { color: #cbd5e1; }
+    .lat { font-style: normal; }
+    table.forms:has(td.txt) { width: 100%; }
+    td.txt { white-space: normal; min-width: 150px; color: #374151; font-size: 0.9rem; }
+    .alt { color: #9ca3af; padding: 0 3px; }
+    .note-form { color: var(--muted); font-size: 0.85em; }
+    .aux { color: #475569; }
+    body.hl .end { color: var(--ending); font-weight: 700; }
+    body.hl .mk { color: var(--marker); font-weight: 600; text-decoration: underline dotted; text-underline-offset: 3px; }
+
+    ul.notes { margin: 10px 0 0; padding-left: 20px; font-size: 0.9rem; color: #374151; }
+    ul.notes li { margin: 3px 0; }
+    .tip { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; font-size: 0.9rem; color: #78350f; margin-top: 14px; }
+    .tip b { color: #78350f; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 16px; }
+    .chip { background: #fff; border: 1px solid #d1d5db; border-radius: 999px; padding: 6px 14px; font-size: 0.9rem; font-weight: 500; color: #374151; cursor: pointer; }
+    .chip:hover { border-color: var(--primary); }
+    .chip.active { background: #eff6ff; border-color: var(--primary); color: #1e40af; font-weight: 600; }
+    .chip .chip-sub { font-weight: 400; color: var(--muted); margin-left: 4px; font-style: italic; }
+    .footer { text-align: center; margin: 28px 0 12px; }
+    .btn { padding: 9px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; color: #fff; background: #1f2937; font-size: 0.92rem; }
+    .btn:hover { opacity: 0.9; }
+
+    @media (max-width: 900px) {
+        h1 { padding: 0; }
+        .lang-switch-top { position: static; justify-content: flex-end; margin-bottom: 8px; }
+        .layout { flex-direction: column; align-items: stretch; gap: 0; }
+        .toc { position: static; width: auto; max-height: none; margin-bottom: 20px; }
+    }
+    @media (max-width: 600px) {
+        body { margin: 12px auto; padding: 0 12px; }
+        .card { padding: 18px 14px; }
+        table.forms th, table.forms td { padding: 5px 8px; }
+    }
+    @media print {
+        body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .toc, .lang-switch-top, .page-nav, .footer, .chips { display: none !important; }
+        .layout { display: block; }
+        .card { box-shadow: none; break-inside: avoid-page; }
+        .tbl-wrap { break-inside: avoid; }
+    }
+
+</style>
+</head>
+<body class="hl">
+<div class="lang-switch-top">
+    <button type="button" class="lang-btn" data-lang="en">EN</button>
+    <button type="button" class="lang-btn" data-lang="de">DE</button>
+</div>
+<div class="brand"><span class="l-de">Syntax-Studio Latein</span><span class="l-en">Latin Syntax Studio</span></div>
+<h1><span class="l-de">Konjugationen</span><span class="l-en">Conjugations</span></h1>
+<p class="subtitle"><span class="l-de">Alle Verbformen im Überblick</span><span class="l-en">All verb forms at a glance</span></p>
+<nav class="page-nav">
+    <a href="deklinationen.html"><span class="l-de">Deklinationen</span><span class="l-en">Declensions</span></a>
+    <a href="konjugationen.html" class="current"><span class="l-de">Konjugationen</span><span class="l-en">Conjugations</span></a>
+    <a href="anleitung.html"><span class="l-de">Anleitung</span><span class="l-en">Guide</span></a>
+</nav>
+
+<div class="layout">
+    <nav class="toc" aria-label="Inhalt / Contents">
+        <div class="toc-title"><span class="l-de">Inhalt</span><span class="l-en">Contents</span></div>
+        <a href="#overview"><span class="l-de">Die fünf Konjugationen</span><span class="l-en">The five conjugations</span></a>
+        <a href="#tables"><span class="l-de">Konjugationstabellen</span><span class="l-en">Conjugation tables</span></a>
+        <a href="#compare"><span class="l-de">Konjugationen im Vergleich</span><span class="l-en">Conjugations compared</span></a>
+        <a href="#participle"><span class="l-de">Partizip Präsens</span><span class="l-en">Present participle</span></a>
+        <a href="#perfect"><span class="l-de">Perfektbildung</span><span class="l-en">Perfect formation</span></a>
+        <a href="#irregular"><span class="l-de">Unregelmäßige Verben</span><span class="l-en">Irregular verbs</span></a>
+        <a href="#deponent"><span class="l-de">Deponentien</span><span class="l-en">Deponent verbs</span></a>
+        <div class="toc-options">
+            <label><input type="checkbox" id="opt-macrons"> <span class="l-de">Längen anzeigen (ā, ē …)</span><span class="l-en">Show long vowels (ā, ē …)</span></label>
+            <label><input type="checkbox" id="opt-hl"> <span class="l-de">Endungen hervorheben</span><span class="l-en">Highlight endings</span></label>
+            <div class="legend"><span class="l-de">Beispiel: <span class="s">laudā</span><span class="mk">ba</span><span class="end">m</span> = Stamm + <span class="mk">Kennzeichen</span> + <span class="end">Personalendung</span></span><span class="l-en">Example: <span class="s">laudā</span><span class="mk">ba</span><span class="end">m</span> = stem + <span class="mk">marker</span> + <span class="end">personal ending</span></span></div>
+        </div>
+    </nav>
+
+    <main class="content">
+        <div class="instruction-box">
+            <p class="l-de">Wähle bei den Konjugationstabellen ein Musterverb aus. Unter jedem Tempus steht eine Übersetzung der 1. Person als Hilfe. Mit den Schaltern links kannst du die Vokallängen ein- und ausblenden und Kennzeichen und Endungen hervorheben.</p>
+            <p class="l-en">In the conjugation tables, choose a model verb. Under each tense you find a translation of the 1st person as a guide. With the switches on the left you can show or hide vowel lengths and highlight markers and endings.</p>
+        </div>
+        <section class="card" id="overview">
+            <h2><span class="l-de">Die fünf Konjugationen</span><span class="l-en">The five conjugations</span></h2>
+            <div id="ov-table"></div>
+        </section>
+        <section class="card" id="tables">
+            <h2><span class="l-de">Konjugationstabellen</span><span class="l-en">Conjugation tables</span></h2>
+            <div class="chips" id="conj-chips"></div>
+            <div id="conj-tables"></div>
+        </section>
+        <section class="card" id="compare">
+            <h2><span class="l-de">Konjugationen im Vergleich</span><span class="l-en">Conjugations compared</span></h2>
+            <p class="lead"><span class="l-de">Hier siehst du eine Zeitform aller fünf Konjugationen nebeneinander, so fallen die Unterschiede sofort auf.</span><span class="l-en">Here you see one tense of all five conjugations side by side, so the differences stand out at once.</span></p>
+            <div class="chips" id="cmp-chips"></div>
+            <div id="cmp-table"></div>
+        </section>
+        <section class="card" id="participle">
+            <h2><span class="l-de">Deklination des Partizips Präsens</span><span class="l-en">Declension of the present participle</span></h2>
+            <div id="part-table"></div>
+        </section>
+        <section class="card" id="perfect">
+            <h2><span class="l-de">Perfektbildung</span><span class="l-en">How the perfect is formed</span></h2>
+            <div id="perf-table"></div>
+        </section>
+        <section class="card" id="irregular">
+            <h2><span class="l-de">Unregelmäßige Verben</span><span class="l-en">Irregular verbs</span></h2>
+            <div class="chips" id="irr-chips"></div>
+            <div id="irr-tables"></div>
+        </section>
+        <section class="card" id="deponent">
+            <h2><span class="l-de">Deponentien</span><span class="l-en">Deponent verbs</span></h2>
+            <div id="dep-table"></div>
+        </section>
+        <div class="footer"><button type="button" class="btn" onclick="window.print()"><span class="l-de">Tabellen drucken</span><span class="l-en">Print tables</span></button></div>
+    </main>
+</div>
+
+<script>
+// ---------- language, options, rendering of forms (shared by both pages) ----------
+let LANG = 'de';
+const tr = (o) => (o && typeof o === 'object' && !Array.isArray(o)) ? (o[LANG] ?? o.de) : o;
+const OPT = { macrons: true, hl: true };
+try { const o = JSON.parse(localStorage.getItem('latin_forms_options') || '{}'); if (typeof o.macrons === 'boolean') OPT.macrons = o.macrons; if (typeof o.hl === 'boolean') OPT.hl = o.hl; } catch (e) {}
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const noMac = (s) => OPT.macrons ? s : s.normalize('NFD').replace(/̄/g, '').normalize('NFC');
+
+// One form: "stem|ending" or "stem|marker|ending"; "-a" = ending only; alternatives separated by " / ";
+// text in (round brackets) is shown small and grey; words after a "+" are an auxiliary ("laudāt|us+sum").
+function fm(str) {
+    if (str === null || str === undefined || str === '') return '<span class="empty">–</span>';
+    return String(str).split(' / ').map(alt => {
+        let note = '';
+        const m = alt.match(/^(.*?)\s*\((.*)\)\s*$/);
+        if (m && m[1]) { alt = m[1]; note = ` <span class="note-form">(${esc(noMac(m[2]))})</span>`; }
+        else if (m && !m[1]) return `<span class="note-form">(${esc(noMac(m[2]))})</span>`;
+        let aux = '';
+        if (alt.includes('+')) { const p = alt.split('+'); alt = p[0]; aux = ' <span class="aux">' + esc(noMac(p.slice(1).join(' '))) + '</span>'; }
+        return alt.split(' ').map(word => {
+            const pm = word.match(/^(.*?)([,;:]?)$/); const w = pm[1], punct = pm[2]; // a trailing comma stays plain
+            if (w.startsWith('-') && w.length > 1 && !w.includes('|')) return `<span class="end">${esc(noMac(w))}</span>${punct}`;
+            const p = w.split('|').map(x => esc(noMac(x)));
+            if (p.length === 2) return `${p[0]}<span class="end">${p[1]}</span>${punct}`;
+            if (p.length === 3) return `${p[0]}<span class="mk">${p[1]}</span><span class="end">${p[2]}</span>${punct}`;
+            return p[0] + punct;
+        }).join(' ') + aux + note;
+    }).join('<span class="alt">/</span>');
+}
+
+// A table: {caption, cols:[{h, sub}], rows:[ {section} | {h, pron, cells:[...] } ]}
+function table(t) {
+    const head = `<thead><tr><th></th>${t.cols.map(c => `<th>${tr(c.h)}${c.sub ? `<span class="hsub">${noMacIfLat(tr(c.sub))}</span>` : ''}</th>`).join('')}</tr></thead>`;
+    const body = t.rows.map(r => {
+        if (r.section) return `<tr class="section"><th colspan="${t.cols.length + 1}">${tr(r.section)}</th></tr>`;
+        return `<tr><th class="rowh" scope="row">${tr(r.h)}${r.pron ? `<span class="pron">${tr(r.pron)}</span>` : ''}</th>${r.cells.map(c => cell(c)).join('')}</tr>`;
+    }).join('');
+    return `<div class="tbl-wrap"><table class="forms">${t.caption ? `<caption>${tr(t.caption)}</caption>` : ''}${head}<tbody>${body}</tbody></table></div>`;
+}
+function noMacIfLat(s) { return noMac(s); }
+function cell(c) {
+    if (c && typeof c === 'object' && c.html !== undefined) return `<td class="txt">${noMac(tr(c.html))}</td>`;
+    if (c && typeof c === 'object') c = tr(c);
+    return `<td class="lat${c ? '' : ' empty'}">${fm(c)}</td>`;
+}
+function notes(list) { return list && list.length ? `<ul class="notes">${list.map(n => `<li>${noMac(tr(n))}</li>`).join('')}</ul>` : ''; }
+
+function applyLang(lang) {
+    LANG = lang === 'en' ? 'en' : 'de';
+    document.documentElement.dataset.lang = LANG; document.documentElement.lang = LANG;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === LANG));
+    try { localStorage.setItem('syntax_guide_lang', LANG); } catch (e) {}
+}
+function initShared(render, titles) {
+    let lang = 'de';
+    try { lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('syntax_guide_lang') || 'de'; } catch (e) {}
+    const rerender = () => { document.body.classList.toggle('hl', OPT.hl); document.title = titles[LANG]; render(); };
+    document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => { applyLang(b.dataset.lang); rerender(); }));
+    const mac = document.getElementById('opt-macrons'), hl = document.getElementById('opt-hl');
+    mac.checked = OPT.macrons; hl.checked = OPT.hl;
+    const save = () => { try { localStorage.setItem('latin_forms_options', JSON.stringify(OPT)); } catch (e) {} };
+    mac.addEventListener('change', () => { OPT.macrons = mac.checked; save(); rerender(); });
+    hl.addEventListener('change', () => { OPT.hl = hl.checked; save(); rerender(); });
+    applyLang(lang); rerender();
+}
+
+const col = (h, sub, sg, pl, extra = {}) => Object.assign({ h, sub, sg, pl }, extra);
+const CASES = {
+    nom: { de: 'Nom.', en: 'Nom.' }, gen: { de: 'Gen.', en: 'Gen.' }, dat: { de: 'Dat.', en: 'Dat.' },
+    acc: { de: 'Akk.', en: 'Acc.' }, abl: { de: 'Abl.', en: 'Abl.' }, voc: { de: 'Vok.', en: 'Voc.' }
+};
+const SG = { de: 'Singular', en: 'Singular' }, PL = { de: 'Plural', en: 'Plural' };
+// rows for a declension table: sg/pl arrays of 5 (or 6 with vocative) forms per column
+function caseRows(cols, opts = {}) {
+    const keys = ['nom', 'gen', 'dat', 'acc', 'abl'];
+    const rows = [];
+    const add = (part, title, withVoc) => {
+        if (!opts.noSections) rows.push({ section: title });
+        keys.forEach((k, i) => rows.push({ h: CASES[k], cells: cols.map(c => c[part] ? c[part][i] : '') }));
+        if (withVoc) rows.push({ h: CASES.voc, cells: cols.map(c => c[part + 'Voc'] || '') });
+    };
+    add('sg', SG, opts.vocSg);
+    if (!opts.sgOnly) add('pl', PL, opts.vocPl);
+    return rows;
+}
+
+// ================= CONJUGATIONS =================
+const PERS = [
+    { h: { de: '1. Sg.', en: '1st sg.' }, pron: { de: 'ich', en: 'I' } }, { h: { de: '2. Sg.', en: '2nd sg.' }, pron: { de: 'du', en: 'you' } },
+    { h: { de: '3. Sg.', en: '3rd sg.' }, pron: { de: 'er, sie, es', en: 'he, she, it' } }, { h: { de: '1. Pl.', en: '1st pl.' }, pron: { de: 'wir', en: 'we' } },
+    { h: { de: '2. Pl.', en: '2nd pl.' }, pron: { de: 'ihr', en: 'you' } }, { h: { de: '3. Pl.', en: '3rd pl.' }, pron: { de: 'sie', en: 'they' } }
+];
+const TENSE = {
+    pres: { de: 'Präsens', en: 'Present' }, impf: { de: 'Imperfekt', en: 'Imperfect' }, fut: { de: 'Futur I', en: 'Future' },
+    perf: { de: 'Perfekt', en: 'Perfect' }, plqpf: { de: 'Plusquamperfekt', en: 'Pluperfect' }, fut2: { de: 'Futur II', en: 'Future perfect' }
+};
+const sixWith = (pre, parts) => parts.map(p => pre + '|' + p);
+const PE_ACT = ['m', 's', 't', 'mus', 'tis', 'nt'], PE_PASS = ['r', 'ris', 'tur', 'mur', 'minī', 'ntur'];
+// marker forms: the vowel is short before final -m, -t, -nt (active) and before -r, -ntur (passive), long elsewhere
+// (so: laudābat, but laudābātur)
+function marked(stem, short, long, passive) {
+    const pe = passive ? PE_PASS : PE_ACT;
+    const shortAt = passive ? [0, 5] : [0, 2, 5];
+    return pe.map((e, i) => `${stem}|${shortAt.includes(i) ? short : long}|${e}`);
+}
+const AUX = {
+    perf: ['sum', 'es', 'est', 'sumus', 'estis', 'sunt'], plqpf: ['eram', 'erās', 'erat', 'erāmus', 'erātis', 'erant'], fut2: ['erō', 'eris', 'erit', 'erimus', 'eritis', 'erunt'],
+    sperf: ['sim', 'sīs', 'sit', 'sīmus', 'sītis', 'sint'], splqpf: ['essem', 'essēs', 'esset', 'essēmus', 'essētis', 'essent']
+};
+function perfActive(S) {
+    return {
+        perf: sixWith(S, ['ī', 'istī', 'it', 'imus', 'istis', 'ērunt']),
+        plqpf: marked(S, 'era', 'erā'),
+        fut2: [`${S}|er|ō`, `${S}|eri|s`, `${S}|eri|t`, `${S}|eri|mus`, `${S}|eri|tis`, `${S}|eri|nt`],
+        sperf: [`${S}|eri|m`, `${S}|erī|s`, `${S}|eri|t`, `${S}|erī|mus`, `${S}|erī|tis`, `${S}|eri|nt`],
+        splqpf: marked(S, 'isse', 'issē')
+    };
+}
+function perfPassive(ppp) { // ppp = stem like "laudāt"
+    const out = {};
+    Object.keys(AUX).forEach(k => { out[k] = AUX[k].map((a, i) => `${ppp}|${i < 3 ? 'us' : 'ī'}+${a}`); });
+    return out;
+}
+
+// The five conjugations. Forms use "stem|ending" or "stem|marker|ending".
+const CONJ = {
+    a: { name: { de: 'ā-Konjugation', en: '1st conjugation' }, verb: 'laudāre', mean: { de: 'loben', en: 'praise' },
+        stamm: 'laudō, laudāre, laudāvī, laudātum', perf: 'laudāv', ppp: 'laudāt', nd: 'laudand', ppa: ['laudā|ns', 'laudant|is'],
+        pres: ['laud|ō', 'laudā|s', 'lauda|t', 'laudā|mus', 'laudā|tis', 'lauda|nt'],
+        presP: ['laud|or', 'laudā|ris', 'laudā|tur', 'laudā|mur', 'laudā|minī', 'lauda|ntur'],
+        impfStem: 'laudā', futType: 'b', futStem: 'laudā', subjStem: 'laud', subjV: ['e', 'ē'], infStem: 'laudā',
+        imp: ['laudā', 'laudā|te'], infPresP: 'laudā|rī',
+        de: { p: 'lobe', pt: 'lobte', inf: 'loben', pp: 'gelobt' }, en: { p: 'praise', pt: 'praised', pp: 'praised', ing: 'praising' } },
+    e: { name: { de: 'ē-Konjugation', en: '2nd conjugation' }, verb: 'monēre', mean: { de: 'mahnen, ermahnen', en: 'warn, advise' },
+        stamm: 'moneō, monēre, monuī, monitum', perf: 'monu', ppp: 'monit', nd: 'monend', ppa: ['monē|ns', 'monent|is'],
+        pres: ['mone|ō', 'monē|s', 'mone|t', 'monē|mus', 'monē|tis', 'mone|nt'],
+        presP: ['mone|or', 'monē|ris', 'monē|tur', 'monē|mur', 'monē|minī', 'mone|ntur'],
+        impfStem: 'monē', futType: 'b', futStem: 'monē', subjStem: 'mone', subjV: ['a', 'ā'], infStem: 'monē',
+        imp: ['monē', 'monē|te'], infPresP: 'monē|rī',
+        de: { p: 'mahne', pt: 'mahnte', inf: 'mahnen', pp: 'gemahnt' }, en: { p: 'warn', pt: 'warned', pp: 'warned', ing: 'warning' } },
+    k: { name: { de: 'Konsonantische Konjugation', en: '3rd conjugation' }, verb: 'regere', mean: { de: 'lenken, regieren', en: 'rule, guide' },
+        stamm: 'regō, regere, rēxī, rēctum', perf: 'rēx', ppp: 'rēct', nd: 'regend', ppa: ['regē|ns', 'regent|is'],
+        pres: ['reg|ō', 'regi|s', 'regi|t', 'regi|mus', 'regi|tis', 'regu|nt'],
+        presP: ['reg|or', 'rege|ris', 'regi|tur', 'regi|mur', 'regi|minī', 'regu|ntur'],
+        impfStem: 'regē', futType: 'e', futStem: 'reg', subjStem: 'reg', subjV: ['a', 'ā'], infStem: 'rege',
+        imp: ['rege', 'regi|te'], infPresP: 'reg|ī',
+        de: { p: 'lenke', pt: 'lenkte', inf: 'lenken', pp: 'gelenkt' }, en: { p: 'rule', pt: 'ruled', pp: 'ruled', ing: 'ruling' } },
+    i: { name: { de: 'ī-Konjugation', en: '4th conjugation' }, verb: 'audīre', mean: { de: 'hören', en: 'hear' },
+        stamm: 'audiō, audīre, audīvī, audītum', perf: 'audīv', ppp: 'audīt', nd: 'audiend', ppa: ['audiē|ns', 'audient|is'],
+        pres: ['audi|ō', 'audī|s', 'audi|t', 'audī|mus', 'audī|tis', 'audiu|nt'],
+        presP: ['audi|or', 'audī|ris', 'audī|tur', 'audī|mur', 'audī|minī', 'audiu|ntur'],
+        impfStem: 'audiē', futType: 'e', futStem: 'audi', subjStem: 'audi', subjV: ['a', 'ā'], infStem: 'audī',
+        imp: ['audī', 'audī|te'], infPresP: 'audī|rī',
+        de: { p: 'höre', pt: 'hörte', inf: 'hören', pp: 'gehört' }, en: { p: 'hear', pt: 'heard', pp: 'heard', ing: 'hearing' } },
+    m: { name: { de: 'Gemischte Konjugation', en: '3rd conjugation -iō' }, verb: 'capere', mean: { de: 'fassen, nehmen', en: 'take, seize' },
+        stamm: 'capiō, capere, cēpī, captum', perf: 'cēp', ppp: 'capt', nd: 'capiend', ppa: ['capiē|ns', 'capient|is'],
+        pres: ['capi|ō', 'capi|s', 'capi|t', 'capi|mus', 'capi|tis', 'capiu|nt'],
+        presP: ['capi|or', 'cape|ris', 'capi|tur', 'capi|mur', 'capi|minī', 'capiu|ntur'],
+        impfStem: 'capiē', futType: 'e', futStem: 'capi', subjStem: 'capi', subjV: ['a', 'ā'], infStem: 'cape',
+        imp: ['cape', 'capi|te'], infPresP: 'cap|ī',
+        de: { p: 'fasse', pt: 'fasste', inf: 'fassen', pp: 'gefasst' }, en: { p: 'take', pt: 'took', pp: 'taken', ing: 'taking' } }
+};
+function build(c) {
+    const F = { act: {}, pass: {} };
+    F.act.pres = c.pres; F.pass.pres = c.presP;
+    F.act.impf = marked(c.impfStem, 'ba', 'bā'); F.pass.impf = marked(c.impfStem, 'ba', 'bā', true);
+    if (c.futType === 'b') {
+        F.act.fut = [`${c.futStem}|b|ō`, `${c.futStem}|bi|s`, `${c.futStem}|bi|t`, `${c.futStem}|bi|mus`, `${c.futStem}|bi|tis`, `${c.futStem}|bu|nt`];
+        F.pass.fut = [`${c.futStem}|b|or`, `${c.futStem}|be|ris`, `${c.futStem}|bi|tur`, `${c.futStem}|bi|mur`, `${c.futStem}|bi|minī`, `${c.futStem}|bu|ntur`];
+    } else {
+        F.act.fut = [`${c.futStem}|a|m`, `${c.futStem}|ē|s`, `${c.futStem}|e|t`, `${c.futStem}|ē|mus`, `${c.futStem}|ē|tis`, `${c.futStem}|e|nt`];
+        F.pass.fut = [`${c.futStem}|a|r`, `${c.futStem}|ē|ris`, `${c.futStem}|ē|tur`, `${c.futStem}|ē|mur`, `${c.futStem}|ē|minī`, `${c.futStem}|e|ntur`];
+    }
+    F.act.spres = marked(c.subjStem, c.subjV[0], c.subjV[1]); F.pass.spres = marked(c.subjStem, c.subjV[0], c.subjV[1], true);
+    F.act.simpf = marked(c.infStem, 're', 'rē'); F.pass.simpf = marked(c.infStem, 're', 'rē', true);
+    Object.assign(F.act, perfActive(c.perf)); Object.assign(F.pass, perfPassive(c.ppp));
+    return F;
+}
+function tenseHead(c, voice, t) {
+    const d = c.de, e = c.en;
+    const de = voice === 'act'
+        ? { pres: `ich ${d.p}`, impf: `ich ${d.pt}`, fut: `ich werde ${d.inf}`, perf: `ich habe ${d.pp}`, plqpf: `ich hatte ${d.pp}`, fut2: `ich werde ${d.pp} haben` }
+        : { pres: `ich werde ${d.pp}`, impf: `ich wurde ${d.pp}`, fut: `ich werde ${d.pp} werden`, perf: `ich bin ${d.pp} worden`, plqpf: `ich war ${d.pp} worden`, fut2: `ich werde ${d.pp} worden sein` };
+    const en = voice === 'act'
+        ? { pres: `I ${e.p}`, impf: `I was ${e.ing}`, fut: `I will ${e.p}`, perf: `I have ${e.pp}`, plqpf: `I had ${e.pp}`, fut2: `I will have ${e.pp}` }
+        : { pres: `I am ${e.pp}`, impf: `I was (being) ${e.pp}`, fut: `I will be ${e.pp}`, perf: `I have been ${e.pp}`, plqpf: `I had been ${e.pp}`, fut2: `I will have been ${e.pp}` };
+    return { de: de[t], en: en[t] };
+}
+function personTable(caption, cols) {
+    return table({ caption, cols: cols.map(c => ({ h: c.h, sub: c.sub })), rows: PERS.map((p, i) => ({ h: p.h, pron: p.pron, cells: cols.map(c => c.f[i]) })) });
+}
+
+let curConj = 'a';
+function renderConj() {
+    const c = CONJ[curConj], F = build(c);
+    document.getElementById('conj-chips').innerHTML = Object.keys(CONJ).map(k => `<button type="button" class="chip${k === curConj ? ' active' : ''}" data-k="${k}">${tr(CONJ[k].name)}<span class="chip-sub">${noMac(CONJ[k].verb)}</span></button>`).join('');
+    document.querySelectorAll('#conj-chips .chip').forEach(b => b.onclick = () => { curConj = b.dataset.k; renderConj(); });
+    const ind = ['pres', 'impf', 'fut', 'perf', 'plqpf', 'fut2'];
+    const sub = [['spres', 'pres'], ['simpf', 'impf'], ['sperf', 'perf'], ['splqpf', 'plqpf']];
+    const indCols = (v) => ind.map(t => ({ h: TENSE[t], sub: tenseHead(c, v, t), f: F[v][t] }));
+    const subCols = (v) => sub.map(([k, t]) => ({ h: TENSE[t], f: F[v][k] }));
+    const P = c.ppp;
+    let h = `<p class="meta"><b>${tr({ de: 'Stammformen', en: 'Principal parts' })}:</b> <span class="lat">${noMac(c.stamm)}</span> – ${tr(c.mean)}</p>`;
+    h += `<h3>${tr({ de: 'Indikativ', en: 'Indicative' })}</h3><div class="tables">${personTable({ de: 'Aktiv', en: 'Active' }, indCols('act'))}${personTable({ de: 'Passiv', en: 'Passive' }, indCols('pass'))}</div>`;
+    h += `<h3>${tr({ de: 'Konjunktiv', en: 'Subjunctive' })}</h3><div class="tables">${personTable({ de: 'Aktiv', en: 'Active' }, subCols('act'))}${personTable({ de: 'Passiv', en: 'Passive' }, subCols('pass'))}</div>`;
+    h += `<h3>${tr({ de: 'Imperativ und Infinitive', en: 'Imperative and infinitives' })}</h3><div class="tables">
+        ${table({ caption: { de: 'Imperativ', en: 'Imperative' }, cols: [{ h: SG }, { h: PL }], rows: [{ h: { de: 'Aktiv', en: 'Active' }, cells: c.imp }] })}
+        ${table({ caption: { de: 'Infinitive', en: 'Infinitives' }, cols: [{ h: { de: 'Aktiv', en: 'Active' } }, { h: { de: 'Passiv', en: 'Passive' } }], rows: [
+            { h: { de: 'Präsens', en: 'Present' }, pron: { de: 'gleichzeitig', en: 'same time' }, cells: [`${c.infStem}|re`, c.infPresP] },
+            { h: { de: 'Perfekt', en: 'Perfect' }, pron: { de: 'vorzeitig', en: 'before' }, cells: [`${c.perf}|isse`, `${P}|um+esse`] },
+            { h: { de: 'Futur', en: 'Future' }, pron: { de: 'nachzeitig', en: 'after' }, cells: [`${P}|ūrum+esse`, `${P}|um+īrī (selten)`.replace('selten', tr({ de: 'selten', en: 'rare' }))] }
+        ] })}</div>`;
+    h += `<h3>${tr({ de: 'Partizipien, Gerundium, Gerundivum, Supinum', en: 'Participles, gerund, gerundive, supine' })}</h3><div class="tables">
+        ${table({ cols: [{ h: { de: 'Form', en: 'Form' } }, { h: { de: 'Bedeutung / Gebrauch', en: 'Meaning / use' } }], rows: [
+            { h: { de: 'Partizip Präsens Aktiv (PPA)', en: 'Present active participle' }, cells: [`${c.ppa[0]}, ${c.ppa[1]}`, { html: { de: `gleichzeitig, aktiv: „${c.de.p.replace(/e$/, '')}end“`, en: `same time, active: “${c.en.ing}”` } }] },
+            { h: { de: 'Partizip Perfekt Passiv (PPP)', en: 'Perfect passive participle' }, cells: [`${P}|us, -a, -um`, { html: { de: `vorzeitig, passiv: „${c.de.pp}“`, en: `before, passive: “(having been) ${c.en.pp}”` } }] },
+            { h: { de: 'Partizip Futur Aktiv (PFA)', en: 'Future active participle' }, cells: [`${P}|ūrus, -a, -um`, { html: { de: `nachzeitig, aktiv: „einer, der ${c.de.inf} wird / will“`, en: `after, active: “about to ${c.en.p}”` } }] },
+            { h: { de: 'Gerundium', en: 'Gerund' }, cells: [`${c.nd}|ī, ${c.nd}|ō, ad ${c.nd}|um`, { html: { de: `substantiviertes Verb: „des ${c.de.inf.charAt(0).toUpperCase() + c.de.inf.slice(1)}s“`, en: `verbal noun: “of ${c.en.ing}”` } }] },
+            { h: { de: 'Gerundivum', en: 'Gerundive' }, cells: [`${c.nd}|us, -a, -um`, { html: { de: `„einer, der ${c.de.pp} werden muss“`, en: `“(one) to be ${c.en.pp}”` } }] },
+            { h: { de: 'Supinum', en: 'Supine' }, cells: [`${P}|um, ${P}|ū`, { html: { de: `<i>-um</i> nach Verben der Bewegung („um zu …“), <i>-ū</i> nach Adjektiven`, en: `<i>-um</i> after verbs of motion (“in order to …”), <i>-ū</i> after adjectives` } }] }
+        ] })}</div>`;
+    document.getElementById('conj-tables').innerHTML = h;
+}
+
+// comparison of all conjugations
+let cmpTense = 'pres', cmpVoice = 'act';
+function renderCompare() {
+    const tenses = [['pres', { de: 'Ind. Präsens', en: 'Ind. present' }], ['impf', { de: 'Ind. Imperfekt', en: 'Ind. imperfect' }], ['fut', { de: 'Ind. Futur I', en: 'Ind. future' }], ['spres', { de: 'Konj. Präsens', en: 'Subj. present' }], ['simpf', { de: 'Konj. Imperfekt', en: 'Subj. imperfect' }]];
+    document.getElementById('cmp-chips').innerHTML = tenses.map(([k, l]) => `<button type="button" class="chip${k === cmpTense ? ' active' : ''}" data-t="${k}">${tr(l)}</button>`).join('') +
+        `<span style="width:12px"></span>` + [['act', { de: 'Aktiv', en: 'Active' }], ['pass', { de: 'Passiv', en: 'Passive' }]].map(([k, l]) => `<button type="button" class="chip${k === cmpVoice ? ' active' : ''}" data-v="${k}">${tr(l)}</button>`).join('');
+    document.querySelectorAll('#cmp-chips .chip').forEach(b => b.onclick = () => { if (b.dataset.t) cmpTense = b.dataset.t; if (b.dataset.v) cmpVoice = b.dataset.v; renderCompare(); });
+    const cols = Object.keys(CONJ).map(k => ({ h: CONJ[k].name, sub: CONJ[k].verb, f: build(CONJ[k])[cmpVoice][cmpTense] }));
+    document.getElementById('cmp-table').innerHTML = `<div class="tables">${personTable(null, cols)}</div>`;
+}
+
+function renderOverview() {
+    const recog = { a: { de: 'Inf. <i>-āre</i>', en: 'inf. <i>-āre</i>' }, e: { de: 'Inf. <i>-ēre</i>, 1. Sg. <i>-eō</i>', en: 'inf. <i>-ēre</i>, 1st sg. <i>-eō</i>' }, k: { de: 'Inf. <i>-ere</i>, 1. Sg. <i>-ō</i>', en: 'inf. <i>-ere</i>, 1st sg. <i>-ō</i>' }, i: { de: 'Inf. <i>-īre</i>', en: 'inf. <i>-īre</i>' }, m: { de: 'Inf. <i>-ere</i>, 1. Sg. <i>-iō</i>', en: 'inf. <i>-ere</i>, 1st sg. <i>-iō</i>' } };
+    const h = table({ cols: [{ h: { de: 'Stammformen', en: 'Principal parts' } }, { h: { de: 'Bedeutung', en: 'Meaning' } }, { h: { de: 'Erkennungszeichen', en: 'How to recognise' } }],
+        rows: Object.keys(CONJ).map(k => ({ h: CONJ[k].name, cells: [CONJ[k].stamm, { html: CONJ[k].mean }, { html: recog[k] }] })) });
+    document.getElementById('ov-table').innerHTML = `<div class="tables">${h}</div>` + notes([
+        { de: '<b>Präsensstamm</b> (aus dem Infinitiv: <i>laudā-re</i>): Präsens, Imperfekt, Futur I, Konjunktiv Präsens und Imperfekt, Imperativ, PPA, Gerundium, Gerundivum.', en: '<b>Present stem</b> (from the infinitive: <i>laudā-re</i>): present, imperfect, future, present and imperfect subjunctive, imperative, present participle, gerund, gerundive.' },
+        { de: '<b>Perfektstamm</b> (aus der 1. Sg. Perfekt: <i>laudāv-ī</i>): alle aktiven Formen von Perfekt, Plusquamperfekt und Futur II. Die Endungen sind für alle Konjugationen gleich.', en: '<b>Perfect stem</b> (from the 1st sg. perfect: <i>laudāv-ī</i>): all active forms of the perfect, pluperfect and future perfect. The endings are the same for every conjugation.' },
+        { de: '<b>PPP / Supinstamm</b> (<i>laudāt-um</i>): passive Perfektformen (<i>laudātus sum</i>), PPP, PFA, Supinum.', en: '<b>Supine stem</b> (<i>laudāt-um</i>): perfect passive forms (<i>laudātus sum</i>), perfect passive and future active participles, supine.' },
+        { de: '<b>Personalendungen</b> Aktiv: <i>-ō/-m, -s, -t, -mus, -tis, -nt</i>; Passiv: <i>-or/-r, -ris, -tur, -mur, -minī, -ntur</i>. Kennzeichen: Imperfekt <i>-ba-</i>, Futur <i>-bi-</i> (ā/ē) bzw. <i>-a-/-e-</i> (übrige), Konjunktiv Präsens <i>-e-</i> (ā) bzw. <i>-a-</i> (übrige), Konjunktiv Imperfekt <i>-re-</i>.', en: '<b>Personal endings</b> active: <i>-ō/-m, -s, -t, -mus, -tis, -nt</i>; passive: <i>-or/-r, -ris, -tur, -mur, -minī, -ntur</i>. Markers: imperfect <i>-ba-</i>, future <i>-bi-</i> (1st/2nd) or <i>-a-/-e-</i> (others), present subjunctive <i>-e-</i> (1st) or <i>-a-</i> (others), imperfect subjunctive <i>-re-</i>.' },
+        { de: 'Merkhilfe für das Futur der kons., ī- und gemischten Konjugation: „Im Futur hat nur die 1. Person ein <i>a</i>“ – <i>regam, regēs, reget …</i> Vorsicht: <i>reget</i> (Futur) vs. <i>regat</i> (Konjunktiv Präsens).', en: 'Memory aid for the future of the 3rd, 4th and mixed conjugations: “only the 1st person has an <i>a</i>” – <i>regam, regēs, reget …</i> Careful: <i>reget</i> (future) vs. <i>regat</i> (present subjunctive).' }
+    ]);
+}
+
+function renderPerfect() {
+    const rows = [
+        [{ de: 'v-Perfekt', en: 'v-perfect' }, 'laudāre – laud|āvī; audīre – aud|īvī; dēlēre – dēl|ēvī'],
+        [{ de: 'u-Perfekt', en: 'u-perfect' }, 'monēre – mon|uī; tenēre – ten|uī; vetāre – vet|uī'],
+        [{ de: 's-Perfekt', en: 's-perfect' }, 'regere – rēxī (rēg-s-ī); manēre – mān|sī; scrībere – scrīp|sī'],
+        [{ de: 'Dehnungsperfekt', en: 'lengthened stem' }, 'venīre – vēnī; legere – lēgī; capere – cēpī; vidēre – vīdī'],
+        [{ de: 'Reduplikationsperfekt', en: 'reduplication' }, 'dare – dedī; currere – cucurrī; tangere – tetigī; pellere – pepulī'],
+        [{ de: 'Stammperfekt', en: 'unchanged stem' }, 'dēfendere – dēfendī; vertere – vertī; ostendere – ostendī']
+    ];
+    document.getElementById('perf-table').innerHTML = `<div class="tables">${table({ cols: [{ h: { de: 'Beispiele', en: 'Examples' } }], rows: rows.map(r => ({ h: r[0], cells: [r[1]] })) })}</div>` + notes([
+        { de: 'Wie das Perfekt gebildet wird, lässt sich nur bei der ā- und ī-Konjugation sicher vorhersagen (meist <i>-āvī</i>, <i>-īvī</i>). Bei allen anderen Verben lernst du den Perfektstamm mit den Stammformen.', en: 'Only for the 1st and 4th conjugations can the perfect be predicted with some confidence (usually <i>-āvī</i>, <i>-īvī</i>). For all other verbs, learn the perfect stem with the principal parts.' }
+    ]);
+}
+
+// irregular verbs: forms given in full
+const six = (s) => s.split(', ');
+const IRR = {
+    esse: { name: 'esse', mean: { de: 'sein', en: 'be' }, stamm: 'sum, esse, fuī, futūrus',
+        ind: { pres: six('sum, es, est, sumus, estis, sunt'), impf: six('eram, erās, erat, erāmus, erātis, erant'), fut: six('erō, eris, erit, erimus, eritis, erunt') }, perf: 'fu',
+        sub: { pres: six('sim, sīs, sit, sīmus, sītis, sint'), impf: six('essem, essēs, esset, essēmus, essētis, essent') },
+        extra: [[{ de: 'Imperativ', en: 'Imperative' }, 'es, este'], [{ de: 'Infinitive', en: 'Infinitives' }, 'esse, fuisse, futūrum esse / fore'], [{ de: 'Partizip', en: 'Participle' }, 'futūrus, -a, -um (PFA)']],
+        note: { de: 'Ebenso die Komposita <i>abesse, adesse, dēesse, interesse, praeesse</i> … (Perfekt <i>āfuī, adfuī …</i>). <i>prōdesse</i> (nützen) hat vor Vokal ein <i>d</i>: <i>prōsum, prōdes, prōdest …</i>', en: 'Likewise the compounds <i>abesse, adesse, dēesse, interesse, praeesse</i> … (perfect <i>āfuī, adfuī …</i>). <i>prōdesse</i> (be useful) inserts a <i>d</i> before a vowel: <i>prōsum, prōdes, prōdest …</i>' } },
+    posse: { name: 'posse', mean: { de: 'können', en: 'be able' }, stamm: 'possum, posse, potuī',
+        ind: { pres: six('possum, potes, potest, possumus, potestis, possunt'), impf: six('poteram, poterās, poterat, poterāmus, poterātis, poterant'), fut: six('poterō, poteris, poterit, poterimus, poteritis, poterunt') }, perf: 'potu',
+        sub: { pres: six('possim, possīs, possit, possīmus, possītis, possint'), impf: six('possem, possēs, posset, possēmus, possētis, possent') },
+        extra: [[{ de: 'Infinitive', en: 'Infinitives' }, 'posse, potuisse'], [{ de: 'Adjektiv', en: 'Adjective' }, { de: 'potēns, potentis (mächtig)', en: 'potēns, potentis (powerful)' }]],
+        note: { de: '<i>posse</i> = <i>pot-</i> + <i>esse</i>; vor <i>s</i> wird <i>t</i> zu <i>s</i>: <i>pos-sum</i>, aber <i>pot-es</i>. Kein Imperativ.', en: '<i>posse</i> = <i>pot-</i> + <i>esse</i>; before <i>s</i> the <i>t</i> becomes <i>s</i>: <i>pos-sum</i>, but <i>pot-es</i>. No imperative.' } },
+    ire: { name: 'īre', mean: { de: 'gehen', en: 'go' }, stamm: 'eō, īre, iī, itum',
+        ind: { pres: six('eō, īs, it, īmus, ītis, eunt'), impf: six('ībam, ībās, ībat, ībāmus, ībātis, ībant'), fut: six('ībō, ībis, ībit, ībimus, ībitis, ībunt') },
+        perfForms: { perf: six('iī, īstī, iit, iimus, īstis, iērunt'), plqpf: six('ieram, ierās, ierat, ierāmus, ierātis, ierant'), fut2: six('ierō, ieris, ierit, ierimus, ieritis, ierint'), sperf: six('ierim, ierīs, ierit, ierīmus, ierītis, ierint'), splqpf: six('īssem, īssēs, īsset, īssēmus, īssētis, īssent') },
+        sub: { pres: six('eam, eās, eat, eāmus, eātis, eant'), impf: six('īrem, īrēs, īret, īrēmus, īrētis, īrent') },
+        extra: [[{ de: 'Imperativ', en: 'Imperative' }, 'ī, īte'], [{ de: 'Infinitive', en: 'Infinitives' }, 'īre, īsse, itūrum esse'], [{ de: 'Partizipien', en: 'Participles' }, 'iēns, euntis (PPA); itūrus (PFA)'], [{ de: 'Gerundium', en: 'Gerund' }, 'eundī, eundō'], [{ de: 'Supinum', en: 'Supine' }, 'itum']],
+        note: { de: 'Der Stamm ist <i>i-</i>, vor <i>a, o, u</i> aber <i>e-</i>: <i>eō, eunt, eam</i>. Ebenso die Komposita <i>abīre, adīre, exīre, inīre, redīre, trānsīre, perīre</i> …', en: 'The stem is <i>i-</i>, but <i>e-</i> before <i>a, o, u</i>: <i>eō, eunt, eam</i>. Likewise the compounds <i>abīre, adīre, exīre, inīre, redīre, trānsīre, perīre</i> …' } },
+    ferre: { name: 'ferre', mean: { de: 'tragen, bringen', en: 'carry, bring' }, stamm: 'ferō, ferre, tulī, lātum',
+        ind: { pres: six('ferō, fers, fert, ferimus, fertis, ferunt'), impf: six('ferēbam, ferēbās, ferēbat, ferēbāmus, ferēbātis, ferēbant'), fut: six('feram, ferēs, feret, ferēmus, ferētis, ferent') }, perf: 'tul',
+        sub: { pres: six('feram, ferās, ferat, ferāmus, ferātis, ferant'), impf: six('ferrem, ferrēs, ferret, ferrēmus, ferrētis, ferrent') },
+        passive: { pres: six('feror, ferris, fertur, ferimur, feriminī, feruntur'), impf: six('ferēbar, ferēbāris, ferēbātur, ferēbāmur, ferēbāminī, ferēbantur'), fut: six('ferar, ferēris, ferētur, ferēmur, ferēminī, ferentur'), spres: six('ferar, ferāris, ferātur, ferāmur, ferāminī, ferantur'), simpf: six('ferrer, ferrēris, ferrētur, ferrēmur, ferrēminī, ferrentur'), ppp: 'lāt' },
+        extra: [[{ de: 'Imperativ', en: 'Imperative' }, 'fer, ferte'], [{ de: 'Infinitive', en: 'Infinitives' }, 'ferre / ferrī; tulisse / lātum esse; lātūrum esse'], [{ de: 'Partizipien', en: 'Participles' }, 'ferēns (PPA); lātus (PPP); lātūrus (PFA)']],
+        note: { de: 'Wie die kons. Konjugation, aber ohne Bindevokal in <i>fers, fert, fertis, fer, ferre, ferrem</i>. Ebenso die Komposita: <i>afferre, auferre (abstulī, ablātum), cōnferre, dēferre, efferre, īnferre, offerre, referre, tollere (sustulī, sublātum)</i>.', en: 'Like the 3rd conjugation, but without the connecting vowel in <i>fers, fert, fertis, fer, ferre, ferrem</i>. Likewise the compounds: <i>afferre, auferre (abstulī, ablātum), cōnferre, dēferre, efferre, īnferre, offerre, referre, tollere (sustulī, sublātum)</i>.' } },
+    velle: { name: 'velle', mean: { de: 'wollen', en: 'want' }, stamm: 'volō, velle, voluī',
+        ind: { pres: six('volō, vīs, vult, volumus, vultis, volunt'), impf: six('volēbam, volēbās, volēbat, volēbāmus, volēbātis, volēbant'), fut: six('volam, volēs, volet, volēmus, volētis, volent') }, perf: 'volu',
+        sub: { pres: six('velim, velīs, velit, velīmus, velītis, velint'), impf: six('vellem, vellēs, vellet, vellēmus, vellētis, vellent') },
+        extra: [[{ de: 'Infinitive', en: 'Infinitives' }, 'velle, voluisse'], [{ de: 'Partizip', en: 'Participle' }, 'volēns, volentis (PPA)']],
+        note: { de: 'Kein Imperativ. Nicht verwechseln: <i>vīs</i> „du willst“ und <i>vīs</i> „Kraft“.', en: 'No imperative. Don’t confuse <i>vīs</i> “you want” with <i>vīs</i> “force”.' } },
+    nolle: { name: 'nōlle', mean: { de: 'nicht wollen', en: 'not want' }, stamm: 'nōlō, nōlle, nōluī',
+        ind: { pres: six('nōlō, nōn vīs, nōn vult, nōlumus, nōn vultis, nōlunt'), impf: six('nōlēbam, nōlēbās, nōlēbat, nōlēbāmus, nōlēbātis, nōlēbant'), fut: six('nōlam, nōlēs, nōlet, nōlēmus, nōlētis, nōlent') }, perf: 'nōlu',
+        sub: { pres: six('nōlim, nōlīs, nōlit, nōlīmus, nōlītis, nōlint'), impf: six('nōllem, nōllēs, nōllet, nōllēmus, nōllētis, nōllent') },
+        extra: [[{ de: 'Imperativ', en: 'Imperative' }, 'nōlī, nōlīte (+ Inf.)'], [{ de: 'Infinitive', en: 'Infinitives' }, 'nōlle, nōluisse'], [{ de: 'Partizip', en: 'Participle' }, 'nōlēns, nōlentis (PPA)']],
+        note: { de: '<i>nōlle</i> = <i>nē</i> + <i>velle</i>. Mit dem Imperativ und einem Infinitiv drückt man ein Verbot aus: <i>Nōlī timēre!</i> „Fürchte dich nicht!“', en: '<i>nōlle</i> = <i>nē</i> + <i>velle</i>. Its imperative with an infinitive expresses a prohibition: <i>Nōlī timēre!</i> “Do not be afraid!”' } },
+    malle: { name: 'mālle', mean: { de: 'lieber wollen', en: 'prefer' }, stamm: 'mālō, mālle, māluī',
+        ind: { pres: six('mālō, māvīs, māvult, mālumus, māvultis, mālunt'), impf: six('mālēbam, mālēbās, mālēbat, mālēbāmus, mālēbātis, mālēbant'), fut: six('mālam, mālēs, mālet, mālēmus, mālētis, mālent') }, perf: 'mālu',
+        sub: { pres: six('mālim, mālīs, mālit, mālīmus, mālītis, mālint'), impf: six('māllem, māllēs, māllet, māllēmus, māllētis, māllent') },
+        extra: [[{ de: 'Infinitive', en: 'Infinitives' }, 'mālle, māluisse']],
+        note: { de: '<i>mālle</i> = <i>magis</i> + <i>velle</i>; meist mit <i>quam</i>: <i>Mālō vincere quam vincī.</i> Kein Imperativ.', en: '<i>mālle</i> = <i>magis</i> + <i>velle</i>; usually with <i>quam</i>: <i>Mālō vincere quam vincī.</i> No imperative.' } },
+    fieri: { name: 'fierī', mean: { de: 'werden, geschehen; gemacht werden', en: 'become, happen; be made' }, stamm: 'fīō, fierī, factus sum',
+        ind: { pres: six('fīō, fīs, fit, fīmus, fītis, fīunt'), impf: six('fīēbam, fīēbās, fīēbat, fīēbāmus, fīēbātis, fīēbant'), fut: six('fīam, fīēs, fīet, fīēmus, fīētis, fīent') }, pppPerf: 'fact',
+        sub: { pres: six('fīam, fīās, fīat, fīāmus, fīātis, fīant'), impf: six('fierem, fierēs, fieret, fierēmus, fierētis, fierent') },
+        extra: [[{ de: 'Imperativ', en: 'Imperative' }, 'fī, fīte'], [{ de: 'Infinitive', en: 'Infinitives' }, 'fierī, factum esse, futūrum esse / fore']],
+        note: { de: '<i>fierī</i> dient als Passiv zu <i>facere</i>: <i>fit</i> „es wird gemacht, es geschieht“. Die Perfektformen bildet es mit dem PPP von <i>facere</i>: <i>factus sum</i>.', en: '<i>fierī</i> serves as the passive of <i>facere</i>: <i>fit</i> “it is done, it happens”. Its perfect forms use the perfect participle of <i>facere</i>: <i>factus sum</i>.' } }
+};
+let curIrr = 'esse';
+function renderIrr() {
+    document.getElementById('irr-chips').innerHTML = Object.keys(IRR).map(k => `<button type="button" class="chip${k === curIrr ? ' active' : ''}" data-k="${k}">${noMac(IRR[k].name)}<span class="chip-sub">${tr(IRR[k].mean)}</span></button>`).join('');
+    document.querySelectorAll('#irr-chips .chip').forEach(b => b.onclick = () => { curIrr = b.dataset.k; renderIrr(); });
+    const v = IRR[curIrr];
+    const p = v.perfForms || (v.pppPerf ? perfPassive(v.pppPerf) : perfActive(v.perf));
+    const ind = [['pres', v.ind.pres], ['impf', v.ind.impf], ['fut', v.ind.fut], ['perf', p.perf], ['plqpf', p.plqpf], ['fut2', p.fut2]].map(([t, f]) => ({ h: TENSE[t], f }));
+    const sub = [['pres', v.sub.pres], ['impf', v.sub.impf], ['perf', p.sperf], ['plqpf', p.splqpf]].map(([t, f]) => ({ h: TENSE[t], f }));
+    let h = `<p class="meta"><b>${tr({ de: 'Stammformen', en: 'Principal parts' })}:</b> <span class="lat">${noMac(v.stamm)}</span> – ${tr(v.mean)}</p>`;
+    h += `<div class="tables">${personTable({ de: 'Indikativ', en: 'Indicative' }, ind)}${personTable({ de: 'Konjunktiv', en: 'Subjunctive' }, sub)}`;
+    if (v.passive) {
+        const pp = perfPassive(v.passive.ppp);
+        h += personTable({ de: 'Indikativ Passiv', en: 'Indicative passive' }, [['pres', v.passive.pres], ['impf', v.passive.impf], ['fut', v.passive.fut], ['perf', pp.perf], ['plqpf', pp.plqpf], ['fut2', pp.fut2]].map(([t, f]) => ({ h: TENSE[t], f })));
+        h += personTable({ de: 'Konjunktiv Passiv', en: 'Subjunctive passive' }, [['pres', v.passive.spres], ['impf', v.passive.simpf], ['perf', pp.sperf], ['plqpf', pp.splqpf]].map(([t, f]) => ({ h: TENSE[t], f })));
+    }
+    h += table({ caption: { de: 'Weitere Formen', en: 'Other forms' }, cols: [{ h: { de: 'Formen', en: 'Forms' } }], rows: v.extra.map(([l, f]) => ({ h: l, cells: [f] })) }) + '</div>';
+    h += notes([v.note]);
+    document.getElementById('irr-tables').innerHTML = h;
+}
+
+function renderDeponents() {
+    const rows = [
+        [{ de: 'ā-Konj.', en: '1st conj.' }, 'hortor, hortārī, hortātus sum', { de: 'ermahnen', en: 'encourage' }],
+        [{ de: 'ē-Konj.', en: '2nd conj.' }, 'vereor, verērī, veritus sum', { de: 'fürchten', en: 'fear' }],
+        [{ de: 'kons. Konj.', en: '3rd conj.' }, 'sequor, sequī, secūtus sum', { de: 'folgen', en: 'follow' }],
+        [{ de: 'ī-Konj.', en: '4th conj.' }, 'partior, partīrī, partītus sum', { de: 'teilen', en: 'share' }],
+        [{ de: 'gemischte Konj.', en: '3rd conj. -iō' }, 'patior, patī, passus sum', { de: 'erleiden, zulassen', en: 'suffer, allow' }]
+    ];
+    document.getElementById('dep-table').innerHTML = `<div class="tables">${table({ cols: [{ h: { de: 'Stammformen', en: 'Principal parts' } }, { h: { de: 'Bedeutung', en: 'Meaning' } }], rows: rows.map(r => ({ h: r[0], cells: [r[1], { html: r[2] }] })) })}</div>` + notes([
+        { de: 'Deponentien haben <b>passive Formen, aber aktive Bedeutung</b>: <i>hortātur</i> „er ermahnt“. Die Formen findest du in den Passiv-Tabellen oben.', en: 'Deponents have <b>passive forms but active meaning</b>: <i>hortātur</i> “he encourages”. You find the forms in the passive tables above.' },
+        { de: 'Aktive Formen haben sie dort, wo das Passiv keine hat: PPA (<i>hortāns</i>), PFA (<i>hortātūrus</i>), Infinitiv Futur (<i>hortātūrum esse</i>), Gerundium (<i>hortandī</i>).', en: 'They use active forms where the passive has none: present participle (<i>hortāns</i>), future participle (<i>hortātūrus</i>), future infinitive (<i>hortātūrum esse</i>), gerund (<i>hortandī</i>).' },
+        { de: 'Das PPP ist aktiv und vorzeitig: <i>hortātus</i> „nachdem er ermahnt hatte“. Das Gerundivum bleibt passiv: <i>hortandus</i> „einer, der ermahnt werden muss“.', en: 'The perfect participle is active and refers to an earlier time: <i>hortātus</i> “having encouraged”. The gerundive stays passive: <i>hortandus</i> “(one) to be encouraged”.' },
+        { de: '<b>Semideponentien</b> sind nur im Perfekt deponent: <i>audeō, audēre, ausus sum</i> (wagen); <i>gaudeō, gaudēre, gāvīsus sum</i> (sich freuen); <i>soleō, solēre, solitus sum</i> (pflegen); <i>cōnfīdō, cōnfīdere, cōnfīsus sum</i> (vertrauen).', en: '<b>Semi-deponents</b> are deponent only in the perfect: <i>audeō, audēre, ausus sum</i> (dare); <i>gaudeō, gaudēre, gāvīsus sum</i> (rejoice); <i>soleō, solēre, solitus sum</i> (be used to); <i>cōnfīdō, cōnfīdere, cōnfīsus sum</i> (trust).' }
+    ]);
+}
+
+function renderPart() {
+    const cols = [
+        col({ de: 'm./f.', en: 'm./f.' }, null, ['laudā|ns', 'laudant|is', 'laudant|ī', 'laudant|em', 'laudant|e / laudant|ī'], ['laudant|ēs', 'laudant|ium', 'laudant|ibus', 'laudant|ēs', 'laudant|ibus']),
+        col({ de: 'Neutrum', en: 'Neut.' }, null, ['laudā|ns', 'laudant|is', 'laudant|ī', 'laudā|ns', 'laudant|e / laudant|ī'], ['laudant|ia', 'laudant|ium', 'laudant|ibus', 'laudant|ia', 'laudant|ibus'])
+    ];
+    document.getElementById('part-table').innerHTML = `<div class="tables">${table({ caption: { de: 'laudāns, laudantis – lobend', en: 'laudāns, laudantis – praising' }, cols, rows: caseRows(cols) })}</div>` + notes([
+        { de: 'Ablativ Singular: <i>-e</i>, wenn das Partizip als Partizip gebraucht wird (vor allem im Ablativus absolutus: <i>mātre laudante</i>); <i>-ī</i>, wenn es als Adjektiv gebraucht wird.', en: 'Ablative singular: <i>-e</i> when the participle is used as a participle (above all in the ablative absolute: <i>mātre laudante</i>); <i>-ī</i> when it is used as an adjective.' },
+        { de: 'PPP und PFA werden wie <i>bonus, -a, -um</i> dekliniert.', en: 'The perfect passive and future active participles are declined like <i>bonus, -a, -um</i>.' }
+    ]);
+}
+
+function render() { renderOverview(); renderConj(); renderCompare(); renderPart(); renderPerfect(); renderIrr(); renderDeponents(); }
+initShared(render, { de: 'Syntax-Studio Latein – Konjugationen', en: 'Latin Syntax Studio – Conjugations' });
+
+</script>
+</body>
+</html>
