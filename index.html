@@ -620,14 +620,14 @@
                 correct: 'Richtig!', tipGeneric: 'Lies den Block noch einmal genau: Welche Frage beantwortet er?',
                 genProgress: (n) => `Richtig! Noch ${n} ${n === 1 ? 'Wort' : 'Wörter'} zu markieren.`,
                 genOk: 'Richtig! Das Genitivattribut beantwortet die Frage „Wessen?“ und gehört zum Block seines Bezugswortes.',
-                genAhead: 'In diesem Block steckt außerdem ein Genitivattribut. Das ist der nächste Schritt.',
+                genAhead: 'In diesem Block steckt ausserdem ein Genitivattribut. Das ist der nächste Schritt.',
                 notGen: 'Kein Genitivattribut! Gesucht ist ein Genitiv, der ein anderes Wort in diesem Block näher bestimmt.',
                 labelFirst: 'Bestimme zuerst die Funktion des blau umrandeten Blocks.',
                 locked: 'Im geführten Modus gehst du Block für Block vor. Bestimme zuerst den blau umrandeten Block.',
                 clickWord: 'Klicke direkt auf das Wort im Block, das du markieren willst.',
                 sentenceDone: 'Damit ist der Satz vollständig bestimmt. Das Übersetzungsfeld ist jetzt offen: Übersetze den Satz, bevor du weitergehst.',
-                collapse: 'Hinweisfeld verkleinern', expand: 'Hinweisfeld vergrößern',
-                cont: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Block zu gehen.', contSentence: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Satz zu gehen.', contEnd: 'Klicke irgendwo auf die Seite (oder drücke Enter), um abzuschließen.',
+                collapse: 'Hinweisfeld verkleinern', expand: 'Hinweisfeld vergrössern',
+                cont: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Block zu gehen.', contSentence: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Satz zu gehen.', contEnd: 'Klicke irgendwo auf die Seite (oder drücke Enter), um abzuschliessen.',
                 solution: 'Lösung zeigen', solutionShown: 'Die richtige Antwort ist',
                 end: '<strong>Geschafft!</strong> Du hast alle Sätze Schritt für Schritt bestimmt. Vergiss die Übersetzungen nicht.',
                 fn: {
@@ -939,7 +939,7 @@
                 const de = document.documentElement.lang !== 'en';
                 document.querySelectorAll('.aid-btn, #btn-reading').forEach(b => {
                     b.classList.toggle('active', v); b.setAttribute('aria-pressed', v ? 'true' : 'false');
-                    b.title = (de ? 'Lesehilfe: größere, leichter lesbare Schrift mit mehr Abstand' : 'Reading aid: larger, easier-to-read text with more spacing') + (v ? (de ? ' (an)' : ' (on)') : '');
+                    b.title = (de ? 'Lesehilfe: grössere, leichter lesbare Schrift mit mehr Abstand' : 'Reading aid: larger, easier-to-read text with more spacing') + (v ? (de ? ' (an)' : ' (on)') : '');
                     b.setAttribute('aria-label', b.title);
                 });
             }
@@ -1758,13 +1758,13 @@ const CONFIG = {
         },
         de: {
             heading: "Syntax-Studio Latein", instrH3: "Schritt 1: Einrichtung",
-            instrBody: "Diese Seite ermöglicht es Ihnen, eigene Sätze für die syntaktische Analyse zu erstellen. Geben Sie einen Titel, optionale Hinweise für die Lernenden, ein Bild (optional) und den lateinischen Text (bis 300 Wörter) ein, wählen Sie die Grammatik-Stufe und klicken Sie auf 'Mit KI analysieren'. Die Analyse übernimmt OpenAI.", instrKey: "Dafür hinterlegen Sie einmalig Ihren eigenen OpenAI-API-Schlüssel über den Schlüssel-Button; er bleibt nur in diesem Browser.", instrBodyEnd: "Prüfen und verfeinern Sie die Analyse anschließend im Editor und exportieren Sie die Schülerseite. Ohne KI können Sie auch manuell starten.",
+            instrBody: "Diese Seite ermöglicht es Ihnen, eigene Sätze für die syntaktische Analyse zu erstellen. Geben Sie einen Titel, optionale Hinweise für die Lernenden, ein Bild (optional) und den lateinischen Text (bis 300 Wörter) ein, wählen Sie die Grammatik-Stufe und klicken Sie auf 'Mit KI analysieren'. Die Analyse übernimmt OpenAI.", instrKey: "Dafür hinterlegen Sie einmalig Ihren eigenen OpenAI-API-Schlüssel über den Schlüssel-Button; er bleibt nur in diesem Browser.", instrBodyEnd: "Prüfen und verfeinern Sie die Analyse anschliessend im Editor und exportieren Sie die Schülerseite. Ohne KI können Sie auch manuell starten.",
             exampleLink: "Möchten Sie sehen, wie das Ergebnis aussieht?", linkText: "Beispiel ansehen",
             phTitle: "Übungstitel (z.B. Ovid, Metamorphosen 1,1-4)", phImage: "Optional: Bild-URL", phNotes: "Optional: Kontext / Lehrerhinweise", phText: "Lateinischen Text hier einfügen...",
             btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
             lblLevel: "Grammatik-Level:", optBeg: "Anfänger", optInt: "Fortgeschritten", optAdv: "Profi (Alle)",
             editH3: "Schritt 2: Bearbeitung",
-            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer größeren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe.",
+            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer grösseren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe.",
            	wordModalTitle: "Wort & Hinweis bearbeiten", wordTextLabel: "Worttext:", hintLabel: "Hinweis (optional):", groupHintLabel: "Gruppen-Hinweis (optional):",
             errorHintLabel: "Hinweis nach falscher Antwort (optional):",
             explainLabel: "Erklärung nach richtiger Antwort (geführter Modus, optional):", phWordExplain: "Z.B. Der Akkusativ kündigt ein Verb an, das ihn braucht.", phGroupExplain: "Z.B. Erwarte am Ende des Nebensatzes ein eigenes Prädikat.",
@@ -3635,7 +3635,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             resetWarn: "Ein Moduswechsel lädt die Seite neu und setzt deinen Fortschritt zurück. Fortfahren?",
             btnSubmitExam: "✅ Prüfung abgeben",
             confirmSubmit: "Prüfung jetzt abgeben? Unbeantwortete Wortgruppen und noch nicht gefundene Genitivattribute werden als Fehler gewertet.",
-            examResults: "Prüfungsergebnisse", copyResults: "Ergebnisse kopieren", copied: "Kopiert!", close: "Schließen",
+            examResults: "Prüfungsergebnisse", copyResults: "Ergebnisse kopieren", copied: "Kopiert!", close: "Schliessen",
             saveWarning: "⚠️ Hinweis: Dein Fortschritt wird lokal in diesem Webbrowser gespeichert. Du musst diese Datei auf genau demselben Gerät und in demselben Browser öffnen, um später weiterzuarbeiten. Das Löschen der Browserdaten löscht auch deinen Fortschritt. Möchtest du jetzt speichern?",
             resExercise: "Übung: ", resDate: "Datum: ", resScore: "Ergebnis: ",
             markGen: "🖍️ Genitiv markieren (G)", unmarkGen: "❌ Markierung aufheben (G)", notGenitive: "Kein Genitivattribut!",
