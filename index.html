@@ -448,6 +448,11 @@
         .label-legend { order: -1; position: sticky; top: 16px; z-index: 60; width: 230px; flex-shrink: 0; margin-top: 30px; max-height: calc(100vh - 32px); overflow-y: auto; box-sizing: border-box; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; line-height: 1.3; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .legend-title { font-weight: 600; font-size: 0.9rem; color: #111827; margin-bottom: 2px; }
         .legend-hint { font-size: 0.78rem; color: #6b7280; margin: 0 0 10px; }
+        .z-btn.active { background: #eff6ff; border-color: #3b82f6; }
+        body.high-contrast .z-btn.active { background: #1e3a8a; border-color: #93c5fd; }
+        .instruction-box .guide-sentence a { color: #2563eb; font-weight: 600; text-decoration: none; }
+        .instruction-box .guide-sentence a:hover { text-decoration: underline; }
+        body.high-contrast .instruction-box .guide-sentence a { color: #93c5fd; }
         .legend-cvd { display: block; width: 100%; margin: 0 0 10px; padding: 6px 8px; border: 1px solid #e5e7eb; background: #f9fafb; border-radius: 6px; cursor: pointer; font-size: 0.8rem; color: #374151; font-family: inherit; text-align: left; }
         .legend-cvd:hover, .legend-cvd:focus-visible { background: #f3f4f6; border-color: #bfdbfe; outline: none; }
         body.high-contrast .legend-cvd { background: #333; color: #fff; border-color: #555; }
@@ -837,6 +842,12 @@
             Object.keys(used).filter(isOther).forEach(l => { out[l] = neutral; });
             return { colors: out, total, given: labels.length };
         }
+        function updateCvdButton() {
+            const b = document.getElementById('btn-cvd'); if (!b) return;
+            const t = studentTexts[currentLang], on = cvdActive();
+            b.title = on ? t.cvdOff.replace(/^\S+\s/, '') : t.cvdOn.replace(/^\S+\s/, ''); b.setAttribute('aria-label', b.title);
+            b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.classList.toggle('active', on);
+        }
         function helpLink(page) { return HELP_BASE + page + '?lang=' + currentLang; }
         const CVD_KEY = saveKey + '_cvd';
         function cvdActive() { try { return localStorage.getItem(CVD_KEY) === '1'; } catch(e) { return false; } }
@@ -871,10 +882,6 @@
             const ttl = document.createElement('div'); ttl.className = 'legend-title'; ttl.textContent = t.legendTitle;
             const hint = document.createElement('p'); hint.className = 'legend-hint'; hint.textContent = t.legendHint;
             box.append(ttl, hint);
-            const cvd = document.createElement('button'); cvd.type = 'button'; cvd.className = 'legend-cvd';
-            cvd.textContent = cvdActive() ? t.cvdOff : t.cvdOn; cvd.title = t.cvdTitle;
-            cvd.onclick = (e) => { e.stopPropagation(); closeColorPopover(false); toggleColorBlindColors(); };
-            box.appendChild(cvd);
             const list = document.createElement('div'); list.className = 'legend-list';
             currentLabels().forEach(label => {
                 const chip = document.createElement('button'); chip.type = 'button'; chip.className = 'legend-chip'; chip.dataset.label = label;
@@ -897,12 +904,20 @@
             // reference pages
             const refs = document.createElement('div'); refs.className = 'legend-refs';
             const rt = document.createElement('div'); rt.className = 'legend-refs-title'; rt.textContent = t.refsTitle; refs.appendChild(rt);
-            [['anleitung.html', '📖', t.refGuide], ['deklinationen.html', '📋', t.refDecl], ['konjugationen.html', '📋', t.refConj]].forEach(([page, icon, label]) => {
+            [['deklinationen.html', '📋', t.refDecl], ['konjugationen.html', '📋', t.refConj]].forEach(([page, icon, label]) => {
                 const a = document.createElement('a'); a.href = helpLink(page); a.target = '_blank'; a.rel = 'noopener';
                 a.textContent = icon + ' ' + label; refs.appendChild(a);
             });
             box.appendChild(refs);
-            const lg = document.getElementById('link-guide'); if (lg) { lg.href = helpLink('anleitung.html'); lg.textContent = '📖 ' + t.guideLink; }
+            // sentence with a link to the guide at the end of the introductory text (the text is replaced on a language switch)
+            const ib = document.querySelector('.instruction-box');
+            if (ib) {
+                const old = ib.querySelector('.guide-sentence'); if (old) old.remove();
+                const gs = document.createElement('span'); gs.className = 'guide-sentence';
+                gs.innerHTML = ' ' + t.guideSentence.replace('{link}', `<a href="${helpLink('anleitung.html')}" target="_blank" rel="noopener">${t.guideLinkText}</a>`);
+                ib.appendChild(gs);
+            }
+            updateCvdButton();
         }
         function openColorPopover(label, anchor) {
             const pop = document.getElementById('color-popover'); const t = studentTexts[currentLang];
@@ -3491,7 +3506,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             markGen: "🖍️ Mark Genitive (G)", unmarkGen: "❌ Unmark Genitive (G)", notGenitive: "Not a genitive attribute!",
             legendTitle: "Syntactic functions", legendHint: "Click a function to change its colour.",
             keysTitle: "Keyboard shortcuts", keysHint: "Point at a word with the mouse (or select it with Tab) and press the underlined letter of the function.", keysGen: "Mark genitive (click the word first)", colorFor: "Colour for:", colorInUse: "Used by {label} (it will turn grey)", colorResetOne: "↺ Teacher's colour",
-            refsTitle: "Look it up", refGuide: "Guide", refDecl: "Declension tables", refConj: "Conjugation tables", guideLink: "Guide: how to analyse a sentence step by step",
+            refsTitle: "Look it up", refGuide: "Guide", refDecl: "Declension tables", refConj: "Conjugation tables", guideSentence: "The {link} shows you step by step how to analyse a sentence.", guideLinkText: "📖 guide",
             cvdOn: "👁 Colours for colour blindness", cvdOff: "↺ Back to the teacher's colours", cvdTitle: "Colours that stay clearly distinct with every type of colour blindness",
             cvdPartial: (n) => `Only ${n} functions could get colour-blind-safe colours; the patterns (🏁) help with the rest.`, colorsReset: "↺ All of the teacher's colours"
         },
@@ -3512,7 +3527,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             markGen: "🖍️ Genitiv markieren (G)", unmarkGen: "❌ Markierung aufheben (G)", notGenitive: "Kein Genitivattribut!",
             legendTitle: "Syntaktische Funktionen", legendHint: "Klicke auf eine Funktion, um ihre Farbe zu ändern.",
             keysTitle: "Tastenkürzel", keysHint: "Zeige mit der Maus auf ein Wort (oder wähle es mit Tab) und drücke den unterstrichenen Buchstaben der Funktion.", keysGen: "Genitiv markieren (vorher auf das Wort klicken)", colorFor: "Farbe für:", colorInUse: "Belegt von {label} (wird dann grau)", colorResetOne: "↺ Farbe der Lehrkraft",
-            refsTitle: "Nachschlagen", refGuide: "Anleitung", refDecl: "Deklinationstabellen", refConj: "Konjugationstabellen", guideLink: "Anleitung: So analysierst du einen Satz Schritt für Schritt",
+            refsTitle: "Nachschlagen", refGuide: "Anleitung", refDecl: "Deklinationstabellen", refConj: "Konjugationstabellen", guideSentence: "Wie du einen Satz Schritt für Schritt analysierst, zeigt dir die {link}.", guideLinkText: "📖 Anleitung",
             cvdOn: "👁 Farben für Farbenblinde", cvdOff: "↺ Zurück zu den Farben der Lehrkraft", cvdTitle: "Farben, die bei allen Formen von Farbenblindheit gut unterscheidbar bleiben",
             cvdPartial: (n) => `Nur ${n} Funktionen konnten farbenblind-sichere Farben erhalten; bei den übrigen helfen die Muster (🏁).`, colorsReset: "↺ Alle Farben der Lehrkraft"
         }
@@ -3534,7 +3549,6 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         </div>
         <h1>${safeTitle}</h1>
         <div class="instruction-box">${t.instr}</div>
-        <p class="help-top"><a id="link-guide" target="_blank" rel="noopener"></a></p>
         ${safeNotes ? `<div class="teacher-note"><span style="font-weight: 500;">${t.note}</span> ${safeNotes}</div>` : ''}
         <div class="exercise-wrapper">
             <div style="text-align: center; margin-bottom: 24px;">
@@ -3546,6 +3560,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             </div>
             <div class="zoom-controls">
                 <button class="z-btn" onclick="togglePatterns()" title="${t.togglePat}">🏁</button>
+                <button class="z-btn" id="btn-cvd" type="button" onclick="closeColorPopover(false); toggleColorBlindColors();" aria-pressed="false">👁</button>
                 <button class="z-btn" onclick="toggleContrast()" title="${t.toggleCon}">🌗</button>
                 <span style="border-left: 1px solid #d1d5db; margin: 0 4px; height: 16px;"></span>
                 <button class="z-btn" onclick="setStudentZoom(0.1)" title="Zoom In">🔍 +</button>
