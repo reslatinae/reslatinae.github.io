@@ -278,7 +278,8 @@
             </div>
 
             <div class="project-mini-row">
-                <button class="subtle-btn" id="btn-reset-colors" data-ref="btnResetColors" style="margin-right:auto;">🎨 Default colours</button>
+                <button class="subtle-btn" id="btn-reset-colors" data-ref="btnResetColors">🎨 Default colours</button>
+                <button class="subtle-btn" id="btn-cvd-colors" data-ref="btnCvdColors" style="margin-right:auto;">👁 Colour-blind-safe colours</button>
                 <button class="subtle-btn" id="btn-save-work" data-ref="btnSaveWork">💾 Save Work</button>
                 <label class="subtle-btn">
                     <span id="btn-load-work" data-ref="btnLoadWork">📂 Load Work</span> <input type="file" accept=".json" style="display:none" id="file-load-editor" data-ref="fileLoadEditor">
@@ -408,6 +409,7 @@
         .guide-fb.ok { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
         .guide-fb.err { background: #fef2f2; border: 1px solid #fecaca; color: #7f1d1d; }
         .guide-actions { display: flex; justify-content: flex-end; gap: 8px; }
+        .guide-continue { font-size: 0.85rem; color: #3b82f6; font-weight: 500; }
         .guide-btn { padding: 8px 16px; border: none; border-radius: 6px; background: #3b82f6; color: #fff; font-weight: 500; cursor: pointer; font-size: 0.9rem; }
         .guide-btn:hover { opacity: 0.9; }
         .guide-btn.secondary { background: #e5e7eb; color: #1f2937; }
@@ -446,7 +448,22 @@
         .label-legend { order: -1; position: sticky; top: 16px; z-index: 60; width: 230px; flex-shrink: 0; margin-top: 30px; max-height: calc(100vh - 32px); overflow-y: auto; box-sizing: border-box; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; line-height: 1.3; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .legend-title { font-weight: 600; font-size: 0.9rem; color: #111827; margin-bottom: 2px; }
         .legend-hint { font-size: 0.78rem; color: #6b7280; margin: 0 0 10px; }
+        .legend-cvd { display: block; width: 100%; margin: 0 0 10px; padding: 6px 8px; border: 1px solid #e5e7eb; background: #f9fafb; border-radius: 6px; cursor: pointer; font-size: 0.8rem; color: #374151; font-family: inherit; text-align: left; }
+        .legend-cvd:hover, .legend-cvd:focus-visible { background: #f3f4f6; border-color: #bfdbfe; outline: none; }
+        body.high-contrast .legend-cvd { background: #333; color: #fff; border-color: #555; }
+        @media (max-width: 900px) { .legend-cvd { width: auto; display: inline-block; } }
         .legend-list { display: flex; flex-direction: column; gap: 2px; }
+        .legend-refs { margin-top: 12px; padding-top: 10px; border-top: 1px solid #e5e7eb; display: flex; flex-direction: column; gap: 2px; }
+        .legend-refs-title { font-weight: 600; font-size: 0.85rem; color: #111827; margin-bottom: 2px; }
+        .legend-refs a { color: #2563eb; text-decoration: none; font-size: 0.85rem; padding: 4px 6px; border-radius: 6px; }
+        .legend-refs a:hover, .legend-refs a:focus-visible { background: #eff6ff; outline: none; text-decoration: underline; }
+        .help-top { margin: -14px 0 24px; font-size: 0.9rem; }
+        .help-top a { color: #2563eb; text-decoration: none; font-weight: 500; }
+        .help-top a:hover { text-decoration: underline; }
+        body.high-contrast .legend-refs-title { color: #fff; }
+        body.high-contrast .legend-refs a, body.high-contrast .help-top a { color: #93c5fd; }
+        @media (max-width: 900px) { .legend-refs { flex-direction: row; flex-wrap: wrap; gap: 4px 10px; } }
+        @media print { .legend-refs, .help-top { display: none !important; } }
         .legend-chip { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 1px solid transparent; background: transparent; border-radius: 6px; padding: 5px 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #374151; font-family: inherit; }
         .legend-chip:hover, .legend-chip:focus-visible, .legend-chip.open { background: #f3f4f6; border-color: #bfdbfe; outline: none; }
         .legend-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(17,24,39,0.25); flex-shrink: 0; }
@@ -572,7 +589,8 @@
                 locked: 'Im geführten Modus gehst du Block für Block vor. Bestimme zuerst den blau umrandeten Block.',
                 clickWord: 'Klicke direkt auf das Wort im Block, das du markieren willst.',
                 sentenceDone: 'Damit ist der Satz vollständig bestimmt. Das Übersetzungsfeld ist jetzt offen: Übersetze den Satz, bevor du weitergehst.',
-                next: 'Weiter →', nextSentence: 'Nächster Satz →', solution: 'Lösung zeigen', solutionShown: 'Die richtige Antwort ist',
+                cont: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Block zu gehen.', contSentence: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Satz zu gehen.', contEnd: 'Klicke irgendwo auf die Seite (oder drücke Enter), um abzuschließen.',
+                solution: 'Lösung zeigen', solutionShown: 'Die richtige Antwort ist',
                 end: '<strong>Geschafft!</strong> Du hast alle Sätze Schritt für Schritt bestimmt. Vergiss die Übersetzungen nicht.',
                 fn: {
                     'Subjekt': ['Frage: Wer oder was? Achte auf den Nominativ und darauf, ob der Block in der Zahl zum Prädikat passt.', 'Das Subjekt sagt dir, wer oder was handelt. Prüfe beim Weiterlesen, ob das Prädikat in Person und Zahl dazu passt.'],
@@ -610,7 +628,8 @@
                 locked: 'In guided mode you go block by block. First work out the block outlined in blue.',
                 clickWord: 'Click directly on the word in the block that you want to mark.',
                 sentenceDone: 'The sentence is now fully analysed. The translation box is open: translate the sentence before you move on.',
-                next: 'Next →', nextSentence: 'Next sentence →', solution: 'Show answer', solutionShown: 'The correct answer is',
+                cont: 'Click anywhere on the page (or press Enter) to go to the next block.', contSentence: 'Click anywhere on the page (or press Enter) to go to the next sentence.', contEnd: 'Click anywhere on the page (or press Enter) to finish.',
+                solution: 'Show answer', solutionShown: 'The correct answer is',
                 end: '<strong>Done!</strong> You have analysed every sentence step by step. Don’t forget the translations.',
                 fn: {
                     'Subject': ['Ask: who or what? Look for the nominative and check whether the block agrees in number with the verb.', 'The subject tells you who or what acts. As you read on, check that the verb agrees with it in person and number.'],
@@ -636,6 +655,19 @@
             }
         };
         let guided = { hold: false, el: null, type: null };
+        // After a correct answer in guided mode, the next click anywhere (or Enter/Space) moves on. The listener runs in the
+        // capture phase, before the word/menu handlers: a click on the next block therefore moves on and opens its menu at once.
+        function guidedContinue() { if (exMode === 'guided' && guided.hold) { guided.hold = false; guidedRender(); return true; } return false; }
+        document.addEventListener('click', (e) => {
+            if (!(exMode === 'guided' && guided.hold)) return;
+            if (e.target.closest('textarea, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal')) return; // these keep working as usual
+            guidedContinue();
+        }, true);
+        document.addEventListener('keydown', (e) => {
+            if (!(exMode === 'guided' && guided.hold)) return;
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); guidedContinue(); }
+        });
         let studentDirty = false; let allowUnload = false; // progress changed since "Save progress"; reloads the page itself triggers are allowed
         window.addEventListener('beforeunload', (e) => { if (studentDirty && !allowUnload) { e.preventDefault(); e.returnValue = ''; } });
         document.addEventListener('input', (e) => { if (e.target.tagName === 'TEXTAREA' && !e.target.classList.contains('results-textarea')) studentDirty = true; });
@@ -678,20 +710,19 @@
                 else if (guided.type === 'gen') prompt = t.promptGen(el.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').length);
                 else prompt = t.promptLabel;
             }
-            let actions = '';
+            let actions = '', cont = '';
             if (guided.hold) {
+                // No "Next" button: after a correct answer, any click on the page (or Enter) moves on - see guidedContinue()
                 const nxt = guidedCompute();
-                const label = (!nxt.el || sentenceOf(nxt.el) !== sentenceOf(el)) && nxt.type !== 'end' ? t.nextSentence : t.next;
-                actions = `<button type="button" class="guide-btn" id="guide-next">${label}</button>`;
+                cont = nxt.type === 'end' ? t.contEnd : (sentenceOf(nxt.el) !== sentenceOf(el) ? t.contSentence : t.cont);
             } else if (showSolution) {
                 actions = `<button type="button" class="guide-btn secondary" id="guide-solution">${t.solution}</button>`;
             }
             guidePanel.innerHTML = `<div class="guide-head"><span>${t.counter(Math.max(1, sIdx + 1), sentences.length)}</span></div>
                 ${prompt ? `<div class="guide-prompt">${prompt}</div>` : ''}
                 ${fbHtml ? `<div class="guide-fb ${fbOk ? 'ok' : 'err'}">${fbHtml}</div>` : ''}
+                ${cont ? `<div class="guide-continue">${cont}</div>` : ''}
                 ${actions ? `<div class="guide-actions">${actions}</div>` : ''}`;
-            const nb = document.getElementById('guide-next');
-            if (nb) { nb.onclick = () => { guided.hold = false; guidedRender(); }; nb.focus({ preventScroll: true }); }
             const sb = document.getElementById('guide-solution');
             if (sb) sb.onclick = guidedShowSolution;
 
@@ -788,9 +819,47 @@
             owners.forEach(o => apply(o, NEUTRAL_COLOR));
             writeColorPrefs(prefs); recolorSolved(); renderLegend(); closeColorPopover(true);
         }
+        function assignColorBlindColors(used, order, palette, neutral) {
+            // used: {label: count}; order: the function list (decides who gets which colour, so the result is the same in every exercise).
+            // "Other/Sonstiges" stays grey. If more functions are used than there are safe colours, the most frequent ones get them.
+            const isOther = (l) => l === 'Sonstiges' || l === 'Other';
+            let labels = Object.keys(used).filter(l => !isOther(l));
+            const total = labels.length;
+            if (labels.length > palette.length) labels = labels.sort((a, b) => used[b] - used[a]).slice(0, palette.length);
+            const rank = (l) => { const i = order.indexOf(l); return i === -1 ? 999 : i; };
+            labels.sort((a, b) => rank(a) - rank(b));
+            // fixed colours for the most common functions, close to their usual colours, so they look the same in every exercise
+            const PREF = { 'Subjekt': 0, 'Subject': 0, 'Prädikat': 1, 'Verb': 1, 'Akkusativobjekt': 2, 'Accusative object': 2, 'Dativobjekt': 3, 'Dative object': 3,
+                'Ablativ': 4, 'Ablative': 4, 'Präpositionale Bestimmung': 7, 'Prepositional phrase': 7, 'Relativsatz': 6, 'Relative clause': 6, 'Nebensatz': 5, 'Subordinate clause': 5 };
+            const out = {}, free = palette.map((c, i) => i);
+            labels.forEach(l => { const i = PREF[l]; if (i !== undefined && i < palette.length && free.includes(i)) { out[l] = palette[i]; free.splice(free.indexOf(i), 1); } });
+            labels.forEach(l => { if (!(l in out)) out[l] = palette[free.shift()]; });
+            Object.keys(used).filter(isOther).forEach(l => { out[l] = neutral; });
+            return { colors: out, total, given: labels.length };
+        }
+        function helpLink(page) { return HELP_BASE + page + '?lang=' + currentLang; }
+        const CVD_KEY = saveKey + '_cvd';
+        function cvdActive() { try { return localStorage.getItem(CVD_KEY) === '1'; } catch(e) { return false; } }
+        function toggleColorBlindColors() {
+            const t = studentTexts[currentLang];
+            if (cvdActive()) { resetStudentColors(); return; }
+            const used = {};
+            document.querySelectorAll('#exercise .hover-word').forEach(el => { const l = el.dataset.ans; if (l) used[l] = (used[l] || 0) + 1; });
+            document.querySelectorAll('#exercise .s-group').forEach(el => { const l = el.dataset.ans; if (l) used[l] = (used[l] || 0) + 1; });
+            const order = currentLabels().flatMap(l => [l, colorCounterpart(l)].filter(Boolean)); // the menu order, in both languages
+            const res = assignColorBlindColors(used, order, CVD_SAFE, NEUTRAL_COLOR);
+            const prefs = readColorPrefs();
+            const taken = new Set(Object.values(res.colors).map(c => c.toLowerCase()));
+            currentLabels().forEach(l => { if (!(l in res.colors) && !(colorCounterpart(l) in res.colors) && taken.has((colors[l] || '').toLowerCase())) { [l, colorCounterpart(l)].forEach(k => { if (k) { colors[k] = NEUTRAL_COLOR; prefs[k] = NEUTRAL_COLOR; } }); } });
+            Object.keys(res.colors).forEach(l => { [l, colorCounterpart(l)].forEach(k => { if (k) { colors[k] = res.colors[l]; prefs[k] = res.colors[l]; } }); });
+            writeColorPrefs(prefs);
+            try { localStorage.setItem(CVD_KEY, '1'); } catch(e) {}
+            recolorSolved(); renderLegend();
+            if (res.given < res.total) showToast(t.cvdPartial(res.given), false, 5000);
+        }
         function resetStudentColors() {
             const label = legendOpenLabel;
-            try { localStorage.removeItem(COLOR_PREF_KEY); } catch(e) {}
+            try { localStorage.removeItem(COLOR_PREF_KEY); localStorage.removeItem(CVD_KEY); } catch(e) {}
             Object.keys(teacherColors).forEach(k => { colors[k] = teacherColors[k]; });
             recolorSolved(); renderLegend(); legendOpenLabel = label; closeColorPopover(true);
         }
@@ -802,6 +871,10 @@
             const ttl = document.createElement('div'); ttl.className = 'legend-title'; ttl.textContent = t.legendTitle;
             const hint = document.createElement('p'); hint.className = 'legend-hint'; hint.textContent = t.legendHint;
             box.append(ttl, hint);
+            const cvd = document.createElement('button'); cvd.type = 'button'; cvd.className = 'legend-cvd';
+            cvd.textContent = cvdActive() ? t.cvdOff : t.cvdOn; cvd.title = t.cvdTitle;
+            cvd.onclick = (e) => { e.stopPropagation(); closeColorPopover(false); toggleColorBlindColors(); };
+            box.appendChild(cvd);
             const list = document.createElement('div'); list.className = 'legend-list';
             currentLabels().forEach(label => {
                 const chip = document.createElement('button'); chip.type = 'button'; chip.className = 'legend-chip'; chip.dataset.label = label;
@@ -821,6 +894,15 @@
                 list.appendChild(chip);
             });
             box.appendChild(list);
+            // reference pages
+            const refs = document.createElement('div'); refs.className = 'legend-refs';
+            const rt = document.createElement('div'); rt.className = 'legend-refs-title'; rt.textContent = t.refsTitle; refs.appendChild(rt);
+            [['anleitung.html', '📖', t.refGuide], ['deklinationen.html', '📋', t.refDecl], ['konjugationen.html', '📋', t.refConj]].forEach(([page, icon, label]) => {
+                const a = document.createElement('a'); a.href = helpLink(page); a.target = '_blank'; a.rel = 'noopener';
+                a.textContent = icon + ' ' + label; refs.appendChild(a);
+            });
+            box.appendChild(refs);
+            const lg = document.getElementById('link-guide'); if (lg) { lg.href = helpLink('anleitung.html'); lg.textContent = '📖 ' + t.guideLink; }
         }
         function openColorPopover(label, anchor) {
             const pop = document.getElementById('color-popover'); const t = studentTexts[currentLang];
@@ -1496,6 +1578,10 @@ const CONFIG = {
     MAIN_CLAUSE_DE: 'Hauptsatz',
     SENTENCE_ENDERS: ['.', '!', '?', '·'],
     NEUTRAL_COLOR: '#e5e7eb', // grey given to a label whose colour was taken by another label
+    // Ten colours that stay clearly distinct for normal vision and for protanopia, deuteranopia and tritanopia
+    // (simulated, ΔE2000 >= 9 between any two, and against the grey above). Ordered so that the first functions keep
+    // their familiar colour family: Subjekt green, Prädikat red, Akkusativobjekt yellow, Dativobjekt orange-brown ...
+    CVD_SAFE: ['#77dd66', '#ffaabb', '#ffeeaa', '#bb9988', '#6699ff', '#66ddff', '#ccffdd', '#aaaacc', '#999955', '#889999'],
     AI: {
         ENDPOINT: 'https://api.openai.com/v1/responses',
         PROXY_URL: 'https://latin-syntax-proxy.latin-syntax-proxy.workers.dev/',            // set to the deployed worker URL (see worker/README.md): requests then go there WITHOUT a key and the key button disappears
@@ -1518,12 +1604,14 @@ const CONFIG = {
             btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
             lblLevel: "Grammar Level:", optBeg: "Beginner", optInt: "Intermediate", optAdv: "Advanced (All)",
             editH3: "Step 2: Editing Instruction",
-            editBody: "Revise the syntactic analysis. Adjacent words with same labels merge automatically. Use 'Manual Split' to separate. Use 'Define Word Group' to group phrases. You can use 'Mark Genitive' to draw an underline marking a genitive attribute inside a larger phrase group! Double-click any word or punctuation to edit it or add a hint, an error hint or an explanation for the guided mode. Shortcuts: 'X' for Split, 'M' for Word Group, 'G' for Genitive Underline, 'W' to Toggle Break, Ctrl+Z to Undo. Click ▾ next to a label (or right-click the label) to change its colour. At the end, hit 'Export Student Page'.",
+            editBody: "Check the analysis. Adjacent words merge automatically in the student view. Use 'Manual Split' to separate words. Create groups with 'Define Word Group'. With 'Mark Genitive' you can highlight a genitive attribute inside a larger group by underlining it. Double-click a word to correct it or add hints. With 'New Label' you can add a new function (e.g. Vocative). Click ▾ next to a label (or right-click it) to change its colour.",
            	wordModalTitle: "Edit Word & Hint", wordTextLabel: "Word Text:", hintLabel: "Hint (optional):", groupHintLabel: "Group Hint (optional):",
             errorHintLabel: "Hint after wrong answer (optional):",
             explainLabel: "Explanation after a correct answer (guided mode, optional):", phWordExplain: "E.g. The accusative points ahead to a verb that needs it.", phGroupExplain: "E.g. Expect a verb of its own at the end of the clause.",
             phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (W)", btnBracket: "Define Word Group (M)", btnAttr: "Mark Genitive (G)",
-            btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work", btnResetColors: "🎨 Restore default colours", confirmResetColors: "Reset all label colours to the default colours? (You can undo this with Ctrl+Z.)",
+            btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work", btnResetColors: "🎨 Restore default colours", btnCvdColors: "👁 Colour-blind-safe colours",
+            cvdTitle: "Give the functions in this exercise colours that stay clearly distinct with colour blindness",
+            confirmCvd: (n, given) => `The ${n} functions in this exercise get colours that stay clearly distinct with every type of colour blindness.` + (given < n ? ` There are only ${given} such colours: the ${given} most frequent functions get them, the others keep their colour (the patterns help there).` : '') + ` Students will see these colours too. (Undo with Ctrl+Z.)`, cvdNone: "There are no analysed words yet.", confirmResetColors: "Reset all label colours to the default colours? (You can undo this with Ctrl+Z.)",
             modalTitle: "Name of the syntactic group:", btnCancel: "Cancel", btnSaveGroup: "Save", btnDelete: "Delete", confirmDelete: "Are you sure you want to delete this word?",
             modeTag: "Mode: Tagging", modeSplit: "Mode: Manual Split", modeLineBreak: "Mode: Toggle Break", modeBracket: "Mode: Define Word Group", modeAttr: "Mode: Mark Genitive",
             togglePat: "Toggle Patterns", toggleCon: "Toggle High Contrast",
@@ -1550,12 +1638,14 @@ const CONFIG = {
             btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
             lblLevel: "Grammatik-Level:", optBeg: "Anfänger", optInt: "Fortgeschritten", optAdv: "Profi (Alle)",
             editH3: "Schritt 2: Bearbeitung",
-            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer größeren Gruppe durch Unterstreichung hervorheben! Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen und Erklärungen für den geführten Modus. Shortcuts: 'X' für Trennen, 'M' für Wortgruppe, 'G' für Genitiv-Unterstreichung, 'W' für Umbruch, Strg+Z für Rückgängig. Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe.",
+            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer größeren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe.",
            	wordModalTitle: "Wort & Hinweis bearbeiten", wordTextLabel: "Worttext:", hintLabel: "Hinweis (optional):", groupHintLabel: "Gruppen-Hinweis (optional):",
             errorHintLabel: "Hinweis nach falscher Antwort (optional):",
             explainLabel: "Erklärung nach richtiger Antwort (geführter Modus, optional):", phWordExplain: "Z.B. Der Akkusativ kündigt ein Verb an, das ihn braucht.", phGroupExplain: "Z.B. Erwarte am Ende des Nebensatzes ein eigenes Prädikat.",
             phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (W)", btnBracket: "Wortgruppe definieren (M)", btnAttr: "Genitiv markieren (G)",
-            btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden", btnResetColors: "🎨 Standardfarben wiederherstellen", confirmResetColors: "Alle Label-Farben auf die Standardfarben zurücksetzen? (Mit Strg+Z rückgängig zu machen.)",
+            btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden", btnResetColors: "🎨 Standardfarben wiederherstellen", btnCvdColors: "👁 Farbenblind-sichere Farben",
+            cvdTitle: "Den Funktionen dieser Übung Farben geben, die auch bei Farbenblindheit gut unterscheidbar sind",
+            confirmCvd: (n, given) => `Die ${n} Funktionen dieser Übung erhalten Farben, die bei allen Formen von Farbenblindheit gut unterscheidbar bleiben.` + (given < n ? ` Es gibt nur ${given} solche Farben: Die ${given} häufigsten Funktionen erhalten sie, die übrigen behalten ihre Farbe (dort helfen die Muster).` : '') + ` Auch die Schülerinnen und Schüler sehen diese Farben. (Mit Strg+Z rückgängig.)`, cvdNone: "Es gibt noch keine bestimmten Wörter.", confirmResetColors: "Alle Label-Farben auf die Standardfarben zurücksetzen? (Mit Strg+Z rückgängig zu machen.)",
             modalTitle: "Name der syntaktischen Gruppe:", btnCancel: "Abbrechen", btnSaveGroup: "Speichern", btnDelete: "Löschen", confirmDelete: "Möchten Sie dieses Wort wirklich löschen?",
             modeTag: "Modus: Markieren", modeSplit: "Modus: Manuell trennen", modeLineBreak: "Modus: Umbruch umschalten", modeBracket: "Modus: Wortgruppe definieren", modeAttr: "Modus: Genitiv markieren",
             togglePat: "Muster umschalten", toggleCon: "Hoher Kontrast",
@@ -2015,6 +2105,7 @@ function changeLanguage(lang) {
     DOM.btnExport.textContent = txt.btnExport; 
     DOM.btnSaveWork.textContent = txt.btnSaveWork;
     DOM.btnResetColors.textContent = txt.btnResetColors;
+    DOM.btnCvdColors.textContent = txt.btnCvdColors; DOM.btnCvdColors.title = txt.cvdTitle;
     DOM.btnLoadWork.textContent = txt.btnLoadWork; 
     DOM.btnTogglePattern.title = txt.togglePat;
     DOM.btnToggleContrast.title = txt.toggleCon; 
@@ -2172,6 +2263,44 @@ function loadTeacherColors() {
         const saved = JSON.parse(localStorage.getItem(CONFIG.COLOR_PREF_KEY) || '{}') || {};
         Object.keys(saved).forEach(l => { if (typeof saved[l] === 'string' && /^#[0-9a-f]{3,8}$/i.test(saved[l])) AppState.colors[l] = saved[l]; });
     } catch (e) { console.warn("Could not read saved colours.", e); }
+}
+
+function assignColorBlindColors(used, order, palette, neutral) {
+    // used: {label: count}; order: the function list (decides who gets which colour, so the result is the same in every exercise).
+    // "Other/Sonstiges" stays grey. If more functions are used than there are safe colours, the most frequent ones get them.
+    const isOther = (l) => l === 'Sonstiges' || l === 'Other';
+    let labels = Object.keys(used).filter(l => !isOther(l));
+    const total = labels.length;
+    if (labels.length > palette.length) labels = labels.sort((a, b) => used[b] - used[a]).slice(0, palette.length);
+    const rank = (l) => { const i = order.indexOf(l); return i === -1 ? 999 : i; };
+    labels.sort((a, b) => rank(a) - rank(b));
+    // fixed colours for the most common functions, close to their usual colours, so they look the same in every exercise
+    const PREF = { 'Subjekt': 0, 'Subject': 0, 'Prädikat': 1, 'Verb': 1, 'Akkusativobjekt': 2, 'Accusative object': 2, 'Dativobjekt': 3, 'Dative object': 3,
+        'Ablativ': 4, 'Ablative': 4, 'Präpositionale Bestimmung': 7, 'Prepositional phrase': 7, 'Relativsatz': 6, 'Relative clause': 6, 'Nebensatz': 5, 'Subordinate clause': 5 };
+    const out = {}, free = palette.map((c, i) => i);
+    labels.forEach(l => { const i = PREF[l]; if (i !== undefined && i < palette.length && free.includes(i)) { out[l] = palette[i]; free.splice(free.indexOf(i), 1); } });
+    labels.forEach(l => { if (!(l in out)) out[l] = palette[free.shift()]; });
+    Object.keys(used).filter(isOther).forEach(l => { out[l] = neutral; });
+    return { colors: out, total, given: labels.length };
+}
+
+function applyColorBlindColors() {
+    const txt = CONFIG.LANG_TEXT[AppState.lang];
+    const used = {};
+    AppState.words.forEach(w => { if (w.f && w.f !== CONFIG.PUNCT) used[w.f] = (used[w.f] || 0) + 1; });
+    AppState.groups.forEach(g => { if (g.label) used[g.label] = (used[g.label] || 0) + 1; });
+    if (!Object.keys(used).length) { alert(txt.cvdNone); return; }
+    const res = assignColorBlindColors(used, AppState.functions, CONFIG.CVD_SAFE, CONFIG.NEUTRAL_COLOR);
+    if (!confirm(txt.confirmCvd(res.total, res.given))) return;
+    AppState.saveToHistory();
+    // a colour from the safe set that an unused label still has would look the same: that label turns grey
+    const taken = new Set(Object.values(res.colors).map(c => c.toLowerCase()));
+    AppState.functions.forEach(f => { if (!(f in res.colors) && taken.has((AppState.colors[f] || '').toLowerCase())) AppState.colors[f] = CONFIG.NEUTRAL_COLOR; });
+    Object.keys(res.colors).forEach(l => { AppState.colors[l] = res.colors[l]; const cp = counterpartLabel(l); if (cp) AppState.colors[cp] = res.colors[l]; });
+    renderPalette();
+    renderEditor();
+    saveTeacherColors();
+    StorageManager.debouncedAutoSave();
 }
 
 function restoreDefaultColors() {
@@ -2465,6 +2594,7 @@ function initEventListeners() {
     DOM.btnExport.addEventListener('click', exportToStudent);
     DOM.btnSaveWork.addEventListener('click', () => StorageManager.exportProject());
     DOM.btnResetColors.addEventListener('click', restoreDefaultColors);
+    DOM.btnCvdColors.addEventListener('click', applyColorBlindColors);
 
     DOM.btnTogglePattern.addEventListener('click', () => document.body.classList.toggle('pattern-mode'));
     DOM.btnToggleContrast.addEventListener('click', () => document.body.classList.toggle('high-contrast'));
@@ -3360,7 +3490,10 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             resExercise: "Exercise: ", resDate: "Date: ", resScore: "Score: ",
             markGen: "🖍️ Mark Genitive (G)", unmarkGen: "❌ Unmark Genitive (G)", notGenitive: "Not a genitive attribute!",
             legendTitle: "Syntactic functions", legendHint: "Click a function to change its colour.",
-            keysTitle: "Keyboard shortcuts", keysHint: "Point at a word with the mouse (or select it with Tab) and press the underlined letter of the function.", keysGen: "Mark genitive (click the word first)", colorFor: "Colour for:", colorInUse: "Used by {label} (it will turn grey)", colorResetOne: "↺ Teacher's colour", colorsReset: "↺ All of the teacher's colours"
+            keysTitle: "Keyboard shortcuts", keysHint: "Point at a word with the mouse (or select it with Tab) and press the underlined letter of the function.", keysGen: "Mark genitive (click the word first)", colorFor: "Colour for:", colorInUse: "Used by {label} (it will turn grey)", colorResetOne: "↺ Teacher's colour",
+            refsTitle: "Look it up", refGuide: "Guide", refDecl: "Declension tables", refConj: "Conjugation tables", guideLink: "Guide: how to analyse a sentence step by step",
+            cvdOn: "👁 Colours for colour blindness", cvdOff: "↺ Back to the teacher's colours", cvdTitle: "Colours that stay clearly distinct with every type of colour blindness",
+            cvdPartial: (n) => `Only ${n} functions could get colour-blind-safe colours; the patterns (🏁) help with the rest.`, colorsReset: "↺ All of the teacher's colours"
         },
         de: {
             instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen. <br><br><strong>Wichtig:</strong> Du musst auch versteckte Genitivattribute aufspüren! Klicke dazu direkt auf das Genitivattribut innerhalb eines Wortblocks und nutze das <strong>🖍️ Genitiv markieren</strong> Werkzeug, um es hervorzuheben. Sobald du jede Wortgruppe korrekt analysiert und alle Genitive gefunden hast, erscheint ein Textfeld für deine Übersetzung. <br><br><strong>Tipp:</strong> Im <strong>Geführten Modus</strong> führt dich die Seite Block für Block durch jeden Satz, mit einer Erklärung nach jedem Schritt.",
@@ -3378,7 +3511,10 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             resExercise: "Übung: ", resDate: "Datum: ", resScore: "Ergebnis: ",
             markGen: "🖍️ Genitiv markieren (G)", unmarkGen: "❌ Markierung aufheben (G)", notGenitive: "Kein Genitivattribut!",
             legendTitle: "Syntaktische Funktionen", legendHint: "Klicke auf eine Funktion, um ihre Farbe zu ändern.",
-            keysTitle: "Tastenkürzel", keysHint: "Zeige mit der Maus auf ein Wort (oder wähle es mit Tab) und drücke den unterstrichenen Buchstaben der Funktion.", keysGen: "Genitiv markieren (vorher auf das Wort klicken)", colorFor: "Farbe für:", colorInUse: "Belegt von {label} (wird dann grau)", colorResetOne: "↺ Farbe der Lehrkraft", colorsReset: "↺ Alle Farben der Lehrkraft"
+            keysTitle: "Tastenkürzel", keysHint: "Zeige mit der Maus auf ein Wort (oder wähle es mit Tab) und drücke den unterstrichenen Buchstaben der Funktion.", keysGen: "Genitiv markieren (vorher auf das Wort klicken)", colorFor: "Farbe für:", colorInUse: "Belegt von {label} (wird dann grau)", colorResetOne: "↺ Farbe der Lehrkraft",
+            refsTitle: "Nachschlagen", refGuide: "Anleitung", refDecl: "Deklinationstabellen", refConj: "Konjugationstabellen", guideLink: "Anleitung: So analysierst du einen Satz Schritt für Schritt",
+            cvdOn: "👁 Farben für Farbenblinde", cvdOff: "↺ Zurück zu den Farben der Lehrkraft", cvdTitle: "Farben, die bei allen Formen von Farbenblindheit gut unterscheidbar bleiben",
+            cvdPartial: (n) => `Nur ${n} Funktionen konnten farbenblind-sichere Farben erhalten; bei den übrigen helfen die Muster (🏁).`, colorsReset: "↺ Alle Farben der Lehrkraft"
         }
     };
 
@@ -3398,6 +3534,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         </div>
         <h1>${safeTitle}</h1>
         <div class="instruction-box">${t.instr}</div>
+        <p class="help-top"><a id="link-guide" target="_blank" rel="noopener"></a></p>
         ${safeNotes ? `<div class="teacher-note"><span style="font-weight: 500;">${t.note}</span> ${safeNotes}</div>` : ''}
         <div class="exercise-wrapper">
             <div style="text-align: center; margin-bottom: 24px;">
@@ -3450,9 +3587,9 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         <div id="color-popover" class="color-popover" role="dialog"></div>
         <script>
             const SHORTCUTS = ${JSON.stringify(LatinLabels.SHORTCUTS)};
-            const SAFE_COLORS = ${JSON.stringify(CONFIG.SAFE_COLORS)}; const NEUTRAL_COLOR = ${JSON.stringify(CONFIG.NEUTRAL_COLOR)};
+            const SAFE_COLORS = ${JSON.stringify(CONFIG.SAFE_COLORS)}; const NEUTRAL_COLOR = ${JSON.stringify(CONFIG.NEUTRAL_COLOR)}; const CVD_SAFE = ${JSON.stringify(CONFIG.CVD_SAFE)};
             const colors = ${JSON.stringify(AppState.colors)}; const abbreviations = ${JSON.stringify(allAbbrevs)}; const labelMap = ${JSON.stringify(labelMap)};
-            const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const titleInput = ${JSON.stringify(title).replace(/</g, '\\u003c')};
+            const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const HELP_BASE = ${JSON.stringify(/^https?:$/.test(location.protocol) ? new URL('.', location.href).href : '')}; const titleInput = ${JSON.stringify(title).replace(/</g, '\\u003c')};
             const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + '${exerciseId}';
         <\/script>
         <script>
