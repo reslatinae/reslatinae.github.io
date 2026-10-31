@@ -123,6 +123,16 @@
         /* Compact tool buttons in the editor (Undo, Split, Break, Word group, Genitive, Export) */
         .tool-row .btn-action { flex: 0 0 auto !important; padding: 6px 12px; font-size: 0.82rem; border-radius: 5px; }
         .tool-row #btn-export { margin-left: auto; }
+        .model-trans { margin-top: 18px; border-top: 1px solid #efeae1; padding-top: 12px; }
+        .model-trans summary { cursor: pointer; font-weight: 600; font-size: 0.92rem; color: #2a241d; padding: 4px 0; }
+        .model-trans-count { font-weight: 400; color: #6b6052; font-size: 0.85rem; }
+        .model-trans-intro { font-size: 0.86rem; color: #4a4236; margin: 6px 0 12px; }
+        .model-trans-item { margin-bottom: 14px; }
+        .model-trans-la { font-size: 0.9rem; color: #2a241d; margin-bottom: 4px; font-style: italic; }
+        .model-trans-item textarea { width: 100%; box-sizing: border-box; min-height: 52px; padding: 8px 10px; border: 1px solid #e4ddd1; border-radius: 6px; font: inherit; font-size: 0.92rem; resize: vertical; background: #fff; color: #2a241d; }
+        body.high-contrast .model-trans summary, body.high-contrast .model-trans-la { color: #fff; }
+        body.high-contrast .model-trans-intro, body.high-contrast .model-trans-count { color: #ddd; }
+        body.high-contrast .model-trans-item textarea { background: #2d2d2d; color: #fff; border-color: #555; }
         #split-mode-btn.active-mode { outline-color: #dc2626; background: #b91c1c !important; }
         #group-mode-btn.active-mode { outline-color: #7c3aed; background: #6d28d9 !important; }
         #linebreak-mode-btn.active-mode { outline-color: #0369a1; background: #075985 !important; }
@@ -298,8 +308,7 @@
             </div>
         </div>
         
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 8px;">
-            <div style="font-size: 0.9rem; font-weight: 600; color: #4d4539;">Visual Editor</div>
+        <div style="display:flex; justify-content:flex-end; align-items:flex-end; margin-bottom: 8px;">
             <div class="zoom-controls">
                 <button class="z-btn" id="btn-toggle-pattern" data-ref="btnTogglePattern" title="Toggle Patterns">🏁</button>
                 <button class="z-btn" id="btn-cvd-colors" data-ref="btnCvdColors" type="button" aria-pressed="false">👁</button>
@@ -315,6 +324,11 @@
         <div id="tagging-container-wrapper">
             <div id="tagging-area" data-ref="taggingArea"></div>
         </div>
+        <details class="model-trans" data-ref="modelTransBox">
+            <summary><span data-ref="modelTransSummary">📝 Model translations (optional)</span> <span class="model-trans-count" data-ref="modelTransCount"></span></summary>
+            <p class="model-trans-intro" data-ref="modelTransIntro"></p>
+            <div data-ref="modelTransList"></div>
+        </details>
     </div>
 
     <div id="group-modal" class="modal-overlay" data-ref="groupModal">
@@ -437,9 +451,26 @@
         .guide-actions { display: flex; justify-content: flex-end; gap: 8px; }
         .guide-continue { font-size: 0.85rem; color: #2563eb; font-weight: 500; }
         .guide-next-note { margin-top: 10px; }
+        .guide-hint-step { margin-top: 6px; }
+        .guide-open { margin-top: 10px; padding: 7px 10px; border-left: 3px solid #a07a45; background: #faf6ee; border-radius: 0 6px 6px 0; font-size: 0.86rem; color: #3f372c; }
+        .guide-open-title { font-weight: 600; color: #6b4d24; }
+        .guide-open ul { margin: 3px 0 0; padding-left: 18px; }
+        .guide-open li { margin: 2px 0; }
+        .guide-fulfilled { margin-top: 8px; padding: 7px 10px; background: #f0f7ee; border: 1px solid #cfe3c8; border-radius: 6px; color: #24421c; }
+        body.high-contrast .guide-open { background: #2a2418; border-left-color: #d4a861; color: #f1e6d0; }
+        body.high-contrast .guide-open-title { color: #f0c987; }
+        body.high-contrast .guide-fulfilled { background: #13300f; border-color: #3f7a33; color: #d6f5cc; }
         .guide-nosubj { margin-top: 8px; padding: 8px 10px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; color: #78350f; }
         body.high-contrast .guide-nosubj { background: #422006; border-color: #a16207; color: #fde68a; }
         .guide-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .guide-head-btns { display: flex; align-items: center; gap: 6px; }
+        .guide-level { font: inherit; font-size: 0.75rem; text-transform: none; letter-spacing: 0; font-weight: 500; border: 1px solid #c7d7f5; background: #fff; color: #1d4ed8; border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+        .guide-level:hover, .guide-level:focus-visible { background: #dbeafe; outline: none; }
+        .guide-level-note { margin-top: 8px; font-size: 0.86rem; color: #3f372c; font-style: normal; }
+        .guide-more { margin-top: 4px; } .guide-more summary { cursor: pointer; color: #1d4ed8; font-size: 0.88rem; display: inline; }
+        .guide-more[open] summary { margin-bottom: 4px; display: block; }
+        body.high-contrast .guide-level { background: #2d2d2d; color: #93c5fd; border-color: #555; }
+        body.high-contrast .guide-level-note { color: #eee; } body.high-contrast .guide-more summary { color: #93c5fd; }
         .guide-toggle { border: none; background: transparent; color: #2563eb; cursor: pointer; font-size: 0.9rem; padding: 0 4px; line-height: 1; border-radius: 4px; }
         .guide-toggle:hover, .guide-toggle:focus-visible { background: #dbeafe; outline: none; }
         .guide-panel.collapsed .guide-prompt, .guide-panel.collapsed .guide-fb, .guide-panel.collapsed .guide-continue, .guide-panel.collapsed .guide-actions { display: none; }
@@ -558,6 +589,19 @@
         body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #121212; color: #fff; border: 1px solid #333; }
         body.high-contrast .sentence-container { background-color: #1e1e1e; border: 1px solid #444; }
         body.high-contrast .trans-box { border-top-color: #444; }
+        .model-compare { margin-top: 8px; }
+        .model-btn { font: inherit; font-size: 0.88rem; padding: 6px 12px; border-radius: 6px; border: 1px solid #d9cfbf; background: #fdfbf7; color: #1d4ed8; cursor: pointer; }
+        .model-btn:disabled { color: #6b6052; cursor: not-allowed; background: #f6f3ee; }
+        .model-btn:not(:disabled):hover { background: #f3ede2; }
+        .model-text { margin-top: 10px; padding: 10px 14px; border-left: 3px solid #a07a45; background: #faf6ee; border-radius: 0 6px 6px 0; }
+        .model-head { font-weight: 600; color: #6b4d24; font-size: 0.86rem; margin-bottom: 4px; }
+        .model-body { white-space: pre-wrap; color: #2a241d; }
+        .model-note { margin-top: 8px; font-size: 0.84rem; color: #4a4236; }
+        body.high-contrast .model-btn { background: #2d2d2d; color: #93c5fd; border-color: #555; }
+        body.high-contrast .model-btn:disabled { color: #bbb; }
+        body.high-contrast .model-text { background: #2a2418; border-left-color: #d4a861; }
+        body.high-contrast .model-head { color: #f0c987; } body.high-contrast .model-body { color: #fff; } body.high-contrast .model-note { color: #ddd; }
+        @media print { .model-btn { display: none; } }
         body.high-contrast .instruction-box { background-color: #332b00; border-color: #665500; color: #ffeb3b; }
         body.high-contrast .teacher-note { background: #1e1e1e !important; border: 1px solid #444 !important; color: #efeae1 !important; }
         body.high-contrast .hover-word { background-color: #333; color: #fff; border-bottom: 2px solid #555; }
@@ -640,6 +684,69 @@
                 collapse: 'Hinweisfeld verkleinern', expand: 'Hinweisfeld vergrössern',
                 cont: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Block zu gehen.', contSentence: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Satz zu gehen.', contEnd: 'Klicke irgendwo auf die Seite (oder drücke Enter), um abzuschliessen.',
                 solution: 'Lösung zeigen', solutionShown: 'Die richtige Antwort ist',
+                // Less help as the student gets better: short instructions after a run of correct first answers, full help again after mistakes
+                briefLabel: 'Welche Funktion hat der blau umrandete Block?', briefGroup: 'Klammer: Um welche Einheit handelt es sich?',
+                briefGen: (n) => `Genitivattribut markieren${n > 1 ? ` (${n} Wörter)` : ''}.`, briefCont: 'Weiter: Klick oder Enter.',
+                more: 'Erklärung', levelLess: 'Weniger Hilfe', levelMore: 'Mehr Hilfe',
+                levelLessTitle: 'Kürzere Anweisungen; Erklärungen nur auf Wunsch', levelMoreTitle: 'Ausführliche Anweisungen und Erklärungen',
+                toBrief: 'Das läuft gut! Ab jetzt gibt es kürzere Hinweise. Mit „Mehr Hilfe“ oben rechts bekommst du die ausführlichen zurück.',
+                toFull: 'Ab jetzt gibt es wieder ausführliche Hinweise.',
+                // Hints in steps: 1st wrong answer = a question, 2nd = a pointer to the form, 3rd = two functions to choose from
+                notYet: 'Noch nicht.', hintN: (n) => `Hinweis ${n}:`,
+                ptCase: (w) => `Schau dir die Endung von „${w}“ genau an: Welcher Kasus kann das sein? Und welche Frage beantwortet der Block im Satz?`,
+                ptVerb: (w) => `Schau dir die Endung von „${w}“ an: Ist das eine Personalendung (-t, -nt, -mus, -tur …)?`,
+                ptInf: (w) => `Schau dir die Endung von „${w}“ an: Ist das eine Personalendung oder eine Infinitiv-Endung (-re, -rī, -isse)?`,
+                ptFirst: (w) => `Schau dir das erste Wort an: „${w}“. Was für eine Wortart ist das?`,
+                ptAdv: (w) => `Kann man „${w}“ deklinieren oder konjugieren – oder verändert sich das Wort nie?`,
+                ptAbl: (w) => `Schau dir die Endungen in „${w}“ an: In welchem Kasus stehen die Wörter, und ist ein Partizip dabei?`,
+                ptPart: (w) => `Steckt in „${w}“ ein Partizip? Auf welches Substantiv bezieht es sich?`,
+                ptAci: (w) => `Schau dir „${w}“ an: Gibt es einen Akkusativ (oder Nominativ) und einen Infinitiv? Von welchem Verb hängt das ab?`,
+                ptClause: (w) => `Schau dir das erste Wort der Klammer an: „${w}“. Ist das ein Relativpronomen, eine Subjunktion oder etwas anderes?`,
+                ptLink: (w) => `Was folgt auf „${w}“: ein Nebensatz mit eigenem Prädikat oder ein gleichrangiger Teil?`,
+                ptOther: (w) => `Lies „${w}“ noch einmal: Welche Aufgabe hat der Block im Satz?`,
+                narrow: (a, b) => `Es ist eine dieser beiden Funktionen: <strong>${a}</strong> oder <strong>${b}</strong>.`,
+                lastResort: 'Wenn du nicht weiterkommst, kannst du dir die Lösung zeigen lassen.',
+                modelHint: ' Danach kannst du deine Übersetzung mit der Musterübersetzung vergleichen.',
+                // Feedback on a typical mix-up: key = 'chosen>correct' (German label names, whatever the page language)
+                mix: {
+                    'Dativobjekt>Ablativ': 'Die Endungen -īs und -ibus (und -ō) können Dativ oder Ablativ sein. Passt hier die Frage „Wem? Für wen?“ – oder eher „Womit? Wodurch? Wo? Wann?“? Verlangt das Prädikat überhaupt einen Dativ?',
+                    'Ablativ>Dativobjekt': 'Dativ und Ablativ sehen oft gleich aus (-īs, -ibus, -ō). Passt die Frage „Wem? Für wen?“? Achte auf das Prädikat: Verlangt es eine Ergänzung im Dativ (z. B. dare, placēre, nocēre)?',
+                    'Akkusativobjekt>Subjekt': 'Bei Neutra sehen Nominativ und Akkusativ gleich aus (z. B. bellum, castra), im Plural der 3. Deklination oft auch (-ēs). Wer oder was handelt hier? Passt der Block in der Zahl zum Prädikat? Ist das Prädikat vielleicht passiv?',
+                    'Subjekt>Akkusativobjekt': 'Bei Neutra sehen Nominativ und Akkusativ gleich aus (z. B. bellum, castra), im Plural der 3. Deklination oft auch (-ēs). Handelt der Block selbst – oder richtet sich die Handlung auf ihn (Wen oder was?)?',
+                    'Subjekt>Prädikativum': 'Bei esse (und bei Verben wie fierī, vidērī, appellārī) steht oft ein zweiter Nominativ. Welcher Block ist das Subjekt, und welcher sagt etwas über es aus?',
+                    'Prädikativum>Subjekt': 'Bei esse steht oft ein zweiter Nominativ. Das Subjekt ist der Block, über den etwas ausgesagt wird; das Prädikativum sagt, was oder wie er ist.',
+                    'Akkusativobjekt>Prädikativum': 'Steht hier ein zweiter Akkusativ, der etwas über das Objekt aussagt (jemanden zum Konsul wählen, jemanden als Freund bezeichnen)? Dann ist er ein Prädikativum.',
+                    'Ablativ>Ablativus absolutus': 'Steht beim Substantiv ein Partizip (oder ein Substantiv wie consule, duce) im Ablativ? Zusammen bilden sie einen Ablativus absolutus.',
+                    'Ablativus absolutus>Ablativ': 'Ein Ablativus absolutus braucht zwei Teile im Ablativ: ein Substantiv und ein Partizip (oder ein zweites Substantiv). Gibt es das hier?',
+                    'Partizipialkonstruktion>Ablativus absolutus': 'Steht das Partizip zusammen mit seinem Substantiv im Ablativ, und ist beides vom übrigen Satz losgelöst? Dann ist es ein Ablativus absolutus.',
+                    'Ablativus absolutus>Partizipialkonstruktion': 'Prüfe Kasus und Bezug: Bezieht sich das Partizip auf ein Wort, das im Satz eine eigene Aufgabe hat? Dann ist es eine Partizipialkonstruktion, kein Ablativus absolutus.',
+                    'Ablativ>Präpositionale Bestimmung': 'Schau auf das erste Wort: Steht eine Präposition davor (in, cum, ab, ex, dē, sine, prō …)? Dann gehört sie zum Block, und das Ganze ist eine präpositionale Bestimmung.',
+                    'Präpositionale Bestimmung>Ablativ': 'Hier steht keine Präposition: Der Ablativ steht allein und gibt selbst den Umstand an (Womit? Wodurch? Wo? Wann?).',
+                    'Akkusativobjekt>Präpositionale Bestimmung': 'Steht eine Präposition davor (ad, in, per, post, propter …)? Dann gehört der Akkusativ zur präpositionalen Bestimmung.',
+                    'Präpositionale Bestimmung>Akkusativobjekt': 'Hier steht keine Präposition: Der Akkusativ hängt direkt vom Prädikat ab (Wen oder was?).',
+                    'Ablativ>Adverbiale Bestimmung': 'Das Wort ist unveränderlich, also ein Adverb. Viele Adverbien enden auf -ē oder -ō (z. B. longē, subitō) und sehen nur aus wie ein Ablativ.',
+                    'Adverbiale Bestimmung>Ablativ': 'Der Block hat eine Kasusendung: Er ist ein Substantiv (oder Adjektiv) im Ablativ, kein unveränderliches Adverb.',
+                    'Relativsatz>Nebensatz': 'Beginnt die Einheit wirklich mit einem Relativpronomen? Achtung: quod kann auch „weil“ oder „dass“ heissen. Bezieht sich das erste Wort auf ein Wort davor?',
+                    'Nebensatz>Relativsatz': 'Bezieht sich das erste Wort auf ein Wort davor (quī, quae, quod … = der, die, das / welcher)? Dann ist die Einheit ein Relativsatz.',
+                    'Konjunktion>Subjunktion': 'Leitet das Wort einen Nebensatz mit eigenem Prädikat ein (cum, ut, nē, sī, quod …)? Dann ist es eine Subjunktion. Eine Konjunktion (et, sed, aut …) verbindet nur gleichrangige Teile.',
+                    'Subjunktion>Konjunktion': 'Folgt hier wirklich ein Nebensatz mit eigenem Prädikat? Verbindet das Wort nur gleichrangige Teile (und, aber, oder), ist es eine Konjunktion.',
+                    'Infinitiv>AcI/NcI': 'Hat der Infinitiv hier ein eigenes Subjekt im Akkusativ (oder Nominativ)? Hängt das Ganze von einem Verb des Sagens, Denkens oder Wahrnehmens ab? Dann ist es ein AcI bzw. NcI.',
+                    'AcI/NcI>Infinitiv': 'Hat der Infinitiv hier ein eigenes Subjekt im Akkusativ? Ergänzt er nur ein Verb wie posse, velle, cupere oder audēre, ist es ein einfacher Infinitiv.',
+                    'Prädikat>Infinitiv': 'Hat das Wort eine Personalendung? Endungen wie -re, -rī, -isse gehören zum Infinitiv. Ein Prädikat hat eine Personalendung (-t, -nt, -mus …).',
+                    'Infinitiv>Prädikat': 'Achte auf die Endung: -t, -nt, -mus, -tis, -tur … sind Personalendungen. Ein Prädikat hat eine, ein Infinitiv nicht.',
+                    'Prädikat>Partizipialkonstruktion': 'Ein Partizip hat keine Personalendung, sondern eine Kasusendung wie ein Adjektiv (-ns/-ntis, -tus/-ta/-tum …). Auf welches Substantiv bezieht es sich?',
+                    'Dativobjekt>Genitivobjekt': '-ī und -ae können Genitiv oder Dativ sein. Hängt der Block von einem Verb oder Adjektiv ab, das einen Genitiv verlangt (z. B. meminisse, oblīvīscī, cupidus, plēnus)?',
+                    'Genitivobjekt>Dativobjekt': '-ī und -ae können Genitiv oder Dativ sein. Passt die Frage „Wem? Für wen?“? Verlangt das Prädikat einen Dativ?',
+                    'Subjekt>Vokativ': 'Wird hier jemand angesprochen? Ein Vokativ steht oft zwischen Kommas, und das Prädikat steht dann meist in der 2. Person.',
+                    'Vokativ>Subjekt': 'Passt der Block zur Personalendung des Prädikats? Dann ist er das Subjekt. Ein Vokativ ruft jemanden an und gehört nicht zum Satzbau.'
+                },
+                // "Still open": what a reader expects next while reading from left to right
+                openTitle: 'Noch offen',
+                predSent: 'das <strong>Prädikat</strong> des Satzes', predMain: 'das <strong>Prädikat</strong> des Hauptsatzes',
+                predSub: (w) => `das <strong>Prädikat</strong> des Nebensatzes („${w} …“)`, predRel: (w) => `das <strong>Prädikat</strong> des Relativsatzes („${w} …“)`,
+                after: 'erwartet nach', q: (w) => `„${w}“`,
+                conj: (w) => `nach „${w}“ ein Teil, der dem Teil davor entspricht`,
+                fulfilled: (p, list, subj) => `<strong>Erwartung erfüllt:</strong> „${p}“ ist das Prädikat zu ${list}.${subj ? ' Prüfe: Passt es in Person und Zahl zum Subjekt?' : ''}`,
                 end: '<strong>Geschafft!</strong> Du hast alle Sätze Schritt für Schritt bestimmt. Vergiss die Übersetzungen nicht.',
                 fn: {
                     'Subjekt': ['Frage: Wer oder was? Achte auf den Nominativ und darauf, ob der Block in der Zahl zum Prädikat passt. (Nicht jeder Satz hat ein eigenes Subjekt – oft steckt es nur in der Personalendung.)', 'Das Subjekt sagt dir, wer oder was handelt. Prüfe beim Weiterlesen, ob das Prädikat in Person und Zahl dazu passt.'],
@@ -681,6 +788,65 @@
                 collapse: 'Minimise the hint box', expand: 'Expand the hint box',
                 cont: 'Click anywhere on the page (or press Enter) to go to the next block.', contSentence: 'Click anywhere on the page (or press Enter) to go to the next sentence.', contEnd: 'Click anywhere on the page (or press Enter) to finish.',
                 solution: 'Show answer', solutionShown: 'The correct answer is',
+                briefLabel: 'What function does the block outlined in blue have?', briefGroup: 'Bracket: what kind of unit is it?',
+                briefGen: (n) => `Mark the genitive attribute${n > 1 ? ` (${n} words)` : ''}.`, briefCont: 'Next: click or Enter.',
+                more: 'Explanation', levelLess: 'Less help', levelMore: 'More help',
+                levelLessTitle: 'Shorter instructions; explanations only when you ask for them', levelMoreTitle: 'Detailed instructions and explanations',
+                toBrief: 'Going well! From now on the hints are shorter. “More help” at the top right brings the detailed ones back.',
+                toFull: 'From now on the hints are detailed again.',
+                notYet: 'Not yet.', hintN: (n) => `Hint ${n}:`,
+                ptCase: (w) => `Look closely at the ending of “${w}”: which case can it be? And which question does the block answer in the sentence?`,
+                ptVerb: (w) => `Look at the ending of “${w}”: is it a personal ending (-t, -nt, -mus, -tur …)?`,
+                ptInf: (w) => `Look at the ending of “${w}”: is it a personal ending or an infinitive ending (-re, -rī, -isse)?`,
+                ptFirst: (w) => `Look at the first word: “${w}”. What kind of word is it?`,
+                ptAdv: (w) => `Can “${w}” be declined or conjugated – or does the word never change?`,
+                ptAbl: (w) => `Look at the endings in “${w}”: which case are the words in, and is there a participle?`,
+                ptPart: (w) => `Is there a participle in “${w}”? Which noun does it refer to?`,
+                ptAci: (w) => `Look at “${w}”: is there an accusative (or nominative) and an infinitive? Which verb does it depend on?`,
+                ptClause: (w) => `Look at the first word of the bracket: “${w}”. Is it a relative pronoun, a subjunction or something else?`,
+                ptLink: (w) => `What follows “${w}”: a subordinate clause with a verb of its own, or a part of equal rank?`,
+                ptOther: (w) => `Read “${w}” again: what job does the block do in the sentence?`,
+                narrow: (a, b) => `It is one of these two functions: <strong>${a}</strong> or <strong>${b}</strong>.`,
+                lastResort: 'If you are stuck, you can show the answer.',
+                modelHint: ' Afterwards you can compare your translation with the model translation.',
+                mix: {
+                    'Dativobjekt>Ablativ': 'The endings -īs and -ibus (and -ō) can be dative or ablative. Does the question “To whom? For whom?” fit here – or rather “With what? By what? Where? When?”? Does the verb need a dative at all?',
+                    'Ablativ>Dativobjekt': 'Dative and ablative often look the same (-īs, -ibus, -ō). Does the question “To whom? For whom?” fit? Look at the verb: does it need a dative (e.g. dare, placēre, nocēre)?',
+                    'Akkusativobjekt>Subjekt': 'In the neuter, nominative and accusative look the same (e.g. bellum, castra), and often in the plural of the 3rd declension too (-ēs). Who or what is acting here? Does the block agree in number with the verb? Is the verb perhaps passive?',
+                    'Subjekt>Akkusativobjekt': 'In the neuter, nominative and accusative look the same (e.g. bellum, castra), and often in the plural of the 3rd declension too (-ēs). Is the block itself acting – or is the action directed at it (whom or what?)?',
+                    'Subjekt>Prädikativum': 'With esse (and verbs such as fierī, vidērī, appellārī) there is often a second nominative. Which block is the subject, and which one says something about it?',
+                    'Prädikativum>Subjekt': 'With esse there is often a second nominative. The subject is the block that something is said about; the predicative says what or how it is.',
+                    'Akkusativobjekt>Prädikativum': 'Is there a second accusative that says something about the object (to elect someone consul, to call someone a friend)? Then it is a predicative.',
+                    'Ablativ>Ablativus absolutus': 'Is there a participle (or a noun such as consule, duce) in the ablative together with the noun? Together they form an ablative absolute.',
+                    'Ablativus absolutus>Ablativ': 'An ablative absolute needs two parts in the ablative: a noun and a participle (or a second noun). Is that the case here?',
+                    'Partizipialkonstruktion>Ablativus absolutus': 'Is the participle in the ablative together with its noun, and are both detached from the rest of the sentence? Then it is an ablative absolute.',
+                    'Ablativus absolutus>Partizipialkonstruktion': 'Check case and reference: does the participle refer to a word that has a job of its own in the sentence? Then it is a participial phrase, not an ablative absolute.',
+                    'Ablativ>Präpositionale Bestimmung': 'Look at the first word: is there a preposition (in, cum, ab, ex, dē, sine, prō …)? Then it belongs to the block, and the whole is a prepositional phrase.',
+                    'Präpositionale Bestimmung>Ablativ': 'There is no preposition here: the ablative stands on its own and states the circumstance itself (with what? by what? where? when?).',
+                    'Akkusativobjekt>Präpositionale Bestimmung': 'Is there a preposition before it (ad, in, per, post, propter …)? Then the accusative belongs to the prepositional phrase.',
+                    'Präpositionale Bestimmung>Akkusativobjekt': 'There is no preposition here: the accusative depends directly on the verb (whom or what?).',
+                    'Ablativ>Adverbiale Bestimmung': 'The word never changes, so it is an adverb. Many adverbs end in -ē or -ō (e.g. longē, subitō) and only look like an ablative.',
+                    'Adverbiale Bestimmung>Ablativ': 'The block has a case ending: it is a noun (or adjective) in the ablative, not an adverb that never changes.',
+                    'Relativsatz>Nebensatz': 'Does the unit really begin with a relative pronoun? Careful: quod can also mean “because” or “that”. Does the first word refer back to a word before it?',
+                    'Nebensatz>Relativsatz': 'Does the first word refer back to a word before it (quī, quae, quod … = who, which, that)? Then the unit is a relative clause.',
+                    'Konjunktion>Subjunktion': 'Does the word introduce a subordinate clause with a verb of its own (cum, ut, nē, sī, quod …)? Then it is a subjunction. A conjunction (et, sed, aut …) only joins parts of equal rank.',
+                    'Subjunktion>Konjunktion': 'Does a subordinate clause with a verb of its own really follow? If the word only joins parts of equal rank (and, but, or), it is a conjunction.',
+                    'Infinitiv>AcI/NcI': 'Does the infinitive have a subject of its own in the accusative (or nominative)? Does the whole depend on a verb of saying, thinking or perceiving? Then it is an accusative (or nominative) with infinitive.',
+                    'AcI/NcI>Infinitiv': 'Does the infinitive have a subject of its own in the accusative? If it only completes a verb such as posse, velle, cupere or audēre, it is a simple infinitive.',
+                    'Prädikat>Infinitiv': 'Does the word have a personal ending? Endings such as -re, -rī, -isse belong to the infinitive. A verb has a personal ending (-t, -nt, -mus …).',
+                    'Infinitiv>Prädikat': 'Look at the ending: -t, -nt, -mus, -tis, -tur … are personal endings. A verb has one, an infinitive does not.',
+                    'Prädikat>Partizipialkonstruktion': 'A participle has no personal ending but a case ending like an adjective (-ns/-ntis, -tus/-ta/-tum …). Which noun does it refer to?',
+                    'Dativobjekt>Genitivobjekt': '-ī and -ae can be genitive or dative. Does the block depend on a verb or adjective that needs a genitive (e.g. meminisse, oblīvīscī, cupidus, plēnus)?',
+                    'Genitivobjekt>Dativobjekt': '-ī and -ae can be genitive or dative. Does the question “To whom? For whom?” fit? Does the verb need a dative?',
+                    'Subjekt>Vokativ': 'Is someone being addressed here? A vocative often stands between commas, and the verb is then usually in the 2nd person.',
+                    'Vokativ>Subjekt': 'Does the block agree with the personal ending of the verb? Then it is the subject. A vocative calls someone and is not part of the sentence structure.'
+                },
+                openTitle: 'Still open',
+                predSent: 'the <strong>verb</strong> of the sentence', predMain: 'the <strong>verb</strong> of the main clause',
+                predSub: (w) => `the <strong>verb</strong> of the subordinate clause (“${w} …”)`, predRel: (w) => `the <strong>verb</strong> of the relative clause (“${w} …”)`,
+                after: 'expected after', q: (w) => `“${w}”`,
+                conj: (w) => `after “${w}”: a part that matches the one before`,
+                fulfilled: (p, list, subj) => `<strong>Expectation fulfilled:</strong> “${p}” is the verb for ${list}.${subj ? ' Check: does it agree with the subject in person and number?' : ''}`,
                 end: '<strong>Done!</strong> You have analysed every sentence step by step. Don’t forget the translations.',
                 fn: {
                     'Subject': ['Ask: who or what? Look for the nominative and check whether the block agrees in number with the verb. (Not every sentence has a separate subject – often it is only in the personal ending.)', 'The subject tells you who or what acts. As you read on, check that the verb agrees with it in person and number.'],
@@ -705,13 +871,31 @@
                 }
             }
         };
-        let guided = { hold: false, el: null, type: null };
+        let guided = { hold: false, el: null, type: null, brief: false, streak: 0, slips: 0 };
+        // Adaptive help: after BRIEF_AFTER correct first answers in a row the instructions get shorter; while they are short,
+        // FULL_AFTER wrong answers bring the full help back. The student can switch either way with the button in the panel.
+        const BRIEF_AFTER = 4, FULL_AFTER = 2;
+        // ---- Model translations: open once the student has written an own translation (not during an exam) ----
+        function modelReady(box) { const ta = box.closest('.trans-box').querySelector('textarea'); return !!ta && ta.value.trim().length >= 3; }
+        function updateModelUI() {
+            const t = studentTexts[currentLang]; const locked = exMode === 'exam' && !examFinalized;
+            document.querySelectorAll('.model-compare').forEach(box => {
+                box.style.display = locked ? 'none' : '';
+                const btn = box.querySelector('.model-btn'); const ready = modelReady(box);
+                btn.textContent = t.modelBtn; btn.disabled = !ready; btn.title = ready ? '' : t.modelNeedOwn;
+                btn.hidden = !box.querySelector('.model-text').hidden;
+                box.querySelector('.model-head').textContent = t.modelHead; box.querySelector('.model-note').textContent = t.modelNote;
+            });
+        }
+        function openModel(box) { box.querySelector('.model-text').hidden = false; studentDirty = true; updateModelUI(); }
+        document.addEventListener('input', (e) => { if (e.target.closest && e.target.closest('.trans-box')) updateModelUI(); });
+        document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('.model-btn'); if (b && !b.disabled) { e.stopPropagation(); openModel(b.closest('.model-compare')); } }, true);
         // After a correct answer in guided mode, the next click anywhere (or Enter/Space) moves on. The listener runs in the
         // capture phase, before the word/menu handlers: a click on the next block therefore moves on and opens its menu at once.
         function guidedContinue() { if (exMode === 'guided' && guided.hold) { guided.hold = false; guidedRender(); return true; } return false; }
         document.addEventListener('click', (e) => {
             if (!(exMode === 'guided' && guided.hold)) return;
-            if (e.target.closest('textarea, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal, .guide-toggle')) return; // these keep working as usual
+            if (e.target.closest('textarea, .model-compare, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal, .guide-toggle, .guide-level, .guide-more')) return; // these keep working as usual
             guidedContinue();
         }, true);
         document.addEventListener('keydown', (e) => {
@@ -799,27 +983,31 @@
             let prompt = '';
             if (guided.type === 'end' && !guided.hold) prompt = t.end;
             else if (!guided.hold) {
-                if (guided.type === 'group') prompt = t.promptGroup;
-                else if (guided.type === 'gen') prompt = t.promptGen(el.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').length);
-                else prompt = t.promptLabel;
+                const b = guided.brief && t.briefLabel; const nGen = guided.type === 'gen' ? el.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').length : 0;
+                if (guided.type === 'group') prompt = b ? t.briefGroup : t.promptGroup;
+                else if (guided.type === 'gen') prompt = b ? t.briefGen(nGen) : t.promptGen(nGen);
+                else prompt = b ? t.briefLabel : t.promptLabel;
             }
             let actions = '', cont = '';
             if (guided.hold) {
                 // No "Next" button: after a correct answer, any click on the page (or Enter) moves on - see guidedContinue()
                 const nxt = guidedCompute();
-                cont = nxt.type === 'end' ? t.contEnd : (sentenceOf(nxt.el) !== sentenceOf(el) ? t.contSentence : t.cont);
+                cont = nxt.type === 'end' ? t.contEnd : (guided.brief && t.briefCont ? t.briefCont : (sentenceOf(nxt.el) !== sentenceOf(el) ? t.contSentence : t.cont));
             } else if (showSolution) {
                 actions = `<button type="button" class="guide-btn secondary" id="guide-solution">${t.solution}</button>`;
             }
             guidePanel.classList.toggle('collapsed', !!guided.collapsed);
-            guidePanel.innerHTML = `<div class="guide-head"><span>${t.counter(Math.max(1, sIdx + 1), sentences.length)}</span><button type="button" class="guide-toggle" aria-expanded="${guided.collapsed ? 'false' : 'true'}" title="${guided.collapsed ? t.expand : t.collapse}">${guided.collapsed ? '▴' : '▾'}</button></div>
+            guidePanel.innerHTML = `<div class="guide-head"><span>${t.counter(Math.max(1, sIdx + 1), sentences.length)}</span><span class="guide-head-btns">${t.levelLess && !(guided.type === 'end' && !guided.hold) ? `<button type="button" class="guide-level" aria-pressed="${guided.brief ? 'true' : 'false'}" title="${guided.brief ? t.levelMoreTitle : t.levelLessTitle}">${guided.brief ? t.levelMore : t.levelLess}</button>` : ''}<button type="button" class="guide-toggle" aria-expanded="${guided.collapsed ? 'false' : 'true'}" title="${guided.collapsed ? t.expand : t.collapse}">${guided.collapsed ? '▴' : '▾'}</button></span></div>
                 ${prompt ? `<div class="guide-prompt">${prompt}</div>` : ''}
                 ${fbHtml ? `<div class="guide-fb ${fbOk ? 'ok' : 'err'}">${fbHtml}</div>` : ''}
+                ${guidedOpenHtml()}
                 ${cont ? `<div class="guide-continue">${cont}</div>` : ''}
                 ${actions ? `<div class="guide-actions">${actions}</div>` : ''}`;
             const sb = document.getElementById('guide-solution');
             if (sb) sb.onclick = guidedShowSolution;
             guidePanel.querySelector('.guide-toggle').onclick = (e) => { e.stopPropagation(); guided.collapsed = !guided.collapsed; guidedRender(fbHtml, fbOk, showSolution); };
+            const lv = guidePanel.querySelector('.guide-level');
+            if (lv) lv.onclick = (e) => { e.stopPropagation(); guided.brief = !guided.brief; guided.streak = 0; guided.slips = 0; guidedRender(fbHtml, fbOk, showSolution); };
 
             if (!guided.hold && el) {
                 el.classList.add('guided-current');
@@ -830,16 +1018,23 @@
         function guidedNote(el) {
             const nxt = guidedCompute(); const t = gT();
             if (nxt.type === 'gen' && nxt.el === el) return '<div class="guide-next-note">' + t.genAhead + '</div>';
-            if (!nxt.el || sentenceOf(nxt.el) !== sentenceOf(el)) return '<div class="guide-next-note">' + t.sentenceDone + '</div>';
+            if (!nxt.el || sentenceOf(nxt.el) !== sentenceOf(el)) { const s0 = sentenceOf(el); const hasModel = s0 && s0.querySelector('.model-compare'); return '<div class="guide-next-note">' + t.sentenceDone + (hasModel && t.modelHint ? t.modelHint : '') + '</div>'; }
             return '';
         }
         function guidedSolved(el, answer, byHelp) {
             const t = gT();
-            const ex = el.dataset.explain || (gFn(answer) || [])[1] || '';
+            let note = '';
+            if (!byHelp && !parseInt(el.dataset.mistakes || 0)) {
+                guided.streak++;
+                if (!guided.brief && guided.streak >= BRIEF_AFTER && t.toBrief) { guided.brief = true; guided.slips = 0; note = `<div class="guide-level-note">${t.toBrief}</div>`; }
+            } else guided.streak = 0;
+            // the teacher's own explanation is always shown; the general one is folded away while the help is short
+            const generic = (gFn(answer) || [])[1] || '';
+            const ex = el.dataset.explain || (guided.brief && generic && !note ? `<details class="guide-more"><summary>${t.more}</summary>${generic}</details>` : generic);
             const head = byHelp ? `${t.solutionShown}: <strong>${answer}</strong>.` : '✓ ' + t.correct;
             guided.hold = true; guided.el = el;
             const noSubj = /^(Prädikat|Verb)$/.test(answer) && !hasOwnSubject(el) ? `<div class="guide-nosubj">${t.noSubject}</div>` : '';
-            guidedRender(`${head} ${ex}${noSubj}${guidedNote(el)}`, true);
+            guidedRender(`${head} ${ex}${guidedFulfilled(el, answer)}${noSubj}${guidedNote(el)}${note}`, true);
         }
         // Does the clause of this predicate have a block labelled "Subject"? The clause is the nearest bracket that is a
         // (relative or subordinate) clause, otherwise the sentence; subjects of clauses nested inside it don't count.
@@ -849,10 +1044,129 @@
             const scope = clauseOf(el) || sentenceOf(el); if (!scope) return true;
             return Array.from(scope.querySelectorAll('.hover-word')).some(w => /^(Subjekt|Subject)$/.test(w.dataset.ans) && (clauseOf(w) || sentenceOf(w)) === scope);
         }
-        function guidedWrong(el, answer) {
+        // ---- Reading from left to right: what is still open? ----
+        // Every clause (the sentence, or a bracket labelled as subordinate/relative clause) that has begun and whose verb
+        // has not come yet is "open"; the subject, objects etc. already found in it are what makes the reader expect it.
+        const EXPECT_REASONS = ['Subjekt', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Infinitiv', 'Prädikativum', 'AcI/NcI'];
+        function gCanon(l) { return (labelMap.de || {})[l] || l; }
+        function gDisp(l) { return (labelMap[currentLang] || {})[l] || l; }
+        function gIsClause(g) { return !!g && ['Nebensatz', 'Relativsatz'].includes(gCanon(g.dataset.ans)); }
+        function gClauseOf(node) { let g = node ? node.closest('.s-group') : null; while (g && !gIsClause(g)) g = g.parentElement.closest('.s-group'); return g; }
+        function gWords(el, max) {
+            const box = el.classList.contains('g-label') ? el.parentElement : el;
+            const w = Array.from(box.querySelectorAll('.s-text')).map(x => x.textContent.trim()).filter(x => x && !/^[.,;:!?·–—]+$/.test(x));
+            return w.length > max ? w.slice(0, max).join(' ') + ' …' : w.join(' ');
+        }
+        function gReason(r) {
+            const t = gT(); const isG = r.classList.contains('g-label'); const ans = isG ? r.parentElement.dataset.ans : r.dataset.ans;
+            const w = isG && gIsClause(r.parentElement) ? gWords(r, 1).replace(' …', '') + ' …' : gWords(r, 3); // a clause: just its first word
+            return `${t.q(w)} (${gDisp(ans)})`;
+        }
+        function guidedScopes(sent) {
+            const scopes = new Map(); const reg = (sc) => { if (!scopes.has(sc)) scopes.set(sc, { reasons: [], pred: false, opener: null }); return scopes.get(sc); };
+            const done = Array.from(sent.querySelectorAll('.hover-word, .g-label')).filter(x => x.dataset.done === 'true');
+            if (!done.length) return { scopes, done };
+            reg(sent);
+            for (const it of done) {
+                if (it.classList.contains('g-label')) {
+                    const g = it.parentElement;
+                    if (gIsClause(g)) { reg(g).opener = it; continue; }
+                    const s = reg(gClauseOf(g.parentElement) || sent);
+                    if (EXPECT_REASONS.includes(gCanon(g.dataset.ans))) s.reasons.push(it);
+                    continue;
+                }
+                const s = reg(gClauseOf(it) || sent);
+                const inner = it.closest('.s-group'); if (inner && !gIsClause(inner)) continue; // part of a construction (AcI, abl. abs. …)
+                const a = gCanon(it.dataset.ans);
+                if (a === 'Prädikat') s.pred = true; else if (EXPECT_REASONS.includes(a)) s.reasons.push(it);
+            }
+            return { scopes, done };
+        }
+        function gScopeHasVerb(scope, sent) {
+            return Array.from(scope.querySelectorAll('.hover-word')).some(w => gCanon(w.dataset.ans) === 'Prädikat' && (gClauseOf(w) || sent) === scope);
+        }
+        function guidedOpenHtml() {
+            const t = gT(); if (!t.openTitle || guided.type === 'end' && !guided.hold) return '';
+            const sent = sentenceOf(guided.el); if (!sent) return '';
+            const { scopes, done } = guidedScopes(sent); const out = [];
+            const hasClauses = Array.from(sent.querySelectorAll('.s-group')).some(gIsClause);
+            Array.from(scopes.entries()).reverse().forEach(([sc, info]) => {
+                if (info.pred || !gScopeHasVerb(sc, sent)) return;
+                let txt;
+                if (sc === sent) txt = hasClauses ? t.predMain : t.predSent;
+                else { const first = gWords(info.opener || sc.querySelector('.hover-word') || sc, 1).replace(' …', ''); txt = gCanon(sc.dataset.ans) === 'Relativsatz' ? t.predRel(first) : t.predSub(first); }
+                if (info.reasons.length) txt += ` – ${t.after} ${info.reasons.map(gReason).join(', ')}`;
+                out.push(txt);
+            });
+            const last = done[done.length - 1];
+            if (!guided.hold && last && last.classList.contains('hover-word') && gCanon(last.dataset.ans) === 'Konjunktion') out.unshift(t.conj(gWords(last, 2)));
+            if (!out.length) return '';
+            return `<div class="guide-open"><span class="guide-open-title">${t.openTitle}</span><ul>${out.map(x => `<li>${x}</li>`).join('')}</ul></div>`;
+        }
+        function guidedFulfilled(el, answer) {
+            const t = gT(); if (!t.fulfilled || gCanon(answer) !== 'Prädikat' || !el.classList.contains('hover-word')) return '';
+            const sent = sentenceOf(el); if (!sent) return '';
+            const info = guidedScopes(sent).scopes.get(gClauseOf(el) || sent); if (!info) return '';
+            const reasons = (info.opener ? [info.opener] : []).concat(info.reasons); if (!reasons.length) return '';
+            const subj = info.reasons.some(r => !r.classList.contains('g-label') && gCanon(r.dataset.ans) === 'Subjekt');
+            return `<div class="guide-fulfilled">${t.fulfilled(gWords(el, 3), reasons.map(gReason).join(', '), subj)}</div>`;
+        }
+        // Hint 2: point at the form that decides it, with the student's own words
+        function guidedPointer(el, answer) {
+            const t = gT(); const a = gCanon(answer); const isG = el.classList.contains('g-label');
+            const box = isG ? el.parentElement : el;
+            const words = Array.from(box.querySelectorAll('.s-text')).map(x => x.textContent.trim()).filter(x => x && !/^[.,;:!?·–—]+$/.test(x));
+            if (!words.length) return t.ptOther('…');
+            const first = words[0], last = words[words.length - 1], all = gWords(el, 4);
+            if (isG && gIsClause(box)) return t.ptClause(first);
+            if (['Subjekt', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Vokativ'].includes(a)) return t.ptCase(last);
+            if (a === 'Prädikat') return t.ptVerb(last);
+            if (a === 'Infinitiv') return t.ptInf(last);
+            if (a === 'Präpositionale Bestimmung') return t.ptFirst(first);
+            if (a === 'Adverbiale Bestimmung') return t.ptAdv(last);
+            if (a === 'Ablativus absolutus') return t.ptAbl(all);
+            if (a === 'Partizipialkonstruktion') return t.ptPart(all);
+            if (a === 'AcI/NcI') return t.ptAci(all);
+            if (a === 'Relativsatz' || a === 'Nebensatz') return t.ptClause(first);
+            if (a === 'Konjunktion' || a === 'Subjunktion') return t.ptLink(first);
+            return t.ptOther(all);
+        }
+        // Hint 3: the right function and one look-alike the student has not tried yet, in alphabetical order
+        const LOOKALIKES = {
+            'Subjekt': ['Akkusativobjekt', 'Prädikativum', 'Vokativ'], 'Prädikat': ['Infinitiv', 'Partizipialkonstruktion'],
+            'Akkusativobjekt': ['Subjekt', 'Präpositionale Bestimmung', 'Prädikativum'], 'Dativobjekt': ['Ablativ', 'Genitivobjekt'],
+            'Genitivobjekt': ['Dativobjekt', 'Ablativ'], 'Ablativ': ['Dativobjekt', 'Präpositionale Bestimmung', 'Ablativus absolutus', 'Adverbiale Bestimmung'],
+            'Ablativus absolutus': ['Partizipialkonstruktion', 'Ablativ'], 'Prädikativum': ['Subjekt', 'Akkusativobjekt'],
+            'Präpositionale Bestimmung': ['Ablativ', 'Adverbiale Bestimmung'], 'Adverbiale Bestimmung': ['Ablativ', 'Präpositionale Bestimmung'],
+            'Infinitiv': ['AcI/NcI', 'Prädikat'], 'AcI/NcI': ['Infinitiv', 'Akkusativobjekt'], 'Partizipialkonstruktion': ['Ablativus absolutus', 'Prädikat'],
+            'Relativsatz': ['Nebensatz'], 'Nebensatz': ['Relativsatz'], 'Konjunktion': ['Subjunktion'], 'Subjunktion': ['Konjunktion'],
+            'Vokativ': ['Subjekt'], 'Sonstiges': ['Adverbiale Bestimmung', 'Konjunktion']
+        };
+        function guidedNarrow(el, answer) {
+            const t = gT(); const tried = (el.dataset.tried || '').split('|');
+            const offered = currentLabels();
+            const fresh = (l) => l !== answer && offered.includes(l) && !tried.includes(gCanon(l)) && gCanon(l) !== 'Sonstiges';
+            // a look-alike first; if the student has tried all of those already, any other function not tried yet
+            const pick = (LOOKALIKES[gCanon(answer)] || []).map(gDisp).find(fresh) || offered.find(fresh);
+            if (!pick) return t.lastResort;
+            const pair = [answer, pick].sort((x, y) => x.localeCompare(y, currentLang));
+            return t.narrow(pair[0], pair[1]);
+        }
+        function guidedWrong(el, answer, chosen) {
             const t = gT(); const n = parseInt(el.dataset.mistakes || 0);
-            const tip = el.dataset.errhint || (gFn(answer) || [])[0] || t.tipGeneric;
-            guidedRender('✗ ' + tip, false, n >= 3);
+            guided.streak = 0; let back = '';
+            if (guided.brief && ++guided.slips >= FULL_AFTER && t.toFull) { guided.brief = false; guided.slips = 0; back = `<div class="guide-level-note">${t.toFull}</div>`; }
+            if (chosen) el.dataset.tried = ((el.dataset.tried || '') + '|' + gCanon(chosen)).replace(/^\|/, '');
+            // the teacher's own hint first, then feedback on this particular mix-up, then the general tip for the function
+            const mix = chosen ? (t.mix || {})[gCanon(chosen) + '>' + gCanon(answer)] : null;
+            if (n >= 2 && t.hintN) {
+                // later attempts: the mix-up feedback (if any) plus the next step of the hint ladder
+                const step = n === 2 ? guidedPointer(el, answer) : guidedNarrow(el, answer);
+                guidedRender(`✗ ${mix || t.notYet}<div class="guide-hint-step"><strong>${t.hintN(Math.min(n, 3))}</strong> ${step}</div>${back}`, false, n >= 3);
+                return;
+            }
+            const tip = el.dataset.errhint || mix || (gFn(answer) || [])[0] || t.tipGeneric;
+            guidedRender('✗ ' + tip + back, false, n >= 3);
         }
         function guidedGenFound(blk) {
             const t = gT(); const left = blk.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').length;
@@ -1191,7 +1505,7 @@
             const submitBtn = document.getElementById('btn-submit-exam'); if (submitBtn) submitBtn.textContent = t.btnSubmitExam;
             
             document.querySelector('.results-title').textContent = t.examResults; document.querySelector('.btn-copy').textContent = t.copyResults;
-            document.querySelector('#results-modal .btn:not(.btn-copy)').textContent = t.close; document.querySelectorAll('textarea:not(.results-textarea)').forEach(ta => ta.placeholder = t.transPlaceholder);
+            document.querySelector('#results-modal .btn:not(.btn-copy)').textContent = t.close; document.querySelectorAll('textarea:not(.results-textarea)').forEach(ta => ta.placeholder = t.transPlaceholder); updateModelUI();
             
             if (document.title === studentTexts.en.docTitle || document.title === studentTexts.de.docTitle) {
                 document.title = t.docTitle; document.querySelector('h1').textContent = t.docTitle;
@@ -1254,6 +1568,7 @@
             if (m === 'guided') guidedStart(); else guidedStop();
             const submitBtn = document.getElementById('btn-submit-exam');
             if (submitBtn) submitBtn.style.display = (m === 'exam' && !examFinalized) ? 'inline-block' : 'none';
+            updateModelUI();
         }
 
         menu.addEventListener('mouseenter', () => clearTimeout(hideMenuTimeout));
@@ -1399,7 +1714,7 @@
                     menu.style.display = "none";
                     if (guided.hold || activeEl !== guided.el) return;
                     if (sel === correct) { solve(activeEl, correct, mode); answeredItems++; check(); guidedSolved(activeEl, correct, false); }
-                    else { activeEl.dataset.mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1; guidedWrong(activeEl, correct); }
+                    else { activeEl.dataset.mistakes = parseInt(activeEl.dataset.mistakes || 0) + 1; guidedWrong(activeEl, correct, sel); }
                     return;
                 }
                 
@@ -1514,6 +1829,7 @@ function dismissToastOnInteraction() {
 
             const submitBtn = document.getElementById('btn-submit-exam');
             if (submitBtn) submitBtn.style.display = 'none';
+            updateModelUI();
 
             setTimeout(() => {
                 const pct = Math.round((finalScore / totalItems) * 100);
@@ -1569,7 +1885,8 @@ function dismissToastOnInteraction() {
             
             const textareas = Array.from(document.querySelectorAll('textarea:not(.results-textarea)')).map(ta => ta.value);
             
-            const data = { items: state, subWords: subState, textareas: textareas, exMode: exMode, examScore: examScore, answeredItems: answeredItems };
+            const models = Array.from(document.querySelectorAll('.trans-box')).map(b => { const m = b.querySelector('.model-text'); return !!m && !m.hidden; });
+            const data = { items: state, subWords: subState, textareas: textareas, models: models, exMode: exMode, examScore: examScore, answeredItems: answeredItems };
             
             // --- NEW TRY/CATCH BLOCK ---
             try {
@@ -1608,7 +1925,9 @@ function dismissToastOnInteraction() {
                     });
                 }
                 
-                data.textareas.forEach((val, i) => { if (textareas[i]) textareas[i].value = val; }); check(); 
+                data.textareas.forEach((val, i) => { if (textareas[i]) textareas[i].value = val; });
+                if (data.models) { const boxes = document.querySelectorAll('.trans-box'); data.models.forEach((open, i) => { const m = boxes[i] && boxes[i].querySelector('.model-text'); if (m && open) m.hidden = false; }); }
+                check(); updateModelUI(); 
             } catch (e) { 
                 console.warn("Failed to load progress or storage is blocked.", e); 
             }
@@ -1741,9 +2060,10 @@ const CONFIG = {
             btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
             lblLevel: "Grammar Level:", optBeg: "Beginner", optInt: "Intermediate", optAdv: "Advanced (All)",
             editH3: "Step 2: Editing Instruction",
-            editBody: "Check the analysis. Adjacent words merge automatically in the student view. Use 'Manual Split' to separate words. Create groups with 'Define Word Group'. With 'Mark Genitive' you can highlight a genitive attribute inside a larger group by underlining it. Double-click a word to correct it or add hints. With 'New Label' you can add a new function (e.g. Vocative). Click ▾ next to a label (or right-click it) to change its colour. With 'Save Work' you can save a json file to keep working on it later; at the end, 'Export Student Page' creates an html page that you can share with your students.",
+            editBody: "Check the analysis. Adjacent words merge automatically in the student view. Use 'Manual Split' to separate words. Create groups with 'Define Word Group'. With 'Mark Genitive' you can highlight a genitive attribute inside a larger group by underlining it. Double-click a word to correct it or add hints. With 'New Label' you can add a new function (e.g. Vocative). Click ▾ next to a label (or right-click it) to change its colour. Below the editor you can enter a model translation for each sentence (optional); students can open it once they have written their own translation. With 'Save Work' you can save a json file to keep working on it later; at the end, 'Export Student Page' creates an html page that you can share with your students.",
            	wordModalTitle: "Edit Word & Hint", wordTextLabel: "Word Text:", hintLabel: "Hint (optional):", groupHintLabel: "Group Hint (optional):",
             errorHintLabel: "Hint after wrong answer (optional):",
+            modelSummary: "📝 Model translations (optional)", modelCount: (n, m) => `${n} of ${m} sentences`, modelIntro: "If you enter a model translation, students can open it once they have written their own translation of the sentence, and compare the two.", modelPh: "Model translation (optional)",
             explainLabel: "Explanation after a correct answer (guided mode, optional):", phWordExplain: "E.g. The accusative points ahead to a verb that needs it.", phGroupExplain: "E.g. Expect a verb of its own at the end of the clause.",
             phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (W)", btnBracket: "Define Word Group (M)", btnAttr: "Mark Genitive (G)",
             btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work", btnResetColors: "🎨 Restore default colours", btnCvdColors: "👁 Colour-blind-safe colours", cvdOffTitle: "Back to the colours before",
@@ -1775,9 +2095,10 @@ const CONFIG = {
             btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
             lblLevel: "Grammatik-Level:", optBeg: "Anfänger", optInt: "Fortgeschritten", optAdv: "Profi (Alle)",
             editH3: "Schritt 2: Bearbeitung",
-            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer grösseren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe. Mit 'Speichern' können Sie eine json-Datei für die spätere Bearbeitung speichern, mit 'Schülerseite exportieren' erstellen Sie am Ende eine html-Seite, die Sie mit Ihren Schülerinnen und Schülern teilen können.",
+            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer grösseren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe. Unter dem Editor können Sie zu jedem Satz eine Musterübersetzung eintragen (optional); die Schülerinnen und Schüler können sie öffnen, sobald sie selbst übersetzt haben. Mit 'Speichern' können Sie eine json-Datei für die spätere Bearbeitung speichern, mit 'Schülerseite exportieren' erstellen Sie am Ende eine html-Seite, die Sie mit Ihren Schülerinnen und Schülern teilen können.",
            	wordModalTitle: "Wort & Hinweis bearbeiten", wordTextLabel: "Worttext:", hintLabel: "Hinweis (optional):", groupHintLabel: "Gruppen-Hinweis (optional):",
             errorHintLabel: "Hinweis nach falscher Antwort (optional):",
+            modelSummary: "📝 Musterübersetzungen (optional)", modelCount: (n, m) => `${n} von ${m} Sätzen`, modelIntro: "Tragen Sie eine Musterübersetzung ein, können die Schülerinnen und Schüler sie öffnen, sobald sie den Satz selbst übersetzt haben, und beide vergleichen.", modelPh: "Musterübersetzung (optional)",
             explainLabel: "Erklärung nach richtiger Antwort (geführter Modus, optional):", phWordExplain: "Z.B. Der Akkusativ kündigt ein Verb an, das ihn braucht.", phGroupExplain: "Z.B. Erwarte am Ende des Nebensatzes ein eigenes Prädikat.",
             phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (W)", btnBracket: "Wortgruppe definieren (M)", btnAttr: "Genitiv markieren (G)",
             btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden", btnResetColors: "🎨 Standardfarben wiederherstellen", btnCvdColors: "👁 Farbenblind-sichere Farben", cvdOffTitle: "Zurück zu den vorherigen Farben",
@@ -1818,6 +2139,7 @@ const AppState = {
     words: [],
     groups: [],
     functions: [],
+    translations: [], // model translations, one per sentence (in the order of the editor's sentences)
     colors: { ...CONFIG.SEMANTIC_COLORS },
     lang: 'de',
     level: 'advanced',
@@ -1966,7 +2288,7 @@ const StorageManager = {
                 lang: AppState.lang, level: AppState.level,
                 title: DOM.pageTitle.value, image: DOM.pageImage.value,
                 text: textVal, notes: DOM.teacherNotes.value,
-                groups: AppState.groups, funcs: AppState.functions, cols: AppState.colors, words: AppState.words,
+                groups: AppState.groups, funcs: AppState.functions, cols: AppState.colors, words: AppState.words, translations: AppState.translations,
                 timestamp: new Date().getTime()
             };
             
@@ -2017,7 +2339,7 @@ const StorageManager = {
             text: DOM.enterText.value,
             notes: DOM.teacherNotes.value, 
             words: AppState.words, groups: AppState.groups, 
-            customFunctions: AppState.functions, customColors: AppState.colors
+            customFunctions: AppState.functions, customColors: AppState.colors, translations: AppState.translations
         };
         const blob = new Blob([JSON.stringify(projectData, null, 2)], {type: "application/json"});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); 
@@ -2059,6 +2381,8 @@ const StorageManager = {
         AppState.functions = data.customFunctions || data.funcs || [...CONFIG.PRESETS[safeLang][safeLevel]];
         if(data.customColors || data.cols) Object.assign(AppState.colors, data.customColors || data.cols);
         AppState.groups = data.groups || [];
+        AppState.translations = Array.isArray(data.translations) ? data.translations.map(x => typeof x === 'string' ? x : '') : [];
+        if (DOM.modelTransList) DOM.modelTransList.dataset.sig = '';
         AppState.history = []; 
         
         const loadWords = data.words || data.tokens || [];
@@ -2235,6 +2559,7 @@ function changeLanguage(lang) {
     DOM.lblWordErrorHint.textContent = txt.errorHintLabel;
     DOM.lblGroupErrorHint.textContent = txt.errorHintLabel;
     DOM.lblWordExplain.textContent = txt.explainLabel; DOM.lblGroupExplain.textContent = txt.explainLabel;
+    if (DOM.modelTransList) { DOM.modelTransList.dataset.sig = ''; renderModelTranslations(); }
     DOM.wordExplainInput.placeholder = txt.phWordExplain; DOM.groupExplainInput.placeholder = txt.phGroupExplain;
     
     DOM.undoBtn.textContent = txt.btnUndo; 
@@ -2616,6 +2941,43 @@ function renderEditor() {
     area.appendChild(fragment); 
     
     updateGroupUI();
+    renderModelTranslations();
+}
+
+// The sentences of the exercise as the student page will split them (same rule as the boxes above)
+function editorSentences() {
+    const out = []; let cur = [];
+    AppState.words.forEach((item, i) => {
+        cur.push(item);
+        const w = item.w || '';
+        let br = item.f === CONFIG.PUNCT && CONFIG.SENTENCE_ENDERS.some(c => w.includes(c));
+        if (item.b === 1) br = true; if (item.b === -1) br = false;
+        if (br && i < AppState.words.length - 1) { out.push(cur); cur = []; }
+    });
+    if (cur.length) out.push(cur);
+    return out.map(ws => ws.map((x, k) => (k && x.f !== CONFIG.PUNCT ? ' ' : '') + (x.w || '')).join('').replace(/\s+([.,;:!?])/g, '$1'));
+}
+// Model translations: one text field per sentence. Rebuilt only when the sentences change, so typing keeps its focus.
+function renderModelTranslations() {
+    const list = DOM.modelTransList; if (!list) return;
+    const txt = CONFIG.LANG_TEXT[AppState.lang];
+    const sents = editorSentences(); const sig = AppState.lang + '|' + sents.join('\u0001');
+    const updateCount = () => {
+        const n = sents.filter((_, i) => (AppState.translations[i] || '').trim()).length;
+        DOM.modelTransCount.textContent = n ? '· ' + txt.modelCount(n, sents.length) : '';
+    };
+    DOM.modelTransSummary.textContent = txt.modelSummary; DOM.modelTransIntro.textContent = txt.modelIntro;
+    if (list.dataset.sig === sig) { updateCount(); return; }
+    list.dataset.sig = sig; list.innerHTML = '';
+    sents.forEach((la, i) => {
+        const item = document.createElement('div'); item.className = 'model-trans-item';
+        const head = document.createElement('div'); head.className = 'model-trans-la'; head.textContent = (sents.length > 1 ? (i + 1) + '. ' : '') + la;
+        const ta = document.createElement('textarea'); ta.placeholder = txt.modelPh; ta.value = AppState.translations[i] || '';
+        ta.setAttribute('aria-label', txt.modelPh + ' – ' + la);
+        ta.addEventListener('input', () => { AppState.translations[i] = ta.value; updateCount(); StorageManager.debouncedAutoSave(); });
+        item.append(head, ta); list.appendChild(item);
+    });
+    updateCount();
 }
 
 function updateWordVisuals(idx) {
@@ -3505,6 +3867,7 @@ function initEditor(words) {
     AppState.groups.forEach(g => { if (g.label && !AppState.functions.includes(g.label)) AppState.functions.push(g.label); });
     AppState.history = [];
     AppState.words = words;
+    AppState.translations = []; if (DOM.modelTransList) DOM.modelTransList.dataset.sig = '';
     DOM.editorPageTitle.value = DOM.pageTitle.value;
     renderEditor();
     showScreen('editor');
@@ -3674,6 +4037,8 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             keysTitle: "Keyboard shortcuts", keysHint: "Point at a word with the mouse (or select it with Tab) and press the underlined letter of the function.", keysGen: "Mark genitive (click the word first)", colorFor: "Colour for:", colorInUse: "Used by {label} (it will turn grey)", colorResetOne: "↺ Teacher's colour",
             refsTitle: "Look it up", refGuide: "Guide", refDecl: "Declension tables", refConj: "Conjugation tables", guideSentence: "The {link} shows you step by step how to analyse a sentence.", guideLinkText: "📖 guide",
             cvdOn: "👁 Colours for colour blindness", cvdOff: "↺ Back to the teacher's colours", cvdTitle: "Colours that stay clearly distinct with every type of colour blindness",
+            modelBtn: "📝 Compare with the model translation", modelNeedOwn: "Write your own translation first.", modelHead: "Model translation",
+            modelNote: "There is often more than one good translation. Compare: have you translated every part of the sentence? Do tenses and references match?",
             cvdPartial: (n) => `Only ${n} functions could get colour-blind-safe colours; the patterns (🏁) help with the rest.`, colorsReset: "↺ All of the teacher's colours"
         },
         de: {
@@ -3695,12 +4060,14 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             keysTitle: "Tastenkürzel", keysHint: "Zeige mit der Maus auf ein Wort (oder wähle es mit Tab) und drücke den unterstrichenen Buchstaben der Funktion.", keysGen: "Genitiv markieren (vorher auf das Wort klicken)", colorFor: "Farbe für:", colorInUse: "Belegt von {label} (wird dann grau)", colorResetOne: "↺ Farbe der Lehrkraft",
             refsTitle: "Nachschlagen", refGuide: "Anleitung", refDecl: "Deklinationstabellen", refConj: "Konjugationstabellen", guideSentence: "Wie du einen Satz Schritt für Schritt analysierst, zeigt dir die {link}.", guideLinkText: "📖 Anleitung",
             cvdOn: "👁 Farben für Farbenblinde", cvdOff: "↺ Zurück zu den Farben der Lehrkraft", cvdTitle: "Farben, die bei allen Formen von Farbenblindheit gut unterscheidbar bleiben",
+            modelBtn: "📝 Mit der Musterübersetzung vergleichen", modelNeedOwn: "Schreibe zuerst deine eigene Übersetzung.", modelHead: "Musterübersetzung",
+            modelNote: "Es gibt oft mehr als eine gute Übersetzung. Vergleiche: Hast du alle Teile des Satzes übersetzt? Stimmen Zeiten und Bezüge?",
             cvdPartial: (n) => `Nur ${n} Funktionen konnten farbenblind-sichere Farben erhalten; bei den übrigen helfen die Muster (🏁).`, colorsReset: "↺ Alle Farben der Lehrkraft"
         }
     };
 
     const t = studentTexts[lang]; const pageTitle = title ? title : t.docTitle;
-    const bodyContent = generateExerciseHTML(words, groups, t.transPlaceholder, lang);
+    const bodyContent = generateExerciseHTML(words, groups, t.transPlaceholder, lang, AppState.translations || []);
     
     const safeTitle = escapeHTML(pageTitle);
     const safeNotes = notes ? escapeHTML(notes).replace(/\n/g, '<br>') : '';
@@ -3781,7 +4148,11 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     </body></html>`;
 }
 
-function generateExerciseHTML(words, groups, placeholder, lang) {
+function generateExerciseHTML(words, groups, placeholder, lang, models) {
+    models = models || [];
+    // the model translation of a sentence: hidden until the student has written something and asks for it
+    const modelHtml = (i) => (models[i] || '').trim() ? `
+                    <div class="model-compare"><button type="button" class="model-btn" disabled></button><div class="model-text" hidden><div class="model-head"></div><div class="model-body">${escapeHTML(models[i].trim())}</div><div class="model-note"></div></div></div>` : '';
     let sIdx = 0;
     let containerOpen = true;
     const sentenceEnders = ['.', '!', '?', '·'];
@@ -3854,7 +4225,7 @@ function generateExerciseHTML(words, groups, placeholder, lang) {
         if (shouldBreak) {
             htmlParts.push(`
                 <div id="t-container-${sIdx}" class="trans-box" style="display:none;">
-                    <textarea placeholder="${escapeHTML(placeholder)}"></textarea>
+                    <textarea placeholder="${escapeHTML(placeholder)}"></textarea>${modelHtml(sIdx)}
                 </div>
             </div>`); // Closes the sentence-container
             
@@ -3872,7 +4243,7 @@ function generateExerciseHTML(words, groups, placeholder, lang) {
     if (containerOpen) {
         htmlParts.push(`
             <div id="t-container-${sIdx}" class="trans-box" style="display:none;">
-                <textarea placeholder="${escapeHTML(placeholder)}"></textarea>
+                <textarea placeholder="${escapeHTML(placeholder)}"></textarea>${modelHtml(sIdx)}
             </div>
         </div>`);
     }
