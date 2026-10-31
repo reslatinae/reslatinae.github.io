@@ -66,6 +66,16 @@
         .color-pop-reset:hover { background: #f8f6f1; }
         
         .zoom-controls { display: flex; gap: 6px; align-items: center; background: #f8f6f1; padding: 4px 8px; border-radius: 6px; border: 1px solid #efeae1; }
+        .z-btn.active { background: #eff6ff; border-color: #2563eb; }
+        body.high-contrast .z-btn.active { background: #1e3a8a; border-color: #93c5fd; }
+        /* Lesehilfe (teacher page) / reading aid */
+        html.reading-aid { font-size: 112.5%; }
+        html.reading-aid body, html.reading-aid button, html.reading-aid input, html.reading-aid textarea, html.reading-aid select {
+            font-family: Verdana, Tahoma, "DejaVu Sans", "Segoe UI", Arial, sans-serif !important; }
+        html.reading-aid body { letter-spacing: 0.035em; word-spacing: 0.14em; line-height: 1.8; }
+        html.reading-aid p, html.reading-aid li, html.reading-aid dd, html.reading-aid td, html.reading-aid .instruction-box { line-height: 1.85; }
+        html.reading-aid em, html.reading-aid i, html.reading-aid .la, html.reading-aid cite { font-style: normal; }
+        html.reading-aid .la, html.reading-aid i, html.reading-aid em { font-weight: 600; } /* instead of italics: Latin forms stay recognisable */
         .z-btn { background: white; border: 1px solid #e4ddd1; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.9rem; font-weight: bold; color: #3a3329; transition: background 0.1s; }
         .z-btn:hover { background: #efeae1; }
 
@@ -280,8 +290,7 @@
             </div>
 
             <div class="project-mini-row">
-                <button class="subtle-btn" id="btn-reset-colors" data-ref="btnResetColors">🎨 Default colours</button>
-                <button class="subtle-btn" id="btn-cvd-colors" data-ref="btnCvdColors" style="margin-right:auto;">👁 Colour-blind-safe colours</button>
+                <button class="subtle-btn" id="btn-reset-colors" data-ref="btnResetColors" style="margin-right:auto;">🎨 Default colours</button>
                 <button class="subtle-btn" id="btn-save-work" data-ref="btnSaveWork">💾 Save Work</button>
                 <label class="subtle-btn">
                     <span id="btn-load-work" data-ref="btnLoadWork">📂 Load Work</span> <input type="file" accept=".json" style="display:none" id="file-load-editor" data-ref="fileLoadEditor">
@@ -293,7 +302,9 @@
             <div style="font-size: 0.9rem; font-weight: 600; color: #4d4539;">Visual Editor</div>
             <div class="zoom-controls">
                 <button class="z-btn" id="btn-toggle-pattern" data-ref="btnTogglePattern" title="Toggle Patterns">🏁</button>
+                <button class="z-btn" id="btn-cvd-colors" data-ref="btnCvdColors" type="button" aria-pressed="false">👁</button>
                 <button class="z-btn" id="btn-toggle-contrast" data-ref="btnToggleContrast" title="Toggle High Contrast">🌗</button>
+                <button class="z-btn" id="btn-reading" data-ref="btnReading" type="button" aria-pressed="false" onclick="toggleReadingAid()" style="font-family: Verdana, Tahoma, sans-serif;">Aa</button>
                 <span style="border-left: 1px solid #e4ddd1; margin: 0 4px; height: 16px;"></span>
                 <button class="z-btn" id="btn-zoom-in" data-ref="btnZoomIn" title="Zoom In">🔍 +</button>
                 <button class="z-btn" id="btn-zoom-out" data-ref="btnZoomOut" title="Zoom Out">🔍 -</button>
@@ -1730,12 +1741,12 @@ const CONFIG = {
             btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
             lblLevel: "Grammar Level:", optBeg: "Beginner", optInt: "Intermediate", optAdv: "Advanced (All)",
             editH3: "Step 2: Editing Instruction",
-            editBody: "Check the analysis. Adjacent words merge automatically in the student view. Use 'Manual Split' to separate words. Create groups with 'Define Word Group'. With 'Mark Genitive' you can highlight a genitive attribute inside a larger group by underlining it. Double-click a word to correct it or add hints. With 'New Label' you can add a new function (e.g. Vocative). Click ▾ next to a label (or right-click it) to change its colour.",
+            editBody: "Check the analysis. Adjacent words merge automatically in the student view. Use 'Manual Split' to separate words. Create groups with 'Define Word Group'. With 'Mark Genitive' you can highlight a genitive attribute inside a larger group by underlining it. Double-click a word to correct it or add hints. With 'New Label' you can add a new function (e.g. Vocative). Click ▾ next to a label (or right-click it) to change its colour. With 'Save Work' you can save a json file to keep working on it later; at the end, 'Export Student Page' creates an html page that you can share with your students.",
            	wordModalTitle: "Edit Word & Hint", wordTextLabel: "Word Text:", hintLabel: "Hint (optional):", groupHintLabel: "Group Hint (optional):",
             errorHintLabel: "Hint after wrong answer (optional):",
             explainLabel: "Explanation after a correct answer (guided mode, optional):", phWordExplain: "E.g. The accusative points ahead to a verb that needs it.", phGroupExplain: "E.g. Expect a verb of its own at the end of the clause.",
             phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (W)", btnBracket: "Define Word Group (M)", btnAttr: "Mark Genitive (G)",
-            btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work", btnResetColors: "🎨 Restore default colours", btnCvdColors: "👁 Colour-blind-safe colours",
+            btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work", btnResetColors: "🎨 Restore default colours", btnCvdColors: "👁 Colour-blind-safe colours", cvdOffTitle: "Back to the colours before",
             cvdTitle: "Give the functions in this exercise colours that stay clearly distinct with colour blindness",
             confirmCvd: (n, given) => `The ${n} functions in this exercise get colours that stay clearly distinct with every type of colour blindness.` + (given < n ? ` There are only ${given} such colours: the ${given} most frequent functions get them, the others keep their colour (the patterns help there).` : '') + ` Students will see these colours too. (Undo with Ctrl+Z.)`, cvdNone: "There are no analysed words yet.", confirmResetColors: "Reset all label colours to the default colours? (You can undo this with Ctrl+Z.)",
             modalTitle: "Name of the syntactic group:", btnCancel: "Cancel", btnSaveGroup: "Save", btnDelete: "Delete", confirmDelete: "Are you sure you want to delete this word?",
@@ -1764,12 +1775,12 @@ const CONFIG = {
             btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
             lblLevel: "Grammatik-Level:", optBeg: "Anfänger", optInt: "Fortgeschritten", optAdv: "Profi (Alle)",
             editH3: "Schritt 2: Bearbeitung",
-            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer grösseren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe.",
+            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer grösseren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe. Mit 'Speichern' können Sie eine json-Datei für die spätere Bearbeitung speichern, mit 'Schülerseite exportieren' erstellen Sie am Ende eine html-Seite, die Sie mit Ihren Schülerinnen und Schülern teilen können.",
            	wordModalTitle: "Wort & Hinweis bearbeiten", wordTextLabel: "Worttext:", hintLabel: "Hinweis (optional):", groupHintLabel: "Gruppen-Hinweis (optional):",
             errorHintLabel: "Hinweis nach falscher Antwort (optional):",
             explainLabel: "Erklärung nach richtiger Antwort (geführter Modus, optional):", phWordExplain: "Z.B. Der Akkusativ kündigt ein Verb an, das ihn braucht.", phGroupExplain: "Z.B. Erwarte am Ende des Nebensatzes ein eigenes Prädikat.",
             phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (W)", btnBracket: "Wortgruppe definieren (M)", btnAttr: "Genitiv markieren (G)",
-            btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden", btnResetColors: "🎨 Standardfarben wiederherstellen", btnCvdColors: "👁 Farbenblind-sichere Farben",
+            btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden", btnResetColors: "🎨 Standardfarben wiederherstellen", btnCvdColors: "👁 Farbenblind-sichere Farben", cvdOffTitle: "Zurück zu den vorherigen Farben",
             cvdTitle: "Den Funktionen dieser Übung Farben geben, die auch bei Farbenblindheit gut unterscheidbar sind",
             confirmCvd: (n, given) => `Die ${n} Funktionen dieser Übung erhalten Farben, die bei allen Formen von Farbenblindheit gut unterscheidbar bleiben.` + (given < n ? ` Es gibt nur ${given} solche Farben: Die ${given} häufigsten Funktionen erhalten sie, die übrigen behalten ihre Farbe (dort helfen die Muster).` : '') + ` Auch die Schülerinnen und Schüler sehen diese Farben. (Mit Strg+Z rückgängig.)`, cvdNone: "Es gibt noch keine bestimmten Wörter.", confirmResetColors: "Alle Label-Farben auf die Standardfarben zurücksetzen? (Mit Strg+Z rückgängig zu machen.)",
             modalTitle: "Name der syntaktischen Gruppe:", btnCancel: "Abbrechen", btnSaveGroup: "Speichern", btnDelete: "Löschen", confirmDelete: "Möchten Sie dieses Wort wirklich löschen?",
@@ -2234,7 +2245,7 @@ function changeLanguage(lang) {
     DOM.btnExport.textContent = txt.btnExport; 
     DOM.btnSaveWork.textContent = txt.btnSaveWork;
     DOM.btnResetColors.textContent = txt.btnResetColors;
-    DOM.btnCvdColors.textContent = txt.btnCvdColors; DOM.btnCvdColors.title = txt.cvdTitle;
+    document.documentElement.lang = lang; updateTeacherCvdButton(); if (window.updateReadingAid) window.updateReadingAid();
     DOM.btnLoadWork.textContent = txt.btnLoadWork; 
     DOM.btnTogglePattern.title = txt.togglePat;
     DOM.btnToggleContrast.title = txt.toggleCon; 
@@ -2413,6 +2424,25 @@ function assignColorBlindColors(used, order, palette, neutral) {
     return { colors: out, total, given: labels.length };
 }
 
+const CVD_BACKUP_KEY = 'latin_tool_cvd_backup'; // the colours from before switching to colour-blind-safe colours
+function cvdBackup() { try { return JSON.parse(localStorage.getItem(CVD_BACKUP_KEY) || 'null'); } catch (e) { return null; } }
+function updateTeacherCvdButton() {
+    const b = DOM.btnCvdColors; if (!b) return;
+    const txt = CONFIG.LANG_TEXT[AppState.lang], on = !!cvdBackup();
+    b.classList.toggle('active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.title = on ? txt.cvdOffTitle : txt.btnCvdColors.replace(/^\S+\s/, '') + ': ' + txt.cvdTitle; b.setAttribute('aria-label', b.title);
+}
+function toggleColorBlindColors() {
+    const backup = cvdBackup();
+    if (backup) { // switch off: back to the colours from before
+        AppState.saveToHistory();
+        Object.keys(backup).forEach(l => { AppState.colors[l] = backup[l]; });
+        try { localStorage.removeItem(CVD_BACKUP_KEY); } catch (e) {}
+        renderPalette(); renderEditor(); saveTeacherColors(); StorageManager.debouncedAutoSave(); updateTeacherCvdButton();
+        return;
+    }
+    applyColorBlindColors();
+}
 function applyColorBlindColors() {
     const txt = CONFIG.LANG_TEXT[AppState.lang];
     const used = {};
@@ -2421,6 +2451,7 @@ function applyColorBlindColors() {
     if (!Object.keys(used).length) { alert(txt.cvdNone); return; }
     const res = assignColorBlindColors(used, AppState.functions, CONFIG.CVD_SAFE, CONFIG.NEUTRAL_COLOR);
     if (!confirm(txt.confirmCvd(res.total, res.given))) return;
+    try { localStorage.setItem(CVD_BACKUP_KEY, JSON.stringify(AppState.colors)); } catch (e) {}
     AppState.saveToHistory();
     // a colour from the safe set that an unused label still has would look the same: that label turns grey
     const taken = new Set(Object.values(res.colors).map(c => c.toLowerCase()));
@@ -2430,13 +2461,15 @@ function applyColorBlindColors() {
     renderEditor();
     saveTeacherColors();
     StorageManager.debouncedAutoSave();
+    updateTeacherCvdButton();
 }
 
 function restoreDefaultColors() {
     if (!confirm(CONFIG.LANG_TEXT[AppState.lang].confirmResetColors)) return;
     AppState.saveToHistory();
     Object.keys(AppState.colors).forEach(l => { if (CONFIG.SEMANTIC_COLORS[l]) AppState.colors[l] = CONFIG.SEMANTIC_COLORS[l]; });
-    try { localStorage.removeItem(CONFIG.COLOR_PREF_KEY); } catch (e) {} // new exercises start with the default colours again
+    try { localStorage.removeItem(CONFIG.COLOR_PREF_KEY); localStorage.removeItem(CVD_BACKUP_KEY); } catch (e) {} // new exercises start with the default colours again
+    updateTeacherCvdButton();
     renderPalette();
     renderEditor();
     StorageManager.debouncedAutoSave();
@@ -2723,7 +2756,7 @@ function initEventListeners() {
     DOM.btnExport.addEventListener('click', exportToStudent);
     DOM.btnSaveWork.addEventListener('click', () => StorageManager.exportProject());
     DOM.btnResetColors.addEventListener('click', restoreDefaultColors);
-    DOM.btnCvdColors.addEventListener('click', applyColorBlindColors);
+    DOM.btnCvdColors.addEventListener('click', toggleColorBlindColors);
 
     DOM.btnTogglePattern.addEventListener('click', () => document.body.classList.toggle('pattern-mode'));
     DOM.btnToggleContrast.addEventListener('click', () => document.body.classList.toggle('high-contrast'));
@@ -3477,6 +3510,25 @@ function initEditor(words) {
     showScreen('editor');
     renderPalette();
 }
+
+// ---------- Lesehilfe / reading aid (shared by all student-facing pages through the same browser setting) ----------
+(function () {
+    const KEY = 'syntax_reading_aid';
+    const on = () => { try { return localStorage.getItem(KEY) === '1'; } catch (e) { return false; } };
+    function apply() {
+        const v = on(); document.documentElement.classList.toggle('reading-aid', v);
+        const de = document.documentElement.lang !== 'en';
+        document.querySelectorAll('.aid-btn, #btn-reading').forEach(b => {
+            b.classList.toggle('active', v); b.setAttribute('aria-pressed', v ? 'true' : 'false');
+            b.title = (de ? 'Lesehilfe: grössere, leichter lesbare Schrift mit mehr Abstand' : 'Reading aid: larger, easier-to-read text with more spacing') + (v ? (de ? ' (an)' : ' (on)') : '');
+            b.setAttribute('aria-label', b.title);
+        });
+    }
+    window.toggleReadingAid = function () { try { localStorage.setItem(KEY, on() ? '0' : '1'); } catch (e) {} apply(); if (typeof guidedPlace === 'function') guidedPlace(false); };
+    window.updateReadingAid = apply;
+    document.querySelectorAll('.aid-btn').forEach(b => b.addEventListener('click', window.toggleReadingAid));
+    apply();
+})();
 
 window.addEventListener('DOMContentLoaded', initApp);
 
