@@ -159,7 +159,7 @@
         <div class="toc-options">
             <label><input type="checkbox" id="opt-macrons"> <span class="l-de">Längen anzeigen (ā, ē …)</span><span class="l-en">Show long vowels (ā, ē …)</span></label>
             <label><input type="checkbox" id="opt-hl"> <span class="l-de">Endungen hervorheben</span><span class="l-en">Highlight endings</span></label>
-            <div class="legend"><span class="l-de">Beispiel: <span class="s">puell</span><span class="end">ārum</span> = Stamm + <span class="end">Endung</span></span><span class="l-en">Example: <span class="s">puell</span><span class="end">ārum</span> = stem + <span class="end">ending</span></span></div>
+            <div class="legend"><span class="l-de">Beispiel: <span class="s">amīc</span><span class="end">ārum</span> = Stamm + <span class="end">Endung</span></span><span class="l-en">Example: <span class="s">amīc</span><span class="end">ārum</span> = stem + <span class="end">ending</span></span></div>
         </div>
     </nav>
 
@@ -304,8 +304,8 @@ const G = { m: { de: 'm.', en: 'm.' }, f: { de: 'f.', en: 'f.' }, n: { de: 'n.',
 
 function sectionOverview() {
     const cols = [
-        col({ de: 'a-Dekl.', en: '1st decl.' }, 'puella, f.', ['-a', '-ae', '-ae', '-am', '-ā'], ['-ae', '-ārum', '-īs', '-ās', '-īs']),
-        col({ de: 'o-Dekl.', en: '2nd decl.' }, 'dominus, m.', ['-us (-er)', '-ī', '-ō', '-um', '-ō'], ['-ī', '-ōrum', '-īs', '-ōs', '-īs']),
+        col({ de: 'a-Dekl.', en: '1st decl.' }, 'amīca, f.', ['-a', '-ae', '-ae', '-am', '-ā'], ['-ae', '-ārum', '-īs', '-ās', '-īs']),
+        col({ de: 'o-Dekl.', en: '2nd decl.' }, 'amīcus, m.', ['-us (-er)', '-ī', '-ō', '-um', '-ō'], ['-ī', '-ōrum', '-īs', '-ōs', '-īs']),
         col({ de: 'o-Dekl.', en: '2nd decl.' }, 'templum, n.', ['-um', '-ī', '-ō', '-um', '-ō'], ['-a', '-ōrum', '-īs', '-a', '-īs']),
         col({ de: 'kons. Dekl.', en: '3rd decl.' }, 'rēx, m. / f.', ['(versch.)', '-is', '-ī', '-em', '-e'], ['-ēs', '-um (-ium)', '-ibus', '-ēs', '-ibus']),
         col({ de: 'kons. Dekl.', en: '3rd decl.' }, 'corpus, n.', ['(versch.)', '-is', '-ī', '(= Nom.)', '-e'], ['-a', '-um (-ium)', '-ibus', '-a', '-ibus']),
@@ -324,16 +324,16 @@ function sectionOverview() {
 function sectionNouns() {
     let h = '';
     // a-declension
-    const puella = col('puella, -ae f.', { de: 'Mädchen', en: 'girl' }, ['puell|a', 'puell|ae', 'puell|ae', 'puell|am', 'puell|ā'], ['puell|ae', 'puell|ārum', 'puell|īs', 'puell|ās', 'puell|īs']);
+    const amica = col('amīca, -ae f.', { de: 'Freundin', en: 'friend (female)' }, ['amīc|a', 'amīc|ae', 'amīc|ae', 'amīc|am', 'amīc|ā'], ['amīc|ae', 'amīc|ārum', 'amīc|īs', 'amīc|ās', 'amīc|īs']);
     const agricola = col('agricola, -ae m.', { de: 'Bauer', en: 'farmer' }, ['agricol|a', 'agricol|ae', 'agricol|ae', 'agricol|am', 'agricol|ā'], ['agricol|ae', 'agricol|ārum', 'agricol|īs', 'agricol|ās', 'agricol|īs']);
     h += `<h3 id="n-a">${tr({ de: 'a-Deklination', en: '1st (a-) declension' })}</h3>
         <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -ae · <b>Genus:</b> ${tr({ de: 'meist Femininum', en: 'mostly feminine' })}</p>
-        <div class="tables">${table({ cols: [puella, agricola], rows: caseRows([puella, agricola]) })}</div>` + notes([
-        { de: 'Maskulina sind Bezeichnungen für Männer und ihre Tätigkeiten: <i>agricola, nauta, poēta, incola</i>. Adjektive stehen dann im Maskulinum: <i>nauta bonus</i>.', en: 'Masculine nouns denote men and their occupations: <i>agricola, nauta, poēta, incola</i>. Adjectives with them are masculine: <i>nauta bonus</i>.' },
+        <div class="tables">${table({ cols: [amica, agricola], rows: caseRows([amica, agricola]) })}</div>` + notes([
+        { de: 'Maskulinum sind einige Wörter, die (meist) männliche Personen bezeichnen: <i>agricola</i> (Bauer), <i>nauta</i> (Seemann), <i>poēta</i> (Dichter), <i>incola</i> (Einwohner). Adjektive stehen dann im Maskulinum: <i>nauta bonus</i>.', en: 'A few words that (mostly) denote male persons are masculine: <i>agricola</i> (farmer), <i>nauta</i> (sailor), <i>poēta</i> (poet), <i>incola</i> (inhabitant). Adjectives with them are masculine: <i>nauta bonus</i>.' },
         { de: '<i>dea</i> und <i>fīlia</i> bilden Dativ/Ablativ Plural auf <i>-ābus</i> (<i>deābus, fīliābus</i>), um sie von <i>deīs, fīliīs</i> zu unterscheiden.', en: '<i>dea</i> and <i>fīlia</i> form the dative/ablative plural in <i>-ābus</i> (<i>deābus, fīliābus</i>) to keep them apart from <i>deīs, fīliīs</i>.' }
     ]);
     // o-declension
-    const dom = col('dominus, -ī m.', { de: 'Herr', en: 'master' }, ['domin|us', 'domin|ī', 'domin|ō', 'domin|um', 'domin|ō'], ['domin|ī', 'domin|ōrum', 'domin|īs', 'domin|ōs', 'domin|īs'], { sgVoc: 'domin|e' });
+    const dom = col('amīcus, -ī m.', { de: 'Freund', en: 'friend (male)' }, ['amīc|us', 'amīc|ī', 'amīc|ō', 'amīc|um', 'amīc|ō'], ['amīc|ī', 'amīc|ōrum', 'amīc|īs', 'amīc|ōs', 'amīc|īs'], { sgVoc: 'amīc|e' });
     const puer = col('puer, -ī m.', { de: 'Junge', en: 'boy' }, ['puer', 'puer|ī', 'puer|ō', 'puer|um', 'puer|ō'], ['puer|ī', 'puer|ōrum', 'puer|īs', 'puer|ōs', 'puer|īs'], { sgVoc: 'puer' });
     const ager = col('ager, agrī m.', { de: 'Feld', en: 'field' }, ['ager', 'agr|ī', 'agr|ō', 'agr|um', 'agr|ō'], ['agr|ī', 'agr|ōrum', 'agr|īs', 'agr|ōs', 'agr|īs'], { sgVoc: 'ager' });
     const templ = col('templum, -ī n.', { de: 'Tempel', en: 'temple' }, ['templ|um', 'templ|ī', 'templ|ō', 'templ|um', 'templ|ō'], ['templ|a', 'templ|ōrum', 'templ|īs', 'templ|a', 'templ|īs'], { sgVoc: 'templ|um' });
@@ -341,7 +341,7 @@ function sectionNouns() {
     h += `<h3 id="n-o">${tr({ de: 'o-Deklination', en: '2nd (o-) declension' })}</h3>
         <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -ī · <b>Genus:</b> ${tr({ de: 'auf -us/-er meist Maskulinum, auf -um Neutrum', en: '-us/-er mostly masculine, -um neuter' })}</p>
         <div class="tables">${table({ cols: o, rows: caseRows(o, { vocSg: true }) })}</div>` + notes([
-        { de: 'Einen eigenen Vokativ hat nur die Endung <i>-us</i>: <i>domine!</i> Bei <i>-ius</i> wird er zu <i>-ī</i>: <i>fīlī, Gāī</i>; von <i>meus</i> heißt er <i>mī</i>.', en: 'Only nouns in <i>-us</i> have a vocative of their own: <i>domine!</i> Nouns in <i>-ius</i> form it in <i>-ī</i>: <i>fīlī, Gāī</i>; the vocative of <i>meus</i> is <i>mī</i>.' },
+        { de: 'Einen eigenen Vokativ hat nur die Endung <i>-us</i>: <i>amīce!</i> Bei <i>-ius</i> wird er zu <i>-ī</i>: <i>fīlī, Gāī</i>; von <i>meus</i> heißt er <i>mī</i>.', en: 'Only nouns in <i>-us</i> have a vocative of their own: <i>amīce!</i> Nouns in <i>-ius</i> form it in <i>-ī</i>: <i>fīlī, Gāī</i>; the vocative of <i>meus</i> is <i>mī</i>.' },
         { de: 'Bei <i>puer</i> bleibt das <i>e</i> erhalten, bei <i>ager</i> fällt es weg (<i>agrī</i>). Das zeigt dir der Genitiv im Wörterbuch.', en: 'In <i>puer</i> the <i>e</i> stays, in <i>ager</i> it drops out (<i>agrī</i>). The genitive in the dictionary tells you which.' },
         { de: 'Femininum sind u. a. Bäume, Länder, Städte und Inseln: <i>humus, Aegyptus, Corinthus</i>.', en: 'Feminine are, among others, trees, countries, cities and islands: <i>humus, Aegyptus, Corinthus</i>.' }
     ]);
@@ -356,7 +356,7 @@ function sectionNouns() {
         { de: 'Der Nominativ Singular ist oft verändert. Den Stamm, an den alle anderen Endungen treten, zeigt erst der Genitiv: <i>rēx → rēg-is, homō → homin-is, corpus → corpor-is</i>. Lerne Substantive deshalb immer mit Genitiv.', en: 'The nominative singular is often changed. Only the genitive shows the stem to which all other endings are added: <i>rēx → rēg-is, homō → homin-is, corpus → corpor-is</i>. So always learn nouns with their genitive.' }
     ]);
     // i-stems
-    const civis = col('cīvis, -is m.', { de: 'Bürger', en: 'citizen' }, ['cīv|is', 'cīv|is', 'cīv|ī', 'cīv|em', 'cīv|e'], ['cīv|ēs', 'cīv|ium', 'cīv|ibus', 'cīv|ēs', 'cīv|ibus']);
+    const civis = col('cīvis, -is m./f.', { de: 'Bürger, Bürgerin', en: 'citizen' }, ['cīv|is', 'cīv|is', 'cīv|ī', 'cīv|em', 'cīv|e'], ['cīv|ēs', 'cīv|ium', 'cīv|ibus', 'cīv|ēs', 'cīv|ibus']);
     const urbs = col('urbs, urbis f.', { de: 'Stadt', en: 'city' }, ['urbs', 'urb|is', 'urb|ī', 'urb|em', 'urb|e'], ['urb|ēs', 'urb|ium', 'urb|ibus', 'urb|ēs', 'urb|ibus']);
     const turris = col('turris, -is f.', { de: 'Turm', en: 'tower' }, ['turr|is', 'turr|is', 'turr|ī', 'turr|im', 'turr|ī'], ['turr|ēs', 'turr|ium', 'turr|ibus', 'turr|īs / turr|ēs', 'turr|ibus']);
     const mare = col('mare, -is n.', { de: 'Meer', en: 'sea' }, ['mar|e', 'mar|is', 'mar|ī', 'mar|e', 'mar|ī'], ['mar|ia', 'mar|ium', 'mar|ibus', 'mar|ia', 'mar|ibus']);
