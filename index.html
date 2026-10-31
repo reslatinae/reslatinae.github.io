@@ -408,7 +408,6 @@
         .guide-fb.ok { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
         .guide-fb.err { background: #fef2f2; border: 1px solid #fecaca; color: #7f1d1d; }
         .guide-actions { display: flex; justify-content: flex-end; gap: 8px; }
-        .guide-continue { font-size: 0.85rem; color: #3b82f6; font-weight: 500; }
         .guide-btn { padding: 8px 16px; border: none; border-radius: 6px; background: #3b82f6; color: #fff; font-weight: 500; cursor: pointer; font-size: 0.9rem; }
         .guide-btn:hover { opacity: 0.9; }
         .guide-btn.secondary { background: #e5e7eb; color: #1f2937; }
@@ -573,8 +572,7 @@
                 locked: 'Im geführten Modus gehst du Block für Block vor. Bestimme zuerst den blau umrandeten Block.',
                 clickWord: 'Klicke direkt auf das Wort im Block, das du markieren willst.',
                 sentenceDone: 'Damit ist der Satz vollständig bestimmt. Das Übersetzungsfeld ist jetzt offen: Übersetze den Satz, bevor du weitergehst.',
-                cont: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Block zu gehen.', contSentence: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Satz zu gehen.', contEnd: 'Klicke irgendwo auf die Seite (oder drücke Enter), um abzuschließen.',
-                solution: 'Lösung zeigen', solutionShown: 'Die richtige Antwort ist',
+                next: 'Weiter →', nextSentence: 'Nächster Satz →', solution: 'Lösung zeigen', solutionShown: 'Die richtige Antwort ist',
                 end: '<strong>Geschafft!</strong> Du hast alle Sätze Schritt für Schritt bestimmt. Vergiss die Übersetzungen nicht.',
                 fn: {
                     'Subjekt': ['Frage: Wer oder was? Achte auf den Nominativ und darauf, ob der Block in der Zahl zum Prädikat passt.', 'Das Subjekt sagt dir, wer oder was handelt. Prüfe beim Weiterlesen, ob das Prädikat in Person und Zahl dazu passt.'],
@@ -612,8 +610,7 @@
                 locked: 'In guided mode you go block by block. First work out the block outlined in blue.',
                 clickWord: 'Click directly on the word in the block that you want to mark.',
                 sentenceDone: 'The sentence is now fully analysed. The translation box is open: translate the sentence before you move on.',
-                cont: 'Click anywhere on the page (or press Enter) to go to the next block.', contSentence: 'Click anywhere on the page (or press Enter) to go to the next sentence.', contEnd: 'Click anywhere on the page (or press Enter) to finish.',
-                solution: 'Show answer', solutionShown: 'The correct answer is',
+                next: 'Next →', nextSentence: 'Next sentence →', solution: 'Show answer', solutionShown: 'The correct answer is',
                 end: '<strong>Done!</strong> You have analysed every sentence step by step. Don’t forget the translations.',
                 fn: {
                     'Subject': ['Ask: who or what? Look for the nominative and check whether the block agrees in number with the verb.', 'The subject tells you who or what acts. As you read on, check that the verb agrees with it in person and number.'],
@@ -639,19 +636,6 @@
             }
         };
         let guided = { hold: false, el: null, type: null };
-        // After a correct answer in guided mode, the next click anywhere (or Enter/Space) moves on. The listener runs in the
-        // capture phase, before the word/menu handlers: a click on the next block therefore moves on and opens its menu at once.
-        function guidedContinue() { if (exMode === 'guided' && guided.hold) { guided.hold = false; guidedRender(); return true; } return false; }
-        document.addEventListener('click', (e) => {
-            if (!(exMode === 'guided' && guided.hold)) return;
-            if (e.target.closest('textarea, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal')) return; // these keep working as usual
-            guidedContinue();
-        }, true);
-        document.addEventListener('keydown', (e) => {
-            if (!(exMode === 'guided' && guided.hold)) return;
-            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); guidedContinue(); }
-        });
         let studentDirty = false; let allowUnload = false; // progress changed since "Save progress"; reloads the page itself triggers are allowed
         window.addEventListener('beforeunload', (e) => { if (studentDirty && !allowUnload) { e.preventDefault(); e.returnValue = ''; } });
         document.addEventListener('input', (e) => { if (e.target.tagName === 'TEXTAREA' && !e.target.classList.contains('results-textarea')) studentDirty = true; });
@@ -694,19 +678,20 @@
                 else if (guided.type === 'gen') prompt = t.promptGen(el.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').length);
                 else prompt = t.promptLabel;
             }
-            let actions = '', cont = '';
+            let actions = '';
             if (guided.hold) {
-                // No "Next" button: after a correct answer, any click on the page (or Enter) moves on - see guidedContinue()
                 const nxt = guidedCompute();
-                cont = nxt.type === 'end' ? t.contEnd : (sentenceOf(nxt.el) !== sentenceOf(el) ? t.contSentence : t.cont);
+                const label = (!nxt.el || sentenceOf(nxt.el) !== sentenceOf(el)) && nxt.type !== 'end' ? t.nextSentence : t.next;
+                actions = `<button type="button" class="guide-btn" id="guide-next">${label}</button>`;
             } else if (showSolution) {
                 actions = `<button type="button" class="guide-btn secondary" id="guide-solution">${t.solution}</button>`;
             }
             guidePanel.innerHTML = `<div class="guide-head"><span>${t.counter(Math.max(1, sIdx + 1), sentences.length)}</span></div>
                 ${prompt ? `<div class="guide-prompt">${prompt}</div>` : ''}
                 ${fbHtml ? `<div class="guide-fb ${fbOk ? 'ok' : 'err'}">${fbHtml}</div>` : ''}
-                ${cont ? `<div class="guide-continue">${cont}</div>` : ''}
                 ${actions ? `<div class="guide-actions">${actions}</div>` : ''}`;
+            const nb = document.getElementById('guide-next');
+            if (nb) { nb.onclick = () => { guided.hold = false; guidedRender(); }; nb.focus({ preventScroll: true }); }
             const sb = document.getElementById('guide-solution');
             if (sb) sb.onclick = guidedShowSolution;
 
