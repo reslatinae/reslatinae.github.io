@@ -8,24 +8,24 @@
 <style>
     :root {
         --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        --primary: #2563eb; --text: #2a241d; --muted: #6b6052; --border: #e6dccb;
+        --primary: #2563eb; --text: #2a241d; --muted: #6b6052; --border: #efeae1;
         --shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
         --ending: #1d4ed8; --marker: #b45309;
     }
     html { scrollbar-gutter: stable; scroll-behavior: smooth; }
     html[data-lang="de"] .l-en, html[data-lang="en"] .l-de { display: none !important; }
     body, button, select { font-family: var(--main-font); }
-    body { position: relative; margin: 2% auto; max-width: 1240px; padding: 0 20px; background: #f5efe3; color: var(--text); line-height: 1.55; }
+    body { position: relative; margin: 2% auto; max-width: 1240px; padding: 0 20px; background: #fcfbf8; color: var(--text); line-height: 1.55; }
     .brand { text-align: center; font-size: 0.85rem; font-weight: 600; color: #7c5a2e; letter-spacing: 0.03em; text-transform: uppercase; margin-bottom: 4px; }
     h1 { text-align: center; color: #1d1914; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.025em; padding: 0 110px; }
     h1::before { content: ""; display: inline-block; width: 1.25em; height: 1.25em; margin-right: 0.4em; vertical-align: -0.24em; background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+CiAgPHRpdGxlPlN5bnRheC1TdHVkaW8gTGF0ZWluPC90aXRsZT4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmciIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjYjlhMDdhIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzdlNjU0NiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iZ2xvdyIgY3g9IjI1NiIgY3k9IjQxMiIgcj0iMTkwIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuNDUiIHN0b3AtY29sb3I9IiNmZmYzYzQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZjZjNDUzIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ1bnVzZWQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHg9IjAiIHk9IjAiIHJ4PSIxMTIiIGhlaWdodD0iNTEyIiB3aWR0aD0iNTEyIiBmaWxsPSJ1cmwoI2JnKSIvPgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI1NiAyNTcpIHNjYWxlKDEuMTIpIHRyYW5zbGF0ZSgtMjU2IC0yNTcpIj48cGF0aCBkPSJNMTUyIDQxMiBMMTUyIDMwMCBBMTA0IDEwNCAwIDAgMSAzNjAgMzAwIEwzNjAgNDEyIFoiIGZpbGw9InVybCgjZ2xvdykiLz48L2c+CiAgPGcgc3Ryb2tlPSIjNmI1YTQ1IiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBwYWludC1vcmRlcj0ic3Ryb2tlIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyNTYgMjU3KSBzY2FsZSgxLjEyKSB0cmFuc2xhdGUoLTI1NiAtMjU3KSI+CiAgICA8cGF0aCBkPSJNODAuMCAzMDAuMCBBMTc2IDE3NiAwIDAgMSA5MC42IDIzOS44IEwxNTguMyAyNjQuNCBBMTA0IDEwNCAwIDAgMCAxNTIuMCAzMDAuMCBaIiBmaWxsPSIjNGFkZTgwIi8+PHBhdGggZD0iTTkwLjYgMjM5LjggQTE3NiAxNzYgMCAwIDEgMTIxLjIgMTg2LjkgTDE3Ni4zIDIzMy4yIEExMDQgMTA0IDAgMCAwIDE1OC4zIDI2NC40IFoiIGZpbGw9IiNmZGUwNDciLz48cGF0aCBkPSJNMTIxLjIgMTg2LjkgQTE3NiAxNzYgMCAwIDEgMTY4LjAgMTQ3LjYgTDIwNC4wIDIwOS45IEExMDQgMTA0IDAgMCAwIDE3Ni4zIDIzMy4yIFoiIGZpbGw9IiNmZGJhNzQiLz48cGF0aCBkPSJNMTY4LjAgMTQ3LjYgQTE3NiAxNzYgMCAwIDEgMjI1LjQgMTI2LjcgTDIzNy45IDE5Ny42IEExMDQgMTA0IDAgMCAwIDIwNC4wIDIwOS45IFoiIGZpbGw9IiNjNGI1ZmQiLz48cGF0aCBkPSJNMjE1LjcgMTAyLjEgQTIwMiAyMDIgMCAwIDEgMjk2LjMgMTAyLjEgTDI3NS41IDIwNC4wIEE5OCA5OCAwIDAgMCAyMzYuNSAyMDQuMCBaIiBmaWxsPSIjZTA3ODdkIi8+PHBhdGggZD0iTTI4Ni42IDEyNi43IEExNzYgMTc2IDAgMCAxIDM0NC4wIDE0Ny42IEwzMDguMCAyMDkuOSBBMTA0IDEwNCAwIDAgMCAyNzQuMSAxOTcuNiBaIiBmaWxsPSIjOTNjNWZkIi8+PHBhdGggZD0iTTM0NC4wIDE0Ny42IEExNzYgMTc2IDAgMCAxIDM5MC44IDE4Ni45IEwzMzUuNyAyMzMuMiBBMTA0IDEwNCAwIDAgMCAzMDguMCAyMDkuOSBaIiBmaWxsPSIjYTdmM2QwIi8+PHBhdGggZD0iTTM5MC44IDE4Ni45IEExNzYgMTc2IDAgMCAxIDQyMS40IDIzOS44IEwzNTMuNyAyNjQuNCBBMTA0IDEwNCAwIDAgMCAzMzUuNyAyMzMuMiBaIiBmaWxsPSIjZmNhNWE1Ii8+PHBhdGggZD0iTTQyMS40IDIzOS44IEExNzYgMTc2IDAgMCAxIDQzMi4wIDMwMC4wIEwzNjAuMCAzMDAuMCBBMTA0IDEwNCAwIDAgMCAzNTMuNyAyNjQuNCBaIiBmaWxsPSIjNWVlYWQ0Ii8+CiAgICA8cmVjdCB4PSI3MCIgeT0iMzAwIiB3aWR0aD0iOTIiIGhlaWdodD0iMjAiIHJ4PSIzIiBmaWxsPSIjZjZlZmUyIi8+CiAgICA8cmVjdCB4PSIzNTAiIHk9IjMwMCIgd2lkdGg9IjkyIiBoZWlnaHQ9IjIwIiByeD0iMyIgZmlsbD0iI2Y2ZWZlMiIvPgogICAgPHJlY3QgeD0iODAiIHk9IjMyMCIgd2lkdGg9IjcyIiBoZWlnaHQ9IjQ0IiBmaWxsPSIjZDljOWFkIi8+CiAgICA8cmVjdCB4PSIzNjAiIHk9IjMyMCIgd2lkdGg9IjcyIiBoZWlnaHQ9IjQ0IiBmaWxsPSIjZDljOWFkIi8+CiAgICA8cmVjdCB4PSI4MCIgeT0iMzY0IiB3aWR0aD0iNzIiIGhlaWdodD0iNDgiIGZpbGw9IiNjN2IzOTMiLz4KICAgIDxyZWN0IHg9IjM2MCIgeT0iMzY0IiB3aWR0aD0iNzIiIGhlaWdodD0iNDgiIGZpbGw9IiNjN2IzOTMiLz4KICA8L2c+Cjwvc3ZnPg==") center / contain no-repeat; }
     .subtitle { text-align: center; color: var(--muted); margin: 0 0 18px; font-size: 1.05rem; }
     .lang-switch-top { position: absolute; top: 0; right: 20px; display: flex; gap: 6px; z-index: 5; }
-    .lang-btn { background: #f0e9dc; border: 1px solid transparent; padding: 6px 12px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; color: #4d4539; font-weight: 500; transition: all 0.2s; }
-    .lang-btn.active { background: #f3e7d0; color: #7c5a2e; border-color: #d9c29b; font-weight: 600; }
+    .lang-btn { background: #f8f6f1; border: 1px solid transparent; padding: 6px 12px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; color: #4d4539; font-weight: 500; transition: all 0.2s; }
+    .lang-btn.active { background: #f9f4ea; color: #7c5a2e; border-color: #e9dbc2; font-weight: 600; }
     .page-nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
-    .page-nav a { text-decoration: none; font-size: 0.9rem; font-weight: 500; color: #4a4236; background: #e8dfcf; padding: 6px 14px; border-radius: 999px; }
-    .page-nav a:hover { background: #d3c7b2; color: #1d1914; }
+    .page-nav a { text-decoration: none; font-size: 0.9rem; font-weight: 500; color: #4a4236; background: #f3efe8; padding: 6px 14px; border-radius: 999px; }
+    .page-nav a:hover { background: #e3dbcd; color: #1d1914; }
     .page-nav a.current { background: #fff; color: #1d1914; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
 
     .layout { display: flex; gap: 22px; align-items: flex-start; }
@@ -33,7 +33,7 @@
     .toc { position: sticky; top: 16px; width: 210px; flex-shrink: 0; max-height: calc(100vh - 32px); overflow-y: auto; box-sizing: border-box; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.87rem; }
     .toc-title { font-weight: 600; color: #1d1914; margin-bottom: 6px; }
     .toc a { display: block; color: #3a3329; text-decoration: none; padding: 4px 8px; border-radius: 6px; }
-    .toc a:hover, .toc a:focus-visible { background: #f0e9dc; outline: none; }
+    .toc a:hover, .toc a:focus-visible { background: #f8f6f1; outline: none; }
     .toc a.sub { padding-left: 20px; font-size: 0.82rem; color: var(--muted); }
     .toc-options { border-top: 1px solid var(--border); margin-top: 10px; padding-top: 10px; }
     .toc-options label { display: flex; align-items: center; gap: 8px; padding: 3px 4px; cursor: pointer; color: #3a3329; }
@@ -47,19 +47,19 @@
     .lead { margin: 0 0 14px; color: #3a3329; }
     .meta { font-size: 0.88rem; color: var(--muted); margin: 0 0 8px; }
     .meta b { color: #3a3329; font-weight: 600; }
-    .instruction-box { background: #fbf7ef; border: 1px solid #e8dfcf; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; color: #3a3329; }
+    .instruction-box { background: #fefdfb; border: 1px solid #f3efe8; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; color: #3a3329; }
     .instruction-box p { margin: 0 0 8px; } .instruction-box p:last-child { margin: 0; }
 
     .tables { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
     .tbl-wrap { overflow-x: auto; max-width: 100%; }
     table.forms { border-collapse: separate; border-spacing: 0; font-size: 0.92rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
     table.forms caption { caption-side: top; text-align: left; font-weight: 600; font-size: 0.9rem; color: #3a3329; padding: 0 0 6px; }
-    table.forms th, table.forms td { padding: 6px 9px; border-bottom: 1px solid #efe8db; text-align: left; white-space: nowrap; vertical-align: top; }
-    table.forms thead th { background: #fbf7ef; font-weight: 600; color: #1d1914; border-bottom: 1px solid var(--border); }
+    table.forms th, table.forms td { padding: 6px 9px; border-bottom: 1px solid #f7f5f0; text-align: left; white-space: nowrap; vertical-align: top; }
+    table.forms thead th { background: #fefdfb; font-weight: 600; color: #1d1914; border-bottom: 1px solid var(--border); }
     table.forms thead th .hsub { display: block; font-weight: 400; font-size: 0.78rem; color: var(--muted); white-space: normal; min-width: 72px; }
-    table.forms th.rowh { background: #fcf9f3; font-weight: 600; color: #4a4236; font-size: 0.85rem; border-right: 1px solid #efe8db; }
+    table.forms th.rowh { background: #fefefc; font-weight: 600; color: #4a4236; font-size: 0.85rem; border-right: 1px solid #f7f5f0; }
     table.forms th.rowh .pron { display: block; font-weight: 400; font-size: 0.75rem; color: #73685a; }
-    table.forms tr.section th { background: #f3e7d0; color: #6f4f24; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 12px; }
+    table.forms tr.section th { background: #f9f4ea; color: #6f4f24; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 12px; }
     table.forms tbody tr:last-child td, table.forms tbody tr:last-child th { border-bottom: none; }
     table.forms td.empty { color: #73685a; }
     .lat { font-style: normal; }
@@ -76,9 +76,9 @@
     .tip { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; font-size: 0.9rem; color: #78350f; margin-top: 14px; }
     .tip b { color: #78350f; }
     .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 16px; }
-    .chip { background: #fff; border: 1px solid #d6ccba; border-radius: 999px; padding: 6px 14px; font-size: 0.9rem; font-weight: 500; color: #3a3329; cursor: pointer; }
+    .chip { background: #fff; border: 1px solid #e4ddd1; border-radius: 999px; padding: 6px 14px; font-size: 0.9rem; font-weight: 500; color: #3a3329; cursor: pointer; }
     .chip:hover { border-color: #b8975f; }
-    .chip.active { background: #f3e7d0; border-color: #b8975f; color: #6f4f24; font-weight: 600; }
+    .chip.active { background: #f9f4ea; border-color: #b8975f; color: #6f4f24; font-weight: 600; }
     .chip .chip-sub { font-weight: 400; color: var(--muted); margin-left: 4px; font-style: italic; }
     .footer { text-align: center; margin: 28px 0 12px; }
     .btn { padding: 9px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; color: #fff; background: #2a241d; font-size: 0.92rem; }
@@ -110,9 +110,9 @@
     html.reading-aid p, html.reading-aid li, html.reading-aid dd, html.reading-aid td, html.reading-aid .instruction-box { line-height: 1.85; }
     html.reading-aid em, html.reading-aid i, html.reading-aid .la, html.reading-aid cite { font-style: normal; }
     html.reading-aid .la, html.reading-aid i, html.reading-aid em { font-weight: 600; } /* instead of italics: Latin forms stay recognisable */
-    .aid-btn { background: #f0e9dc; border: 1px solid transparent; padding: 6px 10px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; color: #4d4539; font-weight: 700; font-family: Verdana, Tahoma, sans-serif; margin-right: 6px; }
-    .aid-btn:hover { background: #e8dfcf; }
-    .aid-btn.active { background: #f3e7d0; color: #7c5a2e; border-color: #d9c29b; font-weight: 600; }
+    .aid-btn { background: #f8f6f1; border: 1px solid transparent; padding: 6px 10px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; color: #4d4539; font-weight: 700; font-family: Verdana, Tahoma, sans-serif; margin-right: 6px; }
+    .aid-btn:hover { background: #f3efe8; }
+    .aid-btn.active { background: #f9f4ea; color: #7c5a2e; border-color: #e9dbc2; font-weight: 600; }
 
 </style>
 </head>
@@ -289,7 +289,7 @@ function caseRows(cols, opts = {}) {
         const de = document.documentElement.lang !== 'en';
         document.querySelectorAll('.aid-btn, #btn-reading').forEach(b => {
             b.classList.toggle('active', v); b.setAttribute('aria-pressed', v ? 'true' : 'false');
-            b.title = (de ? 'Lesehilfe: größere, leichter lesbare Schrift mit mehr Abstand' : 'Reading aid: larger, easier-to-read text with more spacing') + (v ? (de ? ' (an)' : ' (on)') : '');
+            b.title = (de ? 'Lesehilfe: grössere, leichter lesbare Schrift mit mehr Abstand' : 'Reading aid: larger, easier-to-read text with more spacing') + (v ? (de ? ' (an)' : ' (on)') : '');
             b.setAttribute('aria-label', b.title);
         });
     }
@@ -341,7 +341,7 @@ function sectionNouns() {
     h += `<h3 id="n-o">${tr({ de: 'o-Deklination', en: '2nd (o-) declension' })}</h3>
         <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -ī · <b>Genus:</b> ${tr({ de: 'auf -us/-er meist Maskulinum, auf -um Neutrum', en: '-us/-er mostly masculine, -um neuter' })}</p>
         <div class="tables">${table({ cols: o, rows: caseRows(o, { vocSg: true }) })}</div>` + notes([
-        { de: 'Einen eigenen Vokativ hat nur die Endung <i>-us</i>: <i>amīce!</i> Bei <i>-ius</i> wird er zu <i>-ī</i>: <i>fīlī, Gāī</i>; von <i>meus</i> heißt er <i>mī</i>.', en: 'Only nouns in <i>-us</i> have a vocative of their own: <i>amīce!</i> Nouns in <i>-ius</i> form it in <i>-ī</i>: <i>fīlī, Gāī</i>; the vocative of <i>meus</i> is <i>mī</i>.' },
+        { de: 'Einen eigenen Vokativ hat nur die Endung <i>-us</i>: <i>amīce!</i> Bei <i>-ius</i> wird er zu <i>-ī</i>: <i>fīlī, Gāī</i>; von <i>meus</i> heisst er <i>mī</i>.', en: 'Only nouns in <i>-us</i> have a vocative of their own: <i>amīce!</i> Nouns in <i>-ius</i> form it in <i>-ī</i>: <i>fīlī, Gāī</i>; the vocative of <i>meus</i> is <i>mī</i>.' },
         { de: 'Bei <i>puer</i> bleibt das <i>e</i> erhalten, bei <i>ager</i> fällt es weg (<i>agrī</i>). Das zeigt dir der Genitiv im Wörterbuch.', en: 'In <i>puer</i> the <i>e</i> stays, in <i>ager</i> it drops out (<i>agrī</i>). The genitive in the dictionary tells you which.' },
         { de: 'Femininum sind u. a. Bäume, Länder, Städte und Inseln: <i>humus, Aegyptus, Corinthus</i>.', en: 'Feminine are, among others, trees, countries, cities and islands: <i>humus, Aegyptus, Corinthus</i>.' }
     ]);
@@ -394,7 +394,7 @@ function sectionNouns() {
     h += `<h3 id="n-x">${tr({ de: 'Besondere Substantive', en: 'Special nouns' })}</h3>
         <div class="tables">${table({ cols: sp, rows: caseRows(sp, { vocSg: true }) })}</div>` + notes([
         { de: '<i>domus</i> mischt u- und o-Deklination. Feste Ortsangaben: <i>domī</i> (zu Hause), <i>domum</i> (nach Hause), <i>domō</i> (von zu Hause).', en: '<i>domus</i> mixes the 4th and 2nd declensions. Fixed expressions of place: <i>domī</i> (at home), <i>domum</i> (home, homewards), <i>domō</i> (from home).' },
-        { de: '<i>vīs</i> hat im Singular keinen gebräuchlichen Genitiv und Dativ. Der Plural <i>vīrēs</i> heißt meist „Kräfte“. Nicht verwechseln mit <i>vir, virī</i> (Mann)!', en: '<i>vīs</i> has no genitive or dative singular in common use. The plural <i>vīrēs</i> usually means “strength”. Don’t confuse it with <i>vir, virī</i> (man)!' }
+        { de: '<i>vīs</i> hat im Singular keinen gebräuchlichen Genitiv und Dativ. Der Plural <i>vīrēs</i> heisst meist „Kräfte“. Nicht verwechseln mit <i>vir, virī</i> (Mann)!', en: '<i>vīs</i> has no genitive or dative singular in common use. The plural <i>vīrēs</i> usually means “strength”. Don’t confuse it with <i>vir, virī</i> (man)!' }
     ]);
     return h;
 }
@@ -441,11 +441,11 @@ function sectionAdjectives() {
     h += `<h3 id="a-comp">${tr({ de: 'Steigerung (Komparation)', en: 'Comparison of adjectives' })}</h3>
         <p class="meta">${tr({ de: '<b>Komparativ:</b> Stamm + <i>-ior</i> (m./f.), <i>-ius</i> (n.) · <b>Superlativ:</b> Stamm + <i>-issimus, -a, -um</i> (wie <i>bonus</i>)', en: '<b>Comparative:</b> stem + <i>-ior</i> (m./f.), <i>-ius</i> (n.) · <b>Superlative:</b> stem + <i>-issimus, -a, -um</i> (like <i>bonus</i>)' })}</p>
         <div class="tables">${table({ caption: { de: 'Komparativ: longior, longius – länger', en: 'Comparative: longior, longius – longer' }, cols: comp, rows: caseRows(comp) })}
-        ${table({ caption: { de: 'Unregelmäßige Steigerung', en: 'Irregular comparison' }, cols: [{ h: { de: 'Positiv', en: 'Positive' } }, { h: { de: 'Komparativ', en: 'Comparative' } }, { h: { de: 'Superlativ', en: 'Superlative' } }],
+        ${table({ caption: { de: 'Unregelmässige Steigerung', en: 'Irregular comparison' }, cols: [{ h: { de: 'Positiv', en: 'Positive' } }, { h: { de: 'Komparativ', en: 'Comparative' } }, { h: { de: 'Superlativ', en: 'Superlative' } }],
             rows: [
                 { h: { de: 'gut', en: 'good' }, cells: ['bonus', 'melior, melius', 'optimus'] },
                 { h: { de: 'schlecht', en: 'bad' }, cells: ['malus', 'peior, peius', 'pessimus'] },
-                { h: { de: 'groß', en: 'great' }, cells: ['magnus', 'maior, maius', 'maximus'] },
+                { h: { de: 'gross', en: 'great' }, cells: ['magnus', 'maior, maius', 'maximus'] },
                 { h: { de: 'klein', en: 'small' }, cells: ['parvus', 'minor, minus', 'minimus'] },
                 { h: { de: 'viel', en: 'much' }, cells: ['multum', 'plūs', 'plūrimum'] },
                 { h: { de: 'viele', en: 'many' }, cells: ['multī', 'plūrēs, plūra', 'plūrimī'] },
@@ -543,7 +543,7 @@ function sectionPronouns() {
     h += `<h3 id="p-unus">${tr({ de: 'Pronominaladjektive („ūnus nauta“)', en: 'Pronominal adjectives (“ūnus nauta”)' })}</h3>
         <div class="tables">${table({ caption: { de: 'ūnus, ūna, ūnum – einer, ein einziger', en: 'ūnus, ūna, ūnum – one, a single' }, cols: unus, rows: caseRows(unus, { sgOnly: true, noSections: true }) })}</div>` + notes([
         { de: 'Wie <i>ūnus</i> (Genitiv <i>-īus</i>, Dativ <i>-ī</i>, sonst wie <i>bonus</i>) gehen: <b>ū</b>nus, <b>ū</b>llus, <b>n</b>ūllus, <b>s</b>ōlus, <b>n</b>euter, <b>a</b>lius, <b>u</b>ter, <b>t</b>ōtus, <b>a</b>lter – Merkwort <b>ŪNUS NAUTA</b>.', en: 'Like <i>ūnus</i> (genitive <i>-īus</i>, dative <i>-ī</i>, otherwise like <i>bonus</i>): <b>ū</b>nus, <b>ū</b>llus, <b>n</b>ūllus, <b>s</b>ōlus, <b>n</b>euter, <b>a</b>lius, <b>u</b>ter, <b>t</b>ōtus, <b>a</b>lter – mnemonic <b>ŪNUS NAUTA</b>.' },
-        { de: '<i>alius</i> hat im Neutrum <i>aliud</i>; als Genitiv dient meist <i>alterīus</i>. Der Plural aller dieser Wörter geht regelmäßig wie <i>bonī, bonae, bona</i>.', en: '<i>alius</i> has the neuter <i>aliud</i>; its genitive is usually supplied by <i>alterīus</i>. The plural of all these words is regular, like <i>bonī, bonae, bona</i>.' }
+        { de: '<i>alius</i> hat im Neutrum <i>aliud</i>; als Genitiv dient meist <i>alterīus</i>. Der Plural aller dieser Wörter geht regelmässig wie <i>bonī, bonae, bona</i>.', en: '<i>alius</i> has the neuter <i>aliud</i>; its genitive is usually supplied by <i>alterīus</i>. The plural of all these words is regular, like <i>bonī, bonae, bona</i>.' }
     ]);
     return h;
 }
