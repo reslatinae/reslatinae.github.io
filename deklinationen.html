@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="de" data-lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Syntax-Studio Latein – Deklinationen</title>
+<style>
+    :root {
+        --main-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --primary: #3b82f6; --text: #1f2937; --muted: #6b7280; --border: #e5e7eb;
+        --shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+        --ending: #1d4ed8; --marker: #b45309;
+    }
+    html { scrollbar-gutter: stable; scroll-behavior: smooth; }
+    html[data-lang="de"] .l-en, html[data-lang="en"] .l-de { display: none !important; }
+    body, button, select { font-family: var(--main-font); }
+    body { position: relative; margin: 2% auto; max-width: 1240px; padding: 0 20px; background: #f9fafb; color: var(--text); line-height: 1.55; }
+    .brand { text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--primary); letter-spacing: 0.03em; text-transform: uppercase; margin-bottom: 4px; }
+    h1 { text-align: center; color: #111827; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.025em; padding: 0 110px; }
+    .subtitle { text-align: center; color: var(--muted); margin: 0 0 18px; font-size: 1.05rem; }
+    .lang-switch-top { position: absolute; top: 0; right: 20px; display: flex; gap: 6px; z-index: 5; }
+    .lang-btn { background: #f3f4f6; border: 1px solid transparent; padding: 6px 12px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; color: #4b5563; font-weight: 500; transition: all 0.2s; }
+    .lang-btn.active { background: #eff6ff; color: var(--primary); border-color: #bfdbfe; font-weight: 600; }
+    .page-nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+    .page-nav a { text-decoration: none; font-size: 0.9rem; font-weight: 500; color: #475569; background: #e2e8f0; padding: 6px 14px; border-radius: 999px; }
+    .page-nav a:hover { background: #cbd5e1; color: #111827; }
+    .page-nav a.current { background: #fff; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+
+    .layout { display: flex; gap: 22px; align-items: flex-start; }
+    .content { flex: 1; min-width: 0; }
+    .toc { position: sticky; top: 16px; width: 210px; flex-shrink: 0; max-height: calc(100vh - 32px); overflow-y: auto; box-sizing: border-box; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.87rem; }
+    .toc-title { font-weight: 600; color: #111827; margin-bottom: 6px; }
+    .toc a { display: block; color: #374151; text-decoration: none; padding: 4px 8px; border-radius: 6px; }
+    .toc a:hover, .toc a:focus-visible { background: #f3f4f6; outline: none; }
+    .toc a.sub { padding-left: 20px; font-size: 0.82rem; color: var(--muted); }
+    .toc-options { border-top: 1px solid var(--border); margin-top: 10px; padding-top: 10px; }
+    .toc-options label { display: flex; align-items: center; gap: 8px; padding: 3px 4px; cursor: pointer; color: #374151; }
+    .legend { margin-top: 10px; font-size: 0.8rem; color: var(--muted); line-height: 1.7; }
+    .legend .s { color: var(--text); }
+
+    .card { background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); padding: 24px 26px; margin-bottom: 24px; scroll-margin-top: 16px; }
+    .card h2 { font-size: 1.3rem; font-weight: 600; color: #111827; margin: 0 0 6px; letter-spacing: -0.01em; }
+    .card h3 { font-size: 1.05rem; font-weight: 600; color: #0f172a; margin: 26px 0 4px; scroll-margin-top: 16px; }
+    .card h3:first-of-type { margin-top: 14px; }
+    .lead { margin: 0 0 14px; color: #374151; }
+    .meta { font-size: 0.88rem; color: var(--muted); margin: 0 0 8px; }
+    .meta b { color: #374151; font-weight: 600; }
+    .instruction-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; font-size: 0.95rem; color: #334155; }
+    .instruction-box p { margin: 0 0 8px; } .instruction-box p:last-child { margin: 0; }
+
+    .tables { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+    .tbl-wrap { overflow-x: auto; max-width: 100%; }
+    table.forms { border-collapse: separate; border-spacing: 0; font-size: 0.92rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    table.forms caption { caption-side: top; text-align: left; font-weight: 600; font-size: 0.9rem; color: #374151; padding: 0 0 6px; }
+    table.forms th, table.forms td { padding: 6px 9px; border-bottom: 1px solid #f1f5f9; text-align: left; white-space: nowrap; vertical-align: top; }
+    table.forms thead th { background: #f8fafc; font-weight: 600; color: #111827; border-bottom: 1px solid var(--border); }
+    table.forms thead th .hsub { display: block; font-weight: 400; font-size: 0.78rem; color: var(--muted); white-space: normal; min-width: 72px; }
+    table.forms th.rowh { background: #fcfcfd; font-weight: 600; color: #475569; font-size: 0.85rem; border-right: 1px solid #f1f5f9; }
+    table.forms th.rowh .pron { display: block; font-weight: 400; font-size: 0.75rem; color: #9ca3af; }
+    table.forms tr.section th { background: #eff6ff; color: #1e40af; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 12px; }
+    table.forms tbody tr:last-child td, table.forms tbody tr:last-child th { border-bottom: none; }
+    table.forms td.empty { color: #cbd5e1; }
+    .lat { font-style: normal; }
+    table.forms:has(td.txt) { width: 100%; }
+    td.txt { white-space: normal; min-width: 150px; color: #374151; font-size: 0.9rem; }
+    .alt { color: #9ca3af; padding: 0 3px; }
+    .note-form { color: var(--muted); font-size: 0.85em; }
+    .aux { color: #475569; }
+    body.hl .end { color: var(--ending); font-weight: 700; }
+    body.hl .mk { color: var(--marker); font-weight: 600; text-decoration: underline dotted; text-underline-offset: 3px; }
+
+    ul.notes { margin: 10px 0 0; padding-left: 20px; font-size: 0.9rem; color: #374151; }
+    ul.notes li { margin: 3px 0; }
+    .tip { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; font-size: 0.9rem; color: #78350f; margin-top: 14px; }
+    .tip b { color: #78350f; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 16px; }
+    .chip { background: #fff; border: 1px solid #d1d5db; border-radius: 999px; padding: 6px 14px; font-size: 0.9rem; font-weight: 500; color: #374151; cursor: pointer; }
+    .chip:hover { border-color: var(--primary); }
+    .chip.active { background: #eff6ff; border-color: var(--primary); color: #1e40af; font-weight: 600; }
+    .chip .chip-sub { font-weight: 400; color: var(--muted); margin-left: 4px; font-style: italic; }
+    .footer { text-align: center; margin: 28px 0 12px; }
+    .btn { padding: 9px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; color: #fff; background: #1f2937; font-size: 0.92rem; }
+    .btn:hover { opacity: 0.9; }
+
+    @media (max-width: 900px) {
+        h1 { padding: 0; }
+        .lang-switch-top { position: static; justify-content: flex-end; margin-bottom: 8px; }
+        .layout { flex-direction: column; align-items: stretch; gap: 0; }
+        .toc { position: static; width: auto; max-height: none; margin-bottom: 20px; }
+    }
+    @media (max-width: 600px) {
+        body { margin: 12px auto; padding: 0 12px; }
+        .card { padding: 18px 14px; }
+        table.forms th, table.forms td { padding: 5px 8px; }
+    }
+    @media print {
+        body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .toc, .lang-switch-top, .page-nav, .footer, .chips { display: none !important; }
+        .layout { display: block; }
+        .card { box-shadow: none; break-inside: avoid-page; }
+        .tbl-wrap { break-inside: avoid; }
+    }
+
+</style>
+</head>
+<body class="hl">
+<div class="lang-switch-top">
+    <button type="button" class="lang-btn" data-lang="en">EN</button>
+    <button type="button" class="lang-btn" data-lang="de">DE</button>
+</div>
+<div class="brand"><span class="l-de">Syntax-Studio Latein</span><span class="l-en">Latin Syntax Studio</span></div>
+<h1><span class="l-de">Deklinationen</span><span class="l-en">Declensions</span></h1>
+<p class="subtitle"><span class="l-de">Substantive, Adjektive, Pronomen und Zahlwörter</span><span class="l-en">Nouns, adjectives, pronouns and numerals</span></p>
+<nav class="page-nav">
+    <a href="deklinationen.html" class="current"><span class="l-de">Deklinationen</span><span class="l-en">Declensions</span></a>
+    <a href="konjugationen.html"><span class="l-de">Konjugationen</span><span class="l-en">Conjugations</span></a>
+    <a href="anleitung.html"><span class="l-de">Anleitung</span><span class="l-en">Guide</span></a>
+</nav>
+
+<div class="layout">
+    <nav class="toc" aria-label="Inhalt / Contents">
+        <div class="toc-title"><span class="l-de">Inhalt</span><span class="l-en">Contents</span></div>
+        <a href="#overview"><span class="l-de">Endungen auf einen Blick</span><span class="l-en">Endings at a glance</span></a>
+        <a href="#nouns"><span class="l-de">Substantive</span><span class="l-en">Nouns</span></a>
+        <a class="sub" href="#n-a"><span class="l-de">a-Deklination</span><span class="l-en">1st declension</span></a>
+        <a class="sub" href="#n-o"><span class="l-de">o-Deklination</span><span class="l-en">2nd declension</span></a>
+        <a class="sub" href="#n-k"><span class="l-de">Konsonantische Dekl.</span><span class="l-en">3rd declension</span></a>
+        <a class="sub" href="#n-i"><span class="l-de">Mischklasse, i-Dekl.</span><span class="l-en">3rd: mixed, i-stems</span></a>
+        <a class="sub" href="#n-u"><span class="l-de">u-Deklination</span><span class="l-en">4th declension</span></a>
+        <a class="sub" href="#n-e"><span class="l-de">e-Deklination</span><span class="l-en">5th declension</span></a>
+        <a class="sub" href="#n-x"><span class="l-de">Besondere Substantive</span><span class="l-en">Special nouns</span></a>
+        <a href="#adjectives"><span class="l-de">Adjektive</span><span class="l-en">Adjectives</span></a>
+        <a class="sub" href="#a-ao"><span class="l-de">a-/o-Deklination</span><span class="l-en">1st/2nd declension</span></a>
+        <a class="sub" href="#a-3"><span class="l-de">3. Deklination</span><span class="l-en">3rd declension</span></a>
+        <a class="sub" href="#a-comp"><span class="l-de">Steigerung</span><span class="l-en">Comparison</span></a>
+        <a class="sub" href="#a-adv"><span class="l-de">Adverbien</span><span class="l-en">Adverbs</span></a>
+        <a href="#pronouns"><span class="l-de">Pronomen</span><span class="l-en">Pronouns</span></a>
+        <a class="sub" href="#p-pers"><span class="l-de">Personal-, Reflexivpron.</span><span class="l-en">Personal, reflexive</span></a>
+        <a class="sub" href="#p-poss"><span class="l-de">Possessivpronomen</span><span class="l-en">Possessive</span></a>
+        <a class="sub" href="#p-dem"><span class="l-de">Demonstrativpronomen</span><span class="l-en">Demonstrative</span></a>
+        <a class="sub" href="#p-rel"><span class="l-de">Relativ-, Fragepronomen</span><span class="l-en">Relative, interrogative</span></a>
+        <a class="sub" href="#p-ind"><span class="l-de">Indefinitpronomen</span><span class="l-en">Indefinite</span></a>
+        <a class="sub" href="#p-unus"><span class="l-de">„ūnus nauta“</span><span class="l-en">“ūnus nauta”</span></a>
+        <a href="#numerals"><span class="l-de">Zahlwörter</span><span class="l-en">Numerals</span></a>
+        <div class="toc-options">
+            <label><input type="checkbox" id="opt-macrons"> <span class="l-de">Längen anzeigen (ā, ē …)</span><span class="l-en">Show long vowels (ā, ē …)</span></label>
+            <label><input type="checkbox" id="opt-hl"> <span class="l-de">Endungen hervorheben</span><span class="l-en">Highlight endings</span></label>
+            <div class="legend"><span class="l-de">Beispiel: <span class="s">puell</span><span class="end">ārum</span> = Stamm + <span class="end">Endung</span></span><span class="l-en">Example: <span class="s">puell</span><span class="end">ārum</span> = stem + <span class="end">ending</span></span></div>
+        </div>
+    </nav>
+
+    <main class="content">
+        <div class="instruction-box">
+            <p class="l-de">Hier findest du alle Deklinationen im Überblick. Die Fälle stehen in der Reihenfolge Nominativ, Genitiv, Dativ, Akkusativ, Ablativ; den Vokativ findest du nur dort, wo er eine eigene Form hat. Mit den Schaltern links kannst du die Vokallängen ein- und ausblenden und die Endungen hervorheben.</p>
+            <p class="l-en">Here you find all declensions at a glance. The cases are given in the order nominative, genitive, dative, accusative, ablative; the vocative is only shown where it has a form of its own. With the switches on the left you can show or hide vowel lengths and highlight the endings.</p>
+        </div>
+        <section class="card" id="overview">
+            <h2><span class="l-de">Endungen auf einen Blick</span><span class="l-en">Endings at a glance</span></h2>
+            <div id="sec-overview"></div>
+        </section>
+        <section class="card" id="nouns">
+            <h2><span class="l-de">Substantive</span><span class="l-en">Nouns</span></h2>
+            <div id="sec-nouns"></div>
+        </section>
+        <section class="card" id="adjectives">
+            <h2><span class="l-de">Adjektive</span><span class="l-en">Adjectives</span></h2>
+            <div id="sec-adj"></div>
+        </section>
+        <section class="card" id="pronouns">
+            <h2><span class="l-de">Pronomen</span><span class="l-en">Pronouns</span></h2>
+            <div id="sec-pron"></div>
+        </section>
+        <section class="card" id="numerals">
+            <h2><span class="l-de">Zahlwörter</span><span class="l-en">Numerals</span></h2>
+            <div id="sec-num"></div>
+        </section>
+        <div class="footer"><button type="button" class="btn" onclick="window.print()"><span class="l-de">Tabellen drucken</span><span class="l-en">Print tables</span></button></div>
+    </main>
+</div>
+
+<script>
+// ---------- language, options, rendering of forms (shared by both pages) ----------
+let LANG = 'de';
+const tr = (o) => (o && typeof o === 'object' && !Array.isArray(o)) ? (o[LANG] ?? o.de) : o;
+const OPT = { macrons: true, hl: true };
+try { const o = JSON.parse(localStorage.getItem('latin_forms_options') || '{}'); if (typeof o.macrons === 'boolean') OPT.macrons = o.macrons; if (typeof o.hl === 'boolean') OPT.hl = o.hl; } catch (e) {}
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const noMac = (s) => OPT.macrons ? s : s.normalize('NFD').replace(/̄/g, '').normalize('NFC');
+
+// One form: "stem|ending" or "stem|marker|ending"; "-a" = ending only; alternatives separated by " / ";
+// text in (round brackets) is shown small and grey; words after a "+" are an auxiliary ("laudāt|us+sum").
+function fm(str) {
+    if (str === null || str === undefined || str === '') return '<span class="empty">–</span>';
+    return String(str).split(' / ').map(alt => {
+        let note = '';
+        const m = alt.match(/^(.*?)\s*\((.*)\)\s*$/);
+        if (m && m[1]) { alt = m[1]; note = ` <span class="note-form">(${esc(noMac(m[2]))})</span>`; }
+        else if (m && !m[1]) return `<span class="note-form">(${esc(noMac(m[2]))})</span>`;
+        let aux = '';
+        if (alt.includes('+')) { const p = alt.split('+'); alt = p[0]; aux = ' <span class="aux">' + esc(noMac(p.slice(1).join(' '))) + '</span>'; }
+        return alt.split(' ').map(word => {
+            const pm = word.match(/^(.*?)([,;:]?)$/); const w = pm[1], punct = pm[2]; // a trailing comma stays plain
+            if (w.startsWith('-') && w.length > 1 && !w.includes('|')) return `<span class="end">${esc(noMac(w))}</span>${punct}`;
+            const p = w.split('|').map(x => esc(noMac(x)));
+            if (p.length === 2) return `${p[0]}<span class="end">${p[1]}</span>${punct}`;
+            if (p.length === 3) return `${p[0]}<span class="mk">${p[1]}</span><span class="end">${p[2]}</span>${punct}`;
+            return p[0] + punct;
+        }).join(' ') + aux + note;
+    }).join('<span class="alt">/</span>');
+}
+
+// A table: {caption, cols:[{h, sub}], rows:[ {section} | {h, pron, cells:[...] } ]}
+function table(t) {
+    const head = `<thead><tr><th></th>${t.cols.map(c => `<th>${tr(c.h)}${c.sub ? `<span class="hsub">${noMacIfLat(tr(c.sub))}</span>` : ''}</th>`).join('')}</tr></thead>`;
+    const body = t.rows.map(r => {
+        if (r.section) return `<tr class="section"><th colspan="${t.cols.length + 1}">${tr(r.section)}</th></tr>`;
+        return `<tr><th class="rowh" scope="row">${tr(r.h)}${r.pron ? `<span class="pron">${tr(r.pron)}</span>` : ''}</th>${r.cells.map(c => cell(c)).join('')}</tr>`;
+    }).join('');
+    return `<div class="tbl-wrap"><table class="forms">${t.caption ? `<caption>${tr(t.caption)}</caption>` : ''}${head}<tbody>${body}</tbody></table></div>`;
+}
+function noMacIfLat(s) { return noMac(s); }
+function cell(c) {
+    if (c && typeof c === 'object' && c.html !== undefined) return `<td class="txt">${noMac(tr(c.html))}</td>`;
+    if (c && typeof c === 'object') c = tr(c);
+    return `<td class="lat${c ? '' : ' empty'}">${fm(c)}</td>`;
+}
+function notes(list) { return list && list.length ? `<ul class="notes">${list.map(n => `<li>${noMac(tr(n))}</li>`).join('')}</ul>` : ''; }
+
+function applyLang(lang) {
+    LANG = lang === 'en' ? 'en' : 'de';
+    document.documentElement.dataset.lang = LANG; document.documentElement.lang = LANG;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === LANG));
+    try { localStorage.setItem('syntax_guide_lang', LANG); } catch (e) {}
+}
+function initShared(render, titles) {
+    let lang = 'de';
+    try { lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('syntax_guide_lang') || 'de'; } catch (e) {}
+    const rerender = () => { document.body.classList.toggle('hl', OPT.hl); document.title = titles[LANG]; render(); };
+    document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => { applyLang(b.dataset.lang); rerender(); }));
+    const mac = document.getElementById('opt-macrons'), hl = document.getElementById('opt-hl');
+    mac.checked = OPT.macrons; hl.checked = OPT.hl;
+    const save = () => { try { localStorage.setItem('latin_forms_options', JSON.stringify(OPT)); } catch (e) {} };
+    mac.addEventListener('change', () => { OPT.macrons = mac.checked; save(); rerender(); });
+    hl.addEventListener('change', () => { OPT.hl = hl.checked; save(); rerender(); });
+    applyLang(lang); rerender();
+}
+
+const col = (h, sub, sg, pl, extra = {}) => Object.assign({ h, sub, sg, pl }, extra);
+const CASES = {
+    nom: { de: 'Nom.', en: 'Nom.' }, gen: { de: 'Gen.', en: 'Gen.' }, dat: { de: 'Dat.', en: 'Dat.' },
+    acc: { de: 'Akk.', en: 'Acc.' }, abl: { de: 'Abl.', en: 'Abl.' }, voc: { de: 'Vok.', en: 'Voc.' }
+};
+const SG = { de: 'Singular', en: 'Singular' }, PL = { de: 'Plural', en: 'Plural' };
+// rows for a declension table: sg/pl arrays of 5 (or 6 with vocative) forms per column
+function caseRows(cols, opts = {}) {
+    const keys = ['nom', 'gen', 'dat', 'acc', 'abl'];
+    const rows = [];
+    const add = (part, title, withVoc) => {
+        if (!opts.noSections) rows.push({ section: title });
+        keys.forEach((k, i) => rows.push({ h: CASES[k], cells: cols.map(c => c[part] ? c[part][i] : '') }));
+        if (withVoc) rows.push({ h: CASES.voc, cells: cols.map(c => c[part + 'Voc'] || '') });
+    };
+    add('sg', SG, opts.vocSg);
+    if (!opts.sgOnly) add('pl', PL, opts.vocPl);
+    return rows;
+}
+
+// ================= DECLENSIONS =================
+const G = { m: { de: 'm.', en: 'm.' }, f: { de: 'f.', en: 'f.' }, n: { de: 'n.', en: 'n.' }, mf: { de: 'm./f.', en: 'm./f.' } };
+
+function sectionOverview() {
+    const cols = [
+        col({ de: 'a-Dekl.', en: '1st decl.' }, 'puella, f.', ['-a', '-ae', '-ae', '-am', '-ā'], ['-ae', '-ārum', '-īs', '-ās', '-īs']),
+        col({ de: 'o-Dekl.', en: '2nd decl.' }, 'dominus, m.', ['-us (-er)', '-ī', '-ō', '-um', '-ō'], ['-ī', '-ōrum', '-īs', '-ōs', '-īs']),
+        col({ de: 'o-Dekl.', en: '2nd decl.' }, 'templum, n.', ['-um', '-ī', '-ō', '-um', '-ō'], ['-a', '-ōrum', '-īs', '-a', '-īs']),
+        col({ de: 'kons. Dekl.', en: '3rd decl.' }, 'rēx, m. / f.', ['(versch.)', '-is', '-ī', '-em', '-e'], ['-ēs', '-um (-ium)', '-ibus', '-ēs', '-ibus']),
+        col({ de: 'kons. Dekl.', en: '3rd decl.' }, 'corpus, n.', ['(versch.)', '-is', '-ī', '(= Nom.)', '-e'], ['-a', '-um (-ium)', '-ibus', '-a', '-ibus']),
+        col({ de: 'u-Dekl.', en: '4th decl.' }, 'frūctus, m.', ['-us', '-ūs', '-uī', '-um', '-ū'], ['-ūs', '-uum', '-ibus', '-ūs', '-ibus']),
+        col({ de: 'e-Dekl.', en: '5th decl.' }, 'rēs, f.', ['-ēs', '-eī / -ēī', '-eī / -ēī', '-em', '-ē'], ['-ēs', '-ērum', '-ēbus', '-ēs', '-ēbus'])
+    ];
+    if (LANG === 'en') { cols[3].sg[0] = '(various)'; cols[4].sg[0] = '(various)'; cols[4].sg[3] = '(= nom.)'; }
+    return table({ cols, rows: caseRows(cols) }) + notes([
+        { de: '<b>Woran erkenne ich die Deklination?</b> Am Genitiv Singular, der im Wörterbuch steht: <i>-ae</i> → a-Dekl., <i>-ī</i> → o-Dekl., <i>-is</i> → kons. Dekl., <i>-ūs</i> → u-Dekl., <i>-eī/-ēī</i> → e-Dekl.',
+          en: '<b>How do I tell the declension?</b> From the genitive singular given in the dictionary: <i>-ae</i> → 1st, <i>-ī</i> → 2nd, <i>-is</i> → 3rd, <i>-ūs</i> → 4th, <i>-eī/-ēī</i> → 5th declension.' },
+        { de: 'Bei allen Neutra sind Nominativ und Akkusativ gleich; im Plural enden beide auf <i>-a</i>.', en: 'In every neuter, nominative and accusative are the same; in the plural both end in <i>-a</i>.' },
+        { de: 'Dativ und Ablativ Plural sind in allen Deklinationen gleich.', en: 'Dative and ablative plural are the same in every declension.' }
+    ]);
+}
+
+function sectionNouns() {
+    let h = '';
+    // a-declension
+    const puella = col('puella, -ae f.', { de: 'Mädchen', en: 'girl' }, ['puell|a', 'puell|ae', 'puell|ae', 'puell|am', 'puell|ā'], ['puell|ae', 'puell|ārum', 'puell|īs', 'puell|ās', 'puell|īs']);
+    const agricola = col('agricola, -ae m.', { de: 'Bauer', en: 'farmer' }, ['agricol|a', 'agricol|ae', 'agricol|ae', 'agricol|am', 'agricol|ā'], ['agricol|ae', 'agricol|ārum', 'agricol|īs', 'agricol|ās', 'agricol|īs']);
+    h += `<h3 id="n-a">${tr({ de: 'a-Deklination', en: '1st (a-) declension' })}</h3>
+        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -ae · <b>Genus:</b> ${tr({ de: 'meist Femininum', en: 'mostly feminine' })}</p>
+        <div class="tables">${table({ cols: [puella, agricola], rows: caseRows([puella, agricola]) })}</div>` + notes([
+        { de: 'Maskulina sind Bezeichnungen für Männer und ihre Tätigkeiten: <i>agricola, nauta, poēta, incola</i>. Adjektive stehen dann im Maskulinum: <i>nauta bonus</i>.', en: 'Masculine nouns denote men and their occupations: <i>agricola, nauta, poēta, incola</i>. Adjectives with them are masculine: <i>nauta bonus</i>.' },
+        { de: '<i>dea</i> und <i>fīlia</i> bilden Dativ/Ablativ Plural auf <i>-ābus</i> (<i>deābus, fīliābus</i>), um sie von <i>deīs, fīliīs</i> zu unterscheiden.', en: '<i>dea</i> and <i>fīlia</i> form the dative/ablative plural in <i>-ābus</i> (<i>deābus, fīliābus</i>) to keep them apart from <i>deīs, fīliīs</i>.' }
+    ]);
+    // o-declension
+    const dom = col('dominus, -ī m.', { de: 'Herr', en: 'master' }, ['domin|us', 'domin|ī', 'domin|ō', 'domin|um', 'domin|ō'], ['domin|ī', 'domin|ōrum', 'domin|īs', 'domin|ōs', 'domin|īs'], { sgVoc: 'domin|e' });
+    const puer = col('puer, -ī m.', { de: 'Junge', en: 'boy' }, ['puer', 'puer|ī', 'puer|ō', 'puer|um', 'puer|ō'], ['puer|ī', 'puer|ōrum', 'puer|īs', 'puer|ōs', 'puer|īs'], { sgVoc: 'puer' });
+    const ager = col('ager, agrī m.', { de: 'Feld', en: 'field' }, ['ager', 'agr|ī', 'agr|ō', 'agr|um', 'agr|ō'], ['agr|ī', 'agr|ōrum', 'agr|īs', 'agr|ōs', 'agr|īs'], { sgVoc: 'ager' });
+    const templ = col('templum, -ī n.', { de: 'Tempel', en: 'temple' }, ['templ|um', 'templ|ī', 'templ|ō', 'templ|um', 'templ|ō'], ['templ|a', 'templ|ōrum', 'templ|īs', 'templ|a', 'templ|īs'], { sgVoc: 'templ|um' });
+    const o = [dom, puer, ager, templ];
+    h += `<h3 id="n-o">${tr({ de: 'o-Deklination', en: '2nd (o-) declension' })}</h3>
+        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -ī · <b>Genus:</b> ${tr({ de: 'auf -us/-er meist Maskulinum, auf -um Neutrum', en: '-us/-er mostly masculine, -um neuter' })}</p>
+        <div class="tables">${table({ cols: o, rows: caseRows(o, { vocSg: true }) })}</div>` + notes([
+        { de: 'Einen eigenen Vokativ hat nur die Endung <i>-us</i>: <i>domine!</i> Bei <i>-ius</i> wird er zu <i>-ī</i>: <i>fīlī, Gāī</i>; von <i>meus</i> heißt er <i>mī</i>.', en: 'Only nouns in <i>-us</i> have a vocative of their own: <i>domine!</i> Nouns in <i>-ius</i> form it in <i>-ī</i>: <i>fīlī, Gāī</i>; the vocative of <i>meus</i> is <i>mī</i>.' },
+        { de: 'Bei <i>puer</i> bleibt das <i>e</i> erhalten, bei <i>ager</i> fällt es weg (<i>agrī</i>). Das zeigt dir der Genitiv im Wörterbuch.', en: 'In <i>puer</i> the <i>e</i> stays, in <i>ager</i> it drops out (<i>agrī</i>). The genitive in the dictionary tells you which.' },
+        { de: 'Femininum sind u. a. Bäume, Länder, Städte und Inseln: <i>humus, Aegyptus, Corinthus</i>.', en: 'Feminine are, among others, trees, countries, cities and islands: <i>humus, Aegyptus, Corinthus</i>.' }
+    ]);
+    // consonant declension
+    const rex = col('rēx, rēgis m.', { de: 'König', en: 'king' }, ['rēx', 'rēg|is', 'rēg|ī', 'rēg|em', 'rēg|e'], ['rēg|ēs', 'rēg|um', 'rēg|ibus', 'rēg|ēs', 'rēg|ibus']);
+    const homo = col('homō, hominis m.', { de: 'Mensch', en: 'human being' }, ['homō', 'homin|is', 'homin|ī', 'homin|em', 'homin|e'], ['homin|ēs', 'homin|um', 'homin|ibus', 'homin|ēs', 'homin|ibus']);
+    const corp = col('corpus, corporis n.', { de: 'Körper', en: 'body' }, ['corpus', 'corpor|is', 'corpor|ī', 'corpus', 'corpor|e'], ['corpor|a', 'corpor|um', 'corpor|ibus', 'corpor|a', 'corpor|ibus']);
+    const kons = [rex, homo, corp];
+    h += `<h3 id="n-k">${tr({ de: 'Konsonantische Deklination', en: '3rd declension (consonant stems)' })}</h3>
+        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -is · <b>Genus:</b> ${tr({ de: 'alle drei Genera möglich – im Wörterbuch nachsehen', en: 'all three genders – check the dictionary' })}</p>
+        <div class="tables">${table({ cols: kons, rows: caseRows(kons) })}</div>` + notes([
+        { de: 'Der Nominativ Singular ist oft verändert. Den Stamm, an den alle anderen Endungen treten, zeigt erst der Genitiv: <i>rēx → rēg-is, homō → homin-is, corpus → corpor-is</i>. Lerne Substantive deshalb immer mit Genitiv.', en: 'The nominative singular is often changed. Only the genitive shows the stem to which all other endings are added: <i>rēx → rēg-is, homō → homin-is, corpus → corpor-is</i>. So always learn nouns with their genitive.' }
+    ]);
+    // i-stems
+    const civis = col('cīvis, -is m.', { de: 'Bürger', en: 'citizen' }, ['cīv|is', 'cīv|is', 'cīv|ī', 'cīv|em', 'cīv|e'], ['cīv|ēs', 'cīv|ium', 'cīv|ibus', 'cīv|ēs', 'cīv|ibus']);
+    const urbs = col('urbs, urbis f.', { de: 'Stadt', en: 'city' }, ['urbs', 'urb|is', 'urb|ī', 'urb|em', 'urb|e'], ['urb|ēs', 'urb|ium', 'urb|ibus', 'urb|ēs', 'urb|ibus']);
+    const turris = col('turris, -is f.', { de: 'Turm', en: 'tower' }, ['turr|is', 'turr|is', 'turr|ī', 'turr|im', 'turr|ī'], ['turr|ēs', 'turr|ium', 'turr|ibus', 'turr|īs / turr|ēs', 'turr|ibus']);
+    const mare = col('mare, -is n.', { de: 'Meer', en: 'sea' }, ['mar|e', 'mar|is', 'mar|ī', 'mar|e', 'mar|ī'], ['mar|ia', 'mar|ium', 'mar|ibus', 'mar|ia', 'mar|ibus']);
+    const animal = col('animal, -ālis n.', { de: 'Lebewesen', en: 'living being' }, ['animal', 'animāl|is', 'animāl|ī', 'animal', 'animāl|ī'], ['animāl|ia', 'animāl|ium', 'animāl|ibus', 'animāl|ia', 'animāl|ibus']);
+    const istem = [civis, urbs, turris, mare, animal];
+    h += `<h3 id="n-i">${tr({ de: 'Mischklasse und i-Deklination', en: '3rd declension: mixed and i-stems' })}</h3>
+        <p class="meta">${tr({ de: 'Varianten der 3. Deklination mit <i>-i-</i> in einigen Endungen.', en: 'Variants of the 3rd declension with <i>-i-</i> in some endings.' })}</p>
+        <div class="tables">${table({ cols: istem, rows: caseRows(istem) })}</div>` + notes([
+        { de: '<b>Mischklasse</b> (<i>cīvis, urbs</i>): wie die konsonantische Deklination, aber Genitiv Plural auf <i>-ium</i>. Dazu gehören gleichsilbige Wörter auf <i>-is</i> und <i>-ēs</i> (<i>cīvis, nāvis, nūbēs</i>) und Wörter, deren Stamm auf zwei Konsonanten endet (<i>urbs, mōns, nox</i>).', en: '<b>Mixed stems</b> (<i>cīvis, urbs</i>): like the consonant stems, but genitive plural in <i>-ium</i>. They include nouns in <i>-is</i> and <i>-ēs</i> with the same number of syllables in nominative and genitive (<i>cīvis, nāvis, nūbēs</i>) and nouns whose stem ends in two consonants (<i>urbs, mōns, nox</i>).' },
+        { de: '<b>i-Deklination</b>: wenige Feminina mit Akkusativ <i>-im</i> und Ablativ <i>-ī</i> (<i>turris, puppis, sitis, vīs, Tiberis</i>) sowie die Neutra auf <i>-e, -al, -ar</i> (<i>mare, animal, exemplar</i>): Ablativ <i>-ī</i>, Nominativ/Akkusativ Plural <i>-ia</i>, Genitiv Plural <i>-ium</i>.', en: '<b>Pure i-stems</b>: a few feminines with accusative <i>-im</i> and ablative <i>-ī</i> (<i>turris, puppis, sitis, vīs, Tiberis</i>) and the neuters in <i>-e, -al, -ar</i> (<i>mare, animal, exemplar</i>): ablative <i>-ī</i>, nominative/accusative plural <i>-ia</i>, genitive plural <i>-ium</i>.' }
+    ]);
+    // u-declension
+    const fructus = col('frūctus, -ūs m.', { de: 'Frucht', en: 'fruit' }, ['frūct|us', 'frūct|ūs', 'frūct|uī', 'frūct|um', 'frūct|ū'], ['frūct|ūs', 'frūct|uum', 'frūct|ibus', 'frūct|ūs', 'frūct|ibus']);
+    const cornu = col('cornū, -ūs n.', { de: 'Horn, Flügel', en: 'horn, wing' }, ['corn|ū', 'corn|ūs', 'corn|ū', 'corn|ū', 'corn|ū'], ['corn|ua', 'corn|uum', 'corn|ibus', 'corn|ua', 'corn|ibus']);
+    h += `<h3 id="n-u">${tr({ de: 'u-Deklination', en: '4th (u-) declension' })}</h3>
+        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -ūs · <b>Genus:</b> ${tr({ de: 'meist Maskulinum; auf -ū Neutrum', en: 'mostly masculine; -ū neuter' })}</p>
+        <div class="tables">${table({ cols: [fructus, cornu], rows: caseRows([fructus, cornu]) })}</div>` + notes([
+        { de: 'Femininum sind <i>manus</i> (Hand, Schar), <i>domus</i> (Haus, siehe unten) und <i>Īdūs</i> (die Iden).', en: 'Feminine are <i>manus</i> (hand, band), <i>domus</i> (house, see below) and <i>Īdūs</i> (the Ides).' },
+        { de: 'Vorsicht: <i>-us</i> kann o- oder u-Deklination sein, und <i>-ūs</i> steht für vier Formen (Gen. Sg., Nom./Akk. Pl.). Der Genitiv im Wörterbuch entscheidet.', en: 'Careful: <i>-us</i> can be 2nd or 4th declension, and <i>-ūs</i> stands for several forms (gen. sg., nom./acc. pl.). The genitive in the dictionary decides.' }
+    ]);
+    // e-declension
+    const res = col('rēs, reī f.', { de: 'Sache', en: 'thing, matter' }, ['r|ēs', 'r|eī', 'r|eī', 'r|em', 'r|ē'], ['r|ēs', 'r|ērum', 'r|ēbus', 'r|ēs', 'r|ēbus']);
+    const dies = col('diēs, diēī m.', { de: 'Tag', en: 'day' }, ['di|ēs', 'di|ēī', 'di|ēī', 'di|em', 'di|ē'], ['di|ēs', 'di|ērum', 'di|ēbus', 'di|ēs', 'di|ēbus']);
+    h += `<h3 id="n-e">${tr({ de: 'e-Deklination', en: '5th (e-) declension' })}</h3>
+        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -eī / -ēī · <b>Genus:</b> ${tr({ de: 'Femininum; <i>diēs</i> meist Maskulinum', en: 'feminine; <i>diēs</i> mostly masculine' })}</p>
+        <div class="tables">${table({ cols: [res, dies], rows: caseRows([res, dies]) })}</div>` + notes([
+        { de: 'Nach Vokal steht <i>-ēī</i> (<i>diēī</i>), nach Konsonant <i>-eī</i> (<i>reī</i>). Einen vollständigen Plural haben nur <i>rēs</i> und <i>diēs</i>.', en: 'After a vowel the ending is <i>-ēī</i> (<i>diēī</i>), after a consonant <i>-eī</i> (<i>reī</i>). Only <i>rēs</i> and <i>diēs</i> have a full plural.' },
+        { de: '<i>rēs</i> hat viele Bedeutungen: <i>rēs pūblica</i> (Staat), <i>rēs gestae</i> (Taten), <i>rēs adversae</i> (Unglück).', en: '<i>rēs</i> has many meanings: <i>rēs pūblica</i> (state), <i>rēs gestae</i> (deeds), <i>rēs adversae</i> (misfortune).' }
+    ]);
+    // special nouns
+    const domus = col('domus, -ūs f.', { de: 'Haus', en: 'house' }, ['dom|us', 'dom|ūs', 'dom|uī', 'dom|um', 'dom|ō'], ['dom|ūs', 'dom|uum / dom|ōrum', 'dom|ibus', 'dom|ūs / dom|ōs', 'dom|ibus']);
+    const vis = col('vīs f.', { de: 'Kraft, Gewalt', en: 'force, violence' }, ['vīs', '', '', 'v|im', 'v|ī'], ['vīr|ēs', 'vīr|ium', 'vīr|ibus', 'vīr|ēs', 'vīr|ibus']);
+    const deus = col('deus, -ī m.', { de: 'Gott', en: 'god' }, ['de|us', 'de|ī', 'de|ō', 'de|um', 'de|ō'], ['dī / de|ī', 'de|ōrum / de|um', 'dīs / de|īs', 'de|ōs', 'dīs / de|īs'], { sgVoc: 'de|us' });
+    const sp = [domus, vis, deus];
+    h += `<h3 id="n-x">${tr({ de: 'Besondere Substantive', en: 'Special nouns' })}</h3>
+        <div class="tables">${table({ cols: sp, rows: caseRows(sp, { vocSg: true }) })}</div>` + notes([
+        { de: '<i>domus</i> mischt u- und o-Deklination. Feste Ortsangaben: <i>domī</i> (zu Hause), <i>domum</i> (nach Hause), <i>domō</i> (von zu Hause).', en: '<i>domus</i> mixes the 4th and 2nd declensions. Fixed expressions of place: <i>domī</i> (at home), <i>domum</i> (home, homewards), <i>domō</i> (from home).' },
+        { de: '<i>vīs</i> hat im Singular keinen gebräuchlichen Genitiv und Dativ. Der Plural <i>vīrēs</i> heißt meist „Kräfte“. Nicht verwechseln mit <i>vir, virī</i> (Mann)!', en: '<i>vīs</i> has no genitive or dative singular in common use. The plural <i>vīrēs</i> usually means “strength”. Don’t confuse it with <i>vir, virī</i> (man)!' }
+    ]);
+    return h;
+}
+
+function sectionAdjectives() {
+    let h = '';
+    const bonus = [
+        col({ de: 'Maskulinum', en: 'Masculine' }, 'bonus', ['bon|us', 'bon|ī', 'bon|ō', 'bon|um', 'bon|ō'], ['bon|ī', 'bon|ōrum', 'bon|īs', 'bon|ōs', 'bon|īs'], { sgVoc: 'bon|e', plVoc: 'bon|ī' }),
+        col({ de: 'Femininum', en: 'Feminine' }, 'bona', ['bon|a', 'bon|ae', 'bon|ae', 'bon|am', 'bon|ā'], ['bon|ae', 'bon|ārum', 'bon|īs', 'bon|ās', 'bon|īs'], { sgVoc: 'bon|a', plVoc: 'bon|ae' }),
+        col({ de: 'Neutrum', en: 'Neuter' }, 'bonum', ['bon|um', 'bon|ī', 'bon|ō', 'bon|um', 'bon|ō'], ['bon|a', 'bon|ōrum', 'bon|īs', 'bon|a', 'bon|īs'], { sgVoc: 'bon|um', plVoc: 'bon|a' })
+    ];
+    h += `<h3 id="a-ao">${tr({ de: 'a-/o-Deklination: bonus, bona, bonum', en: '1st/2nd declension: bonus, bona, bonum' })}</h3>
+        <div class="tables">${table({ cols: bonus, rows: caseRows(bonus) })}</div>` + notes([
+        { de: 'Ebenso: <i>līber, lībera, līberum</i> (frei; <i>e</i> bleibt) und <i>pulcher, pulchra, pulchrum</i> (schön; <i>e</i> fällt weg). Vokativ Maskulinum Singular: <i>bone</i>.', en: 'Likewise: <i>līber, lībera, līberum</i> (free; the <i>e</i> stays) and <i>pulcher, pulchra, pulchrum</i> (beautiful; the <i>e</i> drops out). Vocative masculine singular: <i>bone</i>.' },
+        { de: 'Das Adjektiv richtet sich in Kasus, Numerus und Genus (KNG) nach seinem Bezugswort, nicht in der Deklination: <i>agricola bonus, nauta bonus</i>.', en: 'The adjective agrees with its noun in case, number and gender, not in declension: <i>agricola bonus, nauta bonus</i>.' }
+    ]);
+    const acer = [
+        col({ de: 'Maskulinum', en: 'Masc.' }, 'ācer', ['ācer', 'ācr|is', 'ācr|ī', 'ācr|em', 'ācr|ī'], ['ācr|ēs', 'ācr|ium', 'ācr|ibus', 'ācr|ēs', 'ācr|ibus']),
+        col({ de: 'Femininum', en: 'Fem.' }, 'ācris', ['ācr|is', 'ācr|is', 'ācr|ī', 'ācr|em', 'ācr|ī'], ['ācr|ēs', 'ācr|ium', 'ācr|ibus', 'ācr|ēs', 'ācr|ibus']),
+        col({ de: 'Neutrum', en: 'Neut.' }, 'ācre', ['ācr|e', 'ācr|is', 'ācr|ī', 'ācr|e', 'ācr|ī'], ['ācr|ia', 'ācr|ium', 'ācr|ibus', 'ācr|ia', 'ācr|ibus'])
+    ];
+    const fortis = [
+        col({ de: 'm./f.', en: 'm./f.' }, 'fortis', ['fort|is', 'fort|is', 'fort|ī', 'fort|em', 'fort|ī'], ['fort|ēs', 'fort|ium', 'fort|ibus', 'fort|ēs', 'fort|ibus']),
+        col({ de: 'Neutrum', en: 'Neut.' }, 'forte', ['fort|e', 'fort|is', 'fort|ī', 'fort|e', 'fort|ī'], ['fort|ia', 'fort|ium', 'fort|ibus', 'fort|ia', 'fort|ibus'])
+    ];
+    const felix = [
+        col({ de: 'm./f.', en: 'm./f.' }, 'fēlīx', ['fēlīx', 'fēlīc|is', 'fēlīc|ī', 'fēlīc|em', 'fēlīc|ī'], ['fēlīc|ēs', 'fēlīc|ium', 'fēlīc|ibus', 'fēlīc|ēs', 'fēlīc|ibus']),
+        col({ de: 'Neutrum', en: 'Neut.' }, 'fēlīx', ['fēlīx', 'fēlīc|is', 'fēlīc|ī', 'fēlīx', 'fēlīc|ī'], ['fēlīc|ia', 'fēlīc|ium', 'fēlīc|ibus', 'fēlīc|ia', 'fēlīc|ibus'])
+    ];
+    h += `<h3 id="a-3">${tr({ de: '3. Deklination: drei-, zwei- und einendig', en: '3rd declension: three, two and one ending' })}</h3>
+        <div class="tables">
+            ${table({ caption: { de: 'dreiendig: ācer, ācris, ācre – scharf', en: 'three endings: ācer, ācris, ācre – sharp' }, cols: acer, rows: caseRows(acer) })}
+            ${table({ caption: { de: 'zweiendig: fortis, forte – tapfer', en: 'two endings: fortis, forte – brave' }, cols: fortis, rows: caseRows(fortis) })}
+            ${table({ caption: { de: 'einendig: fēlīx, fēlīcis – glücklich', en: 'one ending: fēlīx, fēlīcis – happy' }, cols: felix, rows: caseRows(felix) })}
+        </div>` + notes([
+        { de: 'Die Adjektive der 3. Deklination folgen der i-Deklination: Ablativ Singular <i>-ī</i>, Genitiv Plural <i>-ium</i>, Neutrum Plural <i>-ia</i>.', en: 'Third-declension adjectives follow the i-stems: ablative singular <i>-ī</i>, genitive plural <i>-ium</i>, neuter plural <i>-ia</i>.' },
+        { de: 'Ausnahmen mit Ablativ <i>-e</i>, Genitiv Plural <i>-um</i> und Neutrum Plural <i>-a</i>: <i>vetus</i> (alt), <i>pauper</i> (arm), <i>dīves</i> (reich), <i>prīnceps</i> (erster) und der Komparativ (siehe unten).', en: 'Exceptions with ablative <i>-e</i>, genitive plural <i>-um</i> and neuter plural <i>-a</i>: <i>vetus</i> (old), <i>pauper</i> (poor), <i>dīves</i> (rich), <i>prīnceps</i> (first) and the comparative (see below).' },
+        { de: 'Das Partizip Präsens wird wie <i>fēlīx</i> dekliniert; als Partizip hat es im Ablativ meist <i>-e</i>: <i>laudante</i> (siehe Seite „Konjugationen“).', en: 'The present participle declines like <i>fēlīx</i>; used as a participle its ablative usually ends in <i>-e</i>: <i>laudante</i> (see the “Conjugations” page).' }
+    ]);
+    const comp = [
+        col({ de: 'm./f.', en: 'm./f.' }, 'longior', ['long|ior', 'long|iōr|is', 'long|iōr|ī', 'long|iōr|em', 'long|iōr|e'], ['long|iōr|ēs', 'long|iōr|um', 'long|iōr|ibus', 'long|iōr|ēs', 'long|iōr|ibus']),
+        col({ de: 'Neutrum', en: 'Neut.' }, 'longius', ['long|ius', 'long|iōr|is', 'long|iōr|ī', 'long|ius', 'long|iōr|e'], ['long|iōr|a', 'long|iōr|um', 'long|iōr|ibus', 'long|iōr|a', 'long|iōr|ibus'])
+    ];
+    h += `<h3 id="a-comp">${tr({ de: 'Steigerung (Komparation)', en: 'Comparison of adjectives' })}</h3>
+        <p class="meta">${tr({ de: '<b>Komparativ:</b> Stamm + <i>-ior</i> (m./f.), <i>-ius</i> (n.) · <b>Superlativ:</b> Stamm + <i>-issimus, -a, -um</i> (wie <i>bonus</i>)', en: '<b>Comparative:</b> stem + <i>-ior</i> (m./f.), <i>-ius</i> (n.) · <b>Superlative:</b> stem + <i>-issimus, -a, -um</i> (like <i>bonus</i>)' })}</p>
+        <div class="tables">${table({ caption: { de: 'Komparativ: longior, longius – länger', en: 'Comparative: longior, longius – longer' }, cols: comp, rows: caseRows(comp) })}
+        ${table({ caption: { de: 'Unregelmäßige Steigerung', en: 'Irregular comparison' }, cols: [{ h: { de: 'Positiv', en: 'Positive' } }, { h: { de: 'Komparativ', en: 'Comparative' } }, { h: { de: 'Superlativ', en: 'Superlative' } }],
+            rows: [
+                { h: { de: 'gut', en: 'good' }, cells: ['bonus', 'melior, melius', 'optimus'] },
+                { h: { de: 'schlecht', en: 'bad' }, cells: ['malus', 'peior, peius', 'pessimus'] },
+                { h: { de: 'groß', en: 'great' }, cells: ['magnus', 'maior, maius', 'maximus'] },
+                { h: { de: 'klein', en: 'small' }, cells: ['parvus', 'minor, minus', 'minimus'] },
+                { h: { de: 'viel', en: 'much' }, cells: ['multum', 'plūs', 'plūrimum'] },
+                { h: { de: 'viele', en: 'many' }, cells: ['multī', 'plūrēs, plūra', 'plūrimī'] },
+                { h: { de: 'schön', en: 'beautiful' }, cells: ['pulcher', 'pulchrior', 'pulcherrimus'] },
+                { h: { de: 'scharf', en: 'sharp' }, cells: ['ācer', 'ācrior', 'ācerrimus'] },
+                { h: { de: 'leicht', en: 'easy' }, cells: ['facilis', 'facilior', 'facillimus'] }
+            ] })}</div>` + notes([
+        { de: 'Der Komparativ folgt der konsonantischen Deklination: Ablativ <i>-e</i>, Genitiv Plural <i>-um</i>, Neutrum Plural <i>-a</i>.', en: 'The comparative follows the consonant stems: ablative <i>-e</i>, genitive plural <i>-um</i>, neuter plural <i>-a</i>.' },
+        { de: 'Adjektive auf <i>-er</i> bilden den Superlativ auf <i>-errimus</i>; <i>facilis, difficilis, similis, dissimilis, humilis, gracilis</i> auf <i>-illimus</i>.', en: 'Adjectives in <i>-er</i> form the superlative in <i>-errimus</i>; <i>facilis, difficilis, similis, dissimilis, humilis, gracilis</i> in <i>-illimus</i>.' },
+        { de: 'Übersetzung: Komparativ auch „ziemlich, zu“ (<i>longior</i> „ziemlich lang“); Superlativ auch „sehr“ (<i>longissimus</i> „sehr lang“). Nach dem Komparativ steht <i>quam</i> oder der Ablativ: <i>longior quam via</i> = <i>longior viā</i>.', en: 'Translation: the comparative can also mean “rather, too” (<i>longior</i> “rather long”), the superlative “very” (<i>longissimus</i> “very long”). After a comparative comes <i>quam</i> or the ablative: <i>longior quam via</i> = <i>longior viā</i>.' }
+    ]);
+    h += `<h3 id="a-adv">${tr({ de: 'Adverbien', en: 'Adverbs' })}</h3>
+        <div class="tables">${table({ cols: [{ h: { de: 'Positiv', en: 'Positive' } }, { h: { de: 'Komparativ', en: 'Comparative' } }, { h: { de: 'Superlativ', en: 'Superlative' } }],
+            rows: [
+                { h: 'longus', cells: ['long|ē', 'long|ius', 'long|issimē'] },
+                { h: 'fortis', cells: ['fort|iter', 'fort|ius', 'fort|issimē'] },
+                { h: 'prūdēns', cells: ['prūdent|er', 'prūdent|ius', 'prūdent|issimē'] },
+                { h: 'bonus', cells: ['bene', 'melius', 'optimē'] },
+                { h: 'malus', cells: ['male', 'peius', 'pessimē'] },
+                { h: 'multus', cells: ['multum', 'plūs', 'plūrimum'] },
+                { h: 'magnus', cells: ['magnopere', 'magis', 'maximē'] },
+                { h: 'parvus', cells: ['parum', 'minus', 'minimē'] }
+            ] })}</div>` + notes([
+        { de: 'Positiv: a-/o-Deklination <i>-ē</i>, 3. Deklination <i>-iter</i> (Stämme auf <i>-nt</i>: <i>-er</i>). Komparativ = Neutrum Singular des Komparativs (<i>-ius</i>), Superlativ auf <i>-issimē</i>.', en: 'Positive: 1st/2nd declension <i>-ē</i>, 3rd declension <i>-iter</i> (stems in <i>-nt</i>: <i>-er</i>). Comparative = neuter singular of the comparative (<i>-ius</i>), superlative in <i>-issimē</i>.' }
+    ]);
+    return h;
+}
+
+function mfn(m, f, n, names) {
+    return [col({ de: 'Maskulinum', en: 'Masc.' }, names ? names[0] : null, m[0], m[1]), col({ de: 'Femininum', en: 'Fem.' }, names ? names[1] : null, f[0], f[1]), col({ de: 'Neutrum', en: 'Neut.' }, names ? names[2] : null, n[0], n[1])];
+}
+function sectionPronouns() {
+    let h = '';
+    const pers = [
+        { h: { de: 'ich', en: 'I' }, sub: 'ego' }, { h: { de: 'du', en: 'you (sg.)' }, sub: 'tū' }, { h: { de: 'wir', en: 'we' }, sub: 'nōs' }, { h: { de: 'ihr', en: 'you (pl.)' }, sub: 'vōs' }, { h: { de: 'sich (reflexiv)', en: 'himself, herself … (reflexive)' }, sub: 'sē' }
+    ];
+    const P = [['ego', 'meī', 'mihi', 'mē', 'mē'], ['tū', 'tuī', 'tibi', 'tē', 'tē'], ['nōs', 'nostrī / nostrum', 'nōbīs', 'nōs', 'nōbīs'], ['vōs', 'vestrī / vestrum', 'vōbīs', 'vōs', 'vōbīs'], ['', 'suī', 'sibi', 'sē', 'sē']];
+    const keys = ['nom', 'gen', 'dat', 'acc', 'abl'];
+    h += `<h3 id="p-pers">${tr({ de: 'Personalpronomen und Reflexivpronomen', en: 'Personal and reflexive pronouns' })}</h3>
+        <div class="tables">${table({ cols: pers, rows: keys.map((k, i) => ({ h: CASES[k], cells: P.map(p => p[i]) })) })}</div>` + notes([
+        { de: 'Mit <i>cum</i> wird das Pronomen verbunden: <i>mēcum, tēcum, sēcum, nōbīscum, vōbīscum</i>.', en: 'With <i>cum</i> the preposition is attached: <i>mēcum, tēcum, sēcum, nōbīscum, vōbīscum</i>.' },
+        { de: '<i>nostrum, vestrum</i> stehen partitiv („von uns“: <i>ūnus nostrum</i>), <i>nostrī, vestrī</i> als Objekt („an uns“: <i>memor nostrī</i>).', en: '<i>nostrum, vestrum</i> are partitive (“of us”: <i>ūnus nostrum</i>), <i>nostrī, vestrī</i> are objective (“of us” as object: <i>memor nostrī</i>).' },
+        { de: 'Das Reflexivpronomen <i>sē</i> (Sg. und Pl. gleich) bezieht sich auf das Subjekt seines Satzes; in AcI und Nebensätzen oft auf das Subjekt des übergeordneten Satzes. Für „ihn, sie“ ohne Rückbezug steht <i>is, ea, id</i>.', en: 'The reflexive <i>sē</i> (same in singular and plural) refers to the subject of its clause; in an AcI or subordinate clause often to the subject of the main clause. For “him, her” without such reference Latin uses <i>is, ea, id</i>.' }
+    ]);
+    h += `<h3 id="p-poss">${tr({ de: 'Possessivpronomen', en: 'Possessive pronouns' })}</h3>
+        <div class="tables">${table({ cols: [{ h: { de: 'Possessivpronomen', en: 'Possessive' } }, { h: { de: 'Bedeutung', en: 'Meaning' } }, { h: { de: 'dekliniert wie', en: 'declined like' } }], rows: [
+            { h: { de: '1. Sg.', en: '1st sg.' }, cells: ['meus, mea, meum', { de: 'mein', en: 'my' }, 'bonus (Vok. mī)'] },
+            { h: { de: '2. Sg.', en: '2nd sg.' }, cells: ['tuus, tua, tuum', { de: 'dein', en: 'your' }, 'bonus'] },
+            { h: { de: '3. (reflexiv)', en: '3rd (reflexive)' }, cells: ['suus, sua, suum', { de: 'sein, ihr (eigener)', en: 'his, her, their (own)' }, 'bonus'] },
+            { h: { de: '1. Pl.', en: '1st pl.' }, cells: ['noster, nostra, nostrum', { de: 'unser', en: 'our' }, 'pulcher'] },
+            { h: { de: '2. Pl.', en: '2nd pl.' }, cells: ['vester, vestra, vestrum', { de: 'euer', en: 'your' }, 'pulcher'] },
+            { h: { de: '3. (nicht refl.)', en: '3rd (non-refl.)' }, cells: ['eius; eōrum, eārum', { de: 'sein, ihr (eines anderen)', en: 'his, her, their (someone else’s)' }, { de: 'Genitiv von is, ea, id', en: 'genitive of is, ea, id' }] }
+        ].map(r => ({ h: r.h, cells: r.cells.map((c, i) => i === 1 ? { html: c } : c) })) })}</div>`;
+    const is_ = mfn([['is', 'eius', 'eī', 'eum', 'eō'], ['eī / iī / ī', 'eōrum', 'eīs / iīs / īs', 'eōs', 'eīs / iīs / īs']], [['ea', 'eius', 'eī', 'eam', 'eā'], ['eae', 'eārum', 'eīs / iīs / īs', 'eās', 'eīs / iīs / īs']], [['id', 'eius', 'eī', 'id', 'eō'], ['ea', 'eōrum', 'eīs / iīs / īs', 'ea', 'eīs / iīs / īs']]);
+    const hic = mfn([['hic', 'huius', 'huic', 'hunc', 'hōc'], ['hī', 'hōrum', 'hīs', 'hōs', 'hīs']], [['haec', 'huius', 'huic', 'hanc', 'hāc'], ['hae', 'hārum', 'hīs', 'hās', 'hīs']], [['hoc', 'huius', 'huic', 'hoc', 'hōc'], ['haec', 'hōrum', 'hīs', 'haec', 'hīs']]);
+    const ille = mfn([['ill|e', 'ill|īus', 'ill|ī', 'ill|um', 'ill|ō'], ['ill|ī', 'ill|ōrum', 'ill|īs', 'ill|ōs', 'ill|īs']], [['ill|a', 'ill|īus', 'ill|ī', 'ill|am', 'ill|ā'], ['ill|ae', 'ill|ārum', 'ill|īs', 'ill|ās', 'ill|īs']], [['ill|ud', 'ill|īus', 'ill|ī', 'ill|ud', 'ill|ō'], ['ill|a', 'ill|ōrum', 'ill|īs', 'ill|a', 'ill|īs']]);
+    const ipse = mfn([['ips|e', 'ips|īus', 'ips|ī', 'ips|um', 'ips|ō'], ['ips|ī', 'ips|ōrum', 'ips|īs', 'ips|ōs', 'ips|īs']], [['ips|a', 'ips|īus', 'ips|ī', 'ips|am', 'ips|ā'], ['ips|ae', 'ips|ārum', 'ips|īs', 'ips|ās', 'ips|īs']], [['ips|um', 'ips|īus', 'ips|ī', 'ips|um', 'ips|ō'], ['ips|a', 'ips|ōrum', 'ips|īs', 'ips|a', 'ips|īs']]);
+    const idem = mfn([['īdem', 'eiusdem', 'eīdem', 'eundem', 'eōdem'], ['eīdem / īdem', 'eōrundem', 'eīsdem / īsdem', 'eōsdem', 'eīsdem / īsdem']], [['eadem', 'eiusdem', 'eīdem', 'eandem', 'eādem'], ['eaedem', 'eārundem', 'eīsdem / īsdem', 'eāsdem', 'eīsdem / īsdem']], [['idem', 'eiusdem', 'eīdem', 'idem', 'eōdem'], ['eadem', 'eōrundem', 'eīsdem / īsdem', 'eadem', 'eīsdem / īsdem']]);
+    h += `<h3 id="p-dem">${tr({ de: 'Demonstrativpronomen', en: 'Demonstrative pronouns' })}</h3>
+        <div class="tables">
+            ${table({ caption: { de: 'is, ea, id – dieser; er, sie, es', en: 'is, ea, id – this, that; he, she, it' }, cols: is_, rows: caseRows(is_) })}
+            ${table({ caption: { de: 'hic, haec, hoc – dieser (hier)', en: 'hic, haec, hoc – this (here)' }, cols: hic, rows: caseRows(hic) })}
+            ${table({ caption: { de: 'ille, illa, illud – jener', en: 'ille, illa, illud – that (there)' }, cols: ille, rows: caseRows(ille) })}
+            ${table({ caption: { de: 'ipse, ipsa, ipsum – selbst', en: 'ipse, ipsa, ipsum – -self, very' }, cols: ipse, rows: caseRows(ipse) })}
+            ${table({ caption: { de: 'īdem, eadem, idem – derselbe', en: 'īdem, eadem, idem – the same' }, cols: idem, rows: caseRows(idem) })}
+        </div>` + notes([
+        { de: '<i>iste, ista, istud</i> („dieser da“, oft abwertend) wird wie <i>ille</i> dekliniert.', en: '<i>iste, ista, istud</i> (“that … of yours”, often disparaging) is declined like <i>ille</i>.' },
+        { de: 'Typisch für die Pronomina: Genitiv Singular auf <i>-īus</i> (bei <i>is, hic</i>: <i>eius, huius</i>) und Dativ Singular auf <i>-ī</i> für alle drei Genera.', en: 'Typical of pronouns: genitive singular in <i>-īus</i> (for <i>is, hic</i>: <i>eius, huius</i>) and dative singular in <i>-ī</i> for all three genders.' },
+        { de: 'Bei <i>īdem</i> wird <i>m</i> vor <i>-dem</i> zu <i>n</i>: <i>eundem, eandem, eōrundem, eārundem</i>.', en: 'In <i>īdem</i>, <i>m</i> before <i>-dem</i> becomes <i>n</i>: <i>eundem, eandem, eōrundem, eārundem</i>.' }
+    ]);
+    const qui = mfn([['quī', 'cuius', 'cui', 'quem', 'quō'], ['quī', 'quōrum', 'quibus', 'quōs', 'quibus']], [['quae', 'cuius', 'cui', 'quam', 'quā'], ['quae', 'quārum', 'quibus', 'quās', 'quibus']], [['quod', 'cuius', 'cui', 'quod', 'quō'], ['quae', 'quōrum', 'quibus', 'quae', 'quibus']]);
+    const quis = [col({ de: 'm./f.', en: 'm./f.' }, { de: 'wer?', en: 'who?' }, ['quis', 'cuius', 'cui', 'quem', 'quō'], null), col({ de: 'Neutrum', en: 'Neut.' }, { de: 'was?', en: 'what?' }, ['quid', 'cuius', 'cui', 'quid', 'quō'], null)];
+    h += `<h3 id="p-rel">${tr({ de: 'Relativ- und Interrogativpronomen', en: 'Relative and interrogative pronouns' })}</h3>
+        <div class="tables">
+            ${table({ caption: { de: 'quī, quae, quod – der, die, das; welcher', en: 'quī, quae, quod – who, which, that' }, cols: qui, rows: caseRows(qui) })}
+            ${table({ caption: { de: 'quis, quid – wer? was? (substantivisch)', en: 'quis, quid – who? what? (as a noun)' }, cols: quis, rows: caseRows(quis, { sgOnly: true, noSections: true }) })}
+        </div>` + notes([
+        { de: 'Das <b>adjektivische</b> Fragepronomen „welcher?“ hat dieselben Formen wie das Relativpronomen: <i>quī vir? quae fēmina? quod templum?</i> Der Plural von <i>quis, quid</i> lautet wie der von <i>quī, quae, quod</i>.', en: 'The <b>adjectival</b> interrogative “which?” has the same forms as the relative: <i>quī vir? quae fēmina? quod templum?</i> The plural of <i>quis, quid</i> is the same as that of <i>quī, quae, quod</i>.' },
+        { de: 'Das Relativpronomen richtet sich in Genus und Numerus nach seinem Bezugswort, im Kasus nach seiner Aufgabe im Relativsatz.', en: 'The relative pronoun takes its gender and number from the word it refers to, its case from its job in the relative clause.' },
+        { de: 'Mit <i>cum</i>: <i>quōcum, quācum, quibuscum</i> (auch <i>cum quō</i>).', en: 'With <i>cum</i>: <i>quōcum, quācum, quibuscum</i> (also <i>cum quō</i>).' }
+    ]);
+    h += `<h3 id="p-ind">${tr({ de: 'Indefinitpronomen', en: 'Indefinite pronouns' })}</h3>
+        <div class="tables">${table({ cols: [{ h: { de: 'substantivisch', en: 'as a noun' } }, { h: { de: 'adjektivisch', en: 'as an adjective' } }, { h: { de: 'Bedeutung', en: 'Meaning' } }], rows: [
+            { h: 'aliquis', cells: ['aliquis, aliquid', 'aliquī, aliqua, aliquod', { html: { de: 'irgendjemand, irgendetwas; irgendein', en: 'someone, something; some' } }] },
+            { h: 'quis', cells: ['quis, quid', 'quī, qua, quod', { html: { de: 'irgendwer (nach sī, nisi, nē, num)', en: 'anyone (after sī, nisi, nē, num)' } }] },
+            { h: 'quīdam', cells: ['quīdam, quaedam, quiddam', 'quīdam, quaedam, quoddam', { html: { de: 'ein gewisser, jemand', en: 'a certain (one)' } }] },
+            { h: 'quisque', cells: ['quisque, quidque', 'quisque, quaeque, quodque', { html: { de: 'jeder', en: 'each' } }] },
+            { h: 'quisquam', cells: ['quisquam, quicquam', 'ūllus, -a, -um', { html: { de: '(irgend)jemand – in verneinten Sätzen', en: 'anyone at all – in negative sentences' } }] },
+            { h: 'nēmō', cells: ['nēmō, nihil', 'nūllus, -a, -um', { html: { de: 'niemand, nichts; kein', en: 'nobody, nothing; no' } }] }
+        ] })}</div>` + notes([
+        { de: 'Diese Pronomen werden wie <i>quis</i> bzw. <i>quī</i> dekliniert; die angehängten Silben bleiben unverändert: <i>alicuius, cuiusdam, cuiusque</i>. Bei <i>quīdam</i> wird <i>m</i> zu <i>n</i>: <i>quendam, quandam, quōrundam, quārundam</i>.', en: 'These pronouns are declined like <i>quis</i> or <i>quī</i>; the added syllables never change: <i>alicuius, cuiusdam, cuiusque</i>. In <i>quīdam</i>, <i>m</i> becomes <i>n</i>: <i>quendam, quandam, quōrundam, quārundam</i>.' },
+        { de: '<i>nēmō</i>: Gen. <i>nūllīus</i>, Dat. <i>nēminī</i>, Akk. <i>nēminem</i>, Abl. <i>nūllō</i>. Merkvers: „Nach <i>sī, nisi, nē, num</i> fällt das <i>ali-</i> um.“', en: '<i>nēmō</i>: gen. <i>nūllīus</i>, dat. <i>nēminī</i>, acc. <i>nēminem</i>, abl. <i>nūllō</i>. Rule of thumb: after <i>sī, nisi, nē, num</i>, <i>aliquis</i> loses its <i>ali-</i>.' }
+    ]);
+    const unus = mfn([['ūn|us', 'ūn|īus', 'ūn|ī', 'ūn|um', 'ūn|ō'], null], [['ūn|a', 'ūn|īus', 'ūn|ī', 'ūn|am', 'ūn|ā'], null], [['ūn|um', 'ūn|īus', 'ūn|ī', 'ūn|um', 'ūn|ō'], null]);
+    h += `<h3 id="p-unus">${tr({ de: 'Pronominaladjektive („ūnus nauta“)', en: 'Pronominal adjectives (“ūnus nauta”)' })}</h3>
+        <div class="tables">${table({ caption: { de: 'ūnus, ūna, ūnum – einer, ein einziger', en: 'ūnus, ūna, ūnum – one, a single' }, cols: unus, rows: caseRows(unus, { sgOnly: true, noSections: true }) })}</div>` + notes([
+        { de: 'Wie <i>ūnus</i> (Genitiv <i>-īus</i>, Dativ <i>-ī</i>, sonst wie <i>bonus</i>) gehen: <b>ū</b>nus, <b>ū</b>llus, <b>n</b>ūllus, <b>s</b>ōlus, <b>n</b>euter, <b>a</b>lius, <b>u</b>ter, <b>t</b>ōtus, <b>a</b>lter – Merkwort <b>ŪNUS NAUTA</b>.', en: 'Like <i>ūnus</i> (genitive <i>-īus</i>, dative <i>-ī</i>, otherwise like <i>bonus</i>): <b>ū</b>nus, <b>ū</b>llus, <b>n</b>ūllus, <b>s</b>ōlus, <b>n</b>euter, <b>a</b>lius, <b>u</b>ter, <b>t</b>ōtus, <b>a</b>lter – mnemonic <b>ŪNUS NAUTA</b>.' },
+        { de: '<i>alius</i> hat im Neutrum <i>aliud</i>; als Genitiv dient meist <i>alterīus</i>. Der Plural aller dieser Wörter geht regelmäßig wie <i>bonī, bonae, bona</i>.', en: '<i>alius</i> has the neuter <i>aliud</i>; its genitive is usually supplied by <i>alterīus</i>. The plural of all these words is regular, like <i>bonī, bonae, bona</i>.' }
+    ]);
+    return h;
+}
+
+function sectionNumerals() {
+    const duo = mfn([['du|o', 'du|ōrum', 'du|ōbus', 'du|ōs / du|o', 'du|ōbus'], null], [['du|ae', 'du|ārum', 'du|ābus', 'du|ās', 'du|ābus'], null], [['du|o', 'du|ōrum', 'du|ōbus', 'du|o', 'du|ōbus'], null]);
+    const tres = [col({ de: 'm./f.', en: 'm./f.' }, null, ['tr|ēs', 'tr|ium', 'tr|ibus', 'tr|ēs', 'tr|ibus'], null), col({ de: 'Neutrum', en: 'Neut.' }, null, ['tr|ia', 'tr|ium', 'tr|ibus', 'tr|ia', 'tr|ibus'], null)];
+    const milia = [col({ de: 'Neutrum Pl.', en: 'Neut. pl.' }, null, ['mīl|ia', 'mīl|ium', 'mīl|ibus', 'mīl|ia', 'mīl|ibus'], null)];
+    const nums = [['I', 'ūnus, -a, -um', 'prīmus'], ['II', 'duo, duae, duo', 'secundus / alter'], ['III', 'trēs, tria', 'tertius'], ['IV', 'quattuor', 'quārtus'], ['V', 'quīnque', 'quīntus'], ['VI', 'sex', 'sextus'], ['VII', 'septem', 'septimus'], ['VIII', 'octō', 'octāvus'], ['IX', 'novem', 'nōnus'], ['X', 'decem', 'decimus'], ['XI', 'ūndecim', 'ūndecimus'], ['XII', 'duodecim', 'duodecimus'], ['XX', 'vīgintī', 'vīcēsimus'], ['C', 'centum', 'centēsimus'], ['M', 'mīlle', 'mīllēsimus']];
+    return `<div class="tables">
+            ${table({ caption: { de: 'duo, duae, duo – zwei', en: 'duo, duae, duo – two' }, cols: duo, rows: caseRows(duo, { sgOnly: true, noSections: true }) })}
+            ${table({ caption: { de: 'trēs, tria – drei', en: 'trēs, tria – three' }, cols: tres, rows: caseRows(tres, { sgOnly: true, noSections: true }) })}
+            ${table({ caption: { de: 'mīlia – Tausende', en: 'mīlia – thousands' }, cols: milia, rows: caseRows(milia, { sgOnly: true, noSections: true }) })}
+            ${table({ caption: { de: 'Grund- und Ordnungszahlen', en: 'Cardinal and ordinal numbers' }, cols: [{ h: { de: 'Grundzahl', en: 'Cardinal' } }, { h: { de: 'Ordnungszahl', en: 'Ordinal' } }], rows: nums.map(n => ({ h: n[0], cells: [n[1], n[2]] })) })}
+        </div>` + notes([
+        { de: '<i>ūnus</i> siehe Pronominaladjektive; <i>ambō</i> (beide) geht wie <i>duo</i>. Von 4 bis 100 sind die Grundzahlen unveränderlich.', en: 'For <i>ūnus</i> see pronominal adjectives; <i>ambō</i> (both) goes like <i>duo</i>. From 4 to 100 the cardinals do not change.' },
+        { de: '<i>mīlle</i> (tausend) ist unveränderlich; der Plural <i>mīlia</i> ist ein Substantiv mit Genitiv: <i>duo mīlia mīlitum</i> „zweitausend Soldaten“.', en: '<i>mīlle</i> (a thousand) does not change; the plural <i>mīlia</i> is a noun taking a genitive: <i>duo mīlia mīlitum</i> “two thousand soldiers”.' },
+        { de: 'Die Ordnungszahlen werden wie <i>bonus</i> dekliniert.', en: 'Ordinal numbers are declined like <i>bonus</i>.' }
+    ]);
+}
+
+function render() {
+    document.getElementById('sec-overview').innerHTML = sectionOverview();
+    document.getElementById('sec-nouns').innerHTML = sectionNouns();
+    document.getElementById('sec-adj').innerHTML = sectionAdjectives();
+    document.getElementById('sec-pron').innerHTML = sectionPronouns();
+    document.getElementById('sec-num').innerHTML = sectionNumerals();
+}
+initShared(render, { de: 'Syntax-Studio Latein – Deklinationen', en: 'Latin Syntax Studio – Declensions' });
+
+</script>
+</body>
+</html>
