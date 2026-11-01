@@ -3694,9 +3694,9 @@ function initEventListeners() {
         }
 
         const el = e.target.closest('.tag-word, .punct-span');
-Â  Â  Â  Â  if (!el) return;
-Â  Â  Â  Â  if (el.clickTimer) clearTimeout(el.clickTimer);
-Â  Â  Â  Â  el.clickTimer = setTimeout(() => { handleWordClick(el); el.clickTimer = null; }, 350);
+        if (!el) return;
+        if (el.clickTimer) clearTimeout(el.clickTimer);
+        el.clickTimer = setTimeout(() => { handleWordClick(el); el.clickTimer = null; }, 350);
     });
 
     taggingArea.addEventListener('dblclick', (e) => {
