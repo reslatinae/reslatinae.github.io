@@ -1985,8 +1985,7 @@
             
             activeEl = el; mode = el.classList.contains('hover-word') ? "word" : "group";
             if(window.innerWidth > 768) { 
-                const rect = (activeSubWord || el).getBoundingClientRect();
-                menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px"; 
+                placeMenuAt((activeSubWord || el).getBoundingClientRect());
             }
             menu.style.display="block"; 
             if (el.dataset.done !== "true") {
@@ -1997,6 +1996,18 @@
             }
         });
 
+        // Puts the menu just below the word. Coordinates are measured from the element the menu is positioned in
+        // (the page body, which is centred on wide screens), and the menu is kept inside the window.
+        function placeMenuAt(rect) {
+            menu.style.visibility = 'hidden'; menu.style.display = 'block';
+            const host = (menu.offsetParent || document.body).getBoundingClientRect();
+            const w = menu.offsetWidth, m = 8;
+            let left = Math.max(m, Math.min(rect.left, window.innerWidth - w - m));
+            const top = rect.bottom + 4; // always just below the word, as before (the page scrolls if the menu is long)
+            menu.style.left = (left - host.left) + 'px'; menu.style.top = (top - host.top) + 'px';
+            menu.style.visibility = '';
+        }
+
         // Shared logic to position and show the menu for a given word/group element.
         // Used both by hover and by the automatic advance to the next word.
         function openMenuFor(el) {
@@ -2006,8 +2017,7 @@
             document.querySelectorAll('.menu-btn:not(.gen-btn)').forEach(b => b.style.display = "block");
 
             if(window.innerWidth > 768) {
-                const rect = el.getBoundingClientRect();
-                menu.style.top = (rect.bottom + window.scrollY + 4) + "px"; menu.style.left = (rect.left + window.scrollX) + "px";
+                placeMenuAt(el.getBoundingClientRect());
             }
             menu.style.display="block";
         }
