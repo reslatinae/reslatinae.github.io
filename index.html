@@ -130,6 +130,22 @@
         .model-trans-count { font-weight: 400; color: #6b6052; font-size: 0.85rem; }
         .model-trans-intro { font-size: 0.86rem; color: #4a4236; margin: 6px 0 12px; }
         .model-trans-item { margin-bottom: 14px; }
+        .vocab-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .vocab-opt { font-size: 0.85rem; color: #4a4236; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+        .vocab-sent { margin-bottom: 16px; }
+        .vocab-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .vocab-table th { text-align: left; font-weight: 600; color: #4a4236; font-size: 0.78rem; padding: 2px 4px; }
+        .vocab-table td { padding: 2px 4px; vertical-align: middle; }
+        .vocab-table td.vw { font-weight: 600; color: #2a241d; white-space: nowrap; width: 12%; border-left: 3px solid transparent; padding-left: 6px; }
+        .vocab-table tr.unchecked td.vw { border-left-color: #d49a2a; }
+        .vocab-table input[type=text] { width: 100%; box-sizing: border-box; padding: 4px 6px; border: 1px solid #e4ddd1; border-radius: 4px; font: inherit; font-size: 0.86rem; background: #fff; color: #2a241d; }
+        .vocab-table tr.unchecked input[type=text] { background: #fffaf0; }
+        .vocab-table td.vok { width: 1%; text-align: center; }
+        .vocab-legend { font-size: 0.8rem; color: #6b6052; margin: -4px 0 10px; }
+        .vocab-legend b { display: inline-block; width: 10px; height: 10px; background: #d49a2a; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
+        body.high-contrast .vocab-table input[type=text] { background: #2d2d2d; color: #fff; border-color: #555; }
+        body.high-contrast .vocab-table td.vw, body.high-contrast .vocab-table th, body.high-contrast .vocab-opt { color: #fff; }
+        body.high-contrast .vocab-table tr.unchecked input[type=text] { background: #3a3020; }
         .model-trans-la { font-size: 0.9rem; color: #2a241d; margin-bottom: 4px; font-style: italic; }
         .model-trans-item textarea { width: 100%; box-sizing: border-box; min-height: 52px; padding: 8px 10px; border: 1px solid #e4ddd1; border-radius: 6px; font: inherit; font-size: 0.92rem; resize: vertical; background: #fff; color: #2a241d; }
         body.high-contrast .model-trans summary, body.high-contrast .model-trans-la { color: #fff; }
@@ -334,6 +350,16 @@
             <p class="model-trans-intro" data-ref="modelTransIntro"></p>
             <div data-ref="modelTransList"></div>
         </details>
+        <details class="model-trans vocab-box" data-ref="vocabBox">
+            <summary><span data-ref="vocabSummary">📖 Word information (optional)</span> <span class="model-trans-count" data-ref="vocabCount"></span></summary>
+            <p class="model-trans-intro" data-ref="vocabIntro"></p>
+            <div class="vocab-actions">
+                <button type="button" class="subtle-btn" data-ref="btnVocabAi">✨ Create with AI</button>
+                <button type="button" class="subtle-btn" data-ref="btnVocabAllOk">✓ Mark all as checked</button>
+                <label class="vocab-opt"><input type="checkbox" data-ref="vocabShowForm"> <span data-ref="vocabShowFormLbl">Also show the form to students</span></label>
+            </div>
+            <div data-ref="vocabList"></div>
+        </details>
     </div>
 
     <div id="group-modal" class="modal-overlay" data-ref="groupModal">
@@ -514,6 +540,11 @@
         
         .hint-icon { position: absolute; top: -12px; right: -8px; font-size: 0.75rem; cursor: pointer; text-decoration: none; filter: grayscale(0.2); transition: filter 0.2s; z-index: 20; }
         .hint-icon:hover { filter: grayscale(0); }
+        .vocab-icon { right: auto; left: -8px; }
+        .vocab-icon .tooltip-text { text-align: left; max-width: 300px; }
+        .vocab-row { display: block; } .vocab-row + .vocab-row { margin-top: 3px; }
+        .vocab-icon:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; border-radius: 4px; }
+        @media print { .vocab-icon { display: none; } }
         .tooltip-text { visibility: hidden; width: max-content; max-width: 250px; background-color: #2a241d; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; position: absolute; z-index: 1000; bottom: 150%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.85rem; font-weight: normal; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none; white-space: normal; line-height: 1.4; text-transform: none; }
         .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #2a241d transparent transparent transparent; }
         .hint-icon.show-tooltip .tooltip-text { visibility: visible; opacity: 1; }
@@ -910,7 +941,7 @@
         function guidedContinue() { if (exMode === 'guided' && guided.hold) { guided.hold = false; guidedRender(); return true; } return false; }
         document.addEventListener('click', (e) => {
             if (!(exMode === 'guided' && guided.hold)) return;
-            if (e.target.closest('textarea, .model-compare, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal, .guide-toggle, .guide-level, .guide-more, [data-refs]')) return; // these keep working as usual
+            if (e.target.closest('textarea, .model-compare, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal, .guide-toggle, .guide-level, .guide-more, [data-refs], .hint-icon')) return; // these keep working as usual
             guidedContinue();
         }, true);
         document.addEventListener('keydown', (e) => {
@@ -2107,12 +2138,20 @@ const CONFIG = {
             btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
             lblLevel: "Grammar Level:", optBeg: "Beginner", optInt: "Intermediate", optAdv: "Advanced (All)",
             editH3: "Step 2: Editing Instruction",
-            editBody: "Check the analysis. Adjacent words merge automatically in the student view. Use 'Manual Split' to separate words. Create groups with 'Define Word Group'. With 'Mark Genitive' you can highlight a genitive attribute inside a larger group by underlining it. Double-click a word to correct it or add hints. With 'New Label' you can add a new function (e.g. Vocative). Click ▾ next to a label (or right-click it) to change its colour. Below the editor you can enter a model translation for each sentence (optional); students can open it once they have written their own translation. With 'Save Work' you can save a json file to keep working on it later; at the end, 'Export Student Page' creates an html page that you can share with your students.",
+            editBody: "Check the analysis. Adjacent words merge automatically in the student view. Use 'Manual Split' to separate words. Create groups with 'Define Word Group'. With 'Mark Genitive' you can highlight a genitive attribute inside a larger group by underlining it. Double-click a word to correct it or add hints. With 'New Label' you can add a new function (e.g. Vocative). Click ▾ next to a label (or right-click it) to change its colour. Below the editor you can enter a model translation for each sentence (optional); students can open it once they have written their own translation. Under 'Word information' the AI can suggest the dictionary form, form and meaning of each word; please check them before you export the page. With 'Save Work' you can save a json file to keep working on it later; at the end, 'Export Student Page' creates an html page that you can share with your students.",
            	wordModalTitle: "Edit Word & Hint", wordTextLabel: "Word Text:", hintLabel: "Hint (optional):", groupHintLabel: "Group Hint (optional):",
             errorHintLabel: "Hint after wrong answer (optional):",
             modelSummary: "📝 Model translations (optional)", modelCount: (n, m) => `${n} of ${m} sentences`, modelIntro: "If you enter a model translation, students can open it once they have written their own translation of the sentence, and compare the two.", modelPh: "Model translation (optional)",
             explainLabel: "Explanation after a correct answer (guided mode, optional):", phWordExplain: "E.g. The accusative points ahead to a verb that needs it.", phGroupExplain: "E.g. Expect a verb of its own at the end of the clause.",
             phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (W)", btnBracket: "Define Word Group (M)", btnAttr: "Mark Genitive (G)",
+            vocabSummary: "📖 Word information (optional)", vocabIntro: "Dictionary form, form in the text and meaning of each word. Students can open them with the 📖 on a block. Entries made by the AI are marked in orange until you have checked them: changing an entry or ticking ✓ marks it as checked.",
+            vocabAi: "✨ Create with AI", vocabAiBusy: "⏳ Creating word information…", vocabAllOk: "✓ Mark all as checked", vocabShowForm: "Also show the form (case, person …) to students",
+            vocabShowFormTitle: "Off by default: the form often gives the function away (e.g. accusative → object).",
+            vocabColWord: "Word", vocabColLemma: "Dictionary form", vocabColForm: "Form", vocabColMeaning: "Meaning", vocabColOk: "✓", vocabOkTitle: "Checked",
+            vocabLegend: "not yet checked", vocabCount: (n, u) => `${n} words` + (u ? ` · ${u} not yet checked` : ''),
+            vocabNone: "There are no words to describe yet.", vocabKeep: (k) => k === 1 ? 'One entry you have already checked is kept.' : `${k} entries you have already checked are kept.`,
+            vocabUnchecked: (n) => (n === 1 ? 'One word entry made by the AI has' : `${n} word entries made by the AI have`) + ' not been checked yet. Export anyway?',
+            vocabPrompt: (txt, list) => `You are an experienced Latin teacher. For every numbered word of the Latin text below, give:\n- "lemma": the dictionary form as in a school dictionary, with macrons. Nouns: nominative, genitive ending, gender (e.g. "castra, -ōrum n. (pl.)", "rēx, rēgis m."). Verbs: principal parts (e.g. "movēre, moveō, mōvī, mōtum"). Adjectives: e.g. "fortis, -e", "bonus, -a, -um". Words that never change: the word itself.\n- "form": the form in this text, decided from the context (e.g. "acc. pl.", "3rd sg. perf. act. ind.", "perf. pass. participle, abl. pl. f."). Words that never change: the part of speech (e.g. "preposition + acc.", "conjunction", "adverb").\n- "meaning": the English meaning that fits this context, short (1–3 words).\nReturn exactly one entry per numbered word, with its number as "i". If you are unsure, still give your best answer.\n\nText:\n${txt}\n\nWords:\n${list}`,
             btnPreview: "▶ Preview", previewTitle: "Opens the student page in a new tab, without downloading it",
             previewBanner: "<strong>Preview:</strong> this is how your students will see the page. After changes in the editor, click “Preview” again. Progress saved here does not affect the exported page.",
             btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work", btnResetColors: "🎨 Restore default colours", btnCvdColors: "👁 Colour-blind-safe colours", cvdOffTitle: "Back to the colours before",
@@ -2144,12 +2183,20 @@ const CONFIG = {
             btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
             lblLevel: "Grammatik-Level:", optBeg: "Anfänger", optInt: "Fortgeschritten", optAdv: "Profi (Alle)",
             editH3: "Schritt 2: Bearbeitung",
-            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer grösseren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe. Unter dem Editor können Sie zu jedem Satz eine Musterübersetzung eintragen (optional); die Schülerinnen und Schüler können sie öffnen, sobald sie selbst übersetzt haben. Mit 'Speichern' können Sie eine json-Datei für die spätere Bearbeitung speichern, mit 'Schülerseite exportieren' erstellen Sie am Ende eine html-Seite, die Sie mit Ihren Schülerinnen und Schülern teilen können.",
+            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer grösseren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe. Unter dem Editor können Sie zu jedem Satz eine Musterübersetzung eintragen (optional); die Schülerinnen und Schüler können sie öffnen, sobald sie selbst übersetzt haben. Unter 'Wortangaben' kann die KI zu jedem Wort Grundform, Form und Bedeutung vorschlagen; prüfen Sie diese Angaben, bevor Sie die Seite exportieren. Mit 'Speichern' können Sie eine json-Datei für die spätere Bearbeitung speichern, mit 'Schülerseite exportieren' erstellen Sie am Ende eine html-Seite, die Sie mit Ihren Schülerinnen und Schülern teilen können.",
            	wordModalTitle: "Wort & Hinweis bearbeiten", wordTextLabel: "Worttext:", hintLabel: "Hinweis (optional):", groupHintLabel: "Gruppen-Hinweis (optional):",
             errorHintLabel: "Hinweis nach falscher Antwort (optional):",
             modelSummary: "📝 Musterübersetzungen (optional)", modelCount: (n, m) => `${n} von ${m} Sätzen`, modelIntro: "Tragen Sie eine Musterübersetzung ein, können die Schülerinnen und Schüler sie öffnen, sobald sie den Satz selbst übersetzt haben, und beide vergleichen.", modelPh: "Musterübersetzung (optional)",
             explainLabel: "Erklärung nach richtiger Antwort (geführter Modus, optional):", phWordExplain: "Z.B. Der Akkusativ kündigt ein Verb an, das ihn braucht.", phGroupExplain: "Z.B. Erwarte am Ende des Nebensatzes ein eigenes Prädikat.",
             phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (W)", btnBracket: "Wortgruppe definieren (M)", btnAttr: "Genitiv markieren (G)",
+            vocabSummary: "📖 Wortangaben (optional)", vocabIntro: "Grundform, Form im Text und Bedeutung jedes Wortes. Die Schülerinnen und Schüler können sie über das 📖 an einem Block öffnen. Einträge der KI sind orange markiert, bis Sie sie geprüft haben: Ein geänderter Eintrag oder ein Häkchen bei ✓ gilt als geprüft.",
+            vocabAi: "✨ Mit KI erstellen", vocabAiBusy: "⏳ Wortangaben werden erstellt…", vocabAllOk: "✓ Alle als geprüft markieren", vocabShowForm: "Form (Kasus, Person …) auch den Schülerinnen und Schülern zeigen",
+            vocabShowFormTitle: "Standardmässig aus: Die Form verrät oft die Funktion (z. B. Akkusativ → Objekt).",
+            vocabColWord: "Wort", vocabColLemma: "Grundform", vocabColForm: "Form", vocabColMeaning: "Bedeutung", vocabColOk: "✓", vocabOkTitle: "Geprüft",
+            vocabLegend: "noch nicht geprüft", vocabCount: (n, u) => `${n} Wörter` + (u ? ` · ${u} noch nicht geprüft` : ''),
+            vocabNone: "Es gibt noch keine Wörter, zu denen Angaben gemacht werden können.", vocabKeep: (k) => k === 1 ? 'Ein bereits geprüfter Eintrag bleibt erhalten.' : `${k} bereits geprüfte Einträge bleiben erhalten.`,
+            vocabUnchecked: (n) => (n === 1 ? 'Eine Wortangabe der KI ist' : `${n} Wortangaben der KI sind`) + ' noch nicht geprüft. Trotzdem exportieren?',
+            vocabPrompt: (txt, list) => `Du bist eine erfahrene Lateinlehrkraft. Gib für jedes nummerierte Wort des folgenden lateinischen Textes an:\n- "lemma": die Grundform wie in einem Schulwörterbuch, mit Längenzeichen. Substantive: Nominativ, Genitivendung, Genus (z. B. "castra, -ōrum n. (Pl.)", "rēx, rēgis m."). Verben: Stammformen (z. B. "movēre, moveō, mōvī, mōtum"). Adjektive: z. B. "fortis, -e", "bonus, -a, -um". Unveränderliche Wörter: das Wort selbst.\n- "form": die Form in diesem Text, bestimmt aus dem Zusammenhang, mit deutschen Schulbegriffen (z. B. "Akk. Pl.", "3. Pers. Sg. Perf. Akt. Ind.", "PPP, Abl. Pl. f."). Unveränderliche Wörter: die Wortart (z. B. "Präposition mit Akk.", "Konjunktion", "Adverb").\n- "meaning": die im Zusammenhang passende deutsche Bedeutung, kurz (1–3 Wörter). Schreibe "ss" statt "ß".\nGib für jedes nummerierte Wort genau einen Eintrag mit seiner Nummer als "i" zurück. Wenn du unsicher bist, gib trotzdem deine beste Antwort.\n\nText:\n${txt}\n\nWörter:\n${list}`,
             btnPreview: "▶ Vorschau", previewTitle: "Öffnet die Schülerseite in einem neuen Tab, ohne sie herunterzuladen",
             previewBanner: "<strong>Vorschau:</strong> So sehen Ihre Schülerinnen und Schüler die Seite. Nach Änderungen im Editor erneut auf „Vorschau“ klicken. Was hier gespeichert wird, wirkt sich nicht auf die exportierte Seite aus.",
             btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden", btnResetColors: "🎨 Standardfarben wiederherstellen", btnCvdColors: "👁 Farbenblind-sichere Farben", cvdOffTitle: "Zurück zu den vorherigen Farben",
@@ -2190,6 +2237,7 @@ const AppState = {
     words: [],
     groups: [],
     functions: [],
+    vocabShowForm: false, // word information: show the form (case, person ...) on the student page too
     translations: [], // model translations, one per sentence (in the order of the editor's sentences)
     colors: { ...CONFIG.SEMANTIC_COLORS },
     lang: 'de',
@@ -2339,7 +2387,7 @@ const StorageManager = {
                 lang: AppState.lang, level: AppState.level,
                 title: DOM.pageTitle.value, image: DOM.pageImage.value,
                 text: textVal, notes: DOM.teacherNotes.value,
-                groups: AppState.groups, funcs: AppState.functions, cols: AppState.colors, words: AppState.words, translations: AppState.translations,
+                groups: AppState.groups, funcs: AppState.functions, cols: AppState.colors, words: AppState.words, translations: AppState.translations, vocabShowForm: AppState.vocabShowForm,
                 timestamp: new Date().getTime()
             };
             
@@ -2390,7 +2438,7 @@ const StorageManager = {
             text: DOM.enterText.value,
             notes: DOM.teacherNotes.value, 
             words: AppState.words, groups: AppState.groups, 
-            customFunctions: AppState.functions, customColors: AppState.colors, translations: AppState.translations
+            customFunctions: AppState.functions, customColors: AppState.colors, translations: AppState.translations, vocabShowForm: AppState.vocabShowForm
         };
         const blob = new Blob([JSON.stringify(projectData, null, 2)], {type: "application/json"});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); 
@@ -2434,6 +2482,7 @@ const StorageManager = {
         AppState.groups = data.groups || [];
         AppState.translations = Array.isArray(data.translations) ? data.translations.map(x => typeof x === 'string' ? x : '') : [];
         if (DOM.modelTransList) DOM.modelTransList.dataset.sig = '';
+        AppState.vocabShowForm = !!data.vocabShowForm; if (DOM.vocabList) DOM.vocabList.dataset.sig = '';
         AppState.history = []; 
         
         const loadWords = data.words || data.tokens || [];
@@ -2620,6 +2669,7 @@ function changeLanguage(lang) {
     DOM.attrModeBtn.textContent = txt.btnAttr;
     DOM.btnExport.textContent = txt.btnExport; 
     if (DOM.btnPreview) { DOM.btnPreview.textContent = txt.btnPreview; DOM.btnPreview.title = txt.previewTitle; }
+    if (DOM.vocabList) { DOM.vocabList.dataset.sig = ''; renderVocab(); }
     DOM.btnSaveWork.textContent = txt.btnSaveWork;
     DOM.btnResetColors.textContent = txt.btnResetColors;
     document.documentElement.lang = lang; updateTeacherCvdButton(); if (window.updateReadingAid) window.updateReadingAid();
@@ -2956,6 +3006,7 @@ function renderEditor() {
                 span.appendChild(hintIcon);
             }
             span.style.backgroundColor = AppState.colors[func]; setGenUnderline(span, AppState.colors[func]);
+            const vl = vocabLine(item.vi, true); if (vl) span.title = vl; // word information: shown on pointing, for checking
         } else { 
             span.dataset.func = CONFIG.PUNCT; 
         }
@@ -2994,6 +3045,114 @@ function renderEditor() {
     
     updateGroupUI();
     renderModelTranslations();
+    renderVocab();
+}
+
+// ---------- Word information (dictionary form, form, meaning): made by the AI or typed in, checked by the teacher ----------
+function vocabHas(vi) { return !!vi && !!((vi.l || '').trim() || (vi.f || '').trim() || (vi.m || '').trim()); }
+function vocabLine(vi, withForm) {
+    if (!vocabHas(vi)) return '';
+    return [vi.l, withForm ? vi.f : '', vi.m].map(x => (x || '').trim()).filter(Boolean).join(' – ');
+}
+function vocabStats() {
+    let n = 0, u = 0;
+    AppState.words.forEach(w => { if (w.f === CONFIG.PUNCT) return; n++; if (vocabHas(w.vi) && !w.vi.ok) u++; });
+    return { n, u };
+}
+function sentenceIndexGroups() {
+    const out = []; let cur = [];
+    AppState.words.forEach((item, i) => {
+        cur.push(i);
+        const w = item.w || '';
+        let br = item.f === CONFIG.PUNCT && CONFIG.SENTENCE_ENDERS.some(c => w.includes(c));
+        if (item.b === 1) br = true; if (item.b === -1) br = false;
+        if (br && i < AppState.words.length - 1) { out.push(cur); cur = []; }
+    });
+    if (cur.length) out.push(cur);
+    return out;
+}
+function renderVocab(force) {
+    const list = DOM.vocabList; if (!list) return;
+    const txt = CONFIG.LANG_TEXT[AppState.lang];
+    DOM.vocabSummary.textContent = txt.vocabSummary; DOM.vocabIntro.textContent = txt.vocabIntro;
+    DOM.btnVocabAi.textContent = DOM.btnVocabAi.disabled ? txt.vocabAiBusy : txt.vocabAi; DOM.btnVocabAllOk.textContent = txt.vocabAllOk;
+    DOM.vocabShowFormLbl.textContent = txt.vocabShowForm; DOM.vocabShowForm.parentElement.title = txt.vocabShowFormTitle; DOM.vocabShowForm.checked = !!AppState.vocabShowForm;
+    const updateCount = () => {
+        const st = vocabStats(); const any = AppState.words.some(w => vocabHas(w.vi));
+        DOM.vocabCount.textContent = any ? '· ' + txt.vocabCount(st.n, st.u) : '';
+        DOM.btnVocabAllOk.style.display = st.u ? '' : 'none';
+    };
+    const sents = sentenceIndexGroups();
+    const sig = AppState.lang + '|' + AppState.words.map(w => w.w + '/' + (w.f === CONFIG.PUNCT ? 'p' : '')).join(' ');
+    if (!force && list.dataset.sig === sig) { updateCount(); return; }
+    list.dataset.sig = sig; list.innerHTML = '';
+    const la = editorSentences();
+    sents.forEach((idxs, si) => {
+        const words = idxs.filter(i => AppState.words[i].f !== CONFIG.PUNCT); if (!words.length) return;
+        const box = document.createElement('div'); box.className = 'vocab-sent';
+        const head = document.createElement('div'); head.className = 'model-trans-la'; head.textContent = (sents.length > 1 ? (si + 1) + '. ' : '') + (la[si] || '');
+        const table = document.createElement('table'); table.className = 'vocab-table';
+        table.innerHTML = `<thead><tr><th>${txt.vocabColWord}</th><th>${txt.vocabColLemma}</th><th>${txt.vocabColForm}</th><th>${txt.vocabColMeaning}</th><th title="${txt.vocabOkTitle}">${txt.vocabColOk}</th></tr></thead>`;
+        const tb = document.createElement('tbody');
+        words.forEach(i => {
+            const w = AppState.words[i]; const tr = document.createElement('tr');
+            const setState = () => tr.classList.toggle('unchecked', vocabHas(w.vi) && !w.vi.ok);
+            const tdW = document.createElement('td'); tdW.className = 'vw'; tdW.textContent = w.w; tr.appendChild(tdW);
+            const inputs = {};
+            [['l', txt.vocabColLemma], ['f', txt.vocabColForm], ['m', txt.vocabColMeaning]].forEach(([k, ph]) => {
+                const td = document.createElement('td'); const inp = document.createElement('input'); inp.type = 'text';
+                inp.value = (w.vi && w.vi[k]) || ''; inp.placeholder = ph; inp.setAttribute('aria-label', ph + ': ' + w.w); inputs[k] = inp;
+                inp.addEventListener('input', () => {
+                    w.vi = Object.assign({}, w.vi, { [k]: inp.value, ok: true });
+                    if (!vocabHas(w.vi)) delete w.vi;
+                    ok.checked = !!(w.vi && w.vi.ok); setState(); updateCount(); vocabSyncWord(i); StorageManager.debouncedAutoSave();
+                });
+                td.appendChild(inp); tr.appendChild(td);
+            });
+            const tdOk = document.createElement('td'); tdOk.className = 'vok'; const ok = document.createElement('input'); ok.type = 'checkbox';
+            ok.checked = !!(w.vi && w.vi.ok); ok.title = txt.vocabOkTitle; ok.setAttribute('aria-label', txt.vocabOkTitle + ': ' + w.w);
+            ok.addEventListener('change', () => { if (!vocabHas(w.vi)) { ok.checked = false; return; } w.vi.ok = ok.checked; setState(); updateCount(); StorageManager.debouncedAutoSave(); });
+            tdOk.appendChild(ok); tr.appendChild(tdOk);
+            setState(); tb.appendChild(tr);
+        });
+        table.appendChild(tb); box.append(head, table); list.appendChild(box);
+    });
+    if (AppState.words.some(w => vocabHas(w.vi) && !w.vi.ok)) {
+        const lg = document.createElement('div'); lg.className = 'vocab-legend'; lg.innerHTML = `<b></b>${txt.vocabLegend}`; list.prepend(lg);
+    }
+    updateCount();
+}
+function vocabSyncWord(i) {
+    const span = document.getElementById('word-' + i); if (!span) return;
+    const vl = vocabLine(AppState.words[i].vi, true); if (vl) span.title = vl; else span.removeAttribute('title');
+}
+async function generateVocabAI() {
+    const txt = CONFIG.LANG_TEXT[AppState.lang];
+    const useProxy = !!CONFIG.AI.PROXY_URL;
+    if (!useProxy && !getAiKey()) { alert(txt.aiErrNoKey); openAiKeyModal(); return; }
+    const idxs = AppState.words.map((w, i) => i).filter(i => AppState.words[i].f !== CONFIG.PUNCT && LatinCore.hasLetters(AppState.words[i].w));
+    if (!idxs.length) { alert(txt.vocabNone); return; }
+    const list = idxs.map(i => `${i}: ${AppState.words[i].w}`).join('\n');
+    const schema = { type: 'object', additionalProperties: false, required: ['entries'], properties: { entries: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['i', 'lemma', 'form', 'meaning'], properties: { i: { type: 'integer' }, lemma: { type: 'string' }, form: { type: 'string' }, meaning: { type: 'string' } } } } } };
+    const btn = DOM.btnVocabAi; btn.disabled = true; btn.textContent = txt.vocabAiBusy;
+    try {
+        const out = await callAI(txt.vocabPrompt(editorSentences().join('\n'), list), 'latin_vocabulary', schema);
+        if (!out) return;
+        let d; try { d = JSON.parse(out); } catch (e) { alert(txt.aiErrOther + 'invalid JSON'); return; }
+        const valid = new Set(idxs); let kept = 0;
+        (d.entries || []).forEach(e => {
+            if (!e || !valid.has(e.i)) return;
+            const w = AppState.words[e.i];
+            if (w.vi && w.vi.ok && vocabHas(w.vi)) { kept++; return; } // never overwrite what the teacher has checked
+            const vi = { l: String(e.lemma || '').trim(), f: String(e.form || '').trim(), m: String(e.meaning || '').trim().replace(/ß/g, AppState.lang === 'de' ? 'ss' : 'ß'), ok: false };
+            if (vocabHas(vi)) w.vi = vi;
+        });
+        AppState.dirty = true; StorageManager.debouncedAutoSave();
+        DOM.vocabBox.open = true; renderEditor(); renderVocab(true);
+        if (kept) alert(txt.vocabKeep(kept));
+    } finally {
+        btn.disabled = false; btn.textContent = CONFIG.LANG_TEXT[AppState.lang].vocabAi;
+    }
 }
 
 // The sentences of the exercise as the student page will split them (same rule as the boxes above)
@@ -3169,6 +3328,9 @@ function initEventListeners() {
     DOM.attrModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.ATTR ? MODES.TAGGING : MODES.ATTR));
     DOM.btnExport.addEventListener('click', () => exportToStudent(false));
     DOM.btnPreview.addEventListener('click', () => exportToStudent(true));
+    DOM.btnVocabAi.addEventListener('click', generateVocabAI);
+    DOM.btnVocabAllOk.addEventListener('click', () => { AppState.words.forEach(w => { if (vocabHas(w.vi)) w.vi.ok = true; }); renderVocab(true); StorageManager.debouncedAutoSave(); });
+    DOM.vocabShowForm.addEventListener('change', () => { AppState.vocabShowForm = DOM.vocabShowForm.checked; StorageManager.debouncedAutoSave(); });
     DOM.btnSaveWork.addEventListener('click', () => StorageManager.exportProject());
     DOM.btnResetColors.addEventListener('click', restoreDefaultColors);
     DOM.btnCvdColors.addEventListener('click', toggleColorBlindColors);
@@ -3857,6 +4019,20 @@ async function analyzeWithAI() {
     const btn = DOM.btnAnalyzeAi;
     btn.disabled = true; btn.textContent = t.btnAnalyzeBusy;
     DOM.grammarLevelSetup.disabled = true; // the label list is part of the request
+    try {
+        const out = await callAI(buildAIPrompt(txt), 'latin_analysis', buildAISchema());
+        if (out) importAI(out);
+    } finally {
+        btn.disabled = false; btn.textContent = CONFIG.LANG_TEXT[AppState.lang].btnAnalyze;
+        DOM.grammarLevelSetup.disabled = false;
+    }
+}
+
+// One request to the AI (directly or through the proxy). Returns the answer text, or null after telling the teacher what went wrong.
+async function callAI(input, schemaName, schema) {
+    const t = CONFIG.LANG_TEXT[AppState.lang];
+    const useProxy = !!CONFIG.AI.PROXY_URL;
+    const key = useProxy ? '' : getAiKey();
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), CONFIG.AI.TIMEOUT_MS);
     try {
@@ -3868,9 +4044,9 @@ async function analyzeWithAI() {
             headers: headers,
             body: JSON.stringify({
                 model: CONFIG.AI.MODEL,
-                input: buildAIPrompt(txt),
+                input: input,
                 reasoning: { effort: CONFIG.AI.EFFORT },
-                text: { format: { type: 'json_schema', name: 'latin_analysis', schema: buildAISchema(), strict: true } }
+                text: { format: { type: 'json_schema', name: schemaName, schema: schema, strict: true } }
             })
         });
         const data = await res.json().catch(() => ({}));
@@ -3881,24 +4057,23 @@ async function analyzeWithAI() {
             else if (res.status === 429 && billingCodes.includes(err.code)) alert(t.aiErrBilling);
             else if (res.status === 429) alert(t.aiErrRate);
             else alert(t.aiErrOther + (err.message || ('HTTP ' + res.status)));
-            return;
+            return null;
         }
         // Responses API: the text sits in the "message" output item (not necessarily output[0]) as an "output_text" part.
         const message = (data.output || []).find(o => o.type === 'message');
         const parts = (message && message.content) || [];
         const refusal = parts.find(p => p.type === 'refusal');
         const textPart = parts.find(p => p.type === 'output_text');
-        if (refusal) { alert(t.aiErrRefusal); return; }
-        if (data.status === 'incomplete') { alert(t.aiErrIncomplete); return; }
-        if (data.status !== 'completed' || !textPart) { alert(t.aiErrOther + (err.message || data.status || 'empty response')); return; }
-        importAI(textPart.text);
+        if (refusal) { alert(t.aiErrRefusal); return null; }
+        if (data.status === 'incomplete') { alert(t.aiErrIncomplete); return null; }
+        if (data.status !== 'completed' || !textPart) { alert(t.aiErrOther + (err.message || data.status || 'empty response')); return null; }
+        return textPart.text;
     } catch (e) {
         console.error("OpenAI request failed:", e); // AbortError (timeout) or TypeError (network / CORS)
         alert(t.aiErrNetwork);
+        return null;
     } finally {
         clearTimeout(timer);
-        btn.disabled = false; btn.textContent = CONFIG.LANG_TEXT[AppState.lang].btnAnalyze;
-        DOM.grammarLevelSetup.disabled = false;
     }
 }
 
@@ -3964,7 +4139,8 @@ let PREVIEW_BUILD = false, lastPreviewUrl = null;
 function exportToStudent(preview) {
     PREVIEW_BUILD = !!preview;
     let previewTab = null;
-    if (PREVIEW_BUILD) { previewTab = window.open('', '_blank'); } // opened at once, inside the click, so pop-up blockers allow it
+    if (PREVIEW_BUILD) { previewTab = window.open('', '_blank'); }
+    else { const st = vocabStats(); if (st.u && !confirm(CONFIG.LANG_TEXT[AppState.lang].vocabUnchecked(st.u))) return; } // opened at once, inside the click, so pop-up blockers allow it
     // Dynamic fetching of the templates from cache directly upon export
     const STUDENT_PAGE_CSS = DOM.templateStudentCss.textContent;
     const STUDENT_PAGE_JS = DOM.templateStudentJs.textContent;
@@ -4008,6 +4184,7 @@ function exportToStudent(preview) {
             current.segments.push({
                 w: token.w,
                 u: token.u,
+                vi: vocabHas(token.vi) ? token.vi : null,
                 space: (['.', ',', ';', ':', '!', '?'].includes(token.w) ? '' : ' ')
             });
             current.originalIndices.push(token.idx);
@@ -4025,7 +4202,7 @@ function exportToStudent(preview) {
                 eh: token.eh,
                 ex: token.ex,
                 b: token.b,
-                segments: [{ w: token.w, u: token.u, space: '' }]
+                segments: [{ w: token.w, u: token.u, space: '', vi: vocabHas(token.vi) ? token.vi : null }]
             };
         }
     });
@@ -4243,6 +4420,9 @@ function generateExerciseHTML(words, groups, placeholder, lang, models) {
         
         // Template literals allow multi-line strings and easy variable injection
         const hintHtml = word.hint ? hintIconHtml(safeWordHint) : '';
+        // word information: one 📖 per block, listing the words that have an entry
+        const vEntries = isPunct ? [] : (word.segments || []).filter(seg => seg.vi);
+        const vocabHtml = vEntries.length ? `<span class="hint-icon vocab-icon" role="button" tabindex="0" title="${lang === 'de' ? 'Wortangaben' : 'Word information'}" aria-label="${lang === 'de' ? 'Wortangaben' : 'Word information'}" onclick="${hintToggle}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">📖<span class="tooltip-text">${vEntries.map(seg => `<span class="vocab-row"><b>${escapeHTML(seg.w)}</b> ${escapeHTML(vocabLine(seg.vi, AppState.vocabShowForm))}</span>`).join('')}</span></span>` : '';
 
         // Using .map() and .join('') for the segments instead of manual loops
         const safeWordHtml = word.segments.map(seg => `${seg.space ? ' ' : ''}<span class="s-text" data-u="${seg.u ? 'true' : 'false'}">${escapeHTML(seg.w)}</span>`).join('');
@@ -4251,7 +4431,7 @@ function generateExerciseHTML(words, groups, placeholder, lang, models) {
         const errHintAttr = (word.eh ? ` data-errhint="${escapeHTML(word.eh)}"` : '') + (word.ex ? ` data-explain="${escapeHTML(word.ex)}"` : '');
         const content = isPunct 
             ? `<span class="punct">${safeWordHtml}</span>` 
-            : `<span class="hover-word" tabindex="0" data-ans="${safeFunc}"${errHintAttr}>${safeWordHtml}${hintHtml}</span>`;
+            : `<span class="hover-word" tabindex="0" data-ans="${safeFunc}"${errHintAttr}>${safeWordHtml}${hintHtml}${vocabHtml}</span>`;
 
         let openDivs = "";
         let closeDivs = "";
