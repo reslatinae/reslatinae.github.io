@@ -21,21 +21,23 @@
         en: {
             beginner: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Prepositional phrase', 'Vocative', 'Other'],
             intermediate: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other'],
-            advanced: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Accusative/Nominative with infinitive', 'Participial phrase', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other']
+            advanced: ['Subject', 'Verb', 'Accusative object', 'Dative object', 'Genitive object', 'Ablative', 'Ablative absolute', 'Predicative', 'Prepositional phrase', 'Adverb', 'Infinitive', 'Accusative/Nominative with infinitive', 'Participle', 'Relative clause', 'Subordinate clause', 'Conjunction', 'Subjunction', 'Vocative', 'Other']
         },
         de: {
             beginner: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Präpositionale Bestimmung', 'Vokativ', 'Sonstiges'],
             intermediate: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverbiale Bestimmung', 'Infinitiv', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges'],
-            advanced: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverbiale Bestimmung', 'Infinitiv', 'AcI/NcI', 'Partizipialkonstruktion', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges']
+            advanced: ['Subjekt', 'Prädikat', 'Akkusativobjekt', 'Dativobjekt', 'Genitivobjekt', 'Ablativ', 'Ablativus absolutus', 'Prädikativum', 'Präpositionale Bestimmung', 'Adverbiale Bestimmung', 'Infinitiv', 'AcI/NcI', 'Partizip', 'Relativsatz', 'Nebensatz', 'Konjunktion', 'Subjunktion', 'Vokativ', 'Sonstiges']
         }
     };
 
     // Labels for clause brackets ("Klammern"). Unlike PRESETS, which shrinks at lower levels, this list
     // applies at every level: a beginner exercise can still carry a correctly labelled Relativsatz bracket
     // even though that word never appears in the beginner word-label list (Anke's decision, 2026-09-06).
+    // A participle is labelled as a single word ("Partizip"); the phrase around it is usually bracketed with the job
+    // it does in the sentence (e.g. Subjekt). "Partizip" stays available as a bracket name as well (2026-11-01).
     const GROUP_LABELS = {
-        en: ['Subordinate clause', 'Relative clause', 'Accusative/Nominative with infinitive', 'Participial phrase', 'Ablative absolute'],
-        de: ['Nebensatz', 'Relativsatz', 'AcI/NcI', 'Partizipialkonstruktion', 'Ablativus absolutus']
+        en: ['Subordinate clause', 'Relative clause', 'Accusative/Nominative with infinitive', 'Participle', 'Ablative absolute'],
+        de: ['Nebensatz', 'Relativsatz', 'AcI/NcI', 'Partizip', 'Ablativus absolutus']
     };
 
     function isGroupLabel(label, lang) { return GROUP_LABELS[lang].indexOf(label) !== -1; }
@@ -63,7 +65,8 @@
         'Predicative': '#fca5a5', 'Prädikativum': '#fca5a5',                          // Rose
         'Conjunction': '#d6d3d1', 'Konjunktion': '#d6d3d1',                           // Warm Grey
         'Subjunction': '#f3f4f6', 'Subjunktion': '#f3f4f6',                           // Light Grey
-        'Participial phrase': '#5eead4', 'Partizipialkonstruktion': '#5eead4',        // Teal
+        'Participle': '#5eead4', 'Partizip': '#5eead4',                              // Teal
+        'Participial phrase': '#5eead4', 'Partizipialkonstruktion': '#5eead4',        // Teal (older exercises)
         'Subordinate clause': '#818cf8', 'Nebensatz': '#818cf8',                      // Indigo
         'Relative clause': '#a7f3d0', 'Relativsatz': '#a7f3d0',                       // Pale Mint
         'Accusative/Nominative with infinitive': '#c084fc', 'AcI/NcI': '#c084fc',     // Bright Purple
@@ -80,8 +83,8 @@
     const SAFE_COLORS = ['#bb9988', '#ffeeaa', '#999955', '#77dd66', '#66ddff', '#6699ff', '#ffaabb', '#ccffdd', '#889999', '#aaaacc'];
 
     const ABBREVIATIONS = {
-        en: { 'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Conjunction': 'Conj', 'Subjunction': 'Subjunc', 'Accusative/Nominative with infinitive': 'Acc/Nom+Inf', 'Vocative': 'Voc', 'Other': 'Other' },
-        de: { 'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverbiale Bestimmung': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'N.satz', 'Konjunktion': 'Konj', 'Subjunktion': 'Subjunk', 'AcI/NcI': 'AcI/NcI', 'Vokativ': 'Vok', 'Sonstiges': 'Sonst.' }
+        en: { 'Subject': 'Subj', 'Accusative object': 'Acc. Obj', 'Dative object': 'Dat. Obj', 'Genitive object': 'Gen. Obj', 'Ablative': 'Abl', 'Ablative absolute': 'Abl. Abs.', 'Predicative': 'Pred', 'Prepositional phrase': 'Prep. Phr', 'Adverb': 'Adv', 'Verb': 'Verb', 'Infinitive': 'Inf', 'Participle': 'Ptc', 'Participial phrase': 'Part. Phr', 'Relative clause': 'Rel. Cl', 'Subordinate clause': 'Sub. Cl', 'Conjunction': 'Conj', 'Subjunction': 'Subjunc', 'Accusative/Nominative with infinitive': 'Acc/Nom+Inf', 'Vocative': 'Voc', 'Other': 'Other' },
+        de: { 'Subjekt': 'Subj', 'Akkusativobjekt': 'Akk. Obj', 'Dativobjekt': 'Dat. Obj', 'Genitivobjekt': 'Gen. Obj', 'Ablativ': 'Abl', 'Ablativus absolutus': 'Abl. Abs.', 'Prädikativum': 'Präd', 'Präpositionale Bestimmung': 'Präp. Best.', 'Adverbiale Bestimmung': 'Adv', 'Prädikat': 'Prädikat', 'Infinitiv': 'Inf', 'Partizip': 'Part', 'Partizipialkonstruktion': 'Part. Konstr', 'Relativsatz': 'Rel. Satz', 'Nebensatz': 'N.satz', 'Konjunktion': 'Konj', 'Subjunktion': 'Subjunk', 'AcI/NcI': 'AcI/NcI', 'Vokativ': 'Vok', 'Sonstiges': 'Sonst.' }
     };
 
     // Keyboard shortcuts in the editor and on the student page. Keys x, m, w, g are reserved for the tools.
@@ -98,7 +101,7 @@
         'Adverb': 'e', 'Adverbiale Bestimmung': 'e',
         'Infinitive': 'i', 'Infinitiv': 'i',
         'Accusative/Nominative with infinitive': 'c', 'AcI/NcI': 'c',
-        'Participial phrase': 'z', 'Partizipialkonstruktion': 'z',
+        'Participle': 'z', 'Partizip': 'z',
         'Relative clause': 't', 'Relativsatz': 't',
         'Subordinate clause': 'n', 'Nebensatz': 'n',
         'Conjunction': 'k', 'Konjunktion': 'k',
@@ -109,8 +112,8 @@
 
     // Names used in exercises exported by earlier versions of the tool, mapped onto today's labels.
     const LEGACY = {
-        en: { 'Accusative with infinitive': 'Accusative/Nominative with infinitive', 'AcI': 'Accusative/Nominative with infinitive' },
-        de: { 'Verb': 'Prädikat', 'AcI': 'AcI/NcI', 'Accusative with infinitive': 'AcI/NcI', 'Adverb': 'Adverbiale Bestimmung' }
+        en: { 'Accusative with infinitive': 'Accusative/Nominative with infinitive', 'AcI': 'Accusative/Nominative with infinitive', 'Participial phrase': 'Participle' },
+        de: { 'Verb': 'Prädikat', 'AcI': 'AcI/NcI', 'Accusative with infinitive': 'AcI/NcI', 'Adverb': 'Adverbiale Bestimmung', 'Partizipialkonstruktion': 'Partizip' }
     };
 
     const lower = (s) => String(s == null ? '' : s).trim().toLowerCase();
@@ -154,7 +157,7 @@
             if (l.includes('subordinate')) return 'Nebensatz';
             if (l.includes('conjunction') || l.includes('konjunktion')) return 'Konjunktion';
             if (l.includes('subjunction')) return 'Subjunktion';
-            if (l.includes('participial')) return 'Partizipialkonstruktion';
+            if (l.includes('participial') || l.includes('participle')) return 'Partizip';
             if (l.includes('subject')) return 'Subjekt';
             if (l.includes('infinitive') && !l.includes('with')) return 'Infinitiv';
             if (l === 'verb') return 'Prädikat';
@@ -171,7 +174,7 @@
             if (l.includes('neben')) return 'Subordinate clause';
             if (l.includes('konjunktion') || l.includes('conjunction')) return 'Conjunction';
             if (l.includes('subjunktion')) return 'Subjunction';
-            if (l.includes('partizipial')) return 'Participial phrase';
+            if (l.includes('partizip')) return 'Participle';
             if (l.includes('subjekt')) return 'Subject';
             if (l.includes('infinitiv') && !l.includes('aci')) return 'Infinitive';
             if (l.includes('vocative') || l.includes('vokativ')) return 'Vocative';
