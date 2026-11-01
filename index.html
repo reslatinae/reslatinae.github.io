@@ -90,7 +90,8 @@
         .tag-word .hint-icon { position: absolute; top: -12px; right: -8px; font-size: 0.7rem; }
         .hint-icon .tooltip-text { visibility: hidden; width: max-content; max-width: 250px; background-color: #2a241d; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; position: absolute; z-index: 1000; bottom: 150%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.85rem; font-weight: normal; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none; white-space: normal; line-height: 1.4; }
         .hint-icon .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #2a241d transparent transparent transparent; }
-        .hint-icon.show-tooltip .tooltip-text { visibility: visible; opacity: 1; }
+        .hint-icon .tooltip-text { display: none; }
+        .hint-icon.show-tooltip .tooltip-text { display: block; visibility: visible; opacity: 1; }
         .punct-span { display: inline-block; margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; padding: 2px 2px; font-size: 1.15rem; vertical-align: bottom; color: #1d1914; position: relative; font-weight: 500; cursor: pointer; user-select: none; border-bottom: 2px solid transparent; height: 1.6rem; line-height: 1.6rem; transition: margin-top 0.3s ease, opacity 0.2s; }
         .split-right { border-right: 3px dashed #ef4444 !important; margin-right: 12px !important; }
         
@@ -142,6 +143,12 @@
         .vocab-table tr.unchecked input[type=text] { background: #fffaf0; }
         .vocab-table td.vok { width: 1%; text-align: center; }
         .vocab-legend { font-size: 0.8rem; color: #6b6052; margin: -4px 0 10px; }
+        .vocab-legend span + span { margin-left: 14px; }
+        .vocab-legend i { display: inline-block; width: 10px; height: 10px; background: #e4ddd1; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
+        .vocab-table tr.vhidden td.vw, .vocab-table tr.vhidden input[type=text] { color: #8a7f6f; }
+        .vocab-table tr.vhidden input[type=text] { background: #f6f3ee; }
+        .vocab-table td.vw { border-left-width: 3px; }
+        .vocab-table tr.vhidden td.vw { border-left-color: #e4ddd1; }
         .vocab-legend b { display: inline-block; width: 10px; height: 10px; background: #d49a2a; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
         body.high-contrast .vocab-table input[type=text] { background: #2d2d2d; color: #fff; border-color: #555; }
         body.high-contrast .vocab-table td.vw, body.high-contrast .vocab-table th, body.high-contrast .vocab-opt { color: #fff; }
@@ -356,6 +363,8 @@
             <div class="vocab-actions">
                 <button type="button" class="subtle-btn" data-ref="btnVocabAi">✨ Create with AI</button>
                 <button type="button" class="subtle-btn" data-ref="btnVocabAllOk">✓ Mark all as checked</button>
+                <button type="button" class="subtle-btn" data-ref="btnVocabShowAll">Show all</button>
+                <button type="button" class="subtle-btn" data-ref="btnVocabShowNone">Show none</button>
                 <label class="vocab-opt"><input type="checkbox" data-ref="vocabShowForm"> <span data-ref="vocabShowFormLbl">Also show the form to students</span></label>
             </div>
             <div data-ref="vocabList"></div>
@@ -541,13 +550,29 @@
         .hint-icon { position: absolute; top: -12px; right: -8px; font-size: 0.75rem; cursor: pointer; text-decoration: none; filter: grayscale(0.2); transition: filter 0.2s; z-index: 20; }
         .hint-icon:hover { filter: grayscale(0); }
         .vocab-icon { right: auto; left: -8px; }
-        .vocab-icon .tooltip-text { text-align: left; max-width: 300px; }
-        .vocab-row { display: block; } .vocab-row + .vocab-row { margin-top: 3px; }
+        #vocab-pop { position: fixed; z-index: 3000; box-sizing: border-box; width: max-content; max-width: min(400px, calc(100vw - 16px)); max-height: min(60vh, 440px); overflow-y: auto;
+            background: #2a241d; color: #fff; border-radius: 8px; padding: 8px 12px 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); font-size: 0.88rem; line-height: 1.4; text-align: left; }
+        #vocab-pop[hidden] { display: none; }
+        #vocab-pop .vp-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #e8d6b5; margin-bottom: 6px; }
+        #vocab-pop .vp-close { border: none; background: transparent; color: #fff; font-size: 1rem; line-height: 1; cursor: pointer; padding: 2px 4px; border-radius: 4px; }
+        #vocab-pop .vp-close:hover, #vocab-pop .vp-close:focus-visible { background: rgba(255,255,255,0.15); outline: none; }
+        #vocab-pop .vp-hint { max-width: 340px; }
+        #vocab-pop .vp-row { display: block; padding: 5px 0; border-top: 1px solid rgba(255,255,255,0.14); }
+        #vocab-pop .vp-row:first-of-type { border-top: none; }
+        #vocab-pop .vp-w { color: #fff; margin-right: 6px; }
+        #vocab-pop .vp-l { color: #f3ead8; }
+        #vocab-pop .vp-f { display: block; color: #cfc3ad; font-size: 0.82rem; }
+        #vocab-pop .vp-m { display: block; color: #fff; font-style: italic; }
+        body.high-contrast #vocab-pop { background: #fff; color: #000; border: 1px solid #ccc; }
+        body.high-contrast #vocab-pop .vp-w, body.high-contrast #vocab-pop .vp-m, body.high-contrast #vocab-pop .vp-close { color: #000; }
+        body.high-contrast #vocab-pop .vp-l, body.high-contrast #vocab-pop .vp-f, body.high-contrast #vocab-pop .vp-head { color: #333; }
+        body.high-contrast #vocab-pop .vp-row { border-top-color: #ddd; }
+        html.reading-aid #vocab-pop .vp-m { font-style: normal; font-weight: 600; }
         .vocab-icon:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; border-radius: 4px; }
         @media print { .vocab-icon { display: none; } }
         .tooltip-text { visibility: hidden; width: max-content; max-width: 250px; background-color: #2a241d; color: #fff; text-align: center; border-radius: 6px; padding: 6px 10px; position: absolute; z-index: 1000; bottom: 150%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.2s; font-size: 0.85rem; font-weight: normal; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); pointer-events: none; white-space: normal; line-height: 1.4; text-transform: none; }
         .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #2a241d transparent transparent transparent; }
-        .hint-icon.show-tooltip .tooltip-text { visibility: visible; opacity: 1; }
+        .hint-icon .tooltip-text { display: none; } /* shown in the on-screen box (#vocab-pop); a hidden box here would still widen the sentence area */
 
         .radio-menu { display: none; position: absolute; background-color: white; border: 1px solid #efeae1; padding: 4px 0; z-index: 1000; border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 85vh; overflow-y: auto; min-width: 150px; line-height: 1.2; }
         .menu-btn { display: block; width: 100%; text-align: left; border: none; background: transparent; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: #3a3329; transition: background-color 0.1s; font-family: inherit; }
@@ -635,6 +660,27 @@
         body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #121212; color: #fff; border: 1px solid #333; }
         body.high-contrast .sentence-container { background-color: #1e1e1e; border: 1px solid #444; }
         body.high-contrast .trans-box { border-top-color: #444; }
+        .trans-plan { margin: 0 0 12px; padding: 10px 14px; background: #fbf8f2; border: 1px solid #ece4d6; border-radius: 8px; font-size: 0.92rem; color: #2a241d; }
+        .trans-plan summary { cursor: pointer; font-weight: 600; color: #6b4d24; }
+        .trans-plan .tp-intro { margin: 6px 0 8px; font-size: 0.84rem; color: #4a4236; }
+        .trans-plan ol { margin: 0; padding-left: 0; list-style: none; }
+        .trans-plan li { margin: 0 0 10px; }
+        .trans-plan .tp-head { font-weight: 600; font-size: 0.86rem; margin-bottom: 4px; }
+        .trans-plan .tp-chain { line-height: 2; }
+        .trans-plan .tp-item { display: inline-block; line-height: 1.35; padding: 2px 8px; background: #fff; border: 1px solid #e4ddd1; border-left: 5px solid #d6cfc2; border-radius: 5px; }
+        .trans-plan .tp-w { font-weight: 600; }
+        .trans-plan .tp-l { font-size: 0.78rem; color: #6b6052; }
+        .trans-plan .tp-ref { font-size: 0.8rem; color: #1d4ed8; font-weight: 600; }
+        .trans-plan .tp-conj { font-style: italic; font-weight: 600; }
+        .trans-plan .tp-nosubj { font-style: italic; color: #4a4236; border-left-color: #c9bfae; border-style: dashed; border-left-style: solid; }
+        .trans-plan .tp-sep { color: #8a7f6f; }
+        .trans-plan .tp-how { font-size: 0.82rem; color: #4a4236; margin-top: 2px; }
+        html.reading-aid .trans-plan .tp-conj, html.reading-aid .trans-plan .tp-nosubj { font-style: normal; }
+        body.high-contrast .trans-plan { background: #1e1e1e; border-color: #555; color: #fff; }
+        body.high-contrast .trans-plan summary { color: #f0c987; }
+        body.high-contrast .trans-plan .tp-item { background: #2d2d2d; border-color: #555; color: #fff; }
+        body.high-contrast .trans-plan .tp-l, body.high-contrast .trans-plan .tp-intro, body.high-contrast .trans-plan .tp-how, body.high-contrast .trans-plan .tp-nosubj { color: #ddd; }
+        body.high-contrast .trans-plan .tp-ref { color: #93c5fd; }
         .model-compare { margin-top: 8px; }
         .model-btn { font: inherit; font-size: 0.88rem; padding: 6px 12px; border-radius: 6px; border: 1px solid #d9cfbf; background: #fdfbf7; color: #1d4ed8; cursor: pointer; }
         .model-btn:disabled { color: #6b6052; cursor: not-allowed; background: #f6f3ee; }
@@ -730,6 +776,18 @@
                 collapse: 'Hinweisfeld verkleinern', expand: 'Hinweisfeld vergrössern',
                 cont: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Block zu gehen.', contSentence: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Satz zu gehen.', contEnd: 'Klicke irgendwo auf die Seite (oder drücke Enter), um abzuschliessen.',
                 solution: 'Lösung zeigen', solutionShown: 'Die richtige Antwort ist',
+                // Translation plan (shown under a sentence once it is fully analysed)
+                planTitle: '📝 Übersetzungsplan', planIntro: 'Ein Vorschlag für die Reihenfolge im Deutschen – oft klingt eine andere Reihenfolge besser. Nebensätze kannst du vor oder nach dem Hauptsatz übersetzen.',
+                planHint: ' Unter dem Satz schlägt dir ein Übersetzungsplan eine Reihenfolge vor.',
+                uMain: 'Hauptsatz', uPart: (n) => `Teil ${n}`, uSub: 'Nebensatz', uRel: 'Relativsatz', uAci: 'AcI/NcI', uAbl: 'Ablativus absolutus', uPtc: 'Partizipialkonstruktion',
+                howMain: 'Im deutschen Hauptsatz steht das Prädikat an zweiter Stelle.',
+                howSub: 'Im deutschen Nebensatz steht das Prädikat am Ende.',
+                howRel: 'Das Relativpronomen bleibt vorne, das Prädikat steht am Ende. Stelle den Relativsatz direkt hinter das Wort, auf das er sich bezieht.',
+                howAci: 'Übersetze als „dass“-Satz: Der Akkusativ wird Subjekt, der Infinitiv Prädikat (am Ende). Beim NcI hilft „man sagt, dass …“ oder „soll …“.',
+                howAbl: 'Übersetze als Nebensatz (nachdem, weil, als …) oder mit einer Präposition (nach, wegen, trotz …).',
+                howPtc: 'Übersetze als Relativsatz, als Nebensatz oder mit „und“ – achte auf das Zeitverhältnis.',
+                noSubj: 'Subjekt aus der Personalendung (er, sie, es …)', sameSubj: 'gleiches Subjekt wie in Teil 1 (oft genügt „und …“)', toUnit: (n) => `→ ${n}`,
+                asDass: '„dass“-Satz', asClause: 'Nebensatz/Präposition',
                 // Less help as the student gets better: short instructions after a run of correct first answers, full help again after mistakes
                 briefLabel: 'Welche Funktion hat der blau umrandete Block?', briefGroup: 'Klammer: Um welche Einheit handelt es sich?',
                 briefGen: (n) => `Genitivattribut markieren${n > 1 ? ` (${n} Wörter)` : ''}.`, briefCont: 'Weiter: Klick oder Enter.',
@@ -834,6 +892,17 @@
                 collapse: 'Minimise the hint box', expand: 'Expand the hint box',
                 cont: 'Click anywhere on the page (or press Enter) to go to the next block.', contSentence: 'Click anywhere on the page (or press Enter) to go to the next sentence.', contEnd: 'Click anywhere on the page (or press Enter) to finish.',
                 solution: 'Show answer', solutionShown: 'The correct answer is',
+                planTitle: '📝 Translation plan', planIntro: 'A suggested order for English – often another order sounds better. You can translate subordinate clauses before or after the main clause.',
+                planHint: ' Below the sentence, a translation plan suggests an order.',
+                uMain: 'Main clause', uPart: (n) => `part ${n}`, uSub: 'Subordinate clause', uRel: 'Relative clause', uAci: 'Acc./Nom. with infinitive', uAbl: 'Ablative absolute', uPtc: 'Participial phrase',
+                howMain: 'In English the verb follows the subject.',
+                howSub: 'Start with the subjunction; in English the verb follows the subject here too.',
+                howRel: 'The relative pronoun stays at the front. Put the relative clause right after the word it refers to.',
+                howAci: 'Translate as a “that” clause: the accusative becomes the subject, the infinitive the verb. For the nominative version, “is said to …” often works.',
+                howAbl: 'Translate as a clause (when, after, because …) or with a preposition (after, because of, despite …).',
+                howPtc: 'Translate as a relative clause, a subordinate clause or with “and” – watch the time relation.',
+                noSubj: 'subject from the personal ending (he, she, it …)', sameSubj: 'same subject as in part 1 (often “and …” is enough)', toUnit: (n) => `→ ${n}`,
+                asDass: '“that” clause', asClause: 'clause/preposition',
                 briefLabel: 'What function does the block outlined in blue have?', briefGroup: 'Bracket: what kind of unit is it?',
                 briefGen: (n) => `Mark the genitive attribute${n > 1 ? ` (${n} words)` : ''}.`, briefCont: 'Next: click or Enter.',
                 more: 'Explanation', levelLess: 'Less help', levelMore: 'More help',
@@ -918,6 +987,38 @@
             }
         };
         let guided = { hold: false, el: null, type: null, brief: false, streak: 0, slips: 0 };
+        // ---- Word information (📖): one shared box, placed next to the icon and kept inside the screen ----
+        let vocabPop = null, vocabFor = null;
+        function closeVocab() { if (vocabPop) vocabPop.hidden = true; if (vocabFor) vocabFor.setAttribute('aria-expanded', 'false'); vocabFor = null; }
+        function placeVocab() {
+            if (!vocabPop || vocabPop.hidden || !vocabFor) return;
+            const r = vocabFor.getBoundingClientRect(); const m = 8;
+            if (r.bottom < 0 || r.top > window.innerHeight) { closeVocab(); return; }
+            const w = vocabPop.offsetWidth, h = vocabPop.offsetHeight;
+            let top = r.bottom + 6; if (top + h > window.innerHeight - m && r.top - 6 - h >= m) top = r.top - 6 - h;
+            top = Math.max(m, Math.min(top, window.innerHeight - h - m));
+            const left = Math.max(m, Math.min(r.left - 4, window.innerWidth - w - m));
+            vocabPop.style.top = top + 'px'; vocabPop.style.left = left + 'px';
+        }
+        window.openVocab = function (icon, e) { openPop(icon, e, '📖 ' + (currentLang === 'de' ? 'Wortangaben' : 'Word information'), icon.querySelector('.vocab-data').innerHTML); };
+        window.openHint = function (icon, e) { openPop(icon, e, '💡 ' + (currentLang === 'de' ? 'Hinweis' : 'Hint'), '<div class="vp-hint">' + icon.querySelector('.tooltip-text').innerHTML + '</div>'); };
+        function openPop(icon, e, title, html) {
+            if (e) { e.stopPropagation(); e.preventDefault(); }
+            if (vocabFor === icon && vocabPop && !vocabPop.hidden) { closeVocab(); return; }
+            document.querySelectorAll('.hint-icon.show-tooltip').forEach(x => x.classList.remove('show-tooltip'));
+            if (!vocabPop) {
+                vocabPop = document.createElement('div'); vocabPop.id = 'vocab-pop'; vocabPop.setAttribute('role', 'dialog'); vocabPop.hidden = true;
+                document.body.appendChild(vocabPop);
+                vocabPop.addEventListener('click', (ev) => { ev.stopPropagation(); if (ev.target.closest('.vp-close')) { const f = vocabFor; closeVocab(); if (f) f.focus(); } });
+            }
+            vocabPop.setAttribute('aria-label', title.replace(/^\S+\s/, ''));
+            vocabPop.innerHTML = `<div class="vp-head"><span>${title}</span><button type="button" class="vp-close" aria-label="${currentLang === 'de' ? 'Schliessen' : 'Close'}">✕</button></div>` + html;
+            vocabPop.hidden = false; vocabPop.scrollTop = 0; vocabFor = icon; icon.setAttribute('aria-expanded', 'true');
+            vocabPop.style.top = '0px'; vocabPop.style.left = '0px'; placeVocab();
+        }
+        document.addEventListener('click', (e) => { if (vocabPop && !vocabPop.hidden && !e.target.closest('#vocab-pop, .hint-icon')) closeVocab(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && vocabPop && !vocabPop.hidden) { const f = vocabFor; closeVocab(); if (f) f.focus(); } });
+        window.addEventListener('scroll', placeVocab, true); window.addEventListener('resize', placeVocab);
         // Adaptive help: after BRIEF_AFTER correct first answers in a row the instructions get shorter; while they are short,
         // FULL_AFTER wrong answers bring the full help back. The student can switch either way with the button in the panel.
         const BRIEF_AFTER = 4, FULL_AFTER = 2;
@@ -941,7 +1042,7 @@
         function guidedContinue() { if (exMode === 'guided' && guided.hold) { guided.hold = false; guidedRender(); return true; } return false; }
         document.addEventListener('click', (e) => {
             if (!(exMode === 'guided' && guided.hold)) return;
-            if (e.target.closest('textarea, .model-compare, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal, .guide-toggle, .guide-level, .guide-more, [data-refs], .hint-icon')) return; // these keep working as usual
+            if (e.target.closest('textarea, .model-compare, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal, .guide-toggle, .guide-level, .guide-more, [data-refs], .hint-icon, #vocab-pop')) return; // these keep working as usual
             guidedContinue();
         }, true);
         document.addEventListener('keydown', (e) => {
@@ -1075,15 +1176,115 @@
                 el.classList.add('guided-current');
                 if (guided.type !== 'gen' && !fbHtml) el.focus({ preventScroll: true });
             }
-            gClearHighlights();
+            gClearHighlights(); renderPlans();
             const ff = guidePanel.querySelector('.guide-fulfilled');
             if (ff && guided.hold && guided.flashFor !== guided.el) { guided.flashFor = guided.el; setTimeout(() => gHighlight(ff.dataset.refs, false, true), 250); }
             requestAnimationFrame(() => guidedPlace(true));
         }
+        // ---- Translation plan: the analysed sentence, reordered unit by unit for the target language ----
+        // Units: the main clause, every subordinate/relative clause and every construction bracket (AcI, abl. abs., participle).
+        function planEsc(x) { return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+        const PLAN_CONSTRUCT = { 'Nebensatz': 'sub', 'Relativsatz': 'rel', 'AcI/NcI': 'aci', 'Ablativus absolutus': 'abl', 'Partizipialkonstruktion': 'ptc' };
+        function planRank(label, kind) {
+            const a = gCanon(label); const de = currentLang === 'de';
+            const verbLast = de && (kind === 'sub' || kind === 'rel');
+            const order = { 'Vokativ': 0, 'Konjunktion': 1, 'Subjunktion': 2, 'Subjekt': 10, 'Prädikat': verbLast ? 90 : 20, 'Dativobjekt': 30, 'Akkusativobjekt': 32, 'Genitivobjekt': 34,
+                'AcI/NcI': 36, 'Prädikativum': 40, 'Ablativus absolutus': 50, 'Ablativ': 50, 'Präpositionale Bestimmung': 50, 'Adverbiale Bestimmung': 50, 'Partizipialkonstruktion': 50, 'Sonstiges': 50, 'Infinitiv': de ? 85 : 38 };
+            return a in order ? order[a] : 50;
+        }
+        function planUnits(sent) {
+            const units = [];
+            const ownGroup = (node, container) => { let g = node.parentElement ? node.parentElement.closest('.s-group') : null; while (g && !container.contains(g)) g = null; return g; };
+            function build(container, kind, opener) {
+                const unit = { kind, opener, items: [], idx: units.length + 1 }; units.push(unit);
+                const nodes = Array.from(container.querySelectorAll('.hover-word, .s-group')).filter(n => n !== container && (n.parentElement.closest('.s-group') === (container.classList.contains('s-group') ? container : null) || (!container.classList.contains('s-group') && !n.parentElement.closest('.s-group'))));
+                nodes.forEach(n => {
+                    if (n.classList.contains('hover-word')) { unit.items.push({ el: n, label: n.dataset.ans, text: gWords(n, 5) }); return; }
+                    const k = PLAN_CONSTRUCT[gCanon(n.dataset.ans)];
+                    if (k) {
+                        const child = build(n, k, gWords(n, 1).replace(' …', ''));
+                        if (k !== 'sub' && k !== 'rel') unit.items.push({ ref: child, label: n.dataset.ans, text: gWords(n, 3) }); // constructions keep their place in the clause
+                    } else unit.items.push({ el: n, label: n.dataset.ans, text: gWords(n, 5) }); // any other bracket: one part
+                });
+                return unit;
+            }
+            build(sent, 'main', '');
+            return units;
+        }
+        function planOrder(unit) {
+            // a conjunction joining two clauses with a verb each splits the clause into parts; otherwise it stays with the word after it
+            const isVerb = (it) => gCanon(it.label) === 'Prädikat';
+            const parts = []; let cur = [];
+            unit.items.forEach((it, i) => {
+                if (gCanon(it.label) === 'Konjunktion' && cur.some(isVerb) && unit.items.slice(i + 1).some(isVerb)) { parts.push(cur); cur = []; }
+                cur.push(it);
+            });
+            parts.push(cur);
+            let subjSeen = false;
+            return parts.map((items, pi) => {
+                const keepFirst = unit.kind === 'rel' && items.length ? items[0] : null; // the relative pronoun stays in front
+                const glued = []; let pending = [];
+                items.forEach(it => { if (gCanon(it.label) === 'Konjunktion' && it !== items[0]) pending.push(it); else { glued.push({ ...it, pre: pending }); pending = []; } });
+                if (pending.length && glued.length) glued[glued.length - 1].post = pending;
+                const rest = glued.filter(g => g.el !== (keepFirst && keepFirst.el) || !keepFirst);
+                const sorted = rest.map((g, i) => ({ g, i })).sort((x, y) => (planRank(x.g.label, unit.kind) - planRank(y.g.label, unit.kind)) || (x.i - y.i)).map(x => x.g);
+                const first = keepFirst ? glued.find(g => g.el === keepFirst.el) : null;
+                const out = first ? [first].concat(sorted.filter(g => g !== first)) : sorted;
+                const hasVerb = items.some(isVerb), hasSubj = items.some(it => gCanon(it.label) === 'Subjekt');
+                if (hasVerb && !hasSubj && unit.kind !== 'rel' && unit.kind !== 'aci') {
+                    const at = out.findIndex(g => planRank(g.label, unit.kind) > 10); out.splice(at < 0 ? out.length : at, 0, { noSubj: true, same: pi > 0 && subjSeen });
+                }
+                if (hasSubj) subjSeen = true;
+                return out;
+            });
+        }
+        function planChip(g) {
+            const t = gT();
+            if (g.noSubj) return `<span class="tp-item tp-nosubj">${g.same && t.sameSubj ? t.sameSubj : t.noSubj}</span>`;
+            const conj = (arr) => (arr || []).map(c => `<span class="tp-conj">${planEsc(c.text)}</span> `).join('');
+            const a = gCanon(g.label); const col = colors[g.label] || colors[gDisp(g.label)] || '#d6cfc2';
+            let extra = '';
+            if (g.ref) extra = ` <span class="tp-ref">${t.toUnit(g.ref.idx)}</span>`;
+            else if (a === 'AcI/NcI') extra = ` <span class="tp-ref">→ ${t.asDass}</span>`;
+            else if (a === 'Ablativus absolutus') extra = ` <span class="tp-ref">→ ${t.asClause}</span>`;
+            return `${conj(g.pre)}<span class="tp-item" style="border-left-color:${col}"><span class="tp-w">${planEsc(g.text)}</span> <span class="tp-l">${planEsc(gDisp(g.label))}</span>${extra}</span>${g.post ? ' ' + conj(g.post) : ''}`;
+        }
+        function planHtml(sent) {
+            const t = gT(); if (!t.planTitle) return '';
+            const units = planUnits(sent); const rows = [];
+            units.forEach(u => {
+                const q = (w) => currentLang === 'de' ? `„${w} …“` : `“${w} …”`;
+                const name = { main: t.uMain, sub: t.uSub, rel: t.uRel, aci: t.uAci, abl: t.uAbl, ptc: t.uPtc }[u.kind] + (u.kind !== 'main' && u.opener ? ' ' + q(planEsc(u.opener)) : '');
+                const how = { main: t.howMain, sub: t.howSub, rel: t.howRel, aci: t.howAci, abl: t.howAbl, ptc: t.howPtc }[u.kind];
+                const parts = planOrder(u).filter(p => p.length);
+                if (!parts.length) return;
+                parts.forEach((p, pi) => {
+                    const label = u.idx + (parts.length > 1 ? String.fromCharCode(97 + pi) : '') + '. ' + name + (parts.length > 1 ? ` (${t.uPart(pi + 1)})` : '');
+                    rows.push(`<li><div class="tp-head">${label}</div><div class="tp-chain">${p.map(planChip).join('<span class="tp-sep"> – </span>')}</div>${pi === parts.length - 1 && how ? `<div class="tp-how">${how}</div>` : ''}</li>`);
+                });
+            });
+            if (!rows.length) return '';
+            return `<details class="trans-plan" open><summary>${t.planTitle}</summary><p class="tp-intro">${t.planIntro}</p><ol>${rows.join('')}</ol></details>`;
+        }
+        function renderPlans() {
+            document.querySelectorAll('#exercise .sentence-container').forEach((sent, i) => {
+                const tb = document.getElementById('t-container-' + i); if (!tb) return;
+                const old = tb.querySelector('.trans-plan');
+                const want = exMode === 'guided' && tb.style.display === 'block';
+                if (!want) { if (old) old.remove(); return; }
+                const sig = currentLang + '|' + JSON.stringify(colors).length + Object.values(colors).join('');
+                if (old && old.dataset.sig === sig) return;
+                const wasOpen = old ? old.open : true;
+                const tmp = document.createElement('div'); tmp.innerHTML = planHtml(sent); const fresh = tmp.firstElementChild;
+                if (!fresh) { if (old) old.remove(); return; }
+                fresh.dataset.sig = sig; fresh.open = wasOpen;
+                if (old) old.replaceWith(fresh); else tb.insertBefore(fresh, tb.firstChild);
+            });
+        }
         function guidedNote(el) {
             const nxt = guidedCompute(); const t = gT();
             if (nxt.type === 'gen' && nxt.el === el) return '<div class="guide-next-note">' + t.genAhead + '</div>';
-            if (!nxt.el || sentenceOf(nxt.el) !== sentenceOf(el)) { const s0 = sentenceOf(el); const hasModel = s0 && s0.querySelector('.model-compare'); return '<div class="guide-next-note">' + t.sentenceDone + (hasModel && t.modelHint ? t.modelHint : '') + '</div>'; }
+            if (!nxt.el || sentenceOf(nxt.el) !== sentenceOf(el)) { const s0 = sentenceOf(el); const hasModel = s0 && s0.querySelector('.model-compare'); return '<div class="guide-next-note">' + t.sentenceDone + (t.planHint ? t.planHint : '') + (hasModel && t.modelHint ? t.modelHint : '') + '</div>'; }
             return '';
         }
         function guidedSolved(el, answer, byHelp) {
@@ -1281,6 +1482,7 @@
             Object.keys(p).forEach(l => { if (typeof p[l] === 'string' && /^#[0-9a-f]{3,8}$/i.test(p[l])) colors[l] = p[l]; });
         }
         function recolorSolved() {
+            if (typeof renderPlans === 'function') setTimeout(renderPlans, 0);
             document.querySelectorAll('.hover-word[data-done="true"]').forEach(el => { if (colors[el.dataset.ans]) paintWord(el, colors[el.dataset.ans]); });
         }
         function genAltColor(bg) {
@@ -2144,14 +2346,16 @@ const CONFIG = {
             modelSummary: "📝 Model translations (optional)", modelCount: (n, m) => `${n} of ${m} sentences`, modelIntro: "If you enter a model translation, students can open it once they have written their own translation of the sentence, and compare the two.", modelPh: "Model translation (optional)",
             explainLabel: "Explanation after a correct answer (guided mode, optional):", phWordExplain: "E.g. The accusative points ahead to a verb that needs it.", phGroupExplain: "E.g. Expect a verb of its own at the end of the clause.",
             phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (W)", btnBracket: "Define Word Group (M)", btnAttr: "Mark Genitive (G)",
-            vocabSummary: "📖 Word information (optional)", vocabIntro: "Dictionary form, form in the text and meaning of each word. Students can open them with the 📖 on a block. Entries made by the AI are marked in orange until you have checked them: changing an entry or ticking ✓ marks it as checked.",
+            vocabSummary: "📖 Word information (optional)", vocabIntro: "Dictionary form, form in the text and meaning of each word. Students can open them with the 📖 on a block; under “Show” you choose which words they see (the AI suggests leaving out very common words and names). Entries made by the AI are marked in orange until you have checked them: changing an entry or ticking “Checked” marks it as checked.",
             vocabAi: "✨ Create with AI", vocabAiBusy: "⏳ Creating word information…", vocabAllOk: "✓ Mark all as checked", vocabShowForm: "Also show the form (case, person …) to students",
             vocabShowFormTitle: "Off by default: the form often gives the function away (e.g. accusative → object).",
-            vocabColWord: "Word", vocabColLemma: "Dictionary form", vocabColForm: "Form", vocabColMeaning: "Meaning", vocabColOk: "✓", vocabOkTitle: "Checked",
-            vocabLegend: "not yet checked", vocabCount: (n, u) => `${n} words` + (u ? ` · ${u} not yet checked` : ''),
+            vocabColWord: "Word", vocabColLemma: "Dictionary form", vocabColForm: "Form", vocabColMeaning: "Meaning", vocabColOk: "Checked", vocabOkTitle: "Checked",
+            vocabColShow: "Show", vocabShowTitle: "Show this word to students", vocabShowAll: "Show all", vocabShowNone: "Show none",
+            vocabLegend: "not yet checked", vocabLegendHidden: "not shown to students",
+            vocabCount: (n, sh, u) => `${sh} of ${n} words shown` + (u ? ` · ${u} not yet checked` : ''),
             vocabNone: "There are no words to describe yet.", vocabKeep: (k) => k === 1 ? 'One entry you have already checked is kept.' : `${k} entries you have already checked are kept.`,
             vocabUnchecked: (n) => (n === 1 ? 'One word entry made by the AI has' : `${n} word entries made by the AI have`) + ' not been checked yet. Export anyway?',
-            vocabPrompt: (txt, list) => `You are an experienced Latin teacher. For every numbered word of the Latin text below, give:\n- "lemma": the dictionary form as in a school dictionary, with macrons. Nouns: nominative, genitive ending, gender (e.g. "castra, -ōrum n. (pl.)", "rēx, rēgis m."). Verbs: principal parts (e.g. "movēre, moveō, mōvī, mōtum"). Adjectives: e.g. "fortis, -e", "bonus, -a, -um". Words that never change: the word itself.\n- "form": the form in this text, decided from the context (e.g. "acc. pl.", "3rd sg. perf. act. ind.", "perf. pass. participle, abl. pl. f."). Words that never change: the part of speech (e.g. "preposition + acc.", "conjunction", "adverb").\n- "meaning": the English meaning that fits this context, short (1–3 words).\nReturn exactly one entry per numbered word, with its number as "i". If you are unsure, still give your best answer.\n\nText:\n${txt}\n\nWords:\n${list}`,
+            vocabPrompt: (txt, list) => `You are an experienced Latin teacher. For every numbered word of the Latin text below, give:\n- "lemma": the dictionary form as in a school dictionary, with macrons. Nouns: nominative, genitive ending, gender (e.g. "castra, -ōrum n. (pl.)", "rēx, rēgis m."). Verbs: principal parts (e.g. "movēre, moveō, mōvī, mōtum"). Adjectives: e.g. "fortis, -e", "bonus, -a, -um". Words that never change: the word itself.\n- "form": the form in this text, decided from the context (e.g. "acc. pl.", "3rd sg. perf. act. ind.", "perf. pass. participle, abl. pl. f."). Words that never change: the part of speech (e.g. "preposition + acc.", "conjunction", "adverb").\n- "meaning": the English meaning that fits this context, short (1–3 words).\n- "basic": true for very common words that students know from the first year of Latin (e.g. et, in, est, sum, is, ea, id, non, magnus, bonus, puer, dicere) and for names of people and places; otherwise false.\nReturn exactly one entry per numbered word, with its number as "i". If you are unsure, still give your best answer.\n\nText:\n${txt}\n\nWords:\n${list}`,
             btnPreview: "▶ Preview", previewTitle: "Opens the student page in a new tab, without downloading it",
             previewBanner: "<strong>Preview:</strong> this is how your students will see the page. After changes in the editor, click “Preview” again. Progress saved here does not affect the exported page.",
             btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work", btnResetColors: "🎨 Restore default colours", btnCvdColors: "👁 Colour-blind-safe colours", cvdOffTitle: "Back to the colours before",
@@ -2189,14 +2393,16 @@ const CONFIG = {
             modelSummary: "📝 Musterübersetzungen (optional)", modelCount: (n, m) => `${n} von ${m} Sätzen`, modelIntro: "Tragen Sie eine Musterübersetzung ein, können die Schülerinnen und Schüler sie öffnen, sobald sie den Satz selbst übersetzt haben, und beide vergleichen.", modelPh: "Musterübersetzung (optional)",
             explainLabel: "Erklärung nach richtiger Antwort (geführter Modus, optional):", phWordExplain: "Z.B. Der Akkusativ kündigt ein Verb an, das ihn braucht.", phGroupExplain: "Z.B. Erwarte am Ende des Nebensatzes ein eigenes Prädikat.",
             phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (W)", btnBracket: "Wortgruppe definieren (M)", btnAttr: "Genitiv markieren (G)",
-            vocabSummary: "📖 Wortangaben (optional)", vocabIntro: "Grundform, Form im Text und Bedeutung jedes Wortes. Die Schülerinnen und Schüler können sie über das 📖 an einem Block öffnen. Einträge der KI sind orange markiert, bis Sie sie geprüft haben: Ein geänderter Eintrag oder ein Häkchen bei ✓ gilt als geprüft.",
+            vocabSummary: "📖 Wortangaben (optional)", vocabIntro: "Grundform, Form im Text und Bedeutung jedes Wortes. Die Schülerinnen und Schüler können sie über das 📖 an einem Block öffnen; unter „Zeigen“ wählen Sie, welche Wörter sie sehen (die KI schlägt vor, sehr häufige Wörter und Namen wegzulassen). Einträge der KI sind orange markiert, bis Sie sie geprüft haben: Ein geänderter Eintrag oder ein Häkchen bei „Geprüft“ gilt als geprüft.",
             vocabAi: "✨ Mit KI erstellen", vocabAiBusy: "⏳ Wortangaben werden erstellt…", vocabAllOk: "✓ Alle als geprüft markieren", vocabShowForm: "Form (Kasus, Person …) auch den Schülerinnen und Schülern zeigen",
             vocabShowFormTitle: "Standardmässig aus: Die Form verrät oft die Funktion (z. B. Akkusativ → Objekt).",
-            vocabColWord: "Wort", vocabColLemma: "Grundform", vocabColForm: "Form", vocabColMeaning: "Bedeutung", vocabColOk: "✓", vocabOkTitle: "Geprüft",
-            vocabLegend: "noch nicht geprüft", vocabCount: (n, u) => `${n} Wörter` + (u ? ` · ${u} noch nicht geprüft` : ''),
+            vocabColWord: "Wort", vocabColLemma: "Grundform", vocabColForm: "Form", vocabColMeaning: "Bedeutung", vocabColOk: "Geprüft", vocabOkTitle: "Geprüft",
+            vocabColShow: "Zeigen", vocabShowTitle: "Dieses Wort den Schülerinnen und Schülern zeigen", vocabShowAll: "Alle zeigen", vocabShowNone: "Keine zeigen",
+            vocabLegend: "noch nicht geprüft", vocabLegendHidden: "wird nicht gezeigt",
+            vocabCount: (n, sh, u) => `${sh} von ${n} Wörtern gezeigt` + (u ? ` · ${u} noch nicht geprüft` : ''),
             vocabNone: "Es gibt noch keine Wörter, zu denen Angaben gemacht werden können.", vocabKeep: (k) => k === 1 ? 'Ein bereits geprüfter Eintrag bleibt erhalten.' : `${k} bereits geprüfte Einträge bleiben erhalten.`,
             vocabUnchecked: (n) => (n === 1 ? 'Eine Wortangabe der KI ist' : `${n} Wortangaben der KI sind`) + ' noch nicht geprüft. Trotzdem exportieren?',
-            vocabPrompt: (txt, list) => `Du bist eine erfahrene Lateinlehrkraft. Gib für jedes nummerierte Wort des folgenden lateinischen Textes an:\n- "lemma": die Grundform wie in einem Schulwörterbuch, mit Längenzeichen. Substantive: Nominativ, Genitivendung, Genus (z. B. "castra, -ōrum n. (Pl.)", "rēx, rēgis m."). Verben: Stammformen (z. B. "movēre, moveō, mōvī, mōtum"). Adjektive: z. B. "fortis, -e", "bonus, -a, -um". Unveränderliche Wörter: das Wort selbst.\n- "form": die Form in diesem Text, bestimmt aus dem Zusammenhang, mit deutschen Schulbegriffen (z. B. "Akk. Pl.", "3. Pers. Sg. Perf. Akt. Ind.", "PPP, Abl. Pl. f."). Unveränderliche Wörter: die Wortart (z. B. "Präposition mit Akk.", "Konjunktion", "Adverb").\n- "meaning": die im Zusammenhang passende deutsche Bedeutung, kurz (1–3 Wörter). Schreibe "ss" statt "ß".\nGib für jedes nummerierte Wort genau einen Eintrag mit seiner Nummer als "i" zurück. Wenn du unsicher bist, gib trotzdem deine beste Antwort.\n\nText:\n${txt}\n\nWörter:\n${list}`,
+            vocabPrompt: (txt, list) => `Du bist eine erfahrene Lateinlehrkraft. Gib für jedes nummerierte Wort des folgenden lateinischen Textes an:\n- "lemma": die Grundform wie in einem Schulwörterbuch, mit Längenzeichen. Substantive: Nominativ, Genitivendung, Genus (z. B. "castra, -ōrum n. (Pl.)", "rēx, rēgis m."). Verben: Stammformen (z. B. "movēre, moveō, mōvī, mōtum"). Adjektive: z. B. "fortis, -e", "bonus, -a, -um". Unveränderliche Wörter: das Wort selbst.\n- "form": die Form in diesem Text, bestimmt aus dem Zusammenhang, mit deutschen Schulbegriffen (z. B. "Akk. Pl.", "3. Pers. Sg. Perf. Akt. Ind.", "PPP, Abl. Pl. f."). Unveränderliche Wörter: die Wortart (z. B. "Präposition mit Akk.", "Konjunktion", "Adverb").\n- "meaning": die im Zusammenhang passende deutsche Bedeutung, kurz (1–3 Wörter). Schreibe "ss" statt "ß".\n- "basic": true für sehr häufige Wörter, die Schülerinnen und Schüler aus dem ersten Lateinjahr kennen (z. B. et, in, est, sum, is, ea, id, non, magnus, bonus, puer, dicere), und für Namen von Personen und Orten; sonst false.\nGib für jedes nummerierte Wort genau einen Eintrag mit seiner Nummer als "i" zurück. Wenn du unsicher bist, gib trotzdem deine beste Antwort.\n\nText:\n${txt}\n\nWörter:\n${list}`,
             btnPreview: "▶ Vorschau", previewTitle: "Öffnet die Schülerseite in einem neuen Tab, ohne sie herunterzuladen",
             previewBanner: "<strong>Vorschau:</strong> So sehen Ihre Schülerinnen und Schüler die Seite. Nach Änderungen im Editor erneut auf „Vorschau“ klicken. Was hier gespeichert wird, wirkt sich nicht auf die exportierte Seite aus.",
             btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden", btnResetColors: "🎨 Standardfarben wiederherstellen", btnCvdColors: "👁 Farbenblind-sichere Farben", cvdOffTitle: "Zurück zu den vorherigen Farben",
@@ -3006,7 +3212,7 @@ function renderEditor() {
                 span.appendChild(hintIcon);
             }
             span.style.backgroundColor = AppState.colors[func]; setGenUnderline(span, AppState.colors[func]);
-            const vl = vocabLine(item.vi, true); if (vl) span.title = vl; // word information: shown on pointing, for checking
+            const vl = vocabLine(item.vi, true); if (vl) span.title = vl + (item.vi.hide ? (AppState.lang === 'de' ? ' (wird nicht gezeigt)' : ' (not shown)') : ''); // word information: shown on pointing, for checking
         } else { 
             span.dataset.func = CONFIG.PUNCT; 
         }
@@ -3055,9 +3261,12 @@ function vocabLine(vi, withForm) {
     return [vi.l, withForm ? vi.f : '', vi.m].map(x => (x || '').trim()).filter(Boolean).join(' – ');
 }
 function vocabStats() {
-    let n = 0, u = 0;
-    AppState.words.forEach(w => { if (w.f === CONFIG.PUNCT) return; n++; if (vocabHas(w.vi) && !w.vi.ok) u++; });
-    return { n, u };
+    let n = 0, u = 0, sh = 0;
+    AppState.words.forEach(w => {
+        if (w.f === CONFIG.PUNCT || !vocabHas(w.vi)) return; n++;
+        if (!w.vi.hide) { sh++; if (!w.vi.ok) u++; } // only entries students will see need checking
+    });
+    return { n, u, sh };
 }
 function sentenceIndexGroups() {
     const out = []; let cur = [];
@@ -3076,11 +3285,13 @@ function renderVocab(force) {
     const txt = CONFIG.LANG_TEXT[AppState.lang];
     DOM.vocabSummary.textContent = txt.vocabSummary; DOM.vocabIntro.textContent = txt.vocabIntro;
     DOM.btnVocabAi.textContent = DOM.btnVocabAi.disabled ? txt.vocabAiBusy : txt.vocabAi; DOM.btnVocabAllOk.textContent = txt.vocabAllOk;
+    DOM.btnVocabShowAll.textContent = txt.vocabShowAll; DOM.btnVocabShowNone.textContent = txt.vocabShowNone;
     DOM.vocabShowFormLbl.textContent = txt.vocabShowForm; DOM.vocabShowForm.parentElement.title = txt.vocabShowFormTitle; DOM.vocabShowForm.checked = !!AppState.vocabShowForm;
     const updateCount = () => {
         const st = vocabStats(); const any = AppState.words.some(w => vocabHas(w.vi));
-        DOM.vocabCount.textContent = any ? '· ' + txt.vocabCount(st.n, st.u) : '';
+        DOM.vocabCount.textContent = any ? '· ' + txt.vocabCount(st.n, st.sh, st.u) : '';
         DOM.btnVocabAllOk.style.display = st.u ? '' : 'none';
+        DOM.btnVocabShowAll.style.display = DOM.btnVocabShowNone.style.display = any ? '' : 'none';
     };
     const sents = sentenceIndexGroups();
     const sig = AppState.lang + '|' + AppState.words.map(w => w.w + '/' + (w.f === CONFIG.PUNCT ? 'p' : '')).join(' ');
@@ -3092,11 +3303,12 @@ function renderVocab(force) {
         const box = document.createElement('div'); box.className = 'vocab-sent';
         const head = document.createElement('div'); head.className = 'model-trans-la'; head.textContent = (sents.length > 1 ? (si + 1) + '. ' : '') + (la[si] || '');
         const table = document.createElement('table'); table.className = 'vocab-table';
-        table.innerHTML = `<thead><tr><th>${txt.vocabColWord}</th><th>${txt.vocabColLemma}</th><th>${txt.vocabColForm}</th><th>${txt.vocabColMeaning}</th><th title="${txt.vocabOkTitle}">${txt.vocabColOk}</th></tr></thead>`;
+        table.innerHTML = `<thead><tr><th>${txt.vocabColWord}</th><th>${txt.vocabColLemma}</th><th>${txt.vocabColForm}</th><th>${txt.vocabColMeaning}</th><th title="${txt.vocabOkTitle}">${txt.vocabColOk}</th><th title="${txt.vocabShowTitle}">${txt.vocabColShow}</th></tr></thead>`;
         const tb = document.createElement('tbody');
         words.forEach(i => {
             const w = AppState.words[i]; const tr = document.createElement('tr');
-            const setState = () => tr.classList.toggle('unchecked', vocabHas(w.vi) && !w.vi.ok);
+            const setState = () => { const has = vocabHas(w.vi); tr.classList.toggle('vhidden', has && !!w.vi.hide); tr.classList.toggle('unchecked', has && !w.vi.ok && !w.vi.hide); if (sh) { sh.checked = has && !w.vi.hide; sh.disabled = !has; } };
+            let sh = null;
             const tdW = document.createElement('td'); tdW.className = 'vw'; tdW.textContent = w.w; tr.appendChild(tdW);
             const inputs = {};
             [['l', txt.vocabColLemma], ['f', txt.vocabColForm], ['m', txt.vocabColMeaning]].forEach(([k, ph]) => {
@@ -3105,26 +3317,36 @@ function renderVocab(force) {
                 inp.addEventListener('input', () => {
                     w.vi = Object.assign({}, w.vi, { [k]: inp.value, ok: true });
                     if (!vocabHas(w.vi)) delete w.vi;
-                    ok.checked = !!(w.vi && w.vi.ok); setState(); updateCount(); vocabSyncWord(i); StorageManager.debouncedAutoSave();
+                    ok.checked = !!(w.vi && w.vi.ok); setState(); updateCount(); vocabLegendUpdate(); vocabSyncWord(i); StorageManager.debouncedAutoSave();
                 });
                 td.appendChild(inp); tr.appendChild(td);
             });
             const tdOk = document.createElement('td'); tdOk.className = 'vok'; const ok = document.createElement('input'); ok.type = 'checkbox';
             ok.checked = !!(w.vi && w.vi.ok); ok.title = txt.vocabOkTitle; ok.setAttribute('aria-label', txt.vocabOkTitle + ': ' + w.w);
-            ok.addEventListener('change', () => { if (!vocabHas(w.vi)) { ok.checked = false; return; } w.vi.ok = ok.checked; setState(); updateCount(); StorageManager.debouncedAutoSave(); });
+            ok.addEventListener('change', () => { if (!vocabHas(w.vi)) { ok.checked = false; return; } w.vi.ok = ok.checked; setState(); updateCount(); vocabLegendUpdate(); StorageManager.debouncedAutoSave(); });
             tdOk.appendChild(ok); tr.appendChild(tdOk);
+            const tdSh = document.createElement('td'); tdSh.className = 'vok'; sh = document.createElement('input'); sh.type = 'checkbox';
+            sh.title = txt.vocabShowTitle; sh.setAttribute('aria-label', txt.vocabShowTitle + ': ' + w.w);
+            sh.addEventListener('change', () => { if (!vocabHas(w.vi)) return; w.vi.hide = !sh.checked; w.vi.showSet = true; setState(); updateCount(); vocabLegendUpdate(); StorageManager.debouncedAutoSave(); });
+            tdSh.appendChild(sh); tr.appendChild(tdSh);
             setState(); tb.appendChild(tr);
         });
         table.appendChild(tb); box.append(head, table); list.appendChild(box);
     });
-    if (AppState.words.some(w => vocabHas(w.vi) && !w.vi.ok)) {
-        const lg = document.createElement('div'); lg.className = 'vocab-legend'; lg.innerHTML = `<b></b>${txt.vocabLegend}`; list.prepend(lg);
-    }
+    const lg = document.createElement('div'); lg.className = 'vocab-legend'; list.prepend(lg);
+    vocabLegendUpdate();
     updateCount();
+}
+function vocabLegendUpdate() {
+    const lg = DOM.vocabList && DOM.vocabList.querySelector('.vocab-legend'); if (!lg) return;
+    const txt = CONFIG.LANG_TEXT[AppState.lang];
+    const u = AppState.words.some(w => vocabHas(w.vi) && !w.vi.ok && !w.vi.hide), h = AppState.words.some(w => vocabHas(w.vi) && w.vi.hide);
+    lg.innerHTML = (u ? `<span><b></b>${txt.vocabLegend}</span>` : '') + (h ? `<span class="lg-hidden"><i></i>${txt.vocabLegendHidden}</span>` : '');
+    lg.style.display = (u || h) ? '' : 'none';
 }
 function vocabSyncWord(i) {
     const span = document.getElementById('word-' + i); if (!span) return;
-    const vl = vocabLine(AppState.words[i].vi, true); if (vl) span.title = vl; else span.removeAttribute('title');
+    const vi = AppState.words[i].vi; const vl = vocabLine(vi, true); if (vl) span.title = vl + (vi.hide ? (AppState.lang === 'de' ? ' (wird nicht gezeigt)' : ' (not shown)') : ''); else span.removeAttribute('title');
 }
 async function generateVocabAI() {
     const txt = CONFIG.LANG_TEXT[AppState.lang];
@@ -3133,7 +3355,7 @@ async function generateVocabAI() {
     const idxs = AppState.words.map((w, i) => i).filter(i => AppState.words[i].f !== CONFIG.PUNCT && LatinCore.hasLetters(AppState.words[i].w));
     if (!idxs.length) { alert(txt.vocabNone); return; }
     const list = idxs.map(i => `${i}: ${AppState.words[i].w}`).join('\n');
-    const schema = { type: 'object', additionalProperties: false, required: ['entries'], properties: { entries: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['i', 'lemma', 'form', 'meaning'], properties: { i: { type: 'integer' }, lemma: { type: 'string' }, form: { type: 'string' }, meaning: { type: 'string' } } } } } };
+    const schema = { type: 'object', additionalProperties: false, required: ['entries'], properties: { entries: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['i', 'lemma', 'form', 'meaning', 'basic'], properties: { i: { type: 'integer' }, lemma: { type: 'string' }, form: { type: 'string' }, meaning: { type: 'string' }, basic: { type: 'boolean' } } } } } };
     const btn = DOM.btnVocabAi; btn.disabled = true; btn.textContent = txt.vocabAiBusy;
     try {
         const out = await callAI(txt.vocabPrompt(editorSentences().join('\n'), list), 'latin_vocabulary', schema);
@@ -3145,6 +3367,9 @@ async function generateVocabAI() {
             const w = AppState.words[e.i];
             if (w.vi && w.vi.ok && vocabHas(w.vi)) { kept++; return; } // never overwrite what the teacher has checked
             const vi = { l: String(e.lemma || '').trim(), f: String(e.form || '').trim(), m: String(e.meaning || '').trim().replace(/ß/g, AppState.lang === 'de' ? 'ss' : 'ß'), ok: false };
+            // a choice the teacher already made about showing the word stays; otherwise follow the AI's suggestion
+            vi.hide = w.vi && typeof w.vi.hide === 'boolean' && w.vi.showSet ? w.vi.hide : !!e.basic;
+            if (w.vi && w.vi.showSet) vi.showSet = true;
             if (vocabHas(vi)) w.vi = vi;
         });
         AppState.dirty = true; StorageManager.debouncedAutoSave();
@@ -3330,6 +3555,9 @@ function initEventListeners() {
     DOM.btnPreview.addEventListener('click', () => exportToStudent(true));
     DOM.btnVocabAi.addEventListener('click', generateVocabAI);
     DOM.btnVocabAllOk.addEventListener('click', () => { AppState.words.forEach(w => { if (vocabHas(w.vi)) w.vi.ok = true; }); renderVocab(true); StorageManager.debouncedAutoSave(); });
+    const vocabShowEvery = (show) => { AppState.words.forEach(w => { if (vocabHas(w.vi)) { w.vi.hide = !show; w.vi.showSet = true; } }); renderVocab(true); StorageManager.debouncedAutoSave(); };
+    DOM.btnVocabShowAll.addEventListener('click', () => vocabShowEvery(true));
+    DOM.btnVocabShowNone.addEventListener('click', () => vocabShowEvery(false));
     DOM.vocabShowForm.addEventListener('change', () => { AppState.vocabShowForm = DOM.vocabShowForm.checked; StorageManager.debouncedAutoSave(); });
     DOM.btnSaveWork.addEventListener('click', () => StorageManager.exportProject());
     DOM.btnResetColors.addEventListener('click', restoreDefaultColors);
@@ -4409,7 +4637,7 @@ function generateExerciseHTML(words, groups, placeholder, lang, models) {
 
     // One click handler for word and group hints (group hints had none and could never be opened).
     const hintToggle = "event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');";
-    const hintIconHtml = (safeHint) => `<span class="hint-icon" title="Hint" onclick="${hintToggle}">💡<span class="tooltip-text">${safeHint}</span></span>`;
+    const hintIconHtml = (safeHint) => `<span class="hint-icon" role="button" tabindex="0" aria-haspopup="dialog" title="${lang === 'de' ? 'Hinweis' : 'Hint'}" onclick="openHint(this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openHint(this, event);}">💡<span class="tooltip-text">${safeHint}</span></span>`;
 
     words.forEach((word, idx) => {
         const isPunct = word.f === CONFIG.PUNCT;
@@ -4421,8 +4649,8 @@ function generateExerciseHTML(words, groups, placeholder, lang, models) {
         // Template literals allow multi-line strings and easy variable injection
         const hintHtml = word.hint ? hintIconHtml(safeWordHint) : '';
         // word information: one 📖 per block, listing the words that have an entry
-        const vEntries = isPunct ? [] : (word.segments || []).filter(seg => seg.vi);
-        const vocabHtml = vEntries.length ? `<span class="hint-icon vocab-icon" role="button" tabindex="0" title="${lang === 'de' ? 'Wortangaben' : 'Word information'}" aria-label="${lang === 'de' ? 'Wortangaben' : 'Word information'}" onclick="${hintToggle}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">📖<span class="tooltip-text">${vEntries.map(seg => `<span class="vocab-row"><b>${escapeHTML(seg.w)}</b> ${escapeHTML(vocabLine(seg.vi, AppState.vocabShowForm))}</span>`).join('')}</span></span>` : '';
+        const vEntries = isPunct ? [] : (word.segments || []).filter(seg => seg.vi && !seg.vi.hide);
+        const vocabHtml = vEntries.length ? `<span class="hint-icon vocab-icon" role="button" tabindex="0" aria-haspopup="dialog" title="${lang === 'de' ? 'Wortangaben' : 'Word information'}" aria-label="${lang === 'de' ? 'Wortangaben' : 'Word information'}" onclick="openVocab(this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openVocab(this, event);}">📖<span class="vocab-data" hidden>${vEntries.map(seg => `<span class="vp-row"><b class="vp-w">${escapeHTML(seg.w)}</b><span class="vp-l">${escapeHTML((seg.vi.l || '').trim())}</span>${AppState.vocabShowForm && (seg.vi.f || '').trim() ? `<span class="vp-f">${escapeHTML(seg.vi.f.trim())}</span>` : ''}${(seg.vi.m || '').trim() ? `<span class="vp-m">${escapeHTML(seg.vi.m.trim())}</span>` : ''}</span>`).join('')}</span></span>` : '';
 
         // Using .map() and .join('') for the segments instead of manual loops
         const safeWordHtml = word.segments.map(seg => `${seg.space ? ' ' : ''}<span class="s-text" data-u="${seg.u ? 'true' : 'false'}">${escapeHTML(seg.w)}</span>`).join('');
