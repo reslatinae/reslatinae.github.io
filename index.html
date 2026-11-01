@@ -689,6 +689,8 @@
         .trans-plan .tp-sep { color: #8a7f6f; }
         .trans-plan .tp-how { font-size: 0.82rem; color: #4a4236; margin-top: 2px; }
         .trans-plan .tp-par { color: #6b4d24; font-weight: 600; }
+        .trans-plan .tp-moved { font-size: 0.8rem; font-weight: 700; color: #6b4d24; margin-left: 2px; cursor: help; }
+        .trans-plan .tp-mv { border-style: dashed; border-left-style: solid; }
         html.reading-aid .trans-plan .tp-conj, html.reading-aid .trans-plan .tp-nosubj { font-style: normal; }
         body.high-contrast .trans-plan { background: #1e1e1e; border-color: #555; color: #fff; }
         body.high-contrast .trans-plan summary { color: #f0c987; }
@@ -798,7 +800,7 @@
                 cont: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Block zu gehen.', contSentence: 'Klicke irgendwo auf die Seite (oder drücke Enter), um zum nächsten Satz zu gehen.', contEnd: 'Klicke irgendwo auf die Seite (oder drücke Enter), um abzuschliessen.',
                 solution: 'Lösung zeigen', solutionShown: 'Die richtige Antwort ist',
                 // Translation plan (shown under a sentence once it is fully analysed)
-                planTitle: '📝 Übersetzungsplan', planIntro: 'Ein Vorschlag für die Reihenfolge im Deutschen – oft klingt eine andere Reihenfolge besser. Nebensätze kannst du vor oder nach dem Hauptsatz übersetzen.',
+                planTitle: '📝 Übersetzungsplan', planIntro: 'Der Plan folgt der lateinischen Reihenfolge. Verschoben (↔) wird nur das Prädikat, wo das Deutsche es verlangt: im Hauptsatz an die zweite Stelle, im Nebensatz ans Ende. Oft klingt eine andere Reihenfolge noch besser.', moved: 'Im Deutschen an eine andere Stelle verschoben',
                 planHint: ' Unter dem Satz schlägt dir ein Übersetzungsplan eine Reihenfolge vor.',
                 uMain: 'Hauptsatz', uPart: (n) => `Teil ${n}`, uSub: 'Nebensatz', uRel: 'Relativsatz', uAci: 'AcI/NcI', uAbl: 'Ablativus absolutus', uPtc: 'Partizipialkonstruktion',
                 howMain: 'Im deutschen Hauptsatz steht das Prädikat an zweiter Stelle.',
@@ -870,7 +872,7 @@
                 // "Still open": what a reader expects next while reading from left to right
                 openTitle: 'Noch offen',
                 predSent: 'das <strong>Prädikat</strong> des Satzes', predMain: 'das <strong>Prädikat</strong> des Hauptsatzes',
-                predSub: (w) => `das <strong>Prädikat</strong> des Nebensatzes („${w} …“)`, predRel: (w) => `das <strong>Prädikat</strong> des Relativsatzes („${w} …“)`,
+                predSub: (w) => `das <strong>Prädikat</strong> des Nebensatzes („${w} …“)`, subjSub: (w) => `die <strong>Subjunktion</strong> des Nebensatzes („${w} …“) – am Anfang oder sehr nahe daran`, predRel: (w) => `das <strong>Prädikat</strong> des Relativsatzes („${w} …“)`,
                 after: 'erwartet nach', q: (w) => `„${w}“`,
                 conj: (w) => `nach „${w}“ ein Teil, der dem Teil davor entspricht`,
                 fulfilled: (p, list, subj) => `<strong>Erwartung erfüllt:</strong> „${p}“ ist das Prädikat zu ${list}.${subj ? ' Prüfe: Passt es in Person und Zahl zum Subjekt?' : ''}`,
@@ -890,9 +892,9 @@
                     'AcI/NcI': ['Steht hier ein Akkusativ (oder Nominativ) zusammen mit einem Infinitiv, abhängig von einem Verb des Sagens oder Denkens?', 'Einen AcI übersetzt du als „dass“-Satz: Der Akkusativ wird Subjekt, der Infinitiv Prädikat. Beim NcI hilft „man sagt, dass …“ oder „soll …“.'],
                     'Partizipialkonstruktion': ['Gibt es hier ein Partizip, das sich auf ein Substantiv im Satz bezieht?', 'Das Partizip bezieht sich auf ein Substantiv im Satz. Übersetze mit Relativsatz, Nebensatz oder „und“ und achte auf das Zeitverhältnis.'],
                     'Relativsatz': ['Womit beginnt diese Einheit? Ist das ein Relativpronomen (qui, quae, quod …)?', 'Ein Relativsatz: Das Relativpronomen bezieht sich auf ein Wort davor. Bestimme die Wörter darin nach ihrer Aufgabe innerhalb des Relativsatzes.'],
-                    'Nebensatz': ['Womit beginnt diese Einheit? Ist das eine Subjunktion (cum, ut, quod, dum …)?', 'Ein Nebensatz hat ein eigenes Prädikat; erwarte es, oft am Ende. Bestimme die Wörter darin nach ihrer Aufgabe innerhalb des Nebensatzes.'],
+                    'Nebensatz': ['Steht am Anfang dieser Einheit oder sehr nahe daran eine Subjunktion (cum, ut, quod, dum …) oder ein Fragewort (quis, cūr, ubi …)? Und hat die Einheit ein eigenes Prädikat?', 'Ein Nebensatz hat immer eine Subjunktion (cum, ut, nē, quod, sī, dum …) oder ein Fragewort (quis, cūr, ubi …) am Anfang oder sehr nahe daran und ein eigenes Prädikat; erwarte es, oft am Ende. Bestimme die Wörter darin nach ihrer Aufgabe innerhalb des Nebensatzes.'],
                     'Konjunktion': ['Verbindet das Wort gleichrangige Teile (und, aber, oder)?', 'Eine Konjunktion verbindet gleichrangige Teile. Erwarte danach einen Teil, der dem vorigen entspricht.'],
-                    'Subjunktion': ['Leitet das Wort einen Nebensatz ein (cum, ut, ne, quod, si, dum …)?', 'Eine Subjunktion leitet einen Nebensatz ein. Erwarte ein eigenes Prädikat, oft am Ende des Nebensatzes.'],
+                    'Subjunktion': ['Leitet das Wort einen Nebensatz ein (cum, ut, ne, quod, si, dum …)? Subjunktionen stehen am Anfang des Nebensatzes oder sehr nahe daran.', 'Eine Subjunktion leitet einen Nebensatz ein; sie steht an seinem Anfang oder sehr nahe daran. Erwarte ein eigenes Prädikat, oft am Ende des Nebensatzes.'],
                     'Vokativ': ['Wird hier jemand angesprochen?', 'Ein Vokativ: Hier wird jemand angesprochen.'],
                     'Sonstiges': ['Hat das Wort überhaupt eine eigene Aufgabe im Satzbau?', 'Dieses Wort hat keine eigene Funktion im Satzbau.']
                 }
@@ -922,7 +924,7 @@
                 collapse: 'Minimise the hint box', expand: 'Expand the hint box',
                 cont: 'Click anywhere on the page (or press Enter) to go to the next block.', contSentence: 'Click anywhere on the page (or press Enter) to go to the next sentence.', contEnd: 'Click anywhere on the page (or press Enter) to finish.',
                 solution: 'Show answer', solutionShown: 'The correct answer is',
-                planTitle: '📝 Translation plan', planIntro: 'A suggested order for English – often another order sounds better. You can translate subordinate clauses before or after the main clause.',
+                planTitle: '📝 Translation plan', planIntro: 'The plan follows the Latin word order. Only the verb is moved (↔) where English needs it: right after the subject. Often another order sounds even better.', moved: 'Moved to another position in English',
                 planHint: ' Below the sentence, a translation plan suggests an order.',
                 uMain: 'Main clause', uPart: (n) => `part ${n}`, uSub: 'Subordinate clause', uRel: 'Relative clause', uAci: 'Acc./Nom. with infinitive', uAbl: 'Ablative absolute', uPtc: 'Participial phrase',
                 howMain: 'In English the verb follows the subject.',
@@ -990,7 +992,7 @@
                 },
                 openTitle: 'Still open',
                 predSent: 'the <strong>verb</strong> of the sentence', predMain: 'the <strong>verb</strong> of the main clause',
-                predSub: (w) => `the <strong>verb</strong> of the subordinate clause (“${w} …”)`, predRel: (w) => `the <strong>verb</strong> of the relative clause (“${w} …”)`,
+                predSub: (w) => `the <strong>verb</strong> of the subordinate clause (“${w} …”)`, subjSub: (w) => `the <strong>subjunction</strong> of the subordinate clause (“${w} …”) – at or very close to its beginning`, predRel: (w) => `the <strong>verb</strong> of the relative clause (“${w} …”)`,
                 after: 'expected after', q: (w) => `“${w}”`,
                 conj: (w) => `after “${w}”: a part that matches the one before`,
                 fulfilled: (p, list, subj) => `<strong>Expectation fulfilled:</strong> “${p}” is the verb for ${list}.${subj ? ' Check: does it agree with the subject in person and number?' : ''}`,
@@ -1010,9 +1012,9 @@
                     'Accusative/Nominative with infinitive': ['Is there an accusative (or nominative) together with an infinitive, depending on a verb of saying or thinking?', 'Translate an accusative with infinitive as a “that” clause: the accusative becomes the subject, the infinitive the verb. For the nominative version, “is said to …” often works.'],
                     'Participial phrase': ['Is there a participle that refers to a noun in the sentence?', 'The participle refers to a noun in the sentence. Translate with a participle, a relative clause, a subordinate clause or “and”, and watch the time relation.'],
                     'Relative clause': ['What does this unit begin with? Is it a relative pronoun (qui, quae, quod …)?', 'A relative clause: the relative pronoun refers to a word before it. Analyse the words inside according to their job within the relative clause.'],
-                    'Subordinate clause': ['What does this unit begin with? Is it a subjunction (cum, ut, quod, dum …)?', 'A subordinate clause has a verb of its own; expect it, often at the end. Analyse the words inside according to their job within the clause.'],
+                    'Subordinate clause': ['Is there a subjunction (cum, ut, quod, dum …) or a question word (quis, cūr, ubi …) at the beginning of this unit or very close to it? And does the unit have a verb of its own?', 'A subordinate clause always has a subjunction (cum, ut, nē, quod, sī, dum …) or a question word (quis, cūr, ubi …) at or very close to its beginning and a verb of its own; expect it, often at the end. Analyse the words inside according to their job within the clause.'],
                     'Conjunction': ['Does the word join parts of equal rank (and, but, or)?', 'A conjunction joins parts of equal rank. Expect a part after it that matches the one before.'],
-                    'Subjunction': ['Does the word introduce a subordinate clause (cum, ut, ne, quod, si, dum …)?', 'A subjunction introduces a subordinate clause. Expect a verb of its own, often at the end of the clause.'],
+                    'Subjunction': ['Does the word introduce a subordinate clause (cum, ut, ne, quod, si, dum …)? Subjunctions stand at the beginning of the clause or very close to it.', 'A subjunction introduces a subordinate clause; it stands at its beginning or very close to it. Expect a verb of its own, often at the end of the clause.'],
                     'Vocative': ['Is someone being addressed here?', 'A vocative: someone is being addressed.'],
                     'Other': ['Does the word have a job of its own in the structure of the sentence at all?', 'This word has no function of its own in the structure of the sentence.']
                 }
@@ -1245,13 +1247,6 @@
         // Units: the main clause, every subordinate/relative clause and every construction bracket (AcI, abl. abs., participle).
         function planEsc(x) { return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
         const PLAN_CONSTRUCT = { 'Nebensatz': 'sub', 'Relativsatz': 'rel', 'AcI/NcI': 'aci', 'Ablativus absolutus': 'abl', 'Partizipialkonstruktion': 'ptc' };
-        function planRank(label, kind) {
-            const a = gCanon(label); const de = currentLang === 'de';
-            const verbLast = de && (kind === 'sub' || kind === 'rel');
-            const order = { 'Vokativ': 0, 'Konjunktion': 1, 'Subjunktion': 2, 'Subjekt': 10, 'Prädikat': verbLast ? 90 : 20, 'Dativobjekt': 30, 'Akkusativobjekt': 32, 'Genitivobjekt': 34,
-                'AcI/NcI': 36, 'Prädikativum': 40, 'Ablativus absolutus': 50, 'Ablativ': 50, 'Präpositionale Bestimmung': 50, 'Adverbiale Bestimmung': 50, 'Partizipialkonstruktion': 50, 'Sonstiges': 50, 'Infinitiv': de ? 85 : 38 };
-            return a in order ? order[a] : 50;
-        }
         function planUnits(sent) {
             const units = [];
             const ownGroup = (node, container) => { let g = node.parentElement ? node.parentElement.closest('.s-group') : null; while (g && !container.contains(g)) g = null; return g; };
@@ -1276,11 +1271,11 @@
             return units;
         }
         function planOrder(unit) {
-            // a conjunction joining two clauses with a verb each splits the clause into parts; otherwise it stays with the word after it
             // Every verb gets its own part (Latin often joins clauses without a conjunction: "…concessit, alteram … attribuit").
             // Between two verbs the cut goes before a conjunction if there is one, otherwise right after the first verb.
             const isVerb = (it) => gCanon(it.label) === 'Prädikat';
             const isConj = (it) => gCanon(it.label) === 'Konjunktion';
+            const isSubj = (it) => !it.noSubj && gCanon(it.label) === 'Subjekt';
             const vIdx = unit.items.map((it, i) => isVerb(it) ? i : -1).filter(i => i >= 0);
             const cuts = new Set();
             for (let k = 0; k + 1 < vIdx.length; k++) {
@@ -1290,19 +1285,36 @@
             const parts = []; let cur = [];
             unit.items.forEach((it, i) => { if (cuts.has(i) && cur.length) { parts.push(cur); cur = []; } cur.push(it); });
             parts.push(cur);
+            // Linear reading: the Latin order stays. Only the verb moves where the target language needs it
+            // (German main clause: second position; German subordinate/relative clause: the end; English: after the subject),
+            // and a missing subject is added where it belongs ("… überliess er …").
+            const de = currentLang === 'de';
+            const clauseEnd = unit.kind === 'sub' || unit.kind === 'rel';
             return parts.map((items, pi) => {
-                const keepFirst = unit.kind === 'rel' && items.length ? items[0] : null; // the relative pronoun stays in front
-                const glued = []; let pending = [];
-                items.forEach(it => { if (gCanon(it.label) === 'Konjunktion' && it !== items[0]) pending.push(it); else { glued.push({ ...it, pre: pending }); pending = []; } });
-                if (pending.length && glued.length) glued[glued.length - 1].post = pending;
-                const rest = glued.filter(g => g.el !== (keepFirst && keepFirst.el) || !keepFirst);
-                const sorted = rest.map((g, i) => ({ g, i })).sort((x, y) => (planRank(x.g.label, unit.kind) - planRank(y.g.label, unit.kind)) || (x.i - y.i)).map(x => x.g);
-                const first = keepFirst ? glued.find(g => g.el === keepFirst.el) : null;
-                const out = first ? [first].concat(sorted.filter(g => g !== first)) : sorted;
-                const hasVerb = items.some(isVerb), hasSubj = items.some(it => gCanon(it.label) === 'Subjekt');
-                if (hasVerb && !hasSubj && unit.kind !== 'rel' && unit.kind !== 'aci') {
-                    const at = out.findIndex(g => planRank(g.label, unit.kind) > 10); out.splice(at < 0 ? out.length : at, 0, { noSubj: true, same: pi > 0 });
-                }
+                const out = items.map(it => ({ ...it }));
+                const lead = () => { let k = 0; while (k < out.length && ['Konjunktion', 'Vokativ', 'Subjunktion'].includes(gCanon(out[k].label))) k++; return k; };
+                const vi = out.findIndex(isVerb);
+                const needSubj = vi >= 0 && !items.some(isSubj) && unit.kind !== 'rel' && unit.kind !== 'aci';
+                const ph = needSubj ? { noSubj: true, same: pi > 0 } : null;
+                if (vi >= 0) {
+                    const verb = out.splice(vi, 1)[0];
+                    let at;
+                    if (de && clauseEnd) {
+                        at = out.length;
+                        if (ph) { const sj = out.findIndex(it => gCanon(it.label) === 'Subjunktion'); out.splice(sj >= 0 ? sj + 1 : lead(), 0, ph); at = out.length; }
+                    } else if (de) {
+                        at = Math.min(lead() + 1, out.length);           // verb second
+                        if (vi < lead()) at = vi;                       // nothing in front of it: leave it where it is
+                        out.splice(at, 0, verb); if (ph) out.splice(at + 1, 0, ph);
+                        verb.moved = out.filter(x => !x.noSubj).indexOf(verb) !== vi; out.asyn = pi > 0 && items.length && !isConj(items[0]); out.latin = items; return out;
+                    } else {
+                        const si = out.findIndex(isSubj);
+                        if (si >= 0) at = si + 1;
+                        else { at = lead(); if (ph) { out.splice(at, 0, ph); at++; } }
+                    }
+                    out.splice(at, 0, verb);
+                    verb.moved = out.filter(x => !x.noSubj).indexOf(verb) !== vi; // only a real change of place against the Latin words
+                } else if (ph) out.splice(lead(), 0, ph);
                 out.asyn = pi > 0 && items.length && !isConj(items[0]);
                 out.latin = items;
                 return out;
@@ -1318,7 +1330,8 @@
             if (g.ref) extra = ` <span class="tp-ref">${t.toUnit(g.ref.idx)}</span>`;
             else if (a === 'AcI/NcI') extra = ` <span class="tp-ref">→ ${t.asDass}</span>`;
             else if (a === 'Ablativus absolutus') extra = ` <span class="tp-ref">→ ${t.asClause}</span>`;
-            return `${conj(g.pre)}<span class="tp-item" style="border-left-color:${col}"><span class="tp-w">${planEsc(g.text)}</span> <span class="tp-l">${planEsc(gDisp(g.label))}</span>${extra}</span>${g.post ? ' ' + conj(g.post) : ''}`;
+            const mv = g.moved && t.moved ? ` <span class="tp-moved" title="${t.moved}">↔</span>` : '';
+            return `${conj(g.pre)}<span class="tp-item${g.moved ? ' tp-mv' : ''}" style="border-left-color:${col}"><span class="tp-w">${planEsc(g.text)}</span> <span class="tp-l">${planEsc(gDisp(g.label))}</span>${extra}${mv}</span>${g.post ? ' ' + conj(g.post) : ''}`;
         }
         function planHtml(sent) {
             const t = gT(); if (!t.planTitle) return '';
@@ -1457,6 +1470,15 @@
             const { scopes, done } = guidedScopes(sent); const out = [];
             const hasClauses = Array.from(sent.querySelectorAll('.s-group')).some(gIsClause);
             Array.from(scopes.entries()).reverse().forEach(([sc, info]) => {
+                // a subordinate clause: its subjunction comes first, at or very close to the beginning
+                if (sc !== sent && t.subjSub && gCanon(sc.dataset.ans) === 'Nebensatz') {
+                    const own = (w) => (gClauseOf(w) || sent) === sc;
+                    const subjs = Array.from(sc.querySelectorAll('.hover-word')).filter(w => own(w) && gCanon(w.dataset.ans) === 'Subjunktion');
+                    if (subjs.length && !subjs.some(w => w.dataset.done === 'true')) {
+                        const first = gWords(info.opener || sc.querySelector('.hover-word') || sc, 1).replace(' …', '');
+                        out.push({ txt: t.subjSub(first), refs: gRefs([sc]) });
+                    }
+                }
                 if (info.pred || !gScopeHasVerb(sc, sent)) return;
                 let txt; const refs = (sc === sent ? [] : [sc]).concat(info.reasons);
                 if (sc === sent) txt = hasClauses ? t.predMain : t.predSent;
