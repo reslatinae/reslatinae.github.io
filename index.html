@@ -126,6 +126,11 @@
         .tool-row .btn-action { flex: 0 0 auto !important; padding: 6px 12px; font-size: 0.82rem; border-radius: 5px; }
         .tool-row .export-pair { display: flex; gap: 8px; margin-left: auto; flex-wrap: nowrap; }
         .tool-row #btn-preview, .tool-row #btn-export { margin-left: 0; white-space: nowrap; }
+        .tag-word.linked { outline: 2px dashed var(--lk, #0f766e); outline-offset: 2px; }
+        .tag-word.link-pending { outline: 3px solid #0f766e !important; outline-offset: 3px; }
+        .tag-word.lk-hl { outline-style: solid; outline-width: 3px; }
+        .lk-badge { position: absolute; top: -10px; left: -8px; min-width: 17px; height: 17px; padding: 0 3px; box-sizing: border-box; border-radius: 9px; background: var(--lk, #0f766e); color: #fff; font-size: 10px; font-weight: 700; line-height: 17px; text-align: center; z-index: 25; pointer-events: none; }
+        .link-opt-row { margin: 12px 0 0; }
         .tool-row #btn-preview:hover { background: #f3ede2 !important; }
         .model-trans { margin-top: 18px; border-top: 1px solid #efeae1; padding-top: 12px; }
         .model-trans summary { cursor: pointer; font-weight: 600; font-size: 0.92rem; color: #2a241d; padding: 4px 0; }
@@ -322,6 +327,7 @@
                 <button class="btn-action" id="linebreak-mode-btn" data-ref="linebreakModeBtn" style="background:#0369a1; flex:1;">Toggle Break (W)</button>
                 <button class="btn-action" id="group-mode-btn" data-ref="groupModeBtn" style="background:#7c3aed; flex:1;">Define Word Group (M)</button>
                 <button class="btn-action" id="attr-mode-btn" data-ref="attrModeBtn" style="background:#be185d; flex:1;">Mark Genitive (G)</button>
+                <button class="btn-action" id="link-mode-btn" data-ref="linkModeBtn" style="background:#0f766e; flex:1;">Connect Words (H)</button>
                 <div class="export-pair">
                     <button class="btn-action" id="btn-preview" data-ref="btnPreview" type="button" style="background:#fff; color:#1d1914; border:1px solid #1d1914;">Preview</button>
                     <button class="btn-action" id="btn-export" data-ref="btnExport" style="background:#1d1914;">Export Student Page</button>
@@ -352,6 +358,9 @@
 
         <div id="tagging-container-wrapper">
             <div id="tagging-area" data-ref="taggingArea"></div>
+        </div>
+        <div class="link-opt-row" data-ref="linkOptRow" style="display:none;">
+            <label class="vocab-opt"><input type="checkbox" data-ref="linkAfterSolve"> <span data-ref="linkAfterSolveLbl">Show connections only once both blocks are solved</span></label>
         </div>
         <details class="model-trans" data-ref="modelTransBox">
             <summary><span data-ref="modelTransSummary">📝 Model translations (optional)</span> <span class="model-trans-count" data-ref="modelTransCount"></span></summary>
@@ -564,6 +573,13 @@
         .g-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
 
         .nobr { white-space: nowrap; } .nobr > * { white-space: normal; }
+        .sent-words { position: relative; }
+        svg.lk-svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; z-index: 3; }
+        .lk-path { fill: none; stroke: #b07d2b; stroke-width: 1.8; stroke-dasharray: 5 4; stroke-linecap: round; opacity: 0.85; }
+        .lk-path.lk-hl { stroke-dasharray: none; stroke-width: 2.6; opacity: 1; }
+        #exercise .hover-word.lk-hl { box-shadow: 0 0 0 3px rgba(176, 125, 43, 0.55); }
+        body.high-contrast .lk-path { stroke: #f0c987; }
+        @media print { svg.lk-svg { display: none !important; } }
         .punct { font-size: 1.15rem; margin: 0 2px; vertical-align: baseline; display:inline-block; font-weight: 500; }
         
         .trans-box { margin: 32px 0 10px; line-height: 1.5; border-top: 1px dashed #efeae1; padding-top: 24px; }
@@ -1115,6 +1131,55 @@
             });
         });
         let guided = { hold: false, el: null, type: null, brief: false, streak: 0, slips: 0, log: [], review: null, lastArgs: [] };
+        // ---- Connected words: a thin arc between blocks that belong together (e.g. tuo … in aequore) ----
+        function linkVisible(members) {
+            const after = (typeof LINK_AFTER_SOLVE !== 'undefined' && LINK_AFTER_SOLVE) || exMode === 'exam';
+            return !after || members.every(m => m.dataset.done === 'true');
+        }
+        function drawLinks() {
+            document.querySelectorAll('#exercise .sent-words').forEach(box => {
+                let svg = box.querySelector(':scope > svg.lk-svg');
+                const blocks = Array.from(box.querySelectorAll('.hover-word[data-lk]'));
+                if (!blocks.length) { if (svg) svg.remove(); return; }
+                if (!svg) { svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('class', 'lk-svg'); svg.setAttribute('aria-hidden', 'true'); box.appendChild(svg); }
+                const br = box.getBoundingClientRect(); const k = br.width ? box.offsetWidth / br.width : 1; // zoom
+                svg.setAttribute('width', box.scrollWidth); svg.setAttribute('height', box.scrollHeight);
+                const groups = {}; blocks.forEach(b => (groups[b.dataset.lk] = groups[b.dataset.lk] || []).push(b));
+                let out = '';
+                Object.keys(groups).forEach(id => {
+                    const m = groups[id]; if (m.length < 2 || !linkVisible(m)) return;
+                    for (let i = 0; i + 1 < m.length; i++) {
+                        const ra = m[i].getBoundingClientRect(), rb = m[i + 1].getBoundingClientRect();
+                        const A = { l: (ra.left - br.left) * k, r: (ra.right - br.left) * k, t: (ra.top - br.top) * k, b: (ra.bottom - br.top) * k };
+                        const B = { l: (rb.left - br.left) * k, r: (rb.right - br.left) * k, t: (rb.top - br.top) * k, b: (rb.bottom - br.top) * k };
+                        const ax = (A.l + A.r) / 2, bx = (B.l + B.r) / 2; let d;
+                        if (Math.abs(A.t - B.t) < 12) { // same line: an arc above the two blocks
+                            const top = Math.min(A.t, B.t), h = Math.min(18, 8 + Math.abs(bx - ax) * 0.05);
+                            d = `M ${ax} ${A.t - 2} C ${ax} ${top - h}, ${bx} ${top - h}, ${bx} ${B.t - 2}`;
+                        } else { // different lines: from below the upper block to above the lower one, through the gap between the lines
+                            const [U, L] = A.t < B.t ? [A, B] : [B, A]; const ux = (U.l + U.r) / 2, lx = (L.l + L.r) / 2; const dir = lx < ux ? -1 : 1;
+                            const sx = ux + dir * Math.max(0, (U.r - U.l) / 2 - 8), ex = lx - dir * Math.max(0, (L.r - L.l) / 2 - 8);
+                            d = `M ${sx} ${U.b + 1} C ${sx} ${U.b + 30}, ${ex} ${L.t - 30}, ${ex} ${L.t - 2}`;
+                        }
+                        out += `<path class="lk-path" data-lk="${id}" d="${d}"/>`;
+                    }
+                });
+                svg.innerHTML = out;
+            });
+        }
+        let drawLinksT = null;
+        function drawLinksSoon() { clearTimeout(drawLinksT); drawLinksT = setTimeout(drawLinks, 30); }
+        window.addEventListener('resize', drawLinksSoon);
+        if (window.ResizeObserver) { const ro = new ResizeObserver(drawLinksSoon); document.querySelectorAll('#exercise .sentence-container').forEach(sc => ro.observe(sc)); }
+        // pointing at a connected block highlights all blocks it belongs with
+        document.addEventListener('mouseover', (e) => {
+            const b = e.target.closest && e.target.closest('#exercise .hover-word[data-lk]');
+            document.querySelectorAll('#exercise .lk-hl').forEach(x => x.classList.remove('lk-hl'));
+            if (!b) return;
+            const m = Array.from(document.querySelectorAll(`#exercise .hover-word[data-lk="${b.dataset.lk}"]`));
+            if (!linkVisible(m)) return;
+            m.forEach(x => x.classList.add('lk-hl')); document.querySelectorAll(`#exercise .lk-path[data-lk="${b.dataset.lk}"]`).forEach(x => x.classList.add('lk-hl'));
+        });
         // ---- Word information (📖): one shared box, placed next to the icon and kept inside the screen ----
         let vocabPop = null, vocabFor = null;
         function closeVocab() { if (vocabPop) vocabPop.hidden = true; if (vocabFor) vocabFor.setAttribute('aria-expanded', 'false'); vocabFor = null; }
@@ -1515,6 +1580,7 @@
             guidedRender();
             const el = guided.el; if (el) setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 50);
         }
+        setTimeout(() => { if (typeof drawLinks === 'function') drawLinks(); }, 0);
         function guidedNote(el) {
             const nxt = guidedCompute(); const t = gT();
             if (nxt.type === 'gen' && nxt.el === el) return '<div class="guide-next-note">' + t.genAhead + '</div>';
@@ -1693,6 +1759,7 @@
                 const n = realWords(b).length;
                 if (n >= 2 && Math.abs(i - me) < dist) { dist = Math.abs(i - me); best = b; }
             });
+            if (el.dataset.lk) { const lp = Array.from(sent.querySelectorAll(`.hover-word[data-lk="${el.dataset.lk}"]`)).find(b => b !== el); if (lp) best = lp; } // the teacher's connection
             return { word: words[0], partner: best ? gWords(best, 4) : '' };
         }
         function guidedWrong(el, answer, chosen) {
@@ -2367,6 +2434,7 @@ function dismissToastOnInteraction() {
         }
 
         function check() { 
+            if (typeof drawLinksSoon === 'function') drawLinksSoon();
             document.querySelectorAll('.sentence-container').forEach((s, i) => { 
                 const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')];
                 const requiredGens = [...s.querySelectorAll('.s-text[data-u="true"]')];
@@ -2633,12 +2701,14 @@ const CONFIG = {
             btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
             lblLevel: "Grammar Level:", optBeg: "Beginner", optInt: "Intermediate", optAdv: "Advanced (All)",
             editH3: "Step 2: Editing Instruction",
-            editBody: "Check the analysis. Adjacent words merge automatically in the student view. Use 'Manual Split' to separate words. Create groups with 'Define Word Group'. With 'Mark Genitive' you can highlight a genitive attribute inside a larger group by underlining it. Double-click a word to correct it or add hints. With 'New Label' you can add a new function (e.g. Vocative). Click ▾ next to a label (or right-click it) to change its colour. Below the editor you can enter a model translation for each sentence (optional); students can open it once they have written their own translation. Under 'Word information' the AI can suggest the dictionary form, form and meaning of each word; please check them before you export the page. With 'Save Work' you can save a json file to keep working on it later; at the end, 'Export Student Page' creates an html page that you can share with your students.",
+            editBody: "Check the analysis. Adjacent words merge automatically in the student view. Use 'Manual Split' to separate words. Create groups with 'Define Word Group'. With 'Mark Genitive' you can highlight a genitive attribute inside a larger group by underlining it. Double-click a word to correct it or add hints. With 'New Label' you can add a new function (e.g. Vocative). Click ▾ next to a label (or right-click it) to change its colour. With 'Connect Words' you link separated words that belong together (e.g. tuo … in aequore): first click the separated word, then a word of its group; students see a dashed arc. Below the editor you can enter a model translation for each sentence (optional); students can open it once they have written their own translation. Under 'Word information' the AI can suggest the dictionary form, form and meaning of each word; please check them before you export the page. With 'Save Work' you can save a json file to keep working on it later; at the end, 'Export Student Page' creates an html page that you can share with your students.",
            	wordModalTitle: "Edit Word & Hint", wordTextLabel: "Word Text:", hintLabel: "Hint (optional):", groupHintLabel: "Group Hint (optional):",
             errorHintLabel: "Hint after wrong answer (optional):",
             modelSummary: "📝 Model translations (optional)", modelCount: (n, m) => `${n} of ${m} sentences`, modelIntro: "If you enter a model translation, students can open it once they have written their own translation of the sentence, and compare the two.", modelPh: "Model translation (optional)",
             explainLabel: "Explanation after a correct answer (guided mode, optional):", phWordExplain: "E.g. The accusative points ahead to a verb that needs it.", phGroupExplain: "E.g. Expect a verb of its own at the end of the clause.",
-            phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (W)", btnBracket: "Define Word Group (M)", btnAttr: "Mark Genitive (G)",
+            phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (W)", btnBracket: "Define Word Group (M)", btnAttr: "Mark Genitive (G)", btnLink: "Connect Words (H)",
+            modeLink: "Mode: Connect words – first click the separated word (e.g. tuo), then a word of the group it belongs to (e.g. aequore). Click a connected word twice to remove it.",
+            linkAfterSolve: "Show connections on the student page only once both blocks are solved (in exam mode always only then)", linkOtherSentence: "Words can only be connected within the same sentence.",
             vocabSummary: "📖 Word information (optional)", vocabIntro: "Dictionary form, form in the text and meaning of each word. Students can open them with the 📖 on a block; under “Show” you choose which words they see (the AI suggests leaving out very common words and names). Entries made by the AI are marked in orange until you have checked them: changing an entry or ticking “Checked” marks it as checked.",
             vocabAi: "✨ Create with AI", vocabAiBusy: "⏳ Creating word information…", vocabAllOk: "✓ Mark all as checked", vocabShowForm: "Also show the form (case, person …) to students",
             vocabShowFormTitle: "Off by default: the form often gives the function away (e.g. accusative → object).",
@@ -2680,12 +2750,14 @@ const CONFIG = {
             btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
             lblLevel: "Grammatik-Level:", optBeg: "Anfänger", optInt: "Fortgeschritten", optAdv: "Profi (Alle)",
             editH3: "Schritt 2: Bearbeitung",
-            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer grösseren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe. Unter dem Editor können Sie zu jedem Satz eine Musterübersetzung eintragen (optional); die Schülerinnen und Schüler können sie öffnen, sobald sie selbst übersetzt haben. Unter 'Wortangaben' kann die KI zu jedem Wort Grundform, Form und Bedeutung vorschlagen; prüfen Sie diese Angaben, bevor Sie die Seite exportieren. Mit 'Speichern' können Sie eine json-Datei für die spätere Bearbeitung speichern, mit 'Schülerseite exportieren' erstellen Sie am Ende eine html-Seite, die Sie mit Ihren Schülerinnen und Schülern teilen können.",
+            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer grösseren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe. Mit 'Wörter verbinden' verknüpfen Sie getrennt stehende Wörter, die zusammengehören (z. B. tuo … in aequore): Klicken Sie zuerst das abgetrennte Wort an, dann ein Wort der Gruppe; die Schülerinnen und Schüler sehen einen gestrichelten Bogen. Unter dem Editor können Sie zu jedem Satz eine Musterübersetzung eintragen (optional); die Schülerinnen und Schüler können sie öffnen, sobald sie selbst übersetzt haben. Unter 'Wortangaben' kann die KI zu jedem Wort Grundform, Form und Bedeutung vorschlagen; prüfen Sie diese Angaben, bevor Sie die Seite exportieren. Mit 'Speichern' können Sie eine json-Datei für die spätere Bearbeitung speichern, mit 'Schülerseite exportieren' erstellen Sie am Ende eine html-Seite, die Sie mit Ihren Schülerinnen und Schülern teilen können.",
            	wordModalTitle: "Wort & Hinweis bearbeiten", wordTextLabel: "Worttext:", hintLabel: "Hinweis (optional):", groupHintLabel: "Gruppen-Hinweis (optional):",
             errorHintLabel: "Hinweis nach falscher Antwort (optional):",
             modelSummary: "📝 Musterübersetzungen (optional)", modelCount: (n, m) => `${n} von ${m} Sätzen`, modelIntro: "Tragen Sie eine Musterübersetzung ein, können die Schülerinnen und Schüler sie öffnen, sobald sie den Satz selbst übersetzt haben, und beide vergleichen.", modelPh: "Musterübersetzung (optional)",
             explainLabel: "Erklärung nach richtiger Antwort (geführter Modus, optional):", phWordExplain: "Z.B. Der Akkusativ kündigt ein Verb an, das ihn braucht.", phGroupExplain: "Z.B. Erwarte am Ende des Nebensatzes ein eigenes Prädikat.",
-            phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (W)", btnBracket: "Wortgruppe definieren (M)", btnAttr: "Genitiv markieren (G)",
+            phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (W)", btnBracket: "Wortgruppe definieren (M)", btnAttr: "Genitiv markieren (G)", btnLink: "Wörter verbinden (H)",
+            modeLink: "Modus: Wörter verbinden – zuerst das abgetrennte Wort anklicken (z. B. tuo), dann ein Wort der Gruppe, zu der es gehört (z. B. aequore). Ein verbundenes Wort zweimal anklicken: Verbindung lösen.",
+            linkAfterSolve: "Verbindungen auf der Schülerseite erst zeigen, wenn beide Blöcke bestimmt sind (im Prüfungsmodus immer erst dann)", linkOtherSentence: "Wörter lassen sich nur innerhalb desselben Satzes verbinden.",
             vocabSummary: "📖 Wortangaben (optional)", vocabIntro: "Grundform, Form im Text und Bedeutung jedes Wortes. Die Schülerinnen und Schüler können sie über das 📖 an einem Block öffnen; unter „Zeigen“ wählen Sie, welche Wörter sie sehen (die KI schlägt vor, sehr häufige Wörter und Namen wegzulassen). Einträge der KI sind orange markiert, bis Sie sie geprüft haben: Ein geänderter Eintrag oder ein Häkchen bei „Geprüft“ gilt als geprüft.",
             vocabAi: "✨ Mit KI erstellen", vocabAiBusy: "⏳ Wortangaben werden erstellt…", vocabAllOk: "✓ Alle als geprüft markieren", vocabShowForm: "Form (Kasus, Person …) auch den Schülerinnen und Schülern zeigen",
             vocabShowFormTitle: "Standardmässig aus: Die Form verrät oft die Funktion (z. B. Akkusativ → Objekt).",
@@ -2726,7 +2798,8 @@ const MODES = {
     SPLIT: 'split',
     LINEBREAK: 'linebreak',
     GROUP: 'group',
-    ATTR: 'attr'
+    ATTR: 'attr',
+    LINK: 'link'
 };
 
 // ==========================================
@@ -2736,6 +2809,7 @@ const AppState = {
     words: [],
     groups: [],
     functions: [],
+    linkAfterSolve: false, // connected words: show the arcs only once both blocks are solved
     vocabShowForm: false, // word information: show the form (case, person ...) on the student page too
     translations: [], // model translations, one per sentence (in the order of the editor's sentences)
     colors: { ...CONFIG.SEMANTIC_COLORS },
@@ -2886,7 +2960,7 @@ const StorageManager = {
                 lang: AppState.lang, level: AppState.level,
                 title: DOM.pageTitle.value, image: DOM.pageImage.value,
                 text: textVal, notes: DOM.teacherNotes.value,
-                groups: AppState.groups, funcs: AppState.functions, cols: AppState.colors, words: AppState.words, translations: AppState.translations, vocabShowForm: AppState.vocabShowForm,
+                groups: AppState.groups, funcs: AppState.functions, cols: AppState.colors, words: AppState.words, translations: AppState.translations, vocabShowForm: AppState.vocabShowForm, linkAfterSolve: AppState.linkAfterSolve,
                 timestamp: new Date().getTime()
             };
             
@@ -2937,7 +3011,7 @@ const StorageManager = {
             text: DOM.enterText.value,
             notes: DOM.teacherNotes.value, 
             words: AppState.words, groups: AppState.groups, 
-            customFunctions: AppState.functions, customColors: AppState.colors, translations: AppState.translations, vocabShowForm: AppState.vocabShowForm
+            customFunctions: AppState.functions, customColors: AppState.colors, translations: AppState.translations, vocabShowForm: AppState.vocabShowForm, linkAfterSolve: AppState.linkAfterSolve
         };
         const blob = new Blob([JSON.stringify(projectData, null, 2)], {type: "application/json"});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); 
@@ -2981,7 +3055,7 @@ const StorageManager = {
         AppState.groups = data.groups || [];
         AppState.translations = Array.isArray(data.translations) ? data.translations.map(x => typeof x === 'string' ? x : '') : [];
         if (DOM.modelTransList) DOM.modelTransList.dataset.sig = '';
-        AppState.vocabShowForm = !!data.vocabShowForm; if (DOM.vocabList) DOM.vocabList.dataset.sig = '';
+        AppState.vocabShowForm = !!data.vocabShowForm; AppState.linkAfterSolve = !!data.linkAfterSolve; if (DOM.vocabList) DOM.vocabList.dataset.sig = '';
         AppState.history = []; 
         
         const loadWords = data.words || data.tokens || [];
@@ -3068,7 +3142,7 @@ function setTeacherZoom(delta) {
 function updateShortcuts() {
     AppState.ui.labelShortcuts = {};
     // Reserved Tool Keys
-    let used = new Set(['x', 'm', 'w', 'g']); 
+    let used = new Set(['x', 'm', 'w', 'g', 'h']); 
     
     const hardcoded = LatinLabels.SHORTCUTS;
 
@@ -3165,7 +3239,8 @@ function changeLanguage(lang) {
     DOM.splitModeBtn.textContent = txt.btnSplit;
     DOM.linebreakModeBtn.textContent = txt.btnLineBreak; 
     DOM.groupModeBtn.textContent = txt.btnBracket;
-    DOM.attrModeBtn.textContent = txt.btnAttr;
+    DOM.attrModeBtn.textContent = txt.btnAttr; if (DOM.linkModeBtn) DOM.linkModeBtn.textContent = txt.btnLink;
+    if (DOM.linkAfterSolveLbl) DOM.linkAfterSolveLbl.textContent = txt.linkAfterSolve;
     DOM.btnExport.textContent = txt.btnExport; 
     if (DOM.btnPreview) { DOM.btnPreview.textContent = txt.btnPreview; DOM.btnPreview.title = txt.previewTitle; }
     if (DOM.vocabList) { DOM.vocabList.dataset.sig = ''; renderVocab(); }
@@ -3240,6 +3315,8 @@ function setMode(newMode) {
     DOM.groupModeBtn.classList.toggle('active-mode', AppState.mode === MODES.GROUP);
     DOM.linebreakModeBtn.classList.toggle('active-mode', AppState.mode === MODES.LINEBREAK);
     DOM.attrModeBtn.classList.toggle('active-mode', AppState.mode === MODES.ATTR);
+    if (DOM.linkModeBtn) DOM.linkModeBtn.classList.toggle('active-mode', AppState.mode === MODES.LINK);
+    if (AppState.mode !== MODES.LINK && AppState.ui.linkStart != null) { AppState.ui.linkStart = null; document.querySelectorAll('#tagging-area .link-pending').forEach(x => x.classList.remove('link-pending')); }
     
     document.querySelectorAll('.p-btn').forEach((b) => {
         b.classList.toggle('active', AppState.mode === MODES.TAGGING && b.dataset.func === AppState.activeFunc);
@@ -3254,6 +3331,7 @@ function updateStatus() {
     else if (AppState.mode === MODES.GROUP) modeText = txt.modeBracket; 
     else if (AppState.mode === MODES.LINEBREAK) modeText = txt.modeLineBreak; 
     else if (AppState.mode === MODES.ATTR) modeText = txt.modeAttr; 
+    else if (AppState.mode === MODES.LINK) modeText = txt.modeLink;
     else modeText = txt.modeTag + ` (${AppState.activeFunc})`;
     DOM.modeStatus.textContent = modeText;
 }
@@ -3548,6 +3626,7 @@ function renderEditor() {
     area.appendChild(fragment); 
     
     updateGroupUI();
+    linkDecorate();
     renderModelTranslations();
     renderVocab();
 }
@@ -3849,6 +3928,8 @@ function initEventListeners() {
 	DOM.linebreakModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.LINEBREAK ? MODES.TAGGING : MODES.LINEBREAK));
     DOM.groupModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.GROUP ? MODES.TAGGING : MODES.GROUP));
     DOM.attrModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.ATTR ? MODES.TAGGING : MODES.ATTR));
+    DOM.linkModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.LINK ? MODES.TAGGING : MODES.LINK));
+    DOM.linkAfterSolve.addEventListener('change', () => { AppState.linkAfterSolve = DOM.linkAfterSolve.checked; StorageManager.debouncedAutoSave(); });
     DOM.btnExport.addEventListener('click', () => exportToStudent(false));
     DOM.btnPreview.addEventListener('click', () => exportToStudent(true));
     DOM.btnVocabAi.addEventListener('click', generateVocabAI);
@@ -3901,6 +3982,9 @@ function initEventListeners() {
     const taggingArea = DOM.taggingArea;
 
     taggingArea.addEventListener('mouseover', (e) => {
+        const lw = e.target.closest && e.target.closest('.tag-word[data-lk]');
+        document.querySelectorAll('#tagging-area .lk-hl').forEach(x => x.classList.remove('lk-hl'));
+        if (lw) document.querySelectorAll(`#tagging-area .tag-word[data-lk="${lw.dataset.lk}"]`).forEach(x => x.classList.add('lk-hl'));
         const badge = e.target.closest('.bracket-badge');
         AppState.ui.hoveredGroupIndex = badge ? parseInt(badge.dataset.groupIndex) : null;
         const word = e.target.closest('.tag-word, .punct-span');
@@ -4072,6 +4156,14 @@ function initEventListeners() {
 				} else { setMode(AppState.mode === MODES.ATTR ? MODES.TAGGING : MODES.ATTR); }
                 return;
             }
+            if (key === 'h') { // connect words: H over the first word, then H over the second
+                e.preventDefault();
+                if (hgi === null && hw && !hw.classList.contains('punct-span')) {
+                    if (AppState.mode !== MODES.LINK) setMode(MODES.LINK);
+                    handleWordClick(hw, false);
+                } else { setMode(AppState.mode === MODES.LINK ? MODES.TAGGING : MODES.LINK); }
+                return;
+            }
             
             let matchedLabel = Object.keys(AppState.ui.labelShortcuts).find(k => AppState.ui.labelShortcuts[k] === key);
             if (matchedLabel) {
@@ -4156,6 +4248,9 @@ function handleWordClick(el) {
    else if(AppState.mode === MODES.ATTR) {
         AppState.mutateWord(domIdx, { u: !AppState.words[domIdx].u });
     }
+    else if (AppState.mode === MODES.LINK) {
+        linkWordClick(domIdx, el);
+    }
     else { 
         if (AppState.words[domIdx].f !== AppState.activeFunc) {
             // We pass false for shouldRender here because updateWordVisuals 
@@ -4166,6 +4261,53 @@ function handleWordClick(el) {
     }
 }
 
+// ---------- Connected words (e.g. an adjective separated from its noun: tuo … in aequore) ----------
+// The first click marks the separated word, the second a word of the group it belongs to. Both get the same id (lk).
+// The separated word becomes a block of its own, so it does not merge with a neighbouring phrase of the same function.
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && AppState.ui.linkStart != null) { AppState.ui.linkStart = null; document.querySelectorAll('#tagging-area .link-pending').forEach(x => x.classList.remove('link-pending')); }
+});
+function linkSentenceOf(i) { const g = sentenceIndexGroups(); return g.findIndex(x => x.includes(i)); }
+function linkCleanup() {
+    const n = {}; AppState.words.forEach(w => { if (w.lk) n[w.lk] = (n[w.lk] || 0) + 1; });
+    AppState.words.forEach(w => { if (w.lk && n[w.lk] < 2) delete w.lk; });
+}
+function linkWordClick(idx, el) {
+    const w = AppState.words[idx]; if (!w || w.f === CONFIG.PUNCT) return;
+    const start = AppState.ui.linkStart;
+    if (start == null) { AppState.ui.linkStart = idx; el.classList.add('link-pending'); return; }
+    AppState.ui.linkStart = null;
+    document.querySelectorAll('#tagging-area .link-pending').forEach(x => x.classList.remove('link-pending'));
+    if (start === idx) { // the same word twice: remove it from its connection
+        if (w.lk) { AppState.saveToHistory(); delete w.lk; linkCleanup(); StorageManager.debouncedAutoSave(); renderEditor(); }
+        return;
+    }
+    if (linkSentenceOf(start) !== linkSentenceOf(idx)) { alert(CONFIG.LANG_TEXT[AppState.lang].linkOtherSentence); return; }
+    AppState.saveToHistory();
+    const a = AppState.words[start];
+    const id = a.lk || w.lk || ('L' + Date.now().toString(36) + Math.floor(Math.random() * 1000));
+    const old = [a.lk, w.lk].filter(x => x && x !== id);
+    AppState.words.forEach(x => { if (old.includes(x.lk)) x.lk = id; });
+    a.lk = id; w.lk = id;
+    // the separated word stands on its own (boundary before and after it)
+    // (before it: on the last word before any punctuation, so "in cacumine, tuo" is not bridged over the comma either)
+    let j = start - 1; while (j >= 0 && AppState.words[j].f === CONFIG.PUNCT) j--;
+    if (j >= 0) AppState.words[j].isSplit = true;
+    a.isSplit = true;
+    linkCleanup(); StorageManager.debouncedAutoSave(); renderEditor();
+}
+function linkDecorate() {
+    // numbered badges in the editor; pointing at a connected word highlights its partners
+    const ids = []; AppState.words.forEach(w => { if (w.lk && !ids.includes(w.lk)) ids.push(w.lk); });
+    const pal = ['#0f766e', '#b45309', '#7c3aed', '#be123c', '#1d4ed8', '#4d7c0f'];
+    AppState.words.forEach((w, i) => {
+        const el = document.getElementById('word-' + i); if (!el || !w.lk) return;
+        const k = ids.indexOf(w.lk); el.classList.add('linked'); el.dataset.lk = w.lk; el.style.setProperty('--lk', pal[k % pal.length]);
+        const b = document.createElement('span'); b.className = 'lk-badge'; b.textContent = k + 1; el.appendChild(b);
+    });
+    if (DOM.linkOptRow) DOM.linkOptRow.style.display = ids.length ? '' : 'none';
+    if (DOM.linkAfterSolve) DOM.linkAfterSolve.checked = !!AppState.linkAfterSolve;
+}
 function handleWordDoubleClick(el, e) {
     e.stopPropagation();
     AppState.ui.editingWordNode = el;
@@ -4717,6 +4859,7 @@ function exportToStudent(preview) {
             if(token.h) current.hint = current.hint ? current.hint + " | " + token.h : token.h;
             if(token.eh) current.eh = current.eh ? current.eh + " | " + token.eh : token.eh;
             if(token.ex) current.ex = current.ex ? current.ex + " " + token.ex : token.ex;
+            if(token.lk && !current.lk) current.lk = token.lk;
             current.b = token.b; 
         } else {
             if (current) merged.push(current);
@@ -4727,6 +4870,7 @@ function exportToStudent(preview) {
                 hint: token.h, 
                 eh: token.eh,
                 ex: token.ex,
+                lk: token.lk,
                 b: token.b,
                 segments: [{ w: token.w, u: token.u, space: '', vi: vocabHas(token.vi) ? token.vi : null }]
             };
@@ -4908,7 +5052,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
         <div id="color-popover" class="color-popover" role="dialog"></div>
         <script>
             const SHORTCUTS = ${JSON.stringify(LatinLabels.SHORTCUTS)};
-            const SAFE_COLORS = ${JSON.stringify(CONFIG.SAFE_COLORS)}; const NEUTRAL_COLOR = ${JSON.stringify(CONFIG.NEUTRAL_COLOR)}; const CVD_SAFE = ${JSON.stringify(CONFIG.CVD_SAFE)};
+            const SAFE_COLORS = ${JSON.stringify(CONFIG.SAFE_COLORS)}; const NEUTRAL_COLOR = ${JSON.stringify(CONFIG.NEUTRAL_COLOR)}; const CVD_SAFE = ${JSON.stringify(CONFIG.CVD_SAFE)}; const LINK_AFTER_SOLVE = ${AppState.linkAfterSolve ? 'true' : 'false'};
             const colors = ${JSON.stringify(AppState.colors)}; const abbreviations = ${JSON.stringify(allAbbrevs)}; const labelMap = ${JSON.stringify(labelMap)};
             const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const HELP_BASE = ${JSON.stringify(PREVIEW_BUILD || /^https?:$/.test(location.protocol) ? new URL('.', location.href).href : '')}; const titleInput = ${JSON.stringify(title).replace(/</g, '\\u003c')};
             const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + '${exerciseId}'${PREVIEW_BUILD ? " + '_preview'" : ''};
@@ -4957,7 +5101,7 @@ function generateExerciseHTML(words, groups, placeholder, lang, models) {
         const errHintAttr = (word.eh ? ` data-errhint="${escapeHTML(word.eh)}"` : '') + (word.ex ? ` data-explain="${escapeHTML(word.ex)}"` : '');
         const content = isPunct 
             ? `<span class="punct">${safeWordHtml}</span>` 
-            : `<span class="hover-word" tabindex="0" data-ans="${safeFunc}"${errHintAttr}>${safeWordHtml}${hintHtml}${vocabHtml}</span>`;
+            : `<span class="hover-word" tabindex="0" data-ans="${safeFunc}"${errHintAttr}${word.lk ? ` data-lk="${escapeHTML(word.lk)}"` : ''}>${safeWordHtml}${hintHtml}${vocabHtml}</span>`;
 
         let openDivs = "";
         let closeDivs = "";
