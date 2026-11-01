@@ -675,18 +675,16 @@
         body.high-contrast .trans-box { border-top-color: #444; }
         /* Large screens: the translation plan stands next to the sentence and its translation box (and stays in view
            while scrolling); the translation box follows directly below the sentence. */
-        /* Smaller screens: sentence – translation box – plan, so the box stays right under the sentence. */
+        /* Guided mode, finished sentence: sentence – translation box – plan – "next", one below the other on every screen. */
         .sentence-container.with-plan { display: grid; grid-template-columns: minmax(0, 1fr); }
         .sentence-container.with-plan > .sent-words { grid-row: 1; min-width: 0; }
         .sentence-container.with-plan > .trans-box { grid-row: 2; }
         .sentence-container.with-plan > .trans-plan { grid-row: 3; margin: 12px 0 0; }
-        @media (min-width: 1100px) {
-            .sentence-container.with-plan { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 40%); column-gap: 24px; align-items: start; }
-            .sentence-container.with-plan > .sent-words { grid-column: 1; grid-row: 1; min-width: 0; }
-            .sentence-container.with-plan > .trans-plan { grid-column: 2; grid-row: 1 / span 2; position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; margin: 0; box-sizing: border-box; }
-            .sentence-container.with-plan > .trans-box { grid-column: 1; grid-row: 2; }
-            .sentence-container.with-plan:has(> .trans-plan:not([open])) { grid-template-columns: minmax(0, 1fr) auto; }
-        }
+        .sentence-container.with-plan > .sent-next { grid-row: 4; }
+        .sent-next { margin-top: 14px; padding: 10px 14px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; line-height: 1.45; font-size: 0.92rem; color: #1e3a5f; }
+        .sent-next .sn-text { flex: 1 1 320px; }
+        .sent-next .sn-note { margin-top: 6px; font-size: 0.86rem; }
+        body.high-contrast .sent-next { background: #172036; border-color: #3b5b8f; color: #dbeafe; }
         .trans-plan { line-height: 1.5; margin: 0 0 12px; padding: 10px 14px; background: #fbf8f2; border: 1px solid #ece4d6; border-radius: 8px; font-size: 0.92rem; color: #2a241d; }
         .trans-plan summary { cursor: pointer; font-weight: 600; color: #6b4d24; }
         .trans-plan .tp-intro { margin: 6px 0 8px; font-size: 0.84rem; color: #4a4236; }
@@ -808,6 +806,8 @@
                 lockedGen: 'Es geht erst weiter, wenn das <strong>Genitivattribut</strong> im blau umrandeten Block markiert ist. Klicke dort direkt auf das Wort im Genitiv und wähle „🖍️ Genitiv markieren“.',
                 genNotLabel: 'Die Funktion dieses Blocks hast du schon richtig bestimmt. Jetzt geht es um das <strong>Genitivattribut</strong>: Klicke direkt auf das Wort im Genitiv und wähle „🖍️ Genitiv markieren“.',
                 genTag: 'Genitiv?',
+                sentDoneBar: '✓ Der Satz ist vollständig bestimmt. Übersetze ihn jetzt – der Übersetzungsplan unter dem Übersetzungsfeld hilft dir dabei.',
+                nextSent: 'Weiter zum nächsten Satz ▶', nextEnd: 'Abschliessen ✓',
                 jumpLabel: 'Satz wählen', jumpOpt: (n) => `Satz ${n}`, jumpDone: ' ✓',
                 otherSentence: (n) => `Dieser Block gehört zu Satz ${n}. Im geführten Modus gehst du Block für Block vor – du kannst aber jederzeit zu einem anderen Satz wechseln.`,
                 jumpBtn: (n) => `▶ Mit Satz ${n} weitermachen`,
@@ -933,6 +933,8 @@
                 lockedGen: 'You can only go on once the <strong>genitive attribute</strong> in the block outlined in blue is marked. Click directly on the genitive word there and choose “🖍️ Mark Genitive”.',
                 genNotLabel: 'You have already worked out the function of this block. Now it is about the <strong>genitive attribute</strong>: click directly on the genitive word and choose “🖍️ Mark Genitive”.',
                 genTag: 'Genitive?',
+                sentDoneBar: '✓ The sentence is fully analysed. Translate it now – the translation plan below the translation box will help you.',
+                nextSent: 'Next sentence ▶', nextEnd: 'Finish ✓',
                 jumpLabel: 'Choose sentence', jumpOpt: (n) => `Sentence ${n}`, jumpDone: ' ✓',
                 otherSentence: (n) => `This block belongs to sentence ${n}. In guided mode you go block by block – but you can switch to another sentence at any time.`,
                 jumpBtn: (n) => `▶ Continue with sentence ${n}`,
@@ -1110,11 +1112,13 @@
         function guidedContinue() { if (exMode === 'guided' && guided.hold) { guided.hold = false; guidedRender(); return true; } return false; }
         document.addEventListener('click', (e) => {
             if (!(exMode === 'guided' && guided.hold)) return;
+            if (guided.sentEnd) return; // end of a sentence: only the "next" button (or Enter) moves on, so reading the plan never skips ahead
             if (e.target.closest('textarea, .model-compare, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal, .guide-toggle, .guide-level, .guide-more, [data-refs], .hint-icon, #vocab-pop, .guide-jump, [data-jump]')) return; // these keep working as usual
             guidedContinue();
         }, true);
         document.addEventListener('keydown', (e) => {
             if (!(exMode === 'guided' && guided.hold)) return;
+            if (guided.sentEnd) return; // end of a sentence: only the "next" button moves on (no accidental skip while translating)
             if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); guidedContinue(); }
         });
@@ -1165,6 +1169,12 @@
         }
         function guidedPlace(scroll) {
             if (!guidePanel || !guidePanel.isConnected || exMode !== 'guided') return;
+            if (guidePanel.style.display === 'none') { // end of a sentence: no hint box; bring the translation box into view
+                guidePanel.classList.remove('docked'); document.body.style.paddingBottom = '';
+                const sc = sentenceOf(guided.el), tb = sc && sc.querySelector('.trans-box');
+                if (scroll && tb) { const r = tb.getBoundingClientRect(); if (r.top < 60 || r.bottom > window.innerHeight - 40) tb.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+                return;
+            }
             const el = guided.el;
             const sent = sentenceOf(el) || guidePanel.previousElementSibling;
             const dock = guidedDockWanted(sent);
@@ -1205,6 +1215,8 @@
             document.querySelectorAll('.guided-current').forEach(x => x.classList.remove('guided-current'));
             gClearHighlights();
             document.querySelectorAll('#exercise .gen-tag').forEach(x => x.remove()); document.body.classList.remove('guided-gen-step');
+            document.querySelectorAll('#exercise .sent-next').forEach(x => x.remove()); guided.sentEnd = false;
+            if (guidePanel) guidePanel.style.display = '';
         }
         function guidedRender(fbHtml, fbOk, showSolution) {
             if (exMode !== 'guided' || !guidePanel) return;
@@ -1263,6 +1275,22 @@
                 if (guided.type !== 'gen' && !fbHtml) el.focus({ preventScroll: true });
             }
             gClearHighlights(); renderPlans();
+            // End of a sentence: the hint box steps aside, so sentence, translation box and plan fit on the screen together.
+            document.querySelectorAll('#exercise .sent-next').forEach(x => x.remove());
+            const nxtS = guided.hold && el ? guidedCompute() : null;
+            guided.sentEnd = !!nxtS && (nxtS.type === 'end' || sentenceOf(nxtS.el) !== sentenceOf(el));
+            guidePanel.style.display = guided.sentEnd ? 'none' : '';
+            if (guided.sentEnd && t.sentDoneBar) {
+                const sc = sentenceOf(el); const hasModel = sc && sc.querySelector('.model-compare');
+                const bar = document.createElement('div'); bar.className = 'sent-next';
+                // a note about the help level (fewer / more hints) would otherwise be hidden with the hint box
+                const lvl = Array.from(guidePanel.querySelectorAll('.guide-level-note')).map(x => `<div class="sn-note">${x.innerHTML}</div>`).join('');
+                bar.innerHTML = `<div class="sn-text">${t.sentDoneBar}${hasModel && t.modelHint ? t.modelHint : ''}${lvl}</div><button type="button" class="guide-btn sn-btn">${nxtS.type === 'end' ? t.nextEnd : t.nextSent}</button>`;
+                bar.querySelector('button').onclick = (e) => { e.stopPropagation(); guidedContinue(); };
+                sc.appendChild(bar);
+                const ta = sc.querySelector('.trans-box textarea');
+                if (ta && window.innerWidth > 900 && !ta.value) ta.focus({ preventScroll: true }); // ready to type (not on phones: no keyboard pop-up)
+            }
             const ff = guidePanel.querySelector('.guide-fulfilled');
             if (ff && guided.hold && guided.flashFor !== guided.el) { guided.flashFor = guided.el; setTimeout(() => gHighlight(ff.dataset.refs, false, true), 250); }
             requestAnimationFrame(() => guidedPlace(true));
@@ -1577,10 +1605,12 @@
                 // later attempts: the mix-up feedback (if any) plus the next step of the hint ladder
                 const step = n === 2 ? guidedPointer(el, answer) : guidedNarrow(el, answer);
                 guidedRender(`✗ ${mix || t.notYet}<div class="guide-hint-step"><strong>${t.hintN(Math.min(n, 3))}</strong> ${step}</div>${back}`, false, n >= 3);
+                el.focus({ preventScroll: true });
                 return;
             }
             const tip = el.dataset.errhint || mix || (gFn(answer) || [])[0] || t.tipGeneric;
             guidedRender('✗ ' + tip + back, false, n >= 3);
+            el.focus({ preventScroll: true });
         }
         function guidedGenFound(blk) {
             const t = gT(); const left = blk.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').length;
@@ -1876,10 +1906,15 @@
         document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             if (e.target.closest && e.target.closest('#color-popover, #label-legend')) return; // label shortcuts are off while choosing colours
-            let targetEl = hoveredStudentEl;
+            // Which block does the key mean? While the menu is open: the block it belongs to (the mouse and the keyboard
+            // focus are then in the menu). Otherwise the block under the mouse, or the focused block.
+            // In guided mode only the block outlined in blue can be answered, so a key always means that block.
+            let targetEl = null;
+            if (menu.style.display === 'block' && activeEl && document.body.contains(activeEl)) targetEl = activeEl;
+            if (!targetEl) targetEl = hoveredStudentEl;
             if (!targetEl && document.activeElement && (document.activeElement.classList.contains('hover-word') || document.activeElement.classList.contains('g-label'))) { targetEl = document.activeElement; }
+            if (exMode === 'guided') { if (guided.hold || !guided.el) return; targetEl = guided.el; }
             if (!targetEl) return;
-            if (exMode === 'guided' && (guided.hold || targetEl !== guided.el)) return;
             if (e.ctrlKey || e.metaKey || e.altKey) return;
             if (e.key.length !== 1 || !/[a-zA-Z]/.test(e.key)) return;
 
