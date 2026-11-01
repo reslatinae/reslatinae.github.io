@@ -566,6 +566,7 @@
                 ptAdv: (w) => `Kann man <i class="la">${w}</i> deklinieren oder konjugieren – oder verändert sich das Wort nie?`,
                 ptAbl: (w) => `Schau dir die Endungen in <i class="la">${w}</i> an: In welchem Kasus stehen die Wörter, und ist ein Partizip dabei?`,
                 ptPart: (w) => `Hat <i class="la">${w}</i> eine Personalendung oder eine Kasusendung wie ein Adjektiv? Auf welches Substantiv bezieht es sich?`,
+                ptPartG: (w) => `Steckt in <i class="la">${w}</i> ein Partizip? Auf welches Substantiv bezieht es sich?`,
                 ptAci: (w) => `Schau dir <i class="la">${w}</i> an: Gibt es einen Akkusativ (oder Nominativ) und einen Infinitiv? Von welchem Verb hängt das ab?`,
                 ptClause: (w) => `Schau dir das erste Wort der Klammer an: <i class="la">${w}</i>. Ist das ein Relativpronomen, eine Subjunktion oder etwas anderes?`,
                 ptLink: (w) => `Was folgt auf <i class="la">${w}</i>: ein Nebensatz mit eigenem Prädikat oder ein gleichrangiger Teil?`,
@@ -585,7 +586,7 @@
                     'Ablativ>Ablativus absolutus': 'Steht beim Substantiv ein Partizip (oder ein Substantiv wie <i class="la">consule, duce</i>) im Ablativ? Zusammen bilden sie einen Ablativus absolutus.',
                     'Ablativus absolutus>Ablativ': 'Ein Ablativus absolutus braucht zwei Teile im Ablativ: ein Substantiv und ein Partizip (oder ein zweites Substantiv). Gibt es das hier?',
                     'Partizip>Ablativus absolutus': 'Steht das Partizip zusammen mit seinem Substantiv im Ablativ, und ist beides vom übrigen Satz losgelöst? Dann bilden die beiden zusammen einen Ablativus absolutus.',
-                    'Ablativus absolutus>Partizip': 'Prüfe Kasus und Bezug: Bezieht sich das Partizip auf ein Wort, das im Satz eine eigene Aufgabe hat? Dann ist es ein einzelnes Partizip (Participium coniunctum), kein Ablativus absolutus.',
+                    'Ablativus absolutus>Partizip': 'Prüfe Kasus und Bezug: Bezieht sich das Partizip auf ein Wort, das im Satz eine eigene Aufgabe hat? Dann ist es ein Participium coniunctum, kein Ablativus absolutus.',
                     'Ablativ>Präpositionale Bestimmung': 'Schau auf das erste Wort: Steht eine Präposition davor (<i class="la">in, cum, ab, ex, dē, sine, prō</i> …)? Dann gehört sie zum Block, und das Ganze ist eine präpositionale Bestimmung.',
                     'Präpositionale Bestimmung>Ablativ': 'Hier steht keine Präposition: Der Ablativ steht allein und gibt selbst den Umstand an (Womit? Wodurch? Wo? Wann?).',
                     'Akkusativobjekt>Präpositionale Bestimmung': 'Steht eine Präposition davor (<i class="la">ad, in, per, post, propter</i> …)? Dann gehört der Akkusativ zur präpositionalen Bestimmung.',
@@ -632,7 +633,7 @@
                     'Adverbiale Bestimmung': ['Hat das Wort eine Kasusendung, oder ist es unveränderlich? Frage: Wann? Wie? Wie sehr?', 'Eine adverbiale Bestimmung gibt einen Umstand an: wann, wie, wie oft, wie sehr.'],
                     'Infinitiv': ['Achte auf die Endung <i class="la">-re, -rī, -isse</i>: Ist das eine Grundform des Verbs?', 'Ein Infinitiv ergänzt oft ein Verb wie <i class="la">posse, velle</i> oder <i class="la">audēre</i>. Übersetze mit „zu …“, bei Modalverben ohne „zu“.'],
                     'AcI/NcI': ['Steht hier ein Akkusativ (oder Nominativ) zusammen mit einem Infinitiv, abhängig von einem Verb des Sagens oder Denkens?', 'Einen AcI übersetzt du als „dass“-Satz: Der Akkusativ wird Subjekt, der Infinitiv Prädikat. Beim NcI hilft „man sagt, dass …“ oder „soll …“.'],
-                    'Partizip': ['Ist das Wort eine Verbform mit Kasusendung wie ein Adjektiv (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …)?', 'Ein Partizip: eine Verbform, die sich wie ein Adjektiv auf ein Substantiv bezieht. Übersetze mit Relativsatz, Nebensatz oder „und“ und achte auf das Zeitverhältnis. Die Wortgruppe um das Partizip bestimmst du nach ihrer Aufgabe im Satz (z. B. Subjekt).'],
+                    'Partizip': ['Steckt hier ein Partizip, also eine Verbform mit Kasusendung wie ein Adjektiv (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …)?', 'Ein Partizip: eine Verbform, die sich wie ein Adjektiv auf ein Substantiv bezieht. Übersetze mit Relativsatz, Nebensatz oder „und“ und achte auf das Zeitverhältnis.'],
                     'Relativsatz': ['Womit beginnt diese Einheit? Ist das ein Relativpronomen (<i class="la">qui, quae, quod</i> …)?', 'Ein Relativsatz: Das Relativpronomen bezieht sich auf ein Wort davor. Bestimme die Wörter darin nach ihrer Aufgabe innerhalb des Relativsatzes.'],
                     'Nebensatz': ['Steht am Anfang dieser Einheit oder sehr nahe daran eine Subjunktion (<i class="la">cum, ut, quod, dum</i> …) oder ein Fragewort (<i class="la">quis, cūr, ubi</i> …)? Und hat die Einheit ein eigenes Prädikat?', 'Ein Nebensatz hat eine Subjunktion (<i class="la">cum, ut, nē, quod, sī, dum</i> …) oder ein Fragewort (<i class="la">quis, cūr, ubi</i> …) am Anfang oder sehr nahe daran und ein eigenes Prädikat; erwarte es oft am Ende. Bestimme die Wörter darin nach ihrer Aufgabe innerhalb des Nebensatzes.'],
                     'Konjunktion': ['Verbindet das Wort gleichrangige Teile (und, aber, oder)?', 'Eine Konjunktion verbindet gleichrangige Teile. Erwarte danach einen Teil, der dem vorigen entspricht.'],
@@ -701,6 +702,7 @@
                 ptAdv: (w) => `Can <i class="la">${w}</i> be declined or conjugated – or does the word never change?`,
                 ptAbl: (w) => `Look at the endings in <i class="la">${w}</i>: which case are the words in, and is there a participle?`,
                 ptPart: (w) => `Does <i class="la">${w}</i> have a personal ending or a case ending like an adjective? Which noun does it refer to?`,
+                ptPartG: (w) => `Is there a participle in <i class="la">${w}</i>? Which noun does it refer to?`,
                 ptAci: (w) => `Look at <i class="la">${w}</i>: is there an accusative (or nominative) and an infinitive? Which verb does it depend on?`,
                 ptClause: (w) => `Look at the first word of the bracket: <i class="la">${w}</i>. Is it a relative pronoun, a subjunction or something else?`,
                 ptLink: (w) => `What follows <i class="la">${w}</i>: a subordinate clause with a verb of its own, or a part of equal rank?`,
@@ -719,7 +721,7 @@
                     'Ablativ>Ablativus absolutus': 'Is there a participle (or a noun such as <i class="la">consule, duce</i>) in the ablative together with the noun? Together they form an ablative absolute.',
                     'Ablativus absolutus>Ablativ': 'An ablative absolute needs two parts in the ablative: a noun and a participle (or a second noun). Is that the case here?',
                     'Partizip>Ablativus absolutus': 'Is the participle in the ablative together with its noun, and are both detached from the rest of the sentence? Then the two together form an ablative absolute.',
-                    'Ablativus absolutus>Partizip': 'Check case and reference: does the participle refer to a word that has a job of its own in the sentence? Then it is a single participle (participium coniunctum), not an ablative absolute.',
+                    'Ablativus absolutus>Partizip': 'Check case and reference: does the participle refer to a word that has a job of its own in the sentence? Then it is a participium coniunctum, not an ablative absolute.',
                     'Ablativ>Präpositionale Bestimmung': 'Look at the first word: is there a preposition (<i class="la">in, cum, ab, ex, dē, sine, prō</i> …)? Then it belongs to the block, and the whole is a prepositional phrase.',
                     'Präpositionale Bestimmung>Ablativ': 'There is no preposition here: the ablative stands on its own and states the circumstance itself (with what? by what? where? when?).',
                     'Akkusativobjekt>Präpositionale Bestimmung': 'Is there a preposition before it (<i class="la">ad, in, per, post, propter</i> …)? Then the accusative belongs to the prepositional phrase.',
@@ -765,7 +767,7 @@
                     'Adverb': ['Does the word have a case ending, or does it never change? Ask: when? how? how much?', 'An adverb states a circumstance: when, how, how often, how much.'],
                     'Infinitive': ['Look at the ending <i class="la">-re, -rī, -isse</i>: is this the basic form of a verb?', 'An infinitive often completes a verb such as <i class="la">posse, velle</i> or <i class="la">audēre</i>. Translate with “to …”, after modal verbs without “to”.'],
                     'Accusative/Nominative with infinitive': ['Is there an accusative (or nominative) together with an infinitive, depending on a verb of saying or thinking?', 'Translate an accusative with infinitive as a “that” clause: the accusative becomes the subject, the infinitive the verb. For the nominative version, “is said to …” often works.'],
-                    'Participle': ['Is the word a verb form with a case ending like an adjective (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …)?', 'A participle: a verb form that refers to a noun like an adjective. Translate with a participle, a relative clause, a subordinate clause or “and”, and watch the time relation. The phrase around the participle is labelled by its job in the sentence (e.g. subject).'],
+                    'Participle': ['Is there a participle here, i.e. a verb form with a case ending like an adjective (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …)?', 'A participle: a verb form that refers to a noun like an adjective. Translate with a participle, a relative clause, a subordinate clause or “and”, and watch the time relation.'],
                     'Relative clause': ['What does this unit begin with? Is it a relative pronoun (<i class="la">qui, quae, quod</i> …)?', 'A relative clause: the relative pronoun refers to a word before it. Analyse the words inside according to their job within the relative clause.'],
                     'Subordinate clause': ['Is there a subjunction (<i class="la">cum, ut, quod, dum</i> …) or a question word (<i class="la">quis, cūr, ubi</i> …) at the beginning of this unit or very close to it? And does the unit have a verb of its own?', 'A subordinate clause always has a subjunction (<i class="la">cum, ut, nē, quod, sī, dum</i> …) or a question word (<i class="la">quis, cūr, ubi</i> …) at or very close to its beginning and a verb of its own; expect it, often at the end. Analyse the words inside according to their job within the clause.'],
                     'Conjunction': ['Does the word join parts of equal rank (and, but, or)?', 'A conjunction joins parts of equal rank. Expect a part after it that matches the one before.'],
@@ -1109,7 +1111,7 @@
         // ---- Translation plan: the analysed sentence, reordered unit by unit for the target language ----
         // Units: the main clause, every subordinate/relative clause and every construction bracket (AcI, abl. abs., participle).
         function planEsc(x) { return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-        const PLAN_CONSTRUCT = { 'Nebensatz': 'sub', 'Relativsatz': 'rel', 'AcI/NcI': 'aci', 'Ablativus absolutus': 'abl', 'Partizipialkonstruktion': 'ptc' };
+        const PLAN_CONSTRUCT = { 'Nebensatz': 'sub', 'Relativsatz': 'rel', 'AcI/NcI': 'aci', 'Ablativus absolutus': 'abl', 'Partizip': 'ptc', 'Partizipialkonstruktion': 'ptc' };
         // A bracket labelled with its job in the sentence (e.g. Subjekt) that holds a participle of its own becomes a unit of its own in the plan.
         const planHasPtc = (g) => Array.from(g.querySelectorAll('.hover-word')).some(w => gCanon(w.dataset.ans) === 'Partizip' && w.parentElement.closest('.s-group') === g);
         function planUnits(sent) {
@@ -1404,7 +1406,7 @@
             if (a === 'Präpositionale Bestimmung') return t.ptFirst(first);
             if (a === 'Adverbiale Bestimmung') return t.ptAdv(last);
             if (a === 'Ablativus absolutus') return t.ptAbl(all);
-            if (a === 'Partizip') return t.ptPart(all);
+            if (a === 'Partizip') return isG ? t.ptPartG(all) : t.ptPart(all);
             if (a === 'AcI/NcI') return t.ptAci(all);
             if (a === 'Relativsatz' || a === 'Nebensatz') return t.ptClause(first);
             if (a === 'Konjunktion' || a === 'Subjunktion') return t.ptLink(first);
