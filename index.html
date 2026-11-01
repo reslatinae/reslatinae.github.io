@@ -673,7 +673,21 @@
         body.high-contrast .container, body.high-contrast .exercise-wrapper { background-color: #121212; color: #fff; border: 1px solid #333; }
         body.high-contrast .sentence-container { background-color: #1e1e1e; border: 1px solid #444; }
         body.high-contrast .trans-box { border-top-color: #444; }
-        .trans-plan { margin: 0 0 12px; padding: 10px 14px; background: #fbf8f2; border: 1px solid #ece4d6; border-radius: 8px; font-size: 0.92rem; color: #2a241d; }
+        /* Large screens: the translation plan stands next to the sentence and its translation box (and stays in view
+           while scrolling); the translation box follows directly below the sentence. */
+        /* Smaller screens: sentence – translation box – plan, so the box stays right under the sentence. */
+        .sentence-container.with-plan { display: grid; grid-template-columns: minmax(0, 1fr); }
+        .sentence-container.with-plan > .sent-words { grid-row: 1; min-width: 0; }
+        .sentence-container.with-plan > .trans-box { grid-row: 2; }
+        .sentence-container.with-plan > .trans-plan { grid-row: 3; margin: 12px 0 0; }
+        @media (min-width: 1100px) {
+            .sentence-container.with-plan { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 40%); column-gap: 24px; align-items: start; }
+            .sentence-container.with-plan > .sent-words { grid-column: 1; grid-row: 1; min-width: 0; }
+            .sentence-container.with-plan > .trans-plan { grid-column: 2; grid-row: 1 / span 2; position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; margin: 0; box-sizing: border-box; }
+            .sentence-container.with-plan > .trans-box { grid-column: 1; grid-row: 2; }
+            .sentence-container.with-plan:has(> .trans-plan:not([open])) { grid-template-columns: minmax(0, 1fr) auto; }
+        }
+        .trans-plan { line-height: 1.5; margin: 0 0 12px; padding: 10px 14px; background: #fbf8f2; border: 1px solid #ece4d6; border-radius: 8px; font-size: 0.92rem; color: #2a241d; }
         .trans-plan summary { cursor: pointer; font-weight: 600; color: #6b4d24; }
         .trans-plan .tp-intro { margin: 6px 0 8px; font-size: 0.84rem; color: #4a4236; }
         .trans-plan ol { margin: 0; padding-left: 0; list-style: none; }
@@ -727,6 +741,9 @@
         body.high-contrast .guide-head { color: #93c5fd; }
         body.high-contrast .guided-current { box-shadow: 0 0 0 3px #121212, 0 0 0 5px #93c5fd !important; }
         body.high-contrast .mode-toggle-bg { background: #1e1e1e !important; border: 1px solid #555; }
+        /* narrow screens: the three mode buttons share the width and may wrap their text, instead of running off the screen */
+        .mode-toggle-bg { max-width: 100%; box-sizing: border-box; }
+        @media (max-width: 520px) { .mode-toggle-bg { display: flex !important; } .mode-toggle-bg button { flex: 1 1 0; min-width: 0; padding: 6px 6px !important; font-size: 0.82rem !important; line-height: 1.25; white-space: normal; } }
         body.high-contrast #results-modal .results-content { background: #1e1e1e; color: #fff; border: 1px solid #555; }
         body.high-contrast #results-modal .results-title { color: #fff; }
         body.high-contrast #results-modal .results-textarea { background: #2d2d2d; color: #fff; border: 1px solid #555; }
@@ -801,7 +818,7 @@
                 solution: 'Lösung zeigen', solutionShown: 'Die richtige Antwort ist',
                 // Translation plan (shown under a sentence once it is fully analysed)
                 planTitle: '📝 Übersetzungsplan', planIntro: 'Der Plan folgt der lateinischen Reihenfolge. Verschoben (↔) wird nur das Prädikat, wo das Deutsche es verlangt: im Hauptsatz an die zweite Stelle, im Nebensatz ans Ende. Oft klingt eine andere Reihenfolge noch besser.', moved: 'Im Deutschen an eine andere Stelle verschoben',
-                planHint: ' Unter dem Satz schlägt dir ein Übersetzungsplan eine Reihenfolge vor.',
+                planHint: ' Ein Übersetzungsplan (neben dem Satz oder unter dem Übersetzungsfeld) schlägt dir eine Reihenfolge vor.',
                 uMain: 'Hauptsatz', uPart: (n) => `Teil ${n}`, uSub: 'Nebensatz', uRel: 'Relativsatz', uAci: 'AcI/NcI', uAbl: 'Ablativus absolutus', uPtc: 'Partizipialkonstruktion',
                 howMain: 'Im deutschen Hauptsatz steht das Prädikat an zweiter Stelle.',
                 howSub: 'Im deutschen Nebensatz steht das Prädikat am Ende.',
@@ -892,7 +909,7 @@
                     'AcI/NcI': ['Steht hier ein Akkusativ (oder Nominativ) zusammen mit einem Infinitiv, abhängig von einem Verb des Sagens oder Denkens?', 'Einen AcI übersetzt du als „dass“-Satz: Der Akkusativ wird Subjekt, der Infinitiv Prädikat. Beim NcI hilft „man sagt, dass …“ oder „soll …“.'],
                     'Partizipialkonstruktion': ['Gibt es hier ein Partizip, das sich auf ein Substantiv im Satz bezieht?', 'Das Partizip bezieht sich auf ein Substantiv im Satz. Übersetze mit Relativsatz, Nebensatz oder „und“ und achte auf das Zeitverhältnis.'],
                     'Relativsatz': ['Womit beginnt diese Einheit? Ist das ein Relativpronomen (qui, quae, quod …)?', 'Ein Relativsatz: Das Relativpronomen bezieht sich auf ein Wort davor. Bestimme die Wörter darin nach ihrer Aufgabe innerhalb des Relativsatzes.'],
-                    'Nebensatz': ['Steht am Anfang dieser Einheit oder sehr nahe daran eine Subjunktion (cum, ut, quod, dum …) oder ein Fragewort (quis, cūr, ubi …)? Und hat die Einheit ein eigenes Prädikat?', 'Ein Nebensatz hat immer eine Subjunktion (cum, ut, nē, quod, sī, dum …) oder ein Fragewort (quis, cūr, ubi …) am Anfang oder sehr nahe daran und ein eigenes Prädikat; erwarte es, oft am Ende. Bestimme die Wörter darin nach ihrer Aufgabe innerhalb des Nebensatzes.'],
+                    'Nebensatz': ['Steht am Anfang dieser Einheit oder sehr nahe daran eine Subjunktion (cum, ut, quod, dum …) oder ein Fragewort (quis, cūr, ubi …)? Und hat die Einheit ein eigenes Prädikat?', 'Ein Nebensatz hat eine Subjunktion (cum, ut, nē, quod, sī, dum …) oder ein Fragewort (quis, cūr, ubi …) am Anfang oder sehr nahe daran und ein eigenes Prädikat; erwarte es oft am Ende. Bestimme die Wörter darin nach ihrer Aufgabe innerhalb des Nebensatzes.'],
                     'Konjunktion': ['Verbindet das Wort gleichrangige Teile (und, aber, oder)?', 'Eine Konjunktion verbindet gleichrangige Teile. Erwarte danach einen Teil, der dem vorigen entspricht.'],
                     'Subjunktion': ['Leitet das Wort einen Nebensatz ein (cum, ut, ne, quod, si, dum …)? Subjunktionen stehen am Anfang des Nebensatzes oder sehr nahe daran.', 'Eine Subjunktion leitet einen Nebensatz ein; sie steht an seinem Anfang oder sehr nahe daran. Erwarte ein eigenes Prädikat, oft am Ende des Nebensatzes.'],
                     'Vokativ': ['Wird hier jemand angesprochen?', 'Ein Vokativ: Hier wird jemand angesprochen.'],
@@ -925,7 +942,7 @@
                 cont: 'Click anywhere on the page (or press Enter) to go to the next block.', contSentence: 'Click anywhere on the page (or press Enter) to go to the next sentence.', contEnd: 'Click anywhere on the page (or press Enter) to finish.',
                 solution: 'Show answer', solutionShown: 'The correct answer is',
                 planTitle: '📝 Translation plan', planIntro: 'The plan follows the Latin word order. Only the verb is moved (↔) where English needs it: right after the subject. Often another order sounds even better.', moved: 'Moved to another position in English',
-                planHint: ' Below the sentence, a translation plan suggests an order.',
+                planHint: ' A translation plan (next to the sentence or below the translation box) suggests an order.',
                 uMain: 'Main clause', uPart: (n) => `part ${n}`, uSub: 'Subordinate clause', uRel: 'Relative clause', uAci: 'Acc./Nom. with infinitive', uAbl: 'Ablative absolute', uPtc: 'Participial phrase',
                 howMain: 'In English the verb follows the subject.',
                 howSub: 'Start with the subjunction; in English the verb follows the subject here too.',
@@ -1020,6 +1037,13 @@
                 }
             }
         };
+        // The words of each sentence get their own box, so the translation plan can stand next to them on large screens.
+        document.querySelectorAll('#exercise .sentence-container').forEach(sc => {
+            if (sc.querySelector(':scope > .sent-words')) return;
+            const box = document.createElement('div'); box.className = 'sent-words';
+            Array.from(sc.childNodes).forEach(n => { if (!(n.nodeType === 1 && n.classList.contains('trans-box'))) box.appendChild(n); });
+            sc.insertBefore(box, sc.firstChild);
+        });
         // Punctuation is glued to the block before it, so a full stop never starts a new line on its own.
         (function gluePunctuation() {
             document.querySelectorAll('#exercise .punct').forEach(pu => {
@@ -1365,16 +1389,17 @@
         function renderPlans() {
             document.querySelectorAll('#exercise .sentence-container').forEach((sent, i) => {
                 const tb = document.getElementById('t-container-' + i); if (!tb) return;
-                const old = tb.querySelector('.trans-plan');
+                const old = sent.querySelector('.trans-plan');
                 const want = exMode === 'guided' && tb.style.display === 'block';
-                if (!want) { if (old) old.remove(); return; }
+                if (!want) { if (old) old.remove(); sent.classList.remove('with-plan'); return; }
                 const sig = currentLang + '|' + JSON.stringify(colors).length + Object.values(colors).join('');
                 if (old && old.dataset.sig === sig) return;
                 const wasOpen = old ? old.open : true;
                 const tmp = document.createElement('div'); tmp.innerHTML = planHtml(sent); const fresh = tmp.firstElementChild;
-                if (!fresh) { if (old) old.remove(); return; }
+                if (!fresh) { if (old) old.remove(); sent.classList.remove('with-plan'); return; }
                 fresh.dataset.sig = sig; fresh.open = wasOpen;
-                if (old) old.replaceWith(fresh); else tb.insertBefore(fresh, tb.firstChild);
+                if (old) old.replaceWith(fresh); else sent.insertBefore(fresh, tb);
+                sent.classList.add('with-plan');
             });
         }
         function guidedJump(i) {
