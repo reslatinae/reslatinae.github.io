@@ -122,7 +122,9 @@
         .btn-action.active-mode { box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); outline: 2px solid #1d1914; outline-offset: 2px; }
         /* Compact tool buttons in the editor (Undo, Split, Break, Word group, Genitive, Export) */
         .tool-row .btn-action { flex: 0 0 auto !important; padding: 6px 12px; font-size: 0.82rem; border-radius: 5px; }
-        .tool-row #btn-export { margin-left: auto; }
+        .tool-row .export-pair { display: flex; gap: 8px; margin-left: auto; flex-wrap: nowrap; }
+        .tool-row #btn-preview, .tool-row #btn-export { margin-left: 0; white-space: nowrap; }
+        .tool-row #btn-preview:hover { background: #f3ede2 !important; }
         .model-trans { margin-top: 18px; border-top: 1px solid #efeae1; padding-top: 12px; }
         .model-trans summary { cursor: pointer; font-weight: 600; font-size: 0.92rem; color: #2a241d; padding: 4px 0; }
         .model-trans-count { font-weight: 400; color: #6b6052; font-size: 0.85rem; }
@@ -200,7 +202,7 @@
             .tag-word { font-size: 1rem; padding: 4px 6px; margin: var(--dynamic-margin-top, 24px) 1px 24px 1px; }
             .punct-span { margin: var(--dynamic-margin-top, 24px) 1px 24px 1px; } .tag-word::after { font-size: 0.55rem; top: 32px; }
             .btn-action { width: 100%; margin-bottom: 8px; font-size: 1rem; } .modal-box { width: 90%; }
-            .tool-row .btn-action { width: auto; margin-bottom: 0; font-size: 0.82rem; } .tool-row #btn-export { margin-left: 0; }
+            .tool-row .btn-action { width: auto; margin-bottom: 0; font-size: 0.82rem; } .tool-row #btn-export, .tool-row #btn-preview { margin-left: 0; }
         }
         #autosave-status { position: fixed; bottom: 16px; right: 16px; font-size: 0.85rem; color: #6b6052; background: white; padding: 6px 12px; border-radius: 4px; box-shadow: var(--shadow); opacity: 0; transition: opacity 0.5s; pointer-events: none; }
     </style>
@@ -296,7 +298,10 @@
                 <button class="btn-action" id="linebreak-mode-btn" data-ref="linebreakModeBtn" style="background:#0369a1; flex:1;">Toggle Break (W)</button>
                 <button class="btn-action" id="group-mode-btn" data-ref="groupModeBtn" style="background:#7c3aed; flex:1;">Define Word Group (M)</button>
                 <button class="btn-action" id="attr-mode-btn" data-ref="attrModeBtn" style="background:#be185d; flex:1;">Mark Genitive (G)</button>
-                <button class="btn-action" id="btn-export" data-ref="btnExport" style="background:#1d1914; flex:1;">Export Student Page</button>
+                <div class="export-pair">
+                    <button class="btn-action" id="btn-preview" data-ref="btnPreview" type="button" style="background:#fff; color:#1d1914; border:1px solid #1d1914;">Preview</button>
+                    <button class="btn-action" id="btn-export" data-ref="btnExport" style="background:#1d1914;">Export Student Page</button>
+                </div>
             </div>
 
             <div class="project-mini-row">
@@ -2066,6 +2071,8 @@ const CONFIG = {
             modelSummary: "📝 Model translations (optional)", modelCount: (n, m) => `${n} of ${m} sentences`, modelIntro: "If you enter a model translation, students can open it once they have written their own translation of the sentence, and compare the two.", modelPh: "Model translation (optional)",
             explainLabel: "Explanation after a correct answer (guided mode, optional):", phWordExplain: "E.g. The accusative points ahead to a verb that needs it.", phGroupExplain: "E.g. Expect a verb of its own at the end of the clause.",
             phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (W)", btnBracket: "Define Word Group (M)", btnAttr: "Mark Genitive (G)",
+            btnPreview: "▶ Preview", previewTitle: "Opens the student page in a new tab, without downloading it",
+            previewBanner: "<strong>Preview:</strong> this is how your students will see the page. After changes in the editor, click “Preview” again. Progress saved here does not affect the exported page.",
             btnExport: "Export Student Page", btnSaveWork: "💾 Save Work", btnLoadWork: "📂 Load Work", btnResetColors: "🎨 Restore default colours", btnCvdColors: "👁 Colour-blind-safe colours", cvdOffTitle: "Back to the colours before",
             cvdTitle: "Give the functions in this exercise colours that stay clearly distinct with colour blindness",
             confirmCvd: (n, given) => `The ${n} functions in this exercise get colours that stay clearly distinct with every type of colour blindness.` + (given < n ? ` There are only ${given} such colours: the ${given} most frequent functions get them, the others keep their colour (the patterns help there).` : '') + ` Students will see these colours too. (Undo with Ctrl+Z.)`, cvdNone: "There are no analysed words yet.", confirmResetColors: "Reset all label colours to the default colours? (You can undo this with Ctrl+Z.)",
@@ -2101,6 +2108,8 @@ const CONFIG = {
             modelSummary: "📝 Musterübersetzungen (optional)", modelCount: (n, m) => `${n} von ${m} Sätzen`, modelIntro: "Tragen Sie eine Musterübersetzung ein, können die Schülerinnen und Schüler sie öffnen, sobald sie den Satz selbst übersetzt haben, und beide vergleichen.", modelPh: "Musterübersetzung (optional)",
             explainLabel: "Erklärung nach richtiger Antwort (geführter Modus, optional):", phWordExplain: "Z.B. Der Akkusativ kündigt ein Verb an, das ihn braucht.", phGroupExplain: "Z.B. Erwarte am Ende des Nebensatzes ein eigenes Prädikat.",
             phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (W)", btnBracket: "Wortgruppe definieren (M)", btnAttr: "Genitiv markieren (G)",
+            btnPreview: "▶ Vorschau", previewTitle: "Öffnet die Schülerseite in einem neuen Tab, ohne sie herunterzuladen",
+            previewBanner: "<strong>Vorschau:</strong> So sehen Ihre Schülerinnen und Schüler die Seite. Nach Änderungen im Editor erneut auf „Vorschau“ klicken. Was hier gespeichert wird, wirkt sich nicht auf die exportierte Seite aus.",
             btnExport: "Schülerseite exportieren", btnSaveWork: "💾 Speichern", btnLoadWork: "📂 Laden", btnResetColors: "🎨 Standardfarben wiederherstellen", btnCvdColors: "👁 Farbenblind-sichere Farben", cvdOffTitle: "Zurück zu den vorherigen Farben",
             cvdTitle: "Den Funktionen dieser Übung Farben geben, die auch bei Farbenblindheit gut unterscheidbar sind",
             confirmCvd: (n, given) => `Die ${n} Funktionen dieser Übung erhalten Farben, die bei allen Formen von Farbenblindheit gut unterscheidbar bleiben.` + (given < n ? ` Es gibt nur ${given} solche Farben: Die ${given} häufigsten Funktionen erhalten sie, die übrigen behalten ihre Farbe (dort helfen die Muster).` : '') + ` Auch die Schülerinnen und Schüler sehen diese Farben. (Mit Strg+Z rückgängig.)`, cvdNone: "Es gibt noch keine bestimmten Wörter.", confirmResetColors: "Alle Label-Farben auf die Standardfarben zurücksetzen? (Mit Strg+Z rückgängig zu machen.)",
@@ -2568,6 +2577,7 @@ function changeLanguage(lang) {
     DOM.groupModeBtn.textContent = txt.btnBracket;
     DOM.attrModeBtn.textContent = txt.btnAttr;
     DOM.btnExport.textContent = txt.btnExport; 
+    if (DOM.btnPreview) { DOM.btnPreview.textContent = txt.btnPreview; DOM.btnPreview.title = txt.previewTitle; }
     DOM.btnSaveWork.textContent = txt.btnSaveWork;
     DOM.btnResetColors.textContent = txt.btnResetColors;
     document.documentElement.lang = lang; updateTeacherCvdButton(); if (window.updateReadingAid) window.updateReadingAid();
@@ -3115,7 +3125,8 @@ function initEventListeners() {
 	DOM.linebreakModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.LINEBREAK ? MODES.TAGGING : MODES.LINEBREAK));
     DOM.groupModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.GROUP ? MODES.TAGGING : MODES.GROUP));
     DOM.attrModeBtn.addEventListener('click', () => setMode(AppState.mode === MODES.ATTR ? MODES.TAGGING : MODES.ATTR));
-    DOM.btnExport.addEventListener('click', exportToStudent);
+    DOM.btnExport.addEventListener('click', () => exportToStudent(false));
+    DOM.btnPreview.addEventListener('click', () => exportToStudent(true));
     DOM.btnSaveWork.addEventListener('click', () => StorageManager.exportProject());
     DOM.btnResetColors.addEventListener('click', restoreDefaultColors);
     DOM.btnCvdColors.addEventListener('click', toggleColorBlindColors);
@@ -3905,7 +3916,13 @@ window.addEventListener('beforeunload', (e) => {
 // 8. STUDENT EXPORT GENERATION
 // ==========================================
 
-function exportToStudent() {
+// Preview: the same page as the export, opened in a new tab instead of downloaded. It keeps its own saved
+// progress (separate storage key) and links the guide and tables next to the tool, wherever the tool runs.
+let PREVIEW_BUILD = false, lastPreviewUrl = null;
+function exportToStudent(preview) {
+    PREVIEW_BUILD = !!preview;
+    let previewTab = null;
+    if (PREVIEW_BUILD) { previewTab = window.open('', '_blank'); } // opened at once, inside the click, so pop-up blockers allow it
     // Dynamic fetching of the templates from cache directly upon export
     const STUDENT_PAGE_CSS = DOM.templateStudentCss.textContent;
     const STUDENT_PAGE_JS = DOM.templateStudentJs.textContent;
@@ -4010,7 +4027,15 @@ const exerciseId = generateStableId(titleInput + baseText);
     const exportLabels = AppState.functions.filter(l => standardLabels.indexOf(l) !== -1 || usedLabels.has(l));
 
     const blob = new Blob([generateStudentHTML(merged, updatedGroups, titleInput, exportLabels, imgUrl, teacherNotes, AppState.lang, CONFIG.ABBREVIATIONS, CONFIG.PRESETS, exerciseId, STUDENT_PAGE_CSS, STUDENT_PAGE_JS)], {type: 'text/html'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+    const url = URL.createObjectURL(blob);
+    if (PREVIEW_BUILD) {
+        PREVIEW_BUILD = false;
+        if (lastPreviewUrl) URL.revokeObjectURL(lastPreviewUrl);
+        lastPreviewUrl = url;
+        if (previewTab && !previewTab.closed) previewTab.location.href = url; else window.open(url, '_blank');
+        return;
+    }
+    const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
 }
 
 function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lang, allAbbrevs, allPresets, exerciseId, STUDENT_PAGE_CSS, STUDENT_PAGE_JS) {
@@ -4077,6 +4102,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     ${ICON_LINKS}
     <style>${STUDENT_PAGE_CSS}</style></head>
     <body>
+        ${PREVIEW_BUILD ? `<div class="preview-banner" style="background:#fdf3dc; border:1px solid #e8c98a; color:#4a3410; border-radius:8px; padding:10px 14px; margin:0 0 16px; font-size:0.9rem; max-width:calc(100% - 140px);">${CONFIG.LANG_TEXT[AppState.lang].previewBanner}</div>` : ''}
         <div class="lang-switch-top">
             <button class="lang-btn ${lang === 'en' ? 'active' : ''}" onclick="switchStudentLang('en')">EN</button>
             <button class="lang-btn ${lang === 'de' ? 'active' : ''}" onclick="switchStudentLang('de')">DE</button>
@@ -4139,8 +4165,8 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             const SHORTCUTS = ${JSON.stringify(LatinLabels.SHORTCUTS)};
             const SAFE_COLORS = ${JSON.stringify(CONFIG.SAFE_COLORS)}; const NEUTRAL_COLOR = ${JSON.stringify(CONFIG.NEUTRAL_COLOR)}; const CVD_SAFE = ${JSON.stringify(CONFIG.CVD_SAFE)};
             const colors = ${JSON.stringify(AppState.colors)}; const abbreviations = ${JSON.stringify(allAbbrevs)}; const labelMap = ${JSON.stringify(labelMap)};
-            const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const HELP_BASE = ${JSON.stringify(/^https?:$/.test(location.protocol) ? new URL('.', location.href).href : '')}; const titleInput = ${JSON.stringify(title).replace(/</g, '\\u003c')};
-            const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + '${exerciseId}';
+            const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const HELP_BASE = ${JSON.stringify(PREVIEW_BUILD || /^https?:$/.test(location.protocol) ? new URL('.', location.href).href : '')}; const titleInput = ${JSON.stringify(title).replace(/</g, '\\u003c')};
+            const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + '${exerciseId}'${PREVIEW_BUILD ? " + '_preview'" : ''};
         <\/script>
         <script>
             ${STUDENT_PAGE_JS}
