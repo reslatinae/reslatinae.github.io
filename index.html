@@ -161,6 +161,8 @@
         body.high-contrast .vocab-table td.vw, body.high-contrast .vocab-table th, body.high-contrast .vocab-opt { color: #fff; }
         body.high-contrast .vocab-table tr.unchecked input[type=text] { background: #3a3020; }
         .model-trans-la { font-size: 0.9rem; color: #2a241d; margin-bottom: 4px; font-style: italic; }
+        .model-trans-item .model-head-input { width: 100%; box-sizing: border-box; margin: 0 0 6px; padding: 6px 10px; border: 1px solid #e4ddd1; border-radius: 6px; font: inherit; font-size: 0.9rem; background: #fff; color: #2a241d; }
+        body.high-contrast .model-trans-item .model-head-input { background: #2d2d2d; color: #fff; border-color: #555; }
         .model-trans-item textarea { width: 100%; box-sizing: border-box; min-height: 52px; padding: 8px 10px; border: 1px solid #e4ddd1; border-radius: 6px; font: inherit; font-size: 0.92rem; resize: vertical; background: #fff; color: #2a241d; }
         body.high-contrast .model-trans summary, body.high-contrast .model-trans-la { color: #fff; }
         body.high-contrast .model-trans-intro, body.high-contrast .model-trans-count { color: #ddd; }
@@ -574,6 +576,10 @@
         .g-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
 
         .nobr { white-space: nowrap; } .nobr > * { white-space: normal; }
+        .sent-heading { font-size: 1.12rem; font-weight: 650; color: #4a3b26; margin: 30px 0 10px; line-height: 1.3; }
+        .sent-heading:first-child { margin-top: 0; }
+        body.high-contrast .sent-heading { color: #f0c987; }
+        @media print { .sent-heading { font-size: 11.5pt !important; margin: 10px 0 4px !important; break-after: avoid; } }
         .sent-words { position: relative; }
         svg.lk-svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; z-index: 3; }
         .lk-path { fill: none; stroke: #b07d2b; stroke-width: 1.8; stroke-dasharray: 5 4; stroke-linecap: round; opacity: 0.85; }
@@ -742,6 +748,8 @@
         .model-compare { margin-top: 8px; }
         .model-btn { font: inherit; font-size: 0.88rem; padding: 6px 12px; border-radius: 6px; border: 1px solid #d9cfbf; background: #fdfbf7; color: #1d4ed8; cursor: pointer; }
         .model-btn:disabled { color: #6b6052; cursor: not-allowed; background: #f6f3ee; }
+        .model-need { margin-left: 10px; font-size: 0.82rem; color: #6b6052; }
+        body.high-contrast .model-need { color: #ccc; }
         .model-btn:not(:disabled):hover { background: #f3ede2; }
         .model-text { margin-top: 10px; padding: 10px 14px; border-left: 3px solid #a07a45; background: #faf6ee; border-radius: 0 6px 6px 0; }
         .model-head { font-weight: 600; color: #6b4d24; font-size: 0.86rem; margin-bottom: 4px; }
@@ -879,7 +887,7 @@
                 // Translation plan (shown under a sentence once it is fully analysed)
                 planTitle: '📝 Übersetzungsplan', planIntro: 'Der Plan folgt der lateinischen Reihenfolge. Verschoben (↔) wird nur das Prädikat, wo das Deutsche es verlangt: im Hauptsatz an die zweite Stelle, im Nebensatz ans Ende. Oft klingt eine andere Reihenfolge noch besser.', moved: 'Im Deutschen an eine andere Stelle verschoben',
                 planHint: ' Ein Übersetzungsplan (neben dem Satz oder unter dem Übersetzungsfeld) schlägt dir eine Reihenfolge vor.',
-                uMain: 'Hauptsatz', uPart: (n) => `Teil ${n}`, uSub: 'Nebensatz', uRel: 'Relativsatz', uAci: 'AcI/NcI', uAbl: 'Ablativus absolutus', uPtc: 'Partizipialkonstruktion',
+                uMain: 'Hauptsatz', uPart: (n) => `Teil ${n}`, uSub: 'Nebensatz', uRel: 'Relativsatz', uAci: 'AcI/NcI', uAbl: 'Ablativus absolutus', uPtc: 'Wortgruppe mit Partizip',
                 howMain: 'Im deutschen Hauptsatz steht das Prädikat an zweiter Stelle.',
                 howSub: 'Im deutschen Nebensatz steht das Prädikat am Ende.',
                 howRel: 'Das Relativpronomen bleibt vorne, das Prädikat steht am Ende. Stelle den Relativsatz direkt hinter das Wort, auf das er sich bezieht.',
@@ -905,7 +913,7 @@
                 ptFirst: (w) => `Schau dir das erste Wort an: <i class="la">${w}</i>. Was für eine Wortart ist das?`,
                 ptAdv: (w) => `Kann man <i class="la">${w}</i> deklinieren oder konjugieren – oder verändert sich das Wort nie?`,
                 ptAbl: (w) => `Schau dir die Endungen in <i class="la">${w}</i> an: In welchem Kasus stehen die Wörter, und ist ein Partizip dabei?`,
-                ptPart: (w) => `Steckt in <i class="la">${w}</i> ein Partizip? Auf welches Substantiv bezieht es sich?`,
+                ptPart: (w) => `Hat <i class="la">${w}</i> eine Personalendung oder eine Kasusendung wie ein Adjektiv? Auf welches Substantiv bezieht es sich?`,
                 ptAci: (w) => `Schau dir <i class="la">${w}</i> an: Gibt es einen Akkusativ (oder Nominativ) und einen Infinitiv? Von welchem Verb hängt das ab?`,
                 ptClause: (w) => `Schau dir das erste Wort der Klammer an: <i class="la">${w}</i>. Ist das ein Relativpronomen, eine Subjunktion oder etwas anderes?`,
                 ptLink: (w) => `Was folgt auf <i class="la">${w}</i>: ein Nebensatz mit eigenem Prädikat oder ein gleichrangiger Teil?`,
@@ -924,8 +932,8 @@
                     'Akkusativobjekt>Prädikativum': 'Steht hier ein zweiter Akkusativ, der etwas über das Objekt aussagt (jemanden zum Konsul wählen, jemanden als Freund bezeichnen)? Dann ist er ein Prädikativum.',
                     'Ablativ>Ablativus absolutus': 'Steht beim Substantiv ein Partizip (oder ein Substantiv wie <i class="la">consule, duce</i>) im Ablativ? Zusammen bilden sie einen Ablativus absolutus.',
                     'Ablativus absolutus>Ablativ': 'Ein Ablativus absolutus braucht zwei Teile im Ablativ: ein Substantiv und ein Partizip (oder ein zweites Substantiv). Gibt es das hier?',
-                    'Partizipialkonstruktion>Ablativus absolutus': 'Steht das Partizip zusammen mit seinem Substantiv im Ablativ, und ist beides vom übrigen Satz losgelöst? Dann ist es ein Ablativus absolutus.',
-                    'Ablativus absolutus>Partizipialkonstruktion': 'Prüfe Kasus und Bezug: Bezieht sich das Partizip auf ein Wort, das im Satz eine eigene Aufgabe hat? Dann ist es eine Partizipialkonstruktion, kein Ablativus absolutus.',
+                    'Partizip>Ablativus absolutus': 'Steht das Partizip zusammen mit seinem Substantiv im Ablativ, und ist beides vom übrigen Satz losgelöst? Dann bilden die beiden zusammen einen Ablativus absolutus.',
+                    'Ablativus absolutus>Partizip': 'Prüfe Kasus und Bezug: Bezieht sich das Partizip auf ein Wort, das im Satz eine eigene Aufgabe hat? Dann ist es ein einzelnes Partizip (Participium coniunctum), kein Ablativus absolutus.',
                     'Ablativ>Präpositionale Bestimmung': 'Schau auf das erste Wort: Steht eine Präposition davor (<i class="la">in, cum, ab, ex, dē, sine, prō</i> …)? Dann gehört sie zum Block, und das Ganze ist eine präpositionale Bestimmung.',
                     'Präpositionale Bestimmung>Ablativ': 'Hier steht keine Präposition: Der Ablativ steht allein und gibt selbst den Umstand an (Womit? Wodurch? Wo? Wann?).',
                     'Akkusativobjekt>Präpositionale Bestimmung': 'Steht eine Präposition davor (<i class="la">ad, in, per, post, propter</i> …)? Dann gehört der Akkusativ zur präpositionalen Bestimmung.',
@@ -940,7 +948,12 @@
                     'AcI/NcI>Infinitiv': 'Hat der Infinitiv hier ein eigenes Subjekt im Akkusativ? Ergänzt er nur ein Verb wie <i class="la">posse, velle, cupere</i> oder <i class="la">audēre</i>, ist es ein einfacher Infinitiv.',
                     'Prädikat>Infinitiv': 'Hat das Wort eine Personalendung? Endungen wie -re, -rī, -isse gehören zum Infinitiv. Ein Prädikat hat eine Personalendung (<i class="la">-t, -nt, -mus</i> …).',
                     'Infinitiv>Prädikat': 'Achte auf die Endung: -t, -nt, -mus, -tis, -tur … sind Personalendungen. Ein Prädikat hat eine, ein Infinitiv nicht.',
-                    'Prädikat>Partizipialkonstruktion': 'Ein Partizip hat keine Personalendung, sondern eine Kasusendung wie ein Adjektiv (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …). Auf welches Substantiv bezieht es sich?',
+                    'Prädikat>Partizip': 'Ein Partizip hat keine Personalendung, sondern eine Kasusendung wie ein Adjektiv (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …). Auf welches Substantiv bezieht es sich?',
+                    'Partizip>Prädikat': 'Hat das Wort eine Personalendung (<i class="la">-t, -nt, -mus, -tur</i> …)? Dann ist es ein Prädikat. Ein Partizip hat eine Kasusendung wie ein Adjektiv.',
+                    'Prädikativum>Partizip': 'Das Wort sagt zwar etwas über ein Satzglied aus, ist aber eine Verbform mit Kasusendung (<i class="la">-ns/-ntis, -tus/-ta/-tum, -ūrus</i> …): ein Partizip.',
+                    'Partizip>Prädikativum': 'Kommt das Wort wirklich von einem Verb? Ein Adjektiv oder Substantiv, das als Zusatz zum Subjekt oder Objekt steht („als …“), ist ein Prädikativum.',
+                    'Subjekt>Partizip': 'Das Wort gehört zum Subjekt, ist aber selbst ein Partizip: eine Verbform mit Kasusendung (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …). Auf welches Substantiv bezieht es sich?',
+                    'Akkusativobjekt>Partizip': 'Das Wort gehört zum Objekt, ist aber selbst ein Partizip: eine Verbform mit Kasusendung (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …). Auf welches Substantiv bezieht es sich?',
                     'Dativobjekt>Genitivobjekt': '-ī und -ae können Genitiv oder Dativ sein. Hängt der Block von einem Verb oder Adjektiv ab, das einen Genitiv verlangt (z. B. <i class="la">meminisse, oblīvīscī, cupidus, plēnus</i>)?',
                     'Genitivobjekt>Dativobjekt': '-ī und -ae können Genitiv oder Dativ sein. Passt die Frage „Wem? Für wen?“? Verlangt das Prädikat einen Dativ?',
                     'Subjekt>Vokativ': 'Wird hier jemand angesprochen? Ein Vokativ steht oft zwischen Kommas, und das Prädikat steht dann meist in der 2. Person.',
@@ -967,7 +980,7 @@
                     'Adverbiale Bestimmung': ['Hat das Wort eine Kasusendung, oder ist es unveränderlich? Frage: Wann? Wie? Wie sehr?', 'Eine adverbiale Bestimmung gibt einen Umstand an: wann, wie, wie oft, wie sehr.'],
                     'Infinitiv': ['Achte auf die Endung <i class="la">-re, -rī, -isse</i>: Ist das eine Grundform des Verbs?', 'Ein Infinitiv ergänzt oft ein Verb wie <i class="la">posse, velle</i> oder <i class="la">audēre</i>. Übersetze mit „zu …“, bei Modalverben ohne „zu“.'],
                     'AcI/NcI': ['Steht hier ein Akkusativ (oder Nominativ) zusammen mit einem Infinitiv, abhängig von einem Verb des Sagens oder Denkens?', 'Einen AcI übersetzt du als „dass“-Satz: Der Akkusativ wird Subjekt, der Infinitiv Prädikat. Beim NcI hilft „man sagt, dass …“ oder „soll …“.'],
-                    'Partizipialkonstruktion': ['Gibt es hier ein Partizip, das sich auf ein Substantiv im Satz bezieht?', 'Das Partizip bezieht sich auf ein Substantiv im Satz. Übersetze mit Relativsatz, Nebensatz oder „und“ und achte auf das Zeitverhältnis.'],
+                    'Partizip': ['Ist das Wort eine Verbform mit Kasusendung wie ein Adjektiv (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …)?', 'Ein Partizip: eine Verbform, die sich wie ein Adjektiv auf ein Substantiv bezieht. Übersetze mit Relativsatz, Nebensatz oder „und“ und achte auf das Zeitverhältnis. Die Wortgruppe um das Partizip bestimmst du nach ihrer Aufgabe im Satz (z. B. Subjekt).'],
                     'Relativsatz': ['Womit beginnt diese Einheit? Ist das ein Relativpronomen (<i class="la">qui, quae, quod</i> …)?', 'Ein Relativsatz: Das Relativpronomen bezieht sich auf ein Wort davor. Bestimme die Wörter darin nach ihrer Aufgabe innerhalb des Relativsatzes.'],
                     'Nebensatz': ['Steht am Anfang dieser Einheit oder sehr nahe daran eine Subjunktion (<i class="la">cum, ut, quod, dum</i> …) oder ein Fragewort (<i class="la">quis, cūr, ubi</i> …)? Und hat die Einheit ein eigenes Prädikat?', 'Ein Nebensatz hat eine Subjunktion (<i class="la">cum, ut, nē, quod, sī, dum</i> …) oder ein Fragewort (<i class="la">quis, cūr, ubi</i> …) am Anfang oder sehr nahe daran und ein eigenes Prädikat; erwarte es oft am Ende. Bestimme die Wörter darin nach ihrer Aufgabe innerhalb des Nebensatzes.'],
                     'Konjunktion': ['Verbindet das Wort gleichrangige Teile (und, aber, oder)?', 'Eine Konjunktion verbindet gleichrangige Teile. Erwarte danach einen Teil, der dem vorigen entspricht.'],
@@ -1011,7 +1024,7 @@
                 solution: 'Show answer', solutionShown: 'The correct answer is',
                 planTitle: '📝 Translation plan', planIntro: 'The plan follows the Latin word order. Only the verb is moved (↔) where English needs it: right after the subject. Often another order sounds even better.', moved: 'Moved to another position in English',
                 planHint: ' A translation plan (next to the sentence or below the translation box) suggests an order.',
-                uMain: 'Main clause', uPart: (n) => `part ${n}`, uSub: 'Subordinate clause', uRel: 'Relative clause', uAci: 'Acc./Nom. with infinitive', uAbl: 'Ablative absolute', uPtc: 'Participial phrase',
+                uMain: 'Main clause', uPart: (n) => `part ${n}`, uSub: 'Subordinate clause', uRel: 'Relative clause', uAci: 'Acc./Nom. with infinitive', uAbl: 'Ablative absolute', uPtc: 'Phrase with a participle',
                 howMain: 'In English the verb follows the subject.',
                 howSub: 'Start with the subjunction; in English the verb follows the subject here too.',
                 howRel: 'The relative pronoun stays at the front. Put the relative clause right after the word it refers to.',
@@ -1035,7 +1048,7 @@
                 ptFirst: (w) => `Look at the first word: <i class="la">${w}</i>. What kind of word is it?`,
                 ptAdv: (w) => `Can <i class="la">${w}</i> be declined or conjugated – or does the word never change?`,
                 ptAbl: (w) => `Look at the endings in <i class="la">${w}</i>: which case are the words in, and is there a participle?`,
-                ptPart: (w) => `Is there a participle in <i class="la">${w}</i>? Which noun does it refer to?`,
+                ptPart: (w) => `Does <i class="la">${w}</i> have a personal ending or a case ending like an adjective? Which noun does it refer to?`,
                 ptAci: (w) => `Look at <i class="la">${w}</i>: is there an accusative (or nominative) and an infinitive? Which verb does it depend on?`,
                 ptClause: (w) => `Look at the first word of the bracket: <i class="la">${w}</i>. Is it a relative pronoun, a subjunction or something else?`,
                 ptLink: (w) => `What follows <i class="la">${w}</i>: a subordinate clause with a verb of its own, or a part of equal rank?`,
@@ -1053,8 +1066,8 @@
                     'Akkusativobjekt>Prädikativum': 'Is there a second accusative that says something about the object (to elect someone consul, to call someone a friend)? Then it is a predicative.',
                     'Ablativ>Ablativus absolutus': 'Is there a participle (or a noun such as <i class="la">consule, duce</i>) in the ablative together with the noun? Together they form an ablative absolute.',
                     'Ablativus absolutus>Ablativ': 'An ablative absolute needs two parts in the ablative: a noun and a participle (or a second noun). Is that the case here?',
-                    'Partizipialkonstruktion>Ablativus absolutus': 'Is the participle in the ablative together with its noun, and are both detached from the rest of the sentence? Then it is an ablative absolute.',
-                    'Ablativus absolutus>Partizipialkonstruktion': 'Check case and reference: does the participle refer to a word that has a job of its own in the sentence? Then it is a participial phrase, not an ablative absolute.',
+                    'Partizip>Ablativus absolutus': 'Is the participle in the ablative together with its noun, and are both detached from the rest of the sentence? Then the two together form an ablative absolute.',
+                    'Ablativus absolutus>Partizip': 'Check case and reference: does the participle refer to a word that has a job of its own in the sentence? Then it is a single participle (participium coniunctum), not an ablative absolute.',
                     'Ablativ>Präpositionale Bestimmung': 'Look at the first word: is there a preposition (<i class="la">in, cum, ab, ex, dē, sine, prō</i> …)? Then it belongs to the block, and the whole is a prepositional phrase.',
                     'Präpositionale Bestimmung>Ablativ': 'There is no preposition here: the ablative stands on its own and states the circumstance itself (with what? by what? where? when?).',
                     'Akkusativobjekt>Präpositionale Bestimmung': 'Is there a preposition before it (<i class="la">ad, in, per, post, propter</i> …)? Then the accusative belongs to the prepositional phrase.',
@@ -1069,7 +1082,12 @@
                     'AcI/NcI>Infinitiv': 'Does the infinitive have a subject of its own in the accusative? If it only completes a verb such as <i class="la">posse, velle, cupere</i> or <i class="la">audēre</i>, it is a simple infinitive.',
                     'Prädikat>Infinitiv': 'Does the word have a personal ending? Endings such as -re, -rī, -isse belong to the infinitive. A verb has a personal ending (<i class="la">-t, -nt, -mus</i> …).',
                     'Infinitiv>Prädikat': 'Look at the ending: -t, -nt, -mus, -tis, -tur … are personal endings. A verb has one, an infinitive does not.',
-                    'Prädikat>Partizipialkonstruktion': 'A participle has no personal ending but a case ending like an adjective (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …). Which noun does it refer to?',
+                    'Prädikat>Partizip': 'A participle has no personal ending but a case ending like an adjective (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …). Which noun does it refer to?',
+                    'Partizip>Prädikat': 'Does the word have a personal ending (<i class="la">-t, -nt, -mus, -tur</i> …)? Then it is a verb. A participle has a case ending like an adjective.',
+                    'Prädikativum>Partizip': 'The word does say something about a part of the sentence, but it is a verb form with a case ending (<i class="la">-ns/-ntis, -tus/-ta/-tum, -ūrus</i> …): a participle.',
+                    'Partizip>Prädikativum': 'Does the word really come from a verb? An adjective or noun added to the subject or object (“as …”) is a predicative.',
+                    'Subjekt>Partizip': 'The word belongs to the subject, but it is a participle itself: a verb form with a case ending (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …). Which noun does it refer to?',
+                    'Akkusativobjekt>Partizip': 'The word belongs to the object, but it is a participle itself: a verb form with a case ending (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …). Which noun does it refer to?',
                     'Dativobjekt>Genitivobjekt': '-ī and -ae can be genitive or dative. Does the block depend on a verb or adjective that needs a genitive (e.g. <i class="la">meminisse, oblīvīscī, cupidus, plēnus</i>)?',
                     'Genitivobjekt>Dativobjekt': '-ī and -ae can be genitive or dative. Does the question “To whom? For whom?” fit? Does the verb need a dative?',
                     'Subjekt>Vokativ': 'Is someone being addressed here? A vocative often stands between commas, and the verb is then usually in the 2nd person.',
@@ -1095,7 +1113,7 @@
                     'Adverb': ['Does the word have a case ending, or does it never change? Ask: when? how? how much?', 'An adverb states a circumstance: when, how, how often, how much.'],
                     'Infinitive': ['Look at the ending <i class="la">-re, -rī, -isse</i>: is this the basic form of a verb?', 'An infinitive often completes a verb such as <i class="la">posse, velle</i> or <i class="la">audēre</i>. Translate with “to …”, after modal verbs without “to”.'],
                     'Accusative/Nominative with infinitive': ['Is there an accusative (or nominative) together with an infinitive, depending on a verb of saying or thinking?', 'Translate an accusative with infinitive as a “that” clause: the accusative becomes the subject, the infinitive the verb. For the nominative version, “is said to …” often works.'],
-                    'Participial phrase': ['Is there a participle that refers to a noun in the sentence?', 'The participle refers to a noun in the sentence. Translate with a participle, a relative clause, a subordinate clause or “and”, and watch the time relation.'],
+                    'Participle': ['Is the word a verb form with a case ending like an adjective (<i class="la">-ns/-ntis, -tus/-ta/-tum</i> …)?', 'A participle: a verb form that refers to a noun like an adjective. Translate with a participle, a relative clause, a subordinate clause or “and”, and watch the time relation. The phrase around the participle is labelled by its job in the sentence (e.g. subject).'],
                     'Relative clause': ['What does this unit begin with? Is it a relative pronoun (<i class="la">qui, quae, quod</i> …)?', 'A relative clause: the relative pronoun refers to a word before it. Analyse the words inside according to their job within the relative clause.'],
                     'Subordinate clause': ['Is there a subjunction (<i class="la">cum, ut, quod, dum</i> …) or a question word (<i class="la">quis, cūr, ubi</i> …) at the beginning of this unit or very close to it? And does the unit have a verb of its own?', 'A subordinate clause always has a subjunction (<i class="la">cum, ut, nē, quod, sī, dum</i> …) or a question word (<i class="la">quis, cūr, ubi</i> …) at or very close to its beginning and a verb of its own; expect it, often at the end. Analyse the words inside according to their job within the clause.'],
                     'Conjunction': ['Does the word join parts of equal rank (and, but, or)?', 'A conjunction joins parts of equal rank. Expect a part after it that matches the one before.'],
@@ -1235,6 +1253,10 @@
                 const btn = box.querySelector('.model-btn'); const ready = modelReady(box);
                 btn.textContent = t.modelBtn; btn.disabled = !ready; btn.title = ready ? '' : t.modelNeedOwn;
                 btn.hidden = !box.querySelector('.model-text').hidden;
+                // while the button is inactive, say why (not only in the tooltip)
+                let need = box.querySelector('.model-need');
+                if (!need) { need = document.createElement('span'); need.className = 'model-need'; btn.after(need); }
+                need.textContent = t.modelNeedOwn; need.hidden = ready || btn.hidden;
                 box.querySelector('.model-head').textContent = t.modelHead; box.querySelector('.model-note').textContent = t.modelNote;
             });
         }
@@ -1436,6 +1458,8 @@
         // Units: the main clause, every subordinate/relative clause and every construction bracket (AcI, abl. abs., participle).
         function planEsc(x) { return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
         const PLAN_CONSTRUCT = { 'Nebensatz': 'sub', 'Relativsatz': 'rel', 'AcI/NcI': 'aci', 'Ablativus absolutus': 'abl', 'Partizipialkonstruktion': 'ptc' };
+        // A bracket labelled with its job in the sentence (e.g. Subjekt) that holds a participle of its own becomes a unit of its own in the plan.
+        const planHasPtc = (g) => Array.from(g.querySelectorAll('.hover-word')).some(w => gCanon(w.dataset.ans) === 'Partizip' && w.parentElement.closest('.s-group') === g);
         function planUnits(sent) {
             const units = [];
             const ownGroup = (node, container) => { let g = node.parentElement ? node.parentElement.closest('.s-group') : null; while (g && !container.contains(g)) g = null; return g; };
@@ -1444,7 +1468,7 @@
                 const nodes = Array.from(container.querySelectorAll('.hover-word, .s-group')).filter(n => n !== container && (n.parentElement.closest('.s-group') === (container.classList.contains('s-group') ? container : null) || (!container.classList.contains('s-group') && !n.parentElement.closest('.s-group'))));
                 nodes.forEach(n => {
                     if (n.classList.contains('hover-word')) { unit.items.push({ el: n, label: n.dataset.ans, text: gWords(n, 5) }); return; }
-                    const k = PLAN_CONSTRUCT[gCanon(n.dataset.ans)];
+                    const k = PLAN_CONSTRUCT[gCanon(n.dataset.ans)] || (planHasPtc(n) ? 'ptc' : null);
                     if (k) {
                         const child = build(n, k, gWords(n, 1).replace(' …', ''));
                         if (k !== 'sub' && k !== 'rel') unit.items.push({ ref: child, label: n.dataset.ans, text: gWords(n, 3) }); // constructions keep their place in the clause
@@ -1591,7 +1615,7 @@
             guidedRender();
             const el = guided.el; if (el) setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 50);
         }
-        setTimeout(() => { if (typeof drawLinks === 'function') drawLinks(); }, 0);
+        setTimeout(() => { if (typeof drawLinks === 'function') drawLinks(); if (typeof updateModelUI === 'function') updateModelUI(); }, 0);
         function guidedNote(el) {
             const nxt = guidedCompute(); const t = gT();
             if (nxt.type === 'gen' && nxt.el === el) return '<div class="guide-next-note">' + t.genAhead + '</div>';
@@ -1728,7 +1752,7 @@
             if (a === 'Präpositionale Bestimmung') return t.ptFirst(first);
             if (a === 'Adverbiale Bestimmung') return t.ptAdv(last);
             if (a === 'Ablativus absolutus') return t.ptAbl(all);
-            if (a === 'Partizipialkonstruktion') return t.ptPart(all);
+            if (a === 'Partizip') return t.ptPart(all);
             if (a === 'AcI/NcI') return t.ptAci(all);
             if (a === 'Relativsatz' || a === 'Nebensatz') return t.ptClause(first);
             if (a === 'Konjunktion' || a === 'Subjunktion') return t.ptLink(first);
@@ -1736,12 +1760,12 @@
         }
         // Hint 3: the right function and one look-alike the student has not tried yet, in alphabetical order
         const LOOKALIKES = {
-            'Subjekt': ['Akkusativobjekt', 'Prädikativum', 'Vokativ'], 'Prädikat': ['Infinitiv', 'Partizipialkonstruktion'],
+            'Subjekt': ['Akkusativobjekt', 'Prädikativum', 'Vokativ'], 'Prädikat': ['Infinitiv', 'Partizip'],
             'Akkusativobjekt': ['Subjekt', 'Präpositionale Bestimmung', 'Prädikativum'], 'Dativobjekt': ['Ablativ', 'Genitivobjekt'],
             'Genitivobjekt': ['Dativobjekt', 'Ablativ'], 'Ablativ': ['Dativobjekt', 'Präpositionale Bestimmung', 'Ablativus absolutus', 'Adverbiale Bestimmung'],
-            'Ablativus absolutus': ['Partizipialkonstruktion', 'Ablativ'], 'Prädikativum': ['Subjekt', 'Akkusativobjekt'],
+            'Ablativus absolutus': ['Ablativ', 'Partizip'], 'Prädikativum': ['Subjekt', 'Akkusativobjekt', 'Partizip'],
             'Präpositionale Bestimmung': ['Ablativ', 'Adverbiale Bestimmung'], 'Adverbiale Bestimmung': ['Ablativ', 'Präpositionale Bestimmung'],
-            'Infinitiv': ['AcI/NcI', 'Prädikat'], 'AcI/NcI': ['Infinitiv', 'Akkusativobjekt'], 'Partizipialkonstruktion': ['Ablativus absolutus', 'Prädikat'],
+            'Infinitiv': ['AcI/NcI', 'Prädikat'], 'AcI/NcI': ['Infinitiv', 'Akkusativobjekt'], 'Partizip': ['Prädikativum', 'Prädikat'],
             'Relativsatz': ['Nebensatz'], 'Nebensatz': ['Relativsatz'], 'Konjunktion': ['Subjunktion'], 'Subjunktion': ['Konjunktion'],
             'Vokativ': ['Subjekt'], 'Sonstiges': ['Adverbiale Bestimmung', 'Konjunktion']
         };
@@ -2447,6 +2471,7 @@ function dismissToastOnInteraction() {
 
         function check() { 
             if (typeof drawLinksSoon === 'function') drawLinksSoon();
+            if (typeof updateModelUI === 'function') setTimeout(updateModelUI, 0);
             document.querySelectorAll('.sentence-container').forEach((s, i) => { 
                 const items = [...s.querySelectorAll('.hover-word'), ...s.querySelectorAll('.g-label')];
                 const requiredGens = [...s.querySelectorAll('.s-text[data-u="true"]')];
@@ -2713,10 +2738,11 @@ const CONFIG = {
             btnLoad: "Load Saved Project", or: "OR", btnManual: "Start Manual Creation",
             lblLevel: "Grammar Level:", optBeg: "Beginner", optInt: "Intermediate", optAdv: "Advanced (All)",
             editH3: "Step 2: Editing Instruction",
-            editBody: "Check the analysis. Adjacent words merge automatically in the student view. Use 'Manual Split' to separate words. Create groups with 'Define Word Group'. With 'Mark Genitive' you can highlight a genitive attribute inside a larger group by underlining it. Double-click a word to correct it or add hints. With 'New Label' you can add a new function (e.g. Vocative). Click ▾ next to a label (or right-click it) to change its colour. With 'Connect Words' you link single words that belong together (e.g. saevae … iram or tuo … aequore): first click the dependent word, then the word it belongs to. Students see a dashed arc from word to word; the blocks stay as they are. Below the editor you can enter a model translation for each sentence (optional); students can open it once they have written their own translation. Under 'Word information' the AI can suggest the dictionary form, form and meaning of each word; please check them before you export the page. With 'Save Work' you can save a json file to keep working on it later; at the end, 'Export Student Page' creates an html page that you can share with your students.",
+            editBody: "Check the analysis. Adjacent words merge automatically in the student view. Use 'Manual Split' to separate words. Create groups with 'Define Word Group'. With 'Mark Genitive' you can highlight a genitive attribute inside a larger group by underlining it. Double-click a word to correct it or add hints. With 'New Label' you can add a new function (e.g. Vocative). Click ▾ next to a label (or right-click it) to change its colour. With 'Connect Words' you link single words that belong together (e.g. saevae … iram or tuo … aequore): first click the dependent word, then the word it belongs to. Students see a dashed arc from word to word; the blocks stay as they are. Below the editor you can enter a heading (e.g. the passage) and a model translation for each sentence (optional); students can open it once they have written their own translation. Under 'Word information' the AI can suggest the dictionary form, form and meaning of each word; please check them before you export the page. With 'Save Work' you can save a json file to keep working on it later; at the end, 'Export Student Page' creates an html page that you can share with your students.",
            	wordModalTitle: "Edit Word & Hint", wordTextLabel: "Word Text:", hintLabel: "Hint (optional):", groupHintLabel: "Group Hint (optional):",
             errorHintLabel: "Hint after wrong answer (optional):",
-            modelSummary: "📝 Model translations (optional)", modelCount: (n, m) => `${n} of ${m} sentences`, modelIntro: "If you enter a model translation, students can open it once they have written their own translation of the sentence, and compare the two.", modelPh: "Model translation (optional)",
+            headPh: "Heading above this sentence (optional), e.g. Caesar, *De bello Gallico* 1,1 – *asterisks* = italics",
+            modelSummary: "📝 Headings and model translations (optional)", modelCount: (n, m) => `${n} of ${m} sentences`, modelIntro: "If you enter a model translation, students can open it once they have written their own translation of the sentence, and compare the two.", modelPh: "Model translation (optional)",
             explainLabel: "Explanation after a correct answer (guided mode, optional):", phWordExplain: "E.g. The accusative points ahead to a verb that needs it.", phGroupExplain: "E.g. Expect a verb of its own at the end of the clause.",
             phLabel: "New Label", btnUndo: "↶ Undo (Ctrl+Z)", btnSplit: "Manual Split (X)", btnLineBreak: "Toggle Break (W)", btnBracket: "Define Word Group (M)", btnAttr: "Mark Genitive (G)", btnLink: "Connect Words (H)",
             modeLink: "Mode: Connect words – first click the word that belongs to another (e.g. saevae), then the word it belongs to (e.g. iram). Several words can point to the same word. Click a connected word twice to remove its connection.",
@@ -2762,10 +2788,11 @@ const CONFIG = {
             btnLoad: "Gespeichertes Projekt laden", or: "ODER", btnManual: "Manuelle Erstellung starten",
             lblLevel: "Grammatik-Level:", optBeg: "Anfänger", optInt: "Fortgeschritten", optAdv: "Profi (Alle)",
             editH3: "Schritt 2: Bearbeitung",
-            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer grösseren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe. Mit 'Wörter verbinden' verknüpfen Sie einzelne Wörter, die zusammengehören (z. B. saevae … iram oder tuo … aequore): Klicken Sie zuerst das abhängige Wort an, dann das Wort, zu dem es gehört. Die Schülerinnen und Schüler sehen einen gestrichelten Bogen von Wort zu Wort; die Blöcke bleiben dabei, wie sie sind. Unter dem Editor können Sie zu jedem Satz eine Musterübersetzung eintragen (optional); die Schülerinnen und Schüler können sie öffnen, sobald sie selbst übersetzt haben. Unter 'Wortangaben' kann die KI zu jedem Wort Grundform, Form und Bedeutung vorschlagen; prüfen Sie diese Angaben, bevor Sie die Seite exportieren. Mit 'Speichern' können Sie eine json-Datei für die spätere Bearbeitung speichern, mit 'Schülerseite exportieren' erstellen Sie am Ende eine html-Seite, die Sie mit Ihren Schülerinnen und Schülern teilen können.",
+            editBody: "Überprüfen Sie die Analyse. Benachbarte Wörter verschmelzen in der Schüleransicht automatisch. Nutzen Sie 'Manuell trennen', um Wörter zu trennen. Erstellen Sie Gruppen mit 'Wortgruppe definieren'. Mit 'Genitiv markieren' können Sie ein Genitivattribut innerhalb einer grösseren Gruppe durch Unterstreichung hervorheben. Ein Doppelklick auf ein Wort ermöglicht die Korrektur oder das Hinzufügen von Hilfestellungen. Mit der Funktion 'Neues Label' können Sie eine neue Funktion hinzufügen (z.B. Vokativ). Über ▾ neben einem Label (oder per Rechtsklick) ändern Sie dessen Farbe. Mit 'Wörter verbinden' verknüpfen Sie einzelne Wörter, die zusammengehören (z. B. saevae … iram oder tuo … aequore): Klicken Sie zuerst das abhängige Wort an, dann das Wort, zu dem es gehört. Die Schülerinnen und Schüler sehen einen gestrichelten Bogen von Wort zu Wort; die Blöcke bleiben dabei, wie sie sind. Unter dem Editor können Sie zu jedem Satz eine Überschrift (z. B. die Textstelle) und eine Musterübersetzung eintragen (optional); die Schülerinnen und Schüler können sie öffnen, sobald sie selbst übersetzt haben. Unter 'Wortangaben' kann die KI zu jedem Wort Grundform, Form und Bedeutung vorschlagen; prüfen Sie diese Angaben, bevor Sie die Seite exportieren. Mit 'Speichern' können Sie eine json-Datei für die spätere Bearbeitung speichern, mit 'Schülerseite exportieren' erstellen Sie am Ende eine html-Seite, die Sie mit Ihren Schülerinnen und Schülern teilen können.",
            	wordModalTitle: "Wort & Hinweis bearbeiten", wordTextLabel: "Worttext:", hintLabel: "Hinweis (optional):", groupHintLabel: "Gruppen-Hinweis (optional):",
             errorHintLabel: "Hinweis nach falscher Antwort (optional):",
-            modelSummary: "📝 Musterübersetzungen (optional)", modelCount: (n, m) => `${n} von ${m} Sätzen`, modelIntro: "Tragen Sie eine Musterübersetzung ein, können die Schülerinnen und Schüler sie öffnen, sobald sie den Satz selbst übersetzt haben, und beide vergleichen.", modelPh: "Musterübersetzung (optional)",
+            headPh: "Überschrift über diesem Satz (optional), z. B. Caesar, *De bello Gallico* 1,1 – *Sternchen* = kursiv",
+            modelSummary: "📝 Überschriften und Musterübersetzungen (optional)", modelCount: (n, m) => `${n} von ${m} Sätzen`, modelIntro: "Tragen Sie eine Musterübersetzung ein, können die Schülerinnen und Schüler sie öffnen, sobald sie den Satz selbst übersetzt haben, und beide vergleichen.", modelPh: "Musterübersetzung (optional)",
             explainLabel: "Erklärung nach richtiger Antwort (geführter Modus, optional):", phWordExplain: "Z.B. Der Akkusativ kündigt ein Verb an, das ihn braucht.", phGroupExplain: "Z.B. Erwarte am Ende des Nebensatzes ein eigenes Prädikat.",
             phLabel: "Neues Label", btnUndo: "↶ Rückgängig (Strg+Z)", btnSplit: "Manuell trennen (X)", btnLineBreak: "Umbruch umschalten (W)", btnBracket: "Wortgruppe definieren (M)", btnAttr: "Genitiv markieren (G)", btnLink: "Wörter verbinden (H)",
             modeLink: "Modus: Wörter verbinden – zuerst das Wort anklicken, das zu einem anderen gehört (z. B. saevae), dann das Wort, zu dem es gehört (z. B. iram). Mehrere Wörter können auf dasselbe Wort zeigen. Ein verbundenes Wort zweimal anklicken: Verbindung lösen.",
@@ -2823,6 +2850,7 @@ const AppState = {
     functions: [],
     linkAfterSolve: false, // connected words: show the arcs only once both blocks are solved
     vocabShowForm: false, // word information: show the form (case, person ...) on the student page too
+    headings: [], // optional headings above sentences (e.g. the passage), by sentence
     translations: [], // model translations, one per sentence (in the order of the editor's sentences)
     colors: { ...CONFIG.SEMANTIC_COLORS },
     lang: 'de',
@@ -2972,7 +3000,7 @@ const StorageManager = {
                 lang: AppState.lang, level: AppState.level,
                 title: DOM.pageTitle.value, image: DOM.pageImage.value,
                 text: textVal, notes: DOM.teacherNotes.value,
-                groups: AppState.groups, funcs: AppState.functions, cols: AppState.colors, words: AppState.words, translations: AppState.translations, vocabShowForm: AppState.vocabShowForm, linkAfterSolve: AppState.linkAfterSolve,
+                groups: AppState.groups, funcs: AppState.functions, cols: AppState.colors, words: AppState.words, translations: AppState.translations, headings: AppState.headings, vocabShowForm: AppState.vocabShowForm, linkAfterSolve: AppState.linkAfterSolve,
                 timestamp: new Date().getTime()
             };
             
@@ -3023,7 +3051,7 @@ const StorageManager = {
             text: DOM.enterText.value,
             notes: DOM.teacherNotes.value, 
             words: AppState.words, groups: AppState.groups, 
-            customFunctions: AppState.functions, customColors: AppState.colors, translations: AppState.translations, vocabShowForm: AppState.vocabShowForm, linkAfterSolve: AppState.linkAfterSolve
+            customFunctions: AppState.functions, customColors: AppState.colors, translations: AppState.translations, headings: AppState.headings, vocabShowForm: AppState.vocabShowForm, linkAfterSolve: AppState.linkAfterSolve
         };
         const blob = new Blob([JSON.stringify(projectData, null, 2)], {type: "application/json"});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); 
@@ -3048,6 +3076,7 @@ const StorageManager = {
     },
 
    restoreData(data) {
+        ptcMigrate(data);
         let safeLang = data.lang;
         if (!safeLang || !CONFIG.LANG_TEXT[safeLang]) safeLang = 'de';
         changeLanguage(safeLang);
@@ -3066,6 +3095,7 @@ const StorageManager = {
         if(data.customColors || data.cols) Object.assign(AppState.colors, data.customColors || data.cols);
         AppState.groups = data.groups || [];
         AppState.translations = Array.isArray(data.translations) ? data.translations.map(x => typeof x === 'string' ? x : '') : [];
+        AppState.headings = Array.isArray(data.headings) ? data.headings.map(x => typeof x === 'string' ? x : '') : [];
         if (Array.isArray(data.words)) linkMigrate(data.words);
         if (DOM.modelTransList) DOM.modelTransList.dataset.sig = '';
         AppState.vocabShowForm = !!data.vocabShowForm; AppState.linkAfterSolve = !!data.linkAfterSolve; if (DOM.vocabList) DOM.vocabList.dataset.sig = '';
@@ -3801,7 +3831,10 @@ function renderModelTranslations() {
         const ta = document.createElement('textarea'); ta.placeholder = txt.modelPh; ta.value = AppState.translations[i] || '';
         ta.setAttribute('aria-label', txt.modelPh + ' – ' + la);
         ta.addEventListener('input', () => { AppState.translations[i] = ta.value; updateCount(); StorageManager.debouncedAutoSave(); });
-        item.append(head, ta); list.appendChild(item);
+        const hd = document.createElement('input'); hd.type = 'text'; hd.className = 'model-head-input'; hd.placeholder = txt.headPh; hd.value = AppState.headings[i] || '';
+        hd.setAttribute('aria-label', txt.headPh + ' – ' + la);
+        hd.addEventListener('input', () => { AppState.headings[i] = hd.value; StorageManager.debouncedAutoSave(); });
+        item.append(head, hd, ta); list.appendChild(item);
     });
     updateCount();
 }
@@ -4566,7 +4599,7 @@ function importAI(raw) {
         rawGroups.forEach(g => { 
             let norm = normalizeLabel(g.label);
             // Groups may use either the current level's word labels or the fixed, level-independent
-            // clause labels (Nebensatz, Relativsatz, AcI/NcI, Partizipialkonstruktion, Ablativus
+            // clause labels (Nebensatz, Relativsatz, AcI/NcI, Ablativus
             // absolutus) - so a correctly-labelled clause never gets silently downgraded to "Sonstiges"
             // just because the exercise is set to Beginner/Anfänger.
             g.label = (AppState.functions.includes(norm) || CONFIG.GROUP_LABELS[AppState.lang].includes(norm)) ? norm : AppState.getOtherLabel();
@@ -4775,6 +4808,18 @@ function startManual() {
     initEditor(processTokens(tokens));
 }
 
+// Older projects used a bracket label "Partizipialkonstruktion" / "Participial phrase". Since 2026-11 a participle is
+// labelled as a single word ("Partizip" / "Participle"); old labels are renamed when such a project is opened.
+function ptcMigrate(data) {
+    if (!data) return;
+    const ren = { 'Partizipialkonstruktion': 'Partizip', 'Participial phrase': 'Participle' };
+    const fix = (l) => ren[l] || l;
+    ['customFunctions', 'funcs'].forEach(k => { if (Array.isArray(data[k])) data[k] = [...new Set(data[k].map(fix))]; });
+    ['customColors', 'cols'].forEach(k => { const c = data[k]; if (c && typeof c === 'object') Object.keys(ren).forEach(o => { if (c[o] && !c[ren[o]]) c[ren[o]] = c[o]; }); });
+    (data.words || data.tokens || []).forEach(w => { if (w) { if (w.f) w.f = fix(w.f); if (w.func) w.func = fix(w.func); } });
+    (data.groups || []).forEach(g => { if (g && g.label) g.label = fix(g.label); });
+}
+
 function initEditor(words) {
     AppState.dirty = true; // a new analysis that has not been saved yet
     AppState.functions = [...CONFIG.PRESETS[AppState.lang][AppState.level]];
@@ -4785,7 +4830,7 @@ function initEditor(words) {
     AppState.groups.forEach(g => { if (g.label && !AppState.functions.includes(g.label)) AppState.functions.push(g.label); });
     AppState.history = [];
     AppState.words = words;
-    AppState.translations = []; if (DOM.modelTransList) DOM.modelTransList.dataset.sig = '';
+    AppState.translations = []; AppState.headings = []; if (DOM.modelTransList) DOM.modelTransList.dataset.sig = '';
     DOM.editorPageTitle.value = DOM.pageTitle.value;
     renderEditor();
     showScreen('editor');
@@ -5003,7 +5048,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     };
 
     const t = studentTexts[lang]; const pageTitle = title ? title : t.docTitle;
-    const bodyContent = generateExerciseHTML(words, groups, t.transPlaceholder, lang, AppState.translations || []);
+    const bodyContent = generateExerciseHTML(words, groups, t.transPlaceholder, lang, AppState.translations || [], AppState.headings || []);
     
     const safeTitle = escapeHTML(pageTitle);
     const safeNotes = notes ? escapeHTML(notes).replace(/\n/g, '<br>') : '';
@@ -5085,7 +5130,10 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     </body></html>`;
 }
 
-function generateExerciseHTML(words, groups, placeholder, lang, models) {
+function generateExerciseHTML(words, groups, placeholder, lang, models, headings) {
+    headings = headings || [];
+    // optional heading above a sentence; *text* becomes italics
+    const headingHtml = (i) => (headings[i] || '').trim() ? `<h2 class="sent-heading">${escapeHTML(headings[i].trim()).replace(/\*([^*]+)\*/g, '<i>$1</i>')}</h2>` : '';
     // ids of words that something points to (only links whose target exists are exported)
     const allUids = new Set(); words.forEach(w => (w.segments || []).forEach(sg => { if (sg.uid) allUids.add(sg.uid); }));
     const LINK_TARGETS = new Set(); words.forEach(w => (w.segments || []).forEach(sg => { if (sg.lto && allUids.has(sg.lto)) LINK_TARGETS.add(sg.lto); }));
@@ -5100,7 +5148,7 @@ function generateExerciseHTML(words, groups, placeholder, lang, models) {
     
     // We use an array to collect our HTML chunks, which is faster and cleaner
     // than constantly concatenating a massive string.
-    let htmlParts = ['<div class="sentence-container">'];
+    let htmlParts = [headingHtml(0) + '<div class="sentence-container">'];
 
     // One click handler for word and group hints (group hints had none and could never be opened).
     const hintToggle = "event.stopPropagation(); document.querySelectorAll('.hint-icon').forEach(el => { if(el !== this) el.classList.remove('show-tooltip'); }); this.classList.toggle('show-tooltip');";
@@ -5179,7 +5227,7 @@ function generateExerciseHTML(words, groups, placeholder, lang, models) {
             containerOpen = false;
             
             if (idx < words.length - 1) {
-                htmlParts.push(`<div class="sentence-container">`);
+                htmlParts.push(`${headingHtml(sIdx)}<div class="sentence-container">`);
                 containerOpen = true;
             }
         }
