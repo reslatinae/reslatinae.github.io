@@ -461,6 +461,16 @@
         .guide-open-title { font-weight: 600; color: #6b4d24; }
         .guide-open ul { margin: 3px 0 0; padding-left: 18px; }
         .guide-open li { margin: 2px 0; }
+        .guide-ref { border-bottom: 1px dotted #a07a45; cursor: help; }
+        .guide-open li[data-refs], .guide-fulfilled[data-refs] { cursor: help; border-radius: 4px; }
+        .guide-open li[data-refs]:hover, .guide-open li[data-refs]:focus-visible { background: #f3ead8; outline: none; }
+        .guide-fulfilled:focus-visible { outline: 2px solid #a07a45; outline-offset: 2px; }
+        #exercise .g-hl { outline: 3px solid #b07d2b !important; outline-offset: 3px; box-shadow: 0 0 0 7px rgba(176, 125, 43, 0.22) !important; border-radius: 6px; }
+        #exercise .g-flash { animation: g-flash 2.4s ease-out; border-radius: 6px; }
+        @keyframes g-flash { 0%, 45% { outline: 3px solid #b07d2b; outline-offset: 3px; box-shadow: 0 0 0 8px rgba(176, 125, 43, 0.3); } 22% { box-shadow: 0 0 0 3px rgba(176, 125, 43, 0.15); } 100% { outline: 3px solid rgba(176, 125, 43, 0); outline-offset: 3px; box-shadow: 0 0 0 8px rgba(176, 125, 43, 0); } }
+        @media (prefers-reduced-motion: reduce) { #exercise .g-flash { animation: none; outline: 3px solid #b07d2b; outline-offset: 3px; } }
+        body.high-contrast #exercise .g-hl { outline-color: #f0c987 !important; box-shadow: 0 0 0 7px rgba(240, 201, 135, 0.3) !important; }
+        body.high-contrast .guide-ref { border-bottom-color: #f0c987; } body.high-contrast .guide-open li[data-refs]:hover { background: #3a3020; }
         .guide-fulfilled { margin-top: 8px; padding: 7px 10px; background: #f0f7ee; border: 1px solid #cfe3c8; border-radius: 6px; color: #24421c; }
         body.high-contrast .guide-open { background: #2a2418; border-left-color: #d4a861; color: #f1e6d0; }
         body.high-contrast .guide-open-title { color: #f0c987; }
@@ -900,7 +910,7 @@
         function guidedContinue() { if (exMode === 'guided' && guided.hold) { guided.hold = false; guidedRender(); return true; } return false; }
         document.addEventListener('click', (e) => {
             if (!(exMode === 'guided' && guided.hold)) return;
-            if (e.target.closest('textarea, .model-compare, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal, .guide-toggle, .guide-level, .guide-more')) return; // these keep working as usual
+            if (e.target.closest('textarea, .model-compare, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal, .guide-toggle, .guide-level, .guide-more, [data-refs]')) return; // these keep working as usual
             guidedContinue();
         }, true);
         document.addEventListener('keydown', (e) => {
@@ -925,7 +935,22 @@
         function guidedAnswer(el) { return el.classList.contains('g-label') ? el.parentElement.dataset.ans : el.dataset.ans; }
         function sentenceOf(el) { return el ? el.closest('.sentence-container') : null; }
         function guidedStart() {
-            if (!guidePanel) { guidePanel = document.createElement('div'); guidePanel.id = 'guide-panel'; guidePanel.className = 'guide-panel'; guidePanel.setAttribute('aria-live', 'polite'); }
+            if (!guidePanel) {
+                guidePanel = document.createElement('div'); guidePanel.id = 'guide-panel'; guidePanel.className = 'guide-panel'; guidePanel.setAttribute('aria-live', 'polite');
+                // pointing at a block's name (or an entry of "Still open") highlights that block in the sentence
+                const refOf = (e) => e.target.closest && e.target.closest('[data-refs]');
+                guidePanel.addEventListener('mouseover', (e) => { const r = refOf(e); if (r) gHighlight(r.dataset.refs, true); });
+                guidePanel.addEventListener('mouseout', (e) => { const r = refOf(e); if (r && !r.contains(e.relatedTarget)) gHighlight(r.dataset.refs, false); });
+                guidePanel.addEventListener('focusin', (e) => { const r = refOf(e); if (r) gHighlight(r.dataset.refs, true); });
+                guidePanel.addEventListener('focusout', (e) => { const r = refOf(e); if (r) gHighlight(r.dataset.refs, false); });
+                // tapping (touch screens) or clicking: flash the blocks and bring the first one into view
+                guidePanel.addEventListener('click', (e) => {
+                    const r = refOf(e); if (!r) return;
+                    const first = document.querySelector(`#exercise [data-gref="${r.dataset.refs.split(' ')[0]}"]`);
+                    if (first) { const b = first.getBoundingClientRect(); if (b.top < 0 || b.bottom > window.innerHeight) first.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+                    gHighlight(r.dataset.refs, false, true);
+                });
+            }
             guided.hold = false; guidedRender();
         }
         // Long sentences and small screens: the panel docks to the bottom of the screen and the page scrolls so that the
@@ -973,6 +998,7 @@
             if (guidePanel) { guidePanel.classList.remove('docked'); guidePanel.style.left = guidePanel.style.width = guidePanel.style.right = ''; }
             if (guidePanel) guidePanel.remove();
             document.querySelectorAll('.guided-current').forEach(x => x.classList.remove('guided-current'));
+            gClearHighlights();
         }
         function guidedRender(fbHtml, fbOk, showSolution) {
             if (exMode !== 'guided' || !guidePanel) return;
@@ -1018,6 +1044,9 @@
                 el.classList.add('guided-current');
                 if (guided.type !== 'gen' && !fbHtml) el.focus({ preventScroll: true });
             }
+            gClearHighlights();
+            const ff = guidePanel.querySelector('.guide-fulfilled');
+            if (ff && guided.hold && guided.flashFor !== guided.el) { guided.flashFor = guided.el; setTimeout(() => gHighlight(ff.dataset.refs, false, true), 250); }
             requestAnimationFrame(() => guidedPlace(true));
         }
         function guidedNote(el) {
@@ -1062,10 +1091,22 @@
             const w = Array.from(box.querySelectorAll('.s-text')).map(x => x.textContent.trim()).filter(x => x && !/^[.,;:!?·–—]+$/.test(x));
             return w.length > max ? w.slice(0, max).join(' ') + ' …' : w.join(' ');
         }
+        let gRefCounter = 0;
+        function gRefTarget(el) { return el.classList.contains('g-label') ? el.parentElement : el; } // a bracket: the whole bracket
+        function gRef(el) { const tg = gRefTarget(el); if (!tg.dataset.gref) tg.dataset.gref = 'r' + (++gRefCounter); return tg.dataset.gref; }
+        function gRefs(els) { return els.filter(Boolean).map(gRef).join(' '); }
+        function gHighlight(refs, on, flash) {
+            (refs || '').split(' ').filter(Boolean).forEach(id => {
+                const el = document.querySelector(`#exercise [data-gref="${id}"]`); if (!el) return;
+                el.classList.toggle('g-hl', !!on);
+                if (flash) { el.classList.remove('g-flash'); void el.offsetWidth; el.classList.add('g-flash'); clearTimeout(el._gFlashT); el._gFlashT = setTimeout(() => el.classList.remove('g-flash'), 2600); }
+            });
+        }
+        function gClearHighlights() { document.querySelectorAll('#exercise .g-hl, #exercise .g-flash').forEach(x => x.classList.remove('g-hl', 'g-flash')); }
         function gReason(r) {
             const t = gT(); const isG = r.classList.contains('g-label'); const ans = isG ? r.parentElement.dataset.ans : r.dataset.ans;
             const w = isG && gIsClause(r.parentElement) ? gWords(r, 1).replace(' …', '') + ' …' : gWords(r, 3); // a clause: just its first word
-            return `${t.q(w)} (${gDisp(ans)})`;
+            return `<span class="guide-ref" data-refs="${gRef(r)}">${t.q(w)} (${gDisp(ans)})</span>`;
         }
         function guidedScopes(sent) {
             const scopes = new Map(); const reg = (sc) => { if (!scopes.has(sc)) scopes.set(sc, { reasons: [], pred: false, opener: null }); return scopes.get(sc); };
@@ -1097,16 +1138,16 @@
             const hasClauses = Array.from(sent.querySelectorAll('.s-group')).some(gIsClause);
             Array.from(scopes.entries()).reverse().forEach(([sc, info]) => {
                 if (info.pred || !gScopeHasVerb(sc, sent)) return;
-                let txt;
+                let txt; const refs = (sc === sent ? [] : [sc]).concat(info.reasons);
                 if (sc === sent) txt = hasClauses ? t.predMain : t.predSent;
                 else { const first = gWords(info.opener || sc.querySelector('.hover-word') || sc, 1).replace(' …', ''); txt = gCanon(sc.dataset.ans) === 'Relativsatz' ? t.predRel(first) : t.predSub(first); }
                 if (info.reasons.length) txt += ` – ${t.after} ${info.reasons.map(gReason).join(', ')}`;
-                out.push(txt);
+                out.push({ txt, refs: gRefs(refs) });
             });
             const last = done[done.length - 1];
-            if (!guided.hold && last && last.classList.contains('hover-word') && gCanon(last.dataset.ans) === 'Konjunktion') out.unshift(t.conj(gWords(last, 2)));
+            if (!guided.hold && last && last.classList.contains('hover-word') && gCanon(last.dataset.ans) === 'Konjunktion') out.unshift({ txt: t.conj(gWords(last, 2)), refs: gRefs([last]) });
             if (!out.length) return '';
-            return `<div class="guide-open"><span class="guide-open-title">${t.openTitle}</span><ul>${out.map(x => `<li>${x}</li>`).join('')}</ul></div>`;
+            return `<div class="guide-open"><span class="guide-open-title">${t.openTitle}</span><ul>${out.map(x => `<li${x.refs ? ` tabindex="0" data-refs="${x.refs}"` : ''}>${x.txt}</li>`).join('')}</ul></div>`;
         }
         function guidedFulfilled(el, answer) {
             const t = gT(); if (!t.fulfilled || gCanon(answer) !== 'Prädikat' || !el.classList.contains('hover-word')) return '';
@@ -1114,7 +1155,8 @@
             const info = guidedScopes(sent).scopes.get(gClauseOf(el) || sent); if (!info) return '';
             const reasons = (info.opener ? [info.opener] : []).concat(info.reasons); if (!reasons.length) return '';
             const subj = info.reasons.some(r => !r.classList.contains('g-label') && gCanon(r.dataset.ans) === 'Subjekt');
-            return `<div class="guide-fulfilled">${t.fulfilled(gWords(el, 3), reasons.map(gReason).join(', '), subj)}</div>`;
+            const verb = `<span class="guide-ref" data-refs="${gRef(el)}">${gWords(el, 3)}</span>`;
+            return `<div class="guide-fulfilled" tabindex="0" data-refs="${gRefs(reasons.concat([el]))}">${t.fulfilled(verb, reasons.map(gReason).join(', '), subj)}</div>`;
         }
         // Hint 2: point at the form that decides it, with the student's own words
         function guidedPointer(el, answer) {
