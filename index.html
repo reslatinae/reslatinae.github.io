@@ -521,6 +521,14 @@
         body.high-contrast .guide-nosubj { background: #422006; border-color: #a16207; color: #fde68a; }
         .guide-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
         .guide-head-btns { display: flex; align-items: center; gap: 6px; }
+        .guide-back { font: inherit; font-size: 0.75rem; border: 1px solid #c7d7f5; background: #fff; color: #1d4ed8; border-radius: 999px; padding: 2px 9px; cursor: pointer; }
+        .guide-back:hover, .guide-back:focus-visible { background: #dbeafe; outline: none; }
+        .guide-review-which { font-weight: 600; font-size: 0.88rem; margin: 0 0 6px; color: #1e3a5f; }
+        .guide-nav .guide-btn:disabled { opacity: 0.45; cursor: default; }
+        .guide-actions.guide-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .sent-next .sn-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+        body.high-contrast .guide-back { background: #2d2d2d; color: #93c5fd; border-color: #555; }
+        body.high-contrast .guide-review-which { color: #dbeafe; }
         .guide-head .guide-count { flex: 1; }
         .guide-jump select { font: inherit; font-size: 0.78rem; text-transform: none; letter-spacing: 0; font-weight: 500; color: #1d4ed8; background: #fff; border: 1px solid #c7d7f5; border-radius: 999px; padding: 2px 6px; cursor: pointer; }
         .guide-jump select:focus-visible { outline: 2px solid #2563eb; outline-offset: 1px; }
@@ -774,6 +782,28 @@
             .menu-btn { padding: 8px 16px; font-size: 0.95rem; border-bottom: 1px solid #f8f6f1; }
             .color-popover { top: 50% !important; left: 50% !important; transform: translate(-50%, -50%); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         }
+        .print-trans { display: none; }
+        @media print {
+            @page { margin: 12mm; }
+            body { margin: 0 !important; padding: 0 !important; max-width: none !important; font-size: 10pt; line-height: 1.35; }
+            h1 { font-size: 15pt !important; margin: 0 0 8px !important; padding: 0 !important; }
+            .teacher-note { padding: 6px 10px !important; margin: 0 0 10px !important; font-size: 9.5pt !important; box-shadow: none !important; }
+            /* everything that belongs to the help, not to the student's own work */
+            #guide-panel, .trans-plan, .sent-next, .gen-tag, .hint-icon, .vocab-icon, #vocab-pop, .model-compare, .preview-banner, #label-legend, .label-legend, .guide-jump, #toast-container, .lang-switch-top, #btn-submit-exam { display: none !important; }
+            .exercise-wrapper { line-height: 3.1 !important; padding: 0 !important; }
+            .sentence-container { padding: 8px 10px 6px !important; margin: 0 0 8px !important; border: 1px solid #bbb !important; box-shadow: none !important; display: block !important; }
+            .hover-word { font-size: 10.5pt !important; padding: 1px 6px !important; margin: 0 2px !important; transition: none !important; }
+            .punct { font-size: 10.5pt !important; }
+            .ans-label { font-size: 6.5pt !important; margin-top: 3px !important; }
+            .s-group { padding: 14px 4px 3px !important; margin: 12px 2px 0 !important; }
+            .g-label { font-size: 6.5pt !important; }
+            .guided-current, .g-hl, .g-flash { outline: none !important; box-shadow: none !important; animation: none !important; }
+            /* the translation: printed as text (a text box would cut it off); empty boxes are left out */
+            .trans-box { margin: 6px 0 0 !important; padding-top: 4px !important; line-height: 1.35 !important; border-top: 1px dashed #bbb !important; }
+            .trans-box textarea { display: none !important; }
+            .trans-box.print-empty { display: none !important; }
+            .print-trans { display: block; white-space: pre-wrap; font-size: 10pt; }
+        }
         @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; } .footer-toolbar, .radio-menu, .instruction-box, .zoom-controls { display: none !important; } .exercise-wrapper { border: none; box-shadow: none; padding: 0; background: transparent; } .sentence-container { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .ex-img { display: none !important; } .mode-toggle-bg, #results-modal, #color-popover, #guide-panel, .legend-hint, .legend-keys, .legend-key { display: none !important; } .exercise-layout { display: block; } .label-legend { position: static; width: auto; max-height: none; margin: 0 0 16px; box-shadow: none; } .legend-list { flex-direction: row; flex-wrap: wrap; } .legend-chip { width: auto; } }
     </script>
 
@@ -806,6 +836,9 @@
                 lockedGen: 'Es geht erst weiter, wenn das <strong>Genitivattribut</strong> im blau umrandeten Block markiert ist. Klicke dort direkt auf das Wort im Genitiv und wähle „🖍️ Genitiv markieren“.',
                 genNotLabel: 'Die Funktion dieses Blocks hast du schon richtig bestimmt. Jetzt geht es um das <strong>Genitivattribut</strong>: Klicke direkt auf das Wort im Genitiv und wähle „🖍️ Genitiv markieren“.',
                 genTag: 'Genitiv?',
+                backTitle: 'Frühere Erklärungen ansehen', reviewHead: (i, n) => `Rückblick · Erklärung ${i} von ${n}`,
+                reviewWhich: (n, w, l) => `Satz ${n} · „${w}“${l ? ' – ' + l : ''}`, reviewPrev: '◀ Früher', reviewNext: 'Später ▶', reviewBack: 'Zurück zum aktuellen Schritt',
+                barBack: '◀ Erklärungen nochmals ansehen',
                 sentDoneBar: '✓ Der Satz ist vollständig bestimmt. Übersetze ihn jetzt – der Übersetzungsplan unter dem Übersetzungsfeld hilft dir dabei.',
                 nextSent: 'Weiter zum nächsten Satz ▶', nextEnd: 'Abschliessen ✓',
                 jumpLabel: 'Satz wählen', jumpOpt: (n) => `Satz ${n}`, jumpDone: ' ✓',
@@ -933,6 +966,9 @@
                 lockedGen: 'You can only go on once the <strong>genitive attribute</strong> in the block outlined in blue is marked. Click directly on the genitive word there and choose “🖍️ Mark Genitive”.',
                 genNotLabel: 'You have already worked out the function of this block. Now it is about the <strong>genitive attribute</strong>: click directly on the genitive word and choose “🖍️ Mark Genitive”.',
                 genTag: 'Genitive?',
+                backTitle: 'See earlier explanations', reviewHead: (i, n) => `Looking back · explanation ${i} of ${n}`,
+                reviewWhich: (n, w, l) => `Sentence ${n} · “${w}”${l ? ' – ' + l : ''}`, reviewPrev: '◀ Earlier', reviewNext: 'Later ▶', reviewBack: 'Back to the current step',
+                barBack: '◀ See the explanations again',
                 sentDoneBar: '✓ The sentence is fully analysed. Translate it now – the translation plan below the translation box will help you.',
                 nextSent: 'Next sentence ▶', nextEnd: 'Finish ✓',
                 jumpLabel: 'Choose sentence', jumpOpt: (n) => `Sentence ${n}`, jumpDone: ' ✓',
@@ -1056,7 +1092,15 @@
                 prev.parentNode.insertBefore(w, prev); w.append(prev, pu);
             });
         })();
-        let guided = { hold: false, el: null, type: null, brief: false, streak: 0, slips: 0 };
+        // Printing: the translations are printed as plain text below each sentence; empty translation boxes are left out.
+        window.addEventListener('beforeprint', () => {
+            document.querySelectorAll('#exercise .trans-box').forEach(tb => {
+                const ta = tb.querySelector('textarea'); let d = tb.querySelector('.print-trans');
+                if (!d) { d = document.createElement('div'); d.className = 'print-trans'; tb.appendChild(d); }
+                d.textContent = ta ? ta.value : ''; tb.classList.toggle('print-empty', !(ta && ta.value.trim()));
+            });
+        });
+        let guided = { hold: false, el: null, type: null, brief: false, streak: 0, slips: 0, log: [], review: null, lastArgs: [] };
         // ---- Word information (📖): one shared box, placed next to the icon and kept inside the screen ----
         let vocabPop = null, vocabFor = null;
         function closeVocab() { if (vocabPop) vocabPop.hidden = true; if (vocabFor) vocabFor.setAttribute('aria-expanded', 'false'); vocabFor = null; }
@@ -1112,13 +1156,13 @@
         function guidedContinue() { if (exMode === 'guided' && guided.hold) { guided.hold = false; guidedRender(); return true; } return false; }
         document.addEventListener('click', (e) => {
             if (!(exMode === 'guided' && guided.hold)) return;
-            if (guided.sentEnd) return; // end of a sentence: only the "next" button (or Enter) moves on, so reading the plan never skips ahead
-            if (e.target.closest('textarea, .model-compare, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal, .guide-toggle, .guide-level, .guide-more, [data-refs], .hint-icon, #vocab-pop, .guide-jump, [data-jump]')) return; // these keep working as usual
+            if (guided.sentEnd || guided.review !== null) return; // end of a sentence / looking back: only the buttons move on
+            if (e.target.closest('textarea, .model-compare, .footer-toolbar, .lang-switch-top, .zoom-controls, .mode-toggle-bg, #label-legend, #color-popover, #results-modal, .guide-toggle, .guide-back, .guide-nav, .guide-level, .guide-more, [data-refs], .hint-icon, #vocab-pop, .guide-jump, [data-jump]')) return; // these keep working as usual
             guidedContinue();
         }, true);
         document.addEventListener('keydown', (e) => {
             if (!(exMode === 'guided' && guided.hold)) return;
-            if (guided.sentEnd) return; // end of a sentence: only the "next" button moves on (no accidental skip while translating)
+            if (guided.sentEnd || guided.review !== null) return; // end of a sentence / looking back: only the buttons move on
             if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); guidedContinue(); }
         });
@@ -1215,11 +1259,12 @@
             document.querySelectorAll('.guided-current').forEach(x => x.classList.remove('guided-current'));
             gClearHighlights();
             document.querySelectorAll('#exercise .gen-tag').forEach(x => x.remove()); document.body.classList.remove('guided-gen-step');
-            document.querySelectorAll('#exercise .sent-next').forEach(x => x.remove()); guided.sentEnd = false;
+            document.querySelectorAll('#exercise .sent-next').forEach(x => x.remove()); guided.sentEnd = false; guided.review = null;
             if (guidePanel) guidePanel.style.display = '';
         }
         function guidedRender(fbHtml, fbOk, showSolution) {
             if (exMode !== 'guided' || !guidePanel) return;
+            guided.review = null; guided.lastArgs = [fbHtml, fbOk, showSolution];
             const t = gT();
             document.querySelectorAll('.guided-current').forEach(x => x.classList.remove('guided-current'));
             if (!guided.hold) { const c = guidedCompute(); guided.el = c.el; guided.type = c.type; }
@@ -1250,7 +1295,7 @@
             const chooser = sentences.length > 1 && t.jumpLabel
                 ? `<label class="guide-jump"><span class="sr-only">${t.jumpLabel}</span><select aria-label="${t.jumpLabel}" title="${t.jumpLabel}">${sentences.map((_, i) => `<option value="${i}"${i === Math.max(0, sIdx) ? ' selected' : ''}>${t.jumpOpt(i + 1)}${doneSent(i) ? t.jumpDone : ''}</option>`).join('')}</select></label>`
                 : '';
-            guidePanel.innerHTML = `<div class="guide-head"><span class="guide-count">${t.counter(Math.max(1, sIdx + 1), sentences.length)}</span>${chooser}<span class="guide-head-btns">${t.levelLess && !(guided.type === 'end' && !guided.hold) ? `<button type="button" class="guide-level" aria-pressed="${guided.brief ? 'true' : 'false'}" title="${guided.brief ? t.levelMoreTitle : t.levelLessTitle}">${guided.brief ? t.levelMore : t.levelLess}</button>` : ''}<button type="button" class="guide-toggle" aria-expanded="${guided.collapsed ? 'false' : 'true'}" title="${guided.collapsed ? t.expand : t.collapse}">${guided.collapsed ? '▴' : '▾'}</button></span></div>
+            guidePanel.innerHTML = `<div class="guide-head"><span class="guide-count">${t.counter(Math.max(1, sIdx + 1), sentences.length)}</span>${chooser}<span class="guide-head-btns">${guided.log.length && t.backTitle ? `<button type="button" class="guide-back" title="${t.backTitle}" aria-label="${t.backTitle}">◀</button>` : ''}${t.levelLess && !(guided.type === 'end' && !guided.hold) ? `<button type="button" class="guide-level" aria-pressed="${guided.brief ? 'true' : 'false'}" title="${guided.brief ? t.levelMoreTitle : t.levelLessTitle}">${guided.brief ? t.levelMore : t.levelLess}</button>` : ''}<button type="button" class="guide-toggle" aria-expanded="${guided.collapsed ? 'false' : 'true'}" title="${guided.collapsed ? t.expand : t.collapse}">${guided.collapsed ? '▴' : '▾'}</button></span></div>
                 ${guided.type === 'gen' && !guided.hold && el && t.genPending ? `<div class="guide-gen-pending">${t.genPending(el.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').length)}</div>` : ''}
                 ${prompt ? `<div class="guide-prompt">${prompt}</div>` : ''}
                 ${fbHtml ? `<div class="guide-fb ${fbOk ? 'ok' : 'err'}">${fbHtml}</div>` : ''}
@@ -1260,6 +1305,7 @@
             const sb = document.getElementById('guide-solution');
             if (sb) sb.onclick = guidedShowSolution;
             guidePanel.querySelector('.guide-toggle').onclick = (e) => { e.stopPropagation(); guided.collapsed = !guided.collapsed; guidedRender(fbHtml, fbOk, showSolution); };
+            const bk = guidePanel.querySelector('.guide-back'); if (bk) bk.onclick = (e) => { e.stopPropagation(); guidedReview(guided.log.length - 1); };
             const js = guidePanel.querySelector('.guide-jump select');
             if (js) { js.onclick = (e) => e.stopPropagation(); js.onchange = () => guidedJump(parseInt(js.value, 10)); }
             guidePanel.querySelectorAll('[data-jump]').forEach(bt => bt.onclick = (e) => { e.stopPropagation(); guidedJump(parseInt(bt.dataset.jump, 10)); });
@@ -1285,8 +1331,9 @@
                 const bar = document.createElement('div'); bar.className = 'sent-next';
                 // a note about the help level (fewer / more hints) would otherwise be hidden with the hint box
                 const lvl = Array.from(guidePanel.querySelectorAll('.guide-level-note')).map(x => `<div class="sn-note">${x.innerHTML}</div>`).join('');
-                bar.innerHTML = `<div class="sn-text">${t.sentDoneBar}${hasModel && t.modelHint ? t.modelHint : ''}${lvl}</div><button type="button" class="guide-btn sn-btn">${nxtS.type === 'end' ? t.nextEnd : t.nextSent}</button>`;
-                bar.querySelector('button').onclick = (e) => { e.stopPropagation(); guidedContinue(); };
+                bar.innerHTML = `<div class="sn-text">${t.sentDoneBar}${hasModel && t.modelHint ? t.modelHint : ''}${lvl}</div><span class="sn-btns">${guided.log.length && t.barBack ? `<button type="button" class="guide-btn secondary sn-back">${t.barBack}</button>` : ''}<button type="button" class="guide-btn sn-btn">${nxtS.type === 'end' ? t.nextEnd : t.nextSent}</button></span>`;
+                bar.querySelector('.sn-btn').onclick = (e) => { e.stopPropagation(); guidedContinue(); };
+                const sb = bar.querySelector('.sn-back'); if (sb) sb.onclick = (e) => { e.stopPropagation(); guidedReview(guided.log.length - 1); };
                 sc.appendChild(bar);
                 const ta = sc.querySelector('.trans-box textarea');
                 if (ta && window.innerWidth > 900 && !ta.value) ta.focus({ preventScroll: true }); // ready to type (not on phones: no keyboard pop-up)
@@ -1430,6 +1477,25 @@
                 sent.classList.add('with-plan');
             });
         }
+        // Look back: earlier explanations, one at a time; the block they belong to lights up. Nothing in the exercise changes.
+        function guidedReview(i) {
+            const t = gT(); const L = guided.log; if (!L.length || !guidePanel) return;
+            i = Math.max(0, Math.min(i, L.length - 1)); guided.review = i;
+            const e = L[i]; const sents = Array.from(document.querySelectorAll('#exercise .sentence-container'));
+            const sn = sents.indexOf(sentenceOf(e.el)) + 1;
+            guidePanel.style.display = ''; guidePanel.classList.remove('collapsed');
+            guidePanel.innerHTML = `<div class="guide-head"><span class="guide-count">${t.reviewHead(i + 1, L.length)}</span></div>
+                <div class="guide-review-which">${t.reviewWhich(sn, gWords(e.el, 3), e.gen ? (currentLang === 'de' ? 'Genitivattribut' : 'genitive attribute') : gDisp(e.label || ''))}</div>
+                <div class="guide-fb ok">${e.html}</div>
+                <div class="guide-actions guide-nav"><button type="button" class="guide-btn secondary" data-rv="prev"${i === 0 ? ' disabled' : ''}>${t.reviewPrev}</button><button type="button" class="guide-btn secondary" data-rv="next"${i === L.length - 1 ? ' disabled' : ''}>${t.reviewNext}</button><button type="button" class="guide-btn" data-rv="back">${t.reviewBack}</button></div>`;
+            guidePanel.querySelectorAll('[data-rv]').forEach(b => b.onclick = (ev) => {
+                ev.stopPropagation(); const a = b.dataset.rv;
+                if (a === 'prev') guidedReview(i - 1); else if (a === 'next') guidedReview(i + 1); else guidedRender(...guided.lastArgs);
+            });
+            const r = e.el.getBoundingClientRect(); if (r.top < 0 || r.bottom > window.innerHeight) e.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            gClearHighlights(); setTimeout(() => gHighlight(gRef(e.el), false, true), 150);
+            requestAnimationFrame(() => guidedPlace(false));
+        }
         function guidedJump(i) {
             guided.startSent = i; guided.hold = false; guided.flashFor = null;
             guidedRender();
@@ -1454,7 +1520,9 @@
             const head = byHelp ? `${t.solutionShown}: <strong>${answer}</strong>.` : '✓ ' + t.correct;
             guided.hold = true; guided.el = el;
             const noSubj = /^(Prädikat|Verb)$/.test(answer) && !hasOwnSubject(el) ? `<div class="guide-nosubj">${t.noSubject}</div>` : '';
-            guidedRender(`${head} ${ex}${guidedFulfilled(el, answer)}${noSubj}${guidedNote(el)}${note}`, true);
+            const ful = guidedFulfilled(el, answer);
+            guided.log.push({ el, label: answer, html: `${head} ${ex}${ful}${noSubj}` });
+            guidedRender(`${head} ${ex}${ful}${noSubj}${guidedNote(el)}${note}`, true);
         }
         // Does the clause of this predicate have a block labelled "Subject"? The clause is the nearest bracket that is a
         // (relative or subordinate) clause, otherwise the sentence; subjects of clauses nested inside it don't count.
@@ -1616,6 +1684,7 @@
             const t = gT(); const left = blk.querySelectorAll('.s-text[data-u="true"]:not(.marked-gen)').length;
             if (left > 0) { guidedRender('✓ ' + t.genProgress(left), true); return; }
             guided.hold = true; guided.el = blk;
+            guided.log.push({ el: blk, label: '', gen: true, html: '✓ ' + t.genOk });
             guidedRender('✓ ' + t.genOk + guidedNote(blk), true);
         }
         function guidedShowSolution() {
@@ -4684,7 +4753,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
     
     const studentTexts = {
         en: {
-            instr: "This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words to select their syntactical function. <br><br><strong>Important:</strong> You must also locate hidden Genitive Attributes! Click directly on a genitive word inside a phrase box and use the <strong>🖍️ Mark Genitive</strong> tool to reveal it. Once you have correctly analyzed every phrase and found all genitives, a textbox will appear into which you can write your translation. <br><br><strong>Tip:</strong> In <strong>Guided Mode</strong> the page leads you block by block through each sentence, with an explanation after every step.",
+            instr: "This page is designed to help you translate Latin sentences. The primary goal is not to identify individual forms, but to understand the function of words or word groups within the structure of the entire sentence. Adjectives and genitive attributes are therefore grouped with the words they modify. You can click on a word or group of words to select their syntactical function. <br><br><strong>Important:</strong> You must also locate hidden Genitive Attributes! Click directly on a genitive word inside a phrase box and use the <strong>🖍️ Mark Genitive</strong> tool to reveal it. Once you have correctly analyzed every phrase and found all genitives, a textbox will appear into which you can write your translation. <br><br><strong>Tip:</strong> In <strong>Guided Mode</strong> the page leads you block by block through each sentence, with an explanation after every step. The hints are based on general explanations of the functions and on your teacher's analysis; they cannot capture every detail of a sentence perfectly. Take them as help for thinking.",
             note: "Note:", togglePat: "Toggle Patterns", toggleCon: "High Contrast", print: "Print Analysis",
             download: "Download HTML", btnSaveProg: "💾 Save Progress", btnClearProg: "🗑️ Clear Progress",
             progSaved: "Progress saved!", progCleared: "Progress cleared!", correct: "Correct!",
@@ -4707,7 +4776,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             cvdPartial: (n) => `Only ${n} functions could get colour-blind-safe colours; the patterns (🏁) help with the rest.`, colorsReset: "↺ All of the teacher's colours"
         },
         de: {
-            instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen. <br><br><strong>Wichtig:</strong> Du musst auch versteckte Genitivattribute aufspüren! Klicke dazu direkt auf das Genitivattribut innerhalb eines Wortblocks und nutze das <strong>🖍️ Genitiv markieren</strong> Werkzeug, um es hervorzuheben. Sobald du jede Wortgruppe korrekt analysiert und alle Genitive gefunden hast, erscheint ein Textfeld für deine Übersetzung. <br><br><strong>Tipp:</strong> Im <strong>Geführten Modus</strong> führt dich die Seite Block für Block durch jeden Satz, mit einer Erklärung nach jedem Schritt.",
+            instr: "Diese Seite hilft dir beim Übersetzen lateinischer Sätze. Es geht dabei nicht primär darum, einzelne Formen zu bestimmen, sondern die Funktion von Worten oder Wortgruppen für das Gefüge des gesamten Satzes zu verstehen. Adjektive und Genitivattribute werden daher mit ihren Bezugswörtern zusammengefasst. Klicke auf ein Wort oder eine Gruppe, um die syntaktische Funktion auszuwählen. <br><br><strong>Wichtig:</strong> Du musst auch versteckte Genitivattribute aufspüren! Klicke dazu direkt auf das Genitivattribut innerhalb eines Wortblocks und nutze das <strong>🖍️ Genitiv markieren</strong> Werkzeug, um es hervorzuheben. Sobald du jede Wortgruppe korrekt analysiert und alle Genitive gefunden hast, erscheint ein Textfeld für deine Übersetzung. <br><br><strong>Tipp:</strong> Im <strong>Geführten Modus</strong> führt dich die Seite Block für Block durch jeden Satz, mit einer Erklärung nach jedem Schritt. Die Hinweise beruhen auf allgemeinen Erklärungen zu den Funktionen und auf der Analyse deiner Lehrkraft; sie können nicht jede Besonderheit eines Satzes perfekt erfassen. Nimm sie als Hilfe zum Nachdenken.",
             note: "Hinweis:", togglePat: "Muster umschalten", toggleCon: "Hoher Kontrast", print: "Drucken",
             download: "HTML herunterladen", btnSaveProg: "💾 Fortschritt speichern", btnClearProg: "🗑️ Fortschritt löschen",
             progSaved: "Fortschritt gespeichert!", progCleared: "Fortschritt gelöscht!", correct: "Richtig!",
