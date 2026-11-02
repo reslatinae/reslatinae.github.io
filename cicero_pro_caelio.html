@@ -31,7 +31,8 @@
     .content { flex: 1; min-width: 0; }
 
     /* Sidebar navigation (same look as the sidebar on the student page) */
-    .toc { position: sticky; top: 16px; width: 220px; flex-shrink: 0; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.88rem; }
+    .toc { position: sticky; top: 16px; width: 220px; flex-shrink: 0; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.88rem; max-height: calc(100vh - 32px); box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #d8c8a8 transparent; }
+    .toc::-webkit-scrollbar { width: 8px; } .toc::-webkit-scrollbar-thumb { background: #d8c8a8; border-radius: 4px; }
     .toc-title { font-weight: 600; color: #1d1914; margin-bottom: 6px; }
     .toc a { display: block; color: #3a3329; text-decoration: none; padding: 5px 8px; border-radius: 6px; }
     .toc a:hover, .toc a:focus-visible { background: #f8f6f1; outline: none; }
@@ -130,7 +131,7 @@
 
     @media (max-width: 900px) {
         .layout { flex-direction: column; align-items: stretch; gap: 0; }
-        .toc { position: static; width: auto; margin-bottom: 20px; }
+        .toc { position: static; width: auto; margin-bottom: 20px; max-height: none; overflow: visible; }
         .fn-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 600px) {
