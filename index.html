@@ -3051,8 +3051,8 @@ const StorageManager = {
         }
     },
 
-    exportProject() {
-        const projectData = { 
+    snapshot() {
+        return {
             lang: AppState.lang, level: AppState.level,
             title: DOM.pageTitle.value, image: DOM.pageImage.value,
             text: DOM.enterText.value,
@@ -3060,6 +3060,10 @@ const StorageManager = {
             words: AppState.words, groups: AppState.groups, 
             customFunctions: AppState.functions, customColors: AppState.colors, translations: AppState.translations, headings: AppState.headings, vocabShowForm: AppState.vocabShowForm, linkAfterSolve: AppState.linkAfterSolve
         };
+    },
+
+    exportProject() {
+        const projectData = this.snapshot();
         const blob = new Blob([JSON.stringify(projectData, null, 2)], {type: "application/json"});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); 
         a.download = (projectData.title || "latin_project").replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".json"; a.click();
@@ -3157,7 +3161,33 @@ function initApp() {
     AppState.activeFunc = AppState.getOtherLabel();
 
     initEventListeners();
-    StorageManager.checkAutoSaveOnLoad();    
+    if (!openProjectFromLink()) StorageManager.checkAutoSaveOnLoad();
+}
+
+// A project can be opened by link: index.html?project=caelio_1.json (a project file on the same website), e.g. from
+// the "bearbeiten" links of a text page. Returns true when the page was opened that way (then no autosave prompt).
+// A page can also hand over a project it contains itself: it leaves it in this browser's storage and opens
+// index.html#from-page (works when that page and the tool are on the same website).
+const HANDOFF_KEY = 'syntax_studio_handoff';
+function openProjectFromLink() {
+    let url = null; try { url = new URLSearchParams(location.search).get('project'); } catch (e) {}
+    const de = AppState.lang !== 'en';
+    if (!url && location.hash === '#from-page') {
+        let data = null;
+        try { const h = JSON.parse(localStorage.getItem(HANDOFF_KEY)); localStorage.removeItem(HANDOFF_KEY); if (h && h.data && Date.now() - (h.t || 0) < 10 * 60 * 1000) data = h.data; } catch (e) {}
+        try { history.replaceState(null, '', location.pathname); } catch (e) {}
+        if (data) { StorageManager.restoreData(data); AppState.dirty = false; return true; }
+        alert(de ? 'Die Übung konnte nicht übernommen werden. Bitte öffnen Sie den Link noch einmal.' : 'The exercise could not be taken over. Please open the link again.');
+        return false;
+    }
+    if (!url) return false;
+    fetch(url, { cache: 'no-store' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+        .then(txt => {
+            StorageManager.restoreData(JSON.parse(txt.replace(/^\uFEFF/, ''))); AppState.dirty = false;
+            try { history.replaceState(null, '', location.pathname); } catch (e) {}
+        })
+        .catch(err => { console.error('Project link', err); alert((de ? 'Die Projektdatei konnte nicht geladen werden: ' : 'The project file could not be loaded: ') + url); });
+    return true;
 }
 
 // The tool's icon (Roman arch with a glowing gateway) for the exported student pages: browser tab and phone home screen
@@ -4826,6 +4856,13 @@ function ptcMigrate(data) {
     ['customColors', 'cols'].forEach(k => { const c = data[k]; if (c && typeof c === 'object') Object.keys(ren).forEach(o => { if (c[o] && !c[ren[o]]) c[ren[o]] = c[o]; }); });
     (data.words || data.tokens || []).forEach(w => { if (w) { if (w.f) w.f = fix(w.f); if (w.func) w.func = fix(w.func); } });
     (data.groups || []).forEach(g => { if (g && g.label) g.label = fix(g.label); });
+    // older names of the project's own language (German: AcI → AcI/NcI, Adverb → Adverbiale Bestimmung, Verb → Prädikat)
+    const legacy = (LatinLabels.LEGACY || {})[data.lang === 'en' ? 'en' : 'de'] || {};
+    const lfix = (l) => legacy[l] || l;
+    ['customFunctions', 'funcs'].forEach(k => { if (Array.isArray(data[k])) data[k] = [...new Set(data[k].map(lfix))]; });
+    ['customColors', 'cols'].forEach(k => { const c = data[k]; if (c && typeof c === 'object') Object.keys(legacy).forEach(o => { if (c[o] && !c[legacy[o]]) c[legacy[o]] = c[o]; }); });
+    (data.words || data.tokens || []).forEach(w => { if (w) { if (w.f) w.f = lfix(w.f); if (w.func) w.func = lfix(w.func); } });
+    (data.groups || []).forEach(g => { if (g && g.label) g.label = lfix(g.label); });
 }
 
 function initEditor(words) {
