@@ -254,6 +254,7 @@
             <div id="instr-body" data-ref="instrBody"></div>
             <div style="margin-top:16px; font-style:italic;">
                 <span id="example-link-text" data-ref="exampleLinkText">Want to see what the final result looks like?</span> <a href="example_page_de.html" target="_blank" id="link-example" data-ref="linkExample">View Example</a>
+<span style="margin:0 6px; color:#a99c86;">·</span><a href="handbuch.html?lang=de" target="_blank" id="link-handbook" data-ref="linkHandbook" style="font-style:normal;">📘 Teacher handbook</a>
             </div>
         </div>
         
@@ -3243,6 +3244,7 @@ function changeLanguage(lang) {
     DOM.instrBody.innerHTML = txt.instrBody + (CONFIG.AI.PROXY_URL ? '' : ' ' + txt.instrKey) + ' ' + txt.instrBodyEnd;
     DOM.exampleLinkText.textContent = txt.exampleLink; 
     DOM.linkExample.textContent = txt.linkText;
+    if (DOM.linkHandbook) { DOM.linkHandbook.textContent = lang === 'de' ? '📘 Handbuch für Lehrkräfte' : '📘 Teacher handbook'; DOM.linkHandbook.href = 'handbuch.html?lang=' + lang; }
     DOM.pageTitle.placeholder = txt.phTitle; 
     DOM.pageImage.placeholder = txt.phImage;
     
