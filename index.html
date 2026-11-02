@@ -3172,12 +3172,31 @@ const HANDOFF_KEY = 'syntax_studio_handoff';
 function openProjectFromLink() {
     let url = null; try { url = new URLSearchParams(location.search).get('project'); } catch (e) {}
     const de = AppState.lang !== 'en';
-    if (!url && location.hash === '#from-page') {
+    const hash = location.hash, view = hash === '#view-page';
+    if (!url && (hash === '#from-page' || view)) {
+        // #from-page: open the exercise in the editor; #view-page: show it at once as a student page
+        if (view) document.documentElement.style.visibility = 'hidden';
+        const fail = () => { document.documentElement.style.visibility = ''; alert(de ? 'Die Übung konnte nicht übernommen werden. Bitte öffnen Sie den Link noch einmal.' : 'The exercise could not be taken over. Please open the link again.'); };
+        const use = (data) => {
+            StorageManager.restoreData(data); AppState.dirty = false;
+            if (view) exportToStudent('view');
+        };
         let data = null;
         try { const h = JSON.parse(localStorage.getItem(HANDOFF_KEY)); localStorage.removeItem(HANDOFF_KEY); if (h && h.data && Date.now() - (h.t || 0) < 10 * 60 * 1000) data = h.data; } catch (e) {}
         try { history.replaceState(null, '', location.pathname); } catch (e) {}
-        if (data) { StorageManager.restoreData(data); AppState.dirty = false; return true; }
-        alert(de ? 'Die Übung konnte nicht übernommen werden. Bitte öffnen Sie den Link noch einmal.' : 'The exercise could not be taken over. Please open the link again.');
+        if (data) { use(data); return true; }
+        // otherwise ask the page that opened the tool to send the exercise directly (works also for local files)
+        if (window.opener) {
+            let got = false;
+            window.addEventListener('message', (e) => {
+                if (got || e.source !== window.opener || !e.data || e.data.type !== 'syntax-studio-project' || !e.data.data) return;
+                got = true; use(e.data.data);
+            });
+            try { window.opener.postMessage({ type: 'syntax-studio-ready' }, '*'); } catch (e) {}
+            setTimeout(() => { if (!got) fail(); }, 5000);
+            return true;
+        }
+        fail();
         return false;
     }
     if (!url) return false;
@@ -4915,11 +4934,14 @@ window.addEventListener('beforeunload', (e) => {
 
 // Preview: the same page as the export, opened in a new tab instead of downloaded. It keeps its own saved
 // progress (separate storage key) and links the guide and tables next to the tool, wherever the tool runs.
-let PREVIEW_BUILD = false, lastPreviewUrl = null;
+let PREVIEW_BUILD = false, VIEW_BUILD = false, lastPreviewUrl = null;
+// exportToStudent('view'): the student page replaces the tool in this tab (a text page's "Analyse öffnen", see openProjectFromLink)
 function exportToStudent(preview) {
-    PREVIEW_BUILD = !!preview;
+    VIEW_BUILD = preview === 'view';
+    PREVIEW_BUILD = !!preview && !VIEW_BUILD;
     let previewTab = null;
     if (PREVIEW_BUILD) { previewTab = window.open('', '_blank'); }
+    else if (VIEW_BUILD) { /* no questions: the page is only shown */ }
     else { const st = vocabStats(); if (st.u && !confirm(CONFIG.LANG_TEXT[AppState.lang].vocabUnchecked(st.u))) return; } // opened at once, inside the click, so pop-up blockers allow it
     // Dynamic fetching of the templates from cache directly upon export
     const STUDENT_PAGE_CSS = DOM.templateStudentCss.textContent;
@@ -5029,6 +5051,7 @@ const exerciseId = generateStableId(titleInput + baseText);
 
     const blob = new Blob(['\ufeff', generateStudentHTML(merged, updatedGroups, titleInput, exportLabels, imgUrl, teacherNotes, AppState.lang, CONFIG.ABBREVIATIONS, CONFIG.PRESETS, exerciseId, STUDENT_PAGE_CSS, STUDENT_PAGE_JS)], {type: 'text/html;charset=utf-8'}); // the BOM (first part) makes every browser and server read the page as UTF-8
     const url = URL.createObjectURL(blob);
+    if (VIEW_BUILD) { VIEW_BUILD = false; location.replace(url); return; }
     if (PREVIEW_BUILD) {
         PREVIEW_BUILD = false;
         if (lastPreviewUrl) URL.revokeObjectURL(lastPreviewUrl);
@@ -5166,7 +5189,7 @@ function generateStudentHTML(words, groups, title, allLabels, imgUrl, notes, lan
             const SHORTCUTS = ${JSON.stringify(LatinLabels.SHORTCUTS)};
             const SAFE_COLORS = ${JSON.stringify(CONFIG.SAFE_COLORS)}; const NEUTRAL_COLOR = ${JSON.stringify(CONFIG.NEUTRAL_COLOR)}; const CVD_SAFE = ${JSON.stringify(CONFIG.CVD_SAFE)}; const LINK_AFTER_SOLVE = ${AppState.linkAfterSolve ? 'true' : 'false'};
             const colors = ${JSON.stringify(AppState.colors)}; const abbreviations = ${JSON.stringify(allAbbrevs)}; const labelMap = ${JSON.stringify(labelMap)};
-            const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const HELP_BASE = ${JSON.stringify(PREVIEW_BUILD || /^https?:$/.test(location.protocol) ? new URL('.', location.href).href : '')}; const titleInput = ${JSON.stringify(title).replace(/</g, '\\u003c')};
+            const studentTexts = ${JSON.stringify(studentTexts)}; let currentLang = '${lang}'; const HELP_BASE = ${JSON.stringify(PREVIEW_BUILD || VIEW_BUILD || /^https?:$/.test(location.protocol) ? new URL('.', location.href).href : '')}; const titleInput = ${JSON.stringify(title).replace(/</g, '\\u003c')};
             const saveKey = 'latin_progress_' + (document.title || 'exercise').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_' + '${exerciseId}'${PREVIEW_BUILD ? " + '_preview'" : ''};
         <\/script>
         <script>
