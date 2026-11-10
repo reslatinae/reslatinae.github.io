@@ -301,6 +301,7 @@
         <div class="instruction-box">
             <h3 id="edit-h3" data-ref="editH3">Step 2: Editing Instruction</h3>
             <div style="margin-bottom:0;" id="edit-body" data-ref="editBody"></div>
+            <div style="margin-top:12px;"><a href="handbuch.html?lang=de" target="_blank" id="link-handbook-editor" data-ref="linkHandbookEditor">📘 Teacher handbook</a></div>
         </div>
 
         <div class="palette">
@@ -3297,6 +3298,7 @@ function changeLanguage(lang) {
         ? 'Dieses Tool wurde von Anke Walter durch vibe-coding mit Claude, Gemini und ChatGPT erstellt. Ich danke J. L. und Dr. Federico di Pasqua sehr herzlich für ihre Hilfe.'
         : 'This tool was created by Anke Walter through vibe-coding with Claude, Gemini, and ChatGPT. I very gratefully acknowledge the help of J. L. and Dr. Federico di Pasqua.';
     if (DOM.btnHideCredits) DOM.btnHideCredits.textContent = lang === 'de' ? 'Zurück' : 'Back';
+    if (DOM.linkHandbookEditor) { DOM.linkHandbookEditor.textContent = lang === 'de' ? '📘 Handbuch für Lehrkräfte' : '📘 Teacher handbook'; DOM.linkHandbookEditor.href = 'handbuch.html?lang=' + lang; }
     if (DOM.linkHandbook) { DOM.linkHandbook.textContent = lang === 'de' ? '📘 Handbuch für Lehrkräfte' : '📘 Teacher handbook'; DOM.linkHandbook.href = 'handbuch.html?lang=' + lang; }
     DOM.pageTitle.placeholder = txt.phTitle; 
     DOM.pageImage.placeholder = txt.phImage;
