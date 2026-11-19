@@ -1220,11 +1220,17 @@
         function closeVocab() { if (vocabPop) vocabPop.hidden = true; if (vocabFor) vocabFor.setAttribute('aria-expanded', 'false'); vocabFor = null; }
         function placeVocab() {
             if (!vocabPop || vocabPop.hidden || !vocabFor) return;
-            const r = vocabFor.getBoundingClientRect(); const m = 8;
-            if (r.bottom < 0 || r.top > window.innerHeight) { closeVocab(); return; }
+            const r = vocabFor.getBoundingClientRect(); const m = 8, gap = 6, vh = window.innerHeight;
+            if (r.bottom < 0 || r.top > vh) { closeVocab(); return; }
+            // keep the words the box refers to in view: open above the whole block (word group), or below it if there is more room there
+            const blk = (vocabFor.closest('.hover-word') || vocabFor).getBoundingClientRect();
+            const above = blk.top - gap - m, below = vh - blk.bottom - gap - m;
+            vocabPop.style.maxHeight = ''; const cssMax = vocabPop.offsetHeight;
+            const useAbove = above >= Math.min(cssMax, 160) || above >= below;
+            vocabPop.style.maxHeight = Math.max(80, Math.min(useAbove ? above : below, parseFloat(getComputedStyle(vocabPop).maxHeight) || 440)) + 'px';
             const w = vocabPop.offsetWidth, h = vocabPop.offsetHeight;
-            let top = r.bottom + 6; if (top + h > window.innerHeight - m && r.top - 6 - h >= m) top = r.top - 6 - h;
-            top = Math.max(m, Math.min(top, window.innerHeight - h - m));
+            let top = useAbove ? blk.top - gap - h : blk.bottom + gap;
+            top = Math.max(m, Math.min(top, vh - h - m));
             const left = Math.max(m, Math.min(r.left - 4, window.innerWidth - w - m));
             vocabPop.style.top = top + 'px'; vocabPop.style.left = left + 'px';
         }
