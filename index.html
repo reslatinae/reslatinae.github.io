@@ -4468,7 +4468,7 @@ function linkDecorate() {
     AppState.words.forEach((w, i) => { if (w.lto && byUid[w.lto] != null) mark(i, w.lto, n => '→' + n, 'lk-dep'); });
     if (DOM.linkOptRow) DOM.linkOptRow.style.display = heads.length ? '' : 'none';
     if (DOM.linkAfterSolve) DOM.linkAfterSolve.checked = !!AppState.linkAfterSolve;
-    // a 💡 at the right edge of a word can reach over the badge of the next word: widen the gap until both are visible
+    // a 💡 at the right edge of a word can reach over the badge of the next word: move it left (inside the word) until both are visible
     if (heads.length) document.querySelectorAll('.tag-word > .hint-icon').forEach(hi => {
         const word = hi.parentElement;
         for (let tries = 0; tries < 3; tries++) {
@@ -4480,7 +4480,11 @@ function linkDecorate() {
             });
             if (!hit) return;
             const q = hit.getBoundingClientRect();
-            word.style.marginRight = (parseFloat(getComputedStyle(word).marginRight) || 0) + Math.ceil(r.right - q.left) + 3 + 'px';
+            hi.style.left = 'auto';
+            hi.style.right = (parseFloat(getComputedStyle(hi).right) || 0) + Math.ceil(r.right - q.left) + 2 + 'px';
+            // on a very short word the bulb may now touch the word's own badge: lift it just above the badges
+            const own = word.querySelector(':scope > .lk-badge');
+            if (own) { const o = own.getBoundingClientRect(), n = hi.getBoundingClientRect(); if (!(o.right <= n.left || n.right <= o.left)) hi.style.top = '-24px'; }
         }
     });
 }
