@@ -844,6 +844,17 @@
     </script>
 
     <script type="text/template" id="template-student-js" data-ref="templateStudentJs">
+        // A copy of the untouched page, taken before anything is filled in. Pages opened from a text page or the tool's
+        // preview live at a temporary blob: address that can't be loaded a second time, so "start again" rebuilds the
+        // page from this copy instead of reloading it.
+        const PRISTINE_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        function reopenFresh(m) {
+            allowUnload = true;
+            if (location.protocol === 'blob:') {
+                try { location.replace(URL.createObjectURL(new Blob([PRISTINE_HTML], {type: 'text/html;charset=utf-8'})) + (m ? '#mode=' + m : '')); return; } catch(e) {}
+            }
+            location.reload();
+        }
         let activeEl = null; let activeSubWord = null; let mode = ""; const menu = document.getElementById('menu-common'); const menuBtns = Array.from(document.querySelectorAll('.menu-btn'));
         let hideMenuTimeout; let toastHideTimeout; let labelShortcuts = {}; let hoveredStudentEl = null; let exMode = 'practise'; let examScore = 0; let answeredItems = 0; let sZoom = 1; let examFinalized = false;
         const totalPhrases = document.querySelectorAll('.hover-word, .g-label').length;
@@ -2227,7 +2238,7 @@
                 const t = studentTexts[currentLang];
                 if(!confirm(t.resetWarn)) return;
                 try { localStorage.removeItem(saveKey); sessionStorage.setItem(saveKey + '_mode', m); } catch(e) { console.warn("Storage blocked", e); }
-                allowUnload = true; location.reload(); return;
+                reopenFresh(m); return;
             }
             exMode = m;
             [['btn-guided', 'guided'], ['btn-practise', 'practise'], ['btn-exam', 'exam']].forEach(([id, val]) => {
@@ -2634,7 +2645,7 @@ function dismissToastOnInteraction() {
                 } catch(e) {
                     console.warn("Failed to clear local storage.", e);
                 }
-                allowUnload = true; location.reload(); 
+                reopenFresh(null);
             }
         }
 
@@ -2657,6 +2668,7 @@ function dismissToastOnInteraction() {
             renderLegend();
             let pendingMode = null;
             try { pendingMode = sessionStorage.getItem(saveKey + '_mode'); sessionStorage.removeItem(saveKey + '_mode'); } catch(e) {}
+            const hm = /#mode=(\w+)/.exec(location.hash); if (hm) { pendingMode = pendingMode || hm[1]; try { history.replaceState(null, '', location.href.split('#')[0]); } catch(e) {} }
             if (pendingMode === 'practise' || pendingMode === 'exam' || pendingMode === 'guided') setMode(pendingMode);
             loadStudentProgress();
             if (exMode === 'guided') guidedStart();
