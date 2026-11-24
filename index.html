@@ -292,7 +292,7 @@
 
     <div id="credits-screen" class="container" data-ref="creditsScreen" style="display:none; text-align:center; padding: 50px;">
         <h2 style="margin-top:0; color: #1d1914;">Credits</h2>
-        <p style="font-size:1.1rem; line-height: 1.6; color: #4d4539; margin: 30px auto; max-width: 640px;" id="credits-text" data-ref="creditsText">This tool was created by Anke Walter through vibe-coding with Claude, Gemini, and ChatGPT. I very gratefully acknowledge the help of J. L., Dr. Federico di Pasqua, Michael Wittweiler und Giorgio Baroni.</p>
+        <p style="font-size:1.1rem; line-height: 1.6; color: #4d4539; margin: 30px auto; max-width: 640px;" id="credits-text" data-ref="creditsText">This tool was created by Anke Walter through vibe-coding with Claude, Gemini, and ChatGPT. I very gratefully acknowledge the help of J. L., Dr. Federico di Pasqua, Michael Wittweiler and Giorgio Baroni.</p>
         <button class="btn-action" style="background:#6a5f50;" id="btn-hide-credits" data-ref="btnHideCredits">Back</button>
     </div>
 
@@ -3323,7 +3323,7 @@ function changeLanguage(lang) {
     DOM.linkExample.textContent = txt.linkText;
     if (DOM.creditsText) DOM.creditsText.textContent = lang === 'de'
         ? 'Dieses Tool wurde von Anke Walter durch vibe-coding mit Claude, Gemini und ChatGPT erstellt. Ich danke J. L., Dr. Federico di Pasqua, Michael Wittweiler und Giorgio Baroni sehr herzlich für ihre Hilfe.'
-        : 'This tool was created by Anke Walter through vibe-coding with Claude, Gemini, and ChatGPT. I very gratefully acknowledge the help of J. L. and Dr. Federico di Pasqua.';
+        : 'This tool was created by Anke Walter through vibe-coding with Claude, Gemini, and ChatGPT. I very gratefully acknowledge the help of J. L., Dr. Federico di Pasqua, Michael Wittweiler and Giorgio Baroni.';
     if (DOM.btnHideCredits) DOM.btnHideCredits.textContent = lang === 'de' ? 'Zurück' : 'Back';
     if (DOM.linkHandbookEditor) { DOM.linkHandbookEditor.textContent = lang === 'de' ? '📘 Handbuch für Lehrkräfte' : '📘 Teacher handbook'; DOM.linkHandbookEditor.href = 'handbuch.html?lang=' + lang; }
     if (DOM.linkHandbook) { DOM.linkHandbook.textContent = lang === 'de' ? '📘 Handbuch für Lehrkräfte' : '📘 Teacher handbook'; DOM.linkHandbook.href = 'handbuch.html?lang=' + lang; }
