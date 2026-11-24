@@ -150,7 +150,7 @@
 
     <main class="content">
         <div class="instruction-box">
-            <p class="l-de">Wähle bei den Konjugationstabellen ein Musterverb aus. Unter jedem Tempus steht eine Übersetzung der 1. Person als Hilfe. Mit den Schaltern links kannst du die Vokallängen ein- und ausblenden und Kennzeichen und Endungen hervorheben.</p>
+            <p class="l-de">Wählen Sie bei den Konjugationstabellen ein Musterverb aus. Unter jedem Tempus steht eine Übersetzung der 1. Person als Hilfe. Mit den Schaltern links können Sie die Vokallängen ein- und ausblenden und Kennzeichen und Endungen hervorheben.</p>
             <p class="l-en">In the conjugation tables, choose a model verb. Under each tense you find a translation of the 1st person as a guide. With the switches on the left you can show or hide vowel lengths and highlight markers and endings.</p>
         </div>
         <section class="card" id="overview">
@@ -164,7 +164,7 @@
         </section>
         <section class="card" id="compare">
             <h2><span class="l-de">Konjugationen im Vergleich</span><span class="l-en">Conjugations compared</span></h2>
-            <p class="lead"><span class="l-de">Hier siehst du eine Zeitform aller fünf Konjugationen nebeneinander, so fallen die Unterschiede sofort auf.</span><span class="l-en">Here you see one tense of all five conjugations side by side, so the differences stand out at once.</span></p>
+            <p class="lead"><span class="l-de">Hier sehen Sie eine Zeitform aller fünf Konjugationen nebeneinander, so fallen die Unterschiede sofort auf.</span><span class="l-en">Here you see one tense of all five conjugations side by side, so the differences stand out at once.</span></p>
             <div class="chips" id="cmp-chips"></div>
             <div id="cmp-table"></div>
         </section>
@@ -422,6 +422,10 @@ function renderConj() {
             { h: { de: 'Perfekt', en: 'Perfect' }, pron: { de: 'vorzeitig', en: 'before' }, cells: [`${c.perf}|isse`, `${P}|um+esse`] },
             { h: { de: 'Futur', en: 'Future' }, pron: { de: 'nachzeitig', en: 'after' }, cells: [`${P}|ūrum+esse`, `${P}|um+īrī (selten)`.replace('selten', tr({ de: 'selten', en: 'rare' }))] }
         ] })}</div>`;
+    // older / poetic by-form of the present passive infinitive: -ier instead of -ī
+    const ipp = c.infPresP.replace('|', ''), ier = ipp.replace(/ī$/, 'ier');
+    h += notes([{ de: `Der Infinitiv Präsens Passiv hat manchmal eine Nebenform auf <i>-ier</i>, vor allem in der Dichtung und im älteren Latein: <i>${ier}</i> statt <i>${ipp}</i>.`,
+                  en: `The present passive infinitive sometimes has an alternative ending in <i>-ier</i>, mainly in poetry and early Latin: <i>${ier}</i> instead of <i>${ipp}</i>.` }]);
     h += `<h3>${tr({ de: 'Partizipien, Gerundium, Gerundivum, Supinum', en: 'Participles, gerund, gerundive, supine' })}</h3><div class="tables">
         ${table({ cols: [{ h: { de: 'Form', en: 'Form' } }, { h: { de: 'Bedeutung / Gebrauch', en: 'Meaning / use' } }], rows: [
             { h: { de: 'Partizip Präsens Aktiv (PPA)', en: 'Present active participle' }, cells: [`${c.ppa[0]}, ${c.ppa[1]}`, { html: { de: `gleichzeitig, aktiv: „${c.de.p.replace(/e$/, '')}end“`, en: `same time, active: “${c.en.ing}”` } }] },
@@ -468,7 +472,7 @@ function renderPerfect() {
         [{ de: 'Stammperfekt', en: 'unchanged stem' }, 'dēfendere – dēfendī; vertere – vertī; ostendere – ostendī']
     ];
     document.getElementById('perf-table').innerHTML = `<div class="tables">${table({ cols: [{ h: { de: 'Beispiele', en: 'Examples' } }], rows: rows.map(r => ({ h: r[0], cells: [r[1]] })) })}</div>` + notes([
-        { de: 'Wie das Perfekt gebildet wird, lässt sich nur bei der ā- und ī-Konjugation sicher vorhersagen (meist <i>-āvī</i>, <i>-īvī</i>). Bei allen anderen Verben lernst du den Perfektstamm mit den Stammformen.', en: 'Only for the 1st and 4th conjugations can the perfect be predicted with some confidence (usually <i>-āvī</i>, <i>-īvī</i>). For all other verbs, learn the perfect stem with the principal parts.' }
+        { de: 'Wie das Perfekt gebildet wird, lässt sich nur bei der ā- und ī-Konjugation sicher vorhersagen (meist <i>-āvī</i>, <i>-īvī</i>). Bei allen anderen Verben lernen Sie den Perfektstamm mit den Stammformen.', en: 'Only for the 1st and 4th conjugations can the perfect be predicted with some confidence (usually <i>-āvī</i>, <i>-īvī</i>). For all other verbs, learn the perfect stem with the principal parts.' }
     ]);
 }
 
@@ -547,10 +551,10 @@ function renderDeponents() {
         [{ de: 'gemischte Konj.', en: '3rd conj. -iō' }, 'patior, patī, passus sum', { de: 'erleiden, zulassen', en: 'suffer, allow' }]
     ];
     document.getElementById('dep-table').innerHTML = `<div class="tables">${table({ cols: [{ h: { de: 'Stammformen', en: 'Principal parts' } }, { h: { de: 'Bedeutung', en: 'Meaning' } }], rows: rows.map(r => ({ h: r[0], cells: [r[1], { html: r[2] }] })) })}</div>` + notes([
-        { de: 'Deponentien haben <b>passive Formen, aber aktive Bedeutung</b>: <i>hortātur</i> „er ermahnt“. Die Formen findest du in den Passiv-Tabellen oben.', en: 'Deponents have <b>passive forms but active meaning</b>: <i>hortātur</i> “he encourages”. You find the forms in the passive tables above.' },
+        { de: 'Deponentien haben <b>passive Formen, aber aktive Bedeutung</b>: <i>hortātur</i> „er ermahnt“. Die Formen finden Sie in den Passiv-Tabellen oben.', en: 'Deponents have <b>passive forms but active meaning</b>: <i>hortātur</i> “he encourages”. You find the forms in the passive tables above.' },
         { de: 'Aktive Formen haben sie dort, wo das Passiv keine hat: PPA (<i>hortāns</i>), PFA (<i>hortātūrus</i>), Infinitiv Futur (<i>hortātūrum esse</i>), Gerundium (<i>hortandī</i>).', en: 'They use active forms where the passive has none: present participle (<i>hortāns</i>), future participle (<i>hortātūrus</i>), future infinitive (<i>hortātūrum esse</i>), gerund (<i>hortandī</i>).' },
         { de: 'Das PPP ist aktiv und vorzeitig: <i>hortātus</i> „nachdem er ermahnt hatte“. Das Gerundivum bleibt passiv: <i>hortandus</i> „einer, der ermahnt werden muss“.', en: 'The perfect participle is active and refers to an earlier time: <i>hortātus</i> “having encouraged”. The gerundive stays passive: <i>hortandus</i> “(one) to be encouraged”.' },
-        { de: '<b>Semideponentien</b> werden nur im Perfekt als Deponentien gebraucht: <i>audeō, audēre, ausus sum</i> (wagen); <i>gaudeō, gaudēre, gāvīsus sum</i> (sich freuen); <i>soleō, solēre, solitus sum</i> (pflegen); <i>cōnfīdō, cōnfīdere, cōnfīsus sum</i> (vertrauen).', en: '<b>Semi-deponents</b> are deponent only in the perfect: <i>audeō, audēre, ausus sum</i> (dare); <i>gaudeō, gaudēre, gāvīsus sum</i> (rejoice); <i>soleō, solēre, solitus sum</i> (be used to); <i>cōnfīdō, cōnfīdere, cōnfīsus sum</i> (trust).' }
+        { de: '<b>Semideponentien</b> sind nur im Perfekt deponent: <i>audeō, audēre, ausus sum</i> (wagen); <i>gaudeō, gaudēre, gāvīsus sum</i> (sich freuen); <i>soleō, solēre, solitus sum</i> (pflegen); <i>cōnfīdō, cōnfīdere, cōnfīsus sum</i> (vertrauen).', en: '<b>Semi-deponents</b> are deponent only in the perfect: <i>audeō, audēre, ausus sum</i> (dare); <i>gaudeō, gaudēre, gāvīsus sum</i> (rejoice); <i>soleō, solēre, solitus sum</i> (be used to); <i>cōnfīdō, cōnfīdere, cōnfīsus sum</i> (trust).' }
     ]);
 }
 
@@ -559,7 +563,7 @@ function renderPart() {
         col({ de: 'm./f.', en: 'm./f.' }, null, ['laudā|ns', 'laudant|is', 'laudant|ī', 'laudant|em', 'laudant|e / laudant|ī'], ['laudant|ēs', 'laudant|ium', 'laudant|ibus', 'laudant|ēs', 'laudant|ibus']),
         col({ de: 'Neutrum', en: 'Neut.' }, null, ['laudā|ns', 'laudant|is', 'laudant|ī', 'laudā|ns', 'laudant|e / laudant|ī'], ['laudant|ia', 'laudant|ium', 'laudant|ibus', 'laudant|ia', 'laudant|ibus'])
     ];
-    document.getElementById('part-table').innerHTML = `<div class="tables">${table({ caption: { de: 'laudāns, laudantis – lobend', en: 'laudāns, laudantis – praising' }, cols, rows: caseRows(cols) })}</div>` + notes([
+    document.getElementById('part-table').innerHTML = `<div class="tables">${table({ caption: { de: '<i>laudāns, laudantis</i> – lobend', en: '<i>laudāns, laudantis</i> – praising' }, cols, rows: caseRows(cols) })}</div>` + notes([
         { de: 'Ablativ Singular: <i>-e</i>, wenn das Partizip als Partizip gebraucht wird (vor allem im Ablativus absolutus: <i>mātre laudante</i>); <i>-ī</i>, wenn es als Adjektiv gebraucht wird.', en: 'Ablative singular: <i>-e</i> when the participle is used as a participle (above all in the ablative absolute: <i>mātre laudante</i>); <i>-ī</i> when it is used as an adjective.' },
         { de: 'PPP und PFA werden wie <i>bonus, -a, -um</i> dekliniert.', en: 'The perfect passive and future active participles are declined like <i>bonus, -a, -um</i>.' }
     ]);
