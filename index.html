@@ -93,6 +93,9 @@
         .hint-icon .tooltip-text::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #2a241d transparent transparent transparent; }
         .hint-icon .tooltip-text { display: none; }
         .hint-icon.show-tooltip .tooltip-text { display: block; visibility: visible; opacity: 1; }
+        /* an opened hint lies above bracket labels and neighbouring words (its word or bracket label is lifted with it) */
+        .hint-icon.show-tooltip { z-index: 1100; }
+        .tag-word:has(.hint-icon.show-tooltip), .group-bracket:has(.hint-icon.show-tooltip), .bracket-badge:has(.hint-icon.show-tooltip), .bracket-end-controls:has(.hint-icon.show-tooltip) { z-index: 1100 !important; filter: none !important; }
         .punct-span { display: inline-block; margin: var(--dynamic-margin-top, 24px) 2px 24px 2px; padding: 2px 2px; font-size: 1.15rem; vertical-align: bottom; color: #1d1914; position: relative; font-weight: 500; cursor: pointer; user-select: none; border-bottom: 2px solid transparent; height: 1.6rem; line-height: 1.6rem; transition: margin-top 0.3s ease, opacity 0.2s; }
         .split-right { border-right: 3px dashed #ef4444 !important; margin-right: 12px !important; }
         
@@ -2921,6 +2924,11 @@ const AppState = {
             if (changed) saveTeacherColors(); // undoing a colour change also updates the remembered colours
         }
         this.ui.startIdx = null;
+        // a label taken off the palette comes back if the undone step used it
+        let readded = false;
+        this.words.forEach(w => { if (w.f && w.f !== CONFIG.PUNCT && !this.functions.includes(w.f)) { this.functions.push(w.f); readded = true; } });
+        this.groups.forEach(g => { if (g.label && !this.functions.includes(g.label)) { this.functions.push(g.label); readded = true; } });
+        if (readded) renderPalette();
         
         // Automatically trigger UI updates and save on undo
         renderEditor();
@@ -3139,6 +3147,7 @@ const StorageManager = {
                 f: w.f || w.func || w.function || CONFIG.PUNCT,
                 u: !!w.u
             }));
+            pruneAllUnusedLabels();
             showScreen('editor');
             renderEditor();
             renderPalette();
@@ -3460,6 +3469,16 @@ function updateStatus() {
     DOM.modeStatus.innerHTML = modeText; // the mode texts may set Latin examples in italics
 }
 
+// keeps an opened hint inside the window: a hint on a word near the left or right edge is shifted sideways
+function fitEditorTooltip(icon) {
+    const t = icon && icon.querySelector('.tooltip-text'); if (!t) return;
+    t.style.transform = '';
+    if (!icon.classList.contains('show-tooltip')) return;
+    const r = t.getBoundingClientRect(), m = 8; let dx = 0;
+    if (r.left < m) dx = m - r.left; else if (r.right > window.innerWidth - m) dx = window.innerWidth - m - r.right;
+    if (dx) t.style.transform = 'translateX(calc(-50% + ' + Math.round(dx) + 'px))';
+}
+
 function renderPalette() {
     closeColorPopover();
     updateShortcuts();
@@ -3697,7 +3716,7 @@ function renderEditor() {
                     e.stopPropagation();
                     if (span.clickTimer) { clearTimeout(span.clickTimer); span.clickTimer = null; }
                     document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => { if (el !== hintIcon) el.classList.remove('show-tooltip'); });
-                    hintIcon.classList.toggle('show-tooltip');
+                    hintIcon.classList.toggle('show-tooltip'); fitEditorTooltip(hintIcon);
                 });
                 hintIcon.addEventListener('dblclick', (e) => e.stopPropagation());
                 const tooltipText = document.createElement('span');
@@ -4130,7 +4149,7 @@ function initEventListeners() {
             else if (action === 'adj-end') adjustGroupEnd(idx, parseInt(btn.dataset.dir));
             else if (action === 'toggle-hint') {
                 document.querySelectorAll('.hint-icon.show-tooltip').forEach(el => { if (el !== btn) el.classList.remove('show-tooltip'); });
-                btn.classList.toggle('show-tooltip');
+                btn.classList.toggle('show-tooltip'); fitEditorTooltip(btn);
             }
             return;
         }
@@ -4543,8 +4562,55 @@ function closeGroupModal() {
     AppState.ui.pendingGroupEnd = null; 
 }
 
+// Turns what the teacher typed in the bracket dialog into a label: an existing label (any capitalisation), its
+// abbreviation ("Rel."), or the start of exactly one label ("Rel" → Relativsatz). Returns {label}, {matches} if
+// several labels start that way, or {none: true}.
+function resolveGroupLabel(typed) {
+    const lang = AppState.lang;
+    const cands = [...new Set([...AppState.functions, ...CONFIG.GROUP_LABELS[lang]])].filter(c => c && c !== CONFIG.PUNCT);
+    const norm = x => (x || '').toLowerCase().replace(/\.+$/, '').trim();
+    const t = norm(typed);
+    if (!t) return { none: true };
+    const exact = cands.find(c => norm(c) === t); if (exact) return { label: exact };
+    const abbr = cands.filter(c => norm((CONFIG.ABBREVIATIONS[lang] || {})[c]) === t); if (abbr.length === 1) return { label: abbr[0] };
+    const pre = cands.filter(c => c.toLowerCase().startsWith(t)); if (pre.length === 1) return { label: pre[0] };
+    if (pre.length > 1) return { matches: pre };
+    return { none: true };
+}
+
+// A label that is not one of the standard ones and is no longer used anywhere is taken off the palette again,
+// so a slip in the bracket dialog doesn't leave a stray category behind.
+function isUnusedCustomLabel(label) {
+    if (!label) return false;
+    const lang = AppState.lang;
+    const std = new Set([].concat(...Object.values(CONFIG.PRESETS[lang]), CONFIG.GROUP_LABELS[lang]));
+    if (std.has(label)) return false;
+    return !(AppState.words.some(w => w.f === label) || AppState.groups.some(g => g.label === label));
+}
+function pruneUnusedLabel(label) {
+    if (!isUnusedCustomLabel(label)) return;
+    const i = AppState.functions.indexOf(label);
+    if (i !== -1) { AppState.functions.splice(i, 1); renderPalette(); }
+}
+// on opening a project: drop all own categories that no word or bracket uses
+function pruneAllUnusedLabels() {
+    AppState.functions = AppState.functions.filter(l => !isUnusedCustomLabel(l));
+}
+
 function saveGroupFromModal() {
-    const label = DOM.groupNameInput.value.trim();
+    let label = DOM.groupNameInput.value.trim();
+    if (label) {
+        const de = AppState.lang === 'de'; const r = resolveGroupLabel(label);
+        if (r.label) label = r.label;
+        else if (r.matches) {
+            alert(de ? `„${label}“ passt zu mehreren Bezeichnungen:\n\n${r.matches.join('\n')}\n\nBitte wählen Sie eine davon aus der Liste oder schreiben Sie sie aus.`
+                     : `“${label}” matches several labels:\n\n${r.matches.join('\n')}\n\nPlease pick one from the list or type it in full.`);
+            DOM.groupNameInput.focus(); return;
+        } else if (!confirm(de ? `„${label}“ gibt es noch nicht als Bezeichnung.\n\nOK: als neue Kategorie anlegen\nAbbrechen: Eingabe korrigieren`
+                                : `“${label}” is not an existing label.\n\nOK: create it as a new category\nCancel: correct the entry`)) {
+            DOM.groupNameInput.focus(); DOM.groupNameInput.select(); return;
+        }
+    }
     const hint = DOM.groupHintInput.value.trim();
     const errorHint = DOM.groupErrorHintInput.value.trim();
     const explain = DOM.groupExplainInput.value.trim();
@@ -4556,7 +4622,9 @@ function saveGroupFromModal() {
             CONFIG.ABBREVIATIONS[AppState.lang][label] = label.substring(0,4) + '.'; renderPalette(); 
         }
         if(AppState.ui.editingGroupIndex !== null) {
+            const oldLabel = AppState.groups[AppState.ui.editingGroupIndex].label;
             AppState.groups[AppState.ui.editingGroupIndex].label = label;
+            if (oldLabel !== label) pruneUnusedLabel(oldLabel);
             if(hint) AppState.groups[AppState.ui.editingGroupIndex].hint = hint; else delete AppState.groups[AppState.ui.editingGroupIndex].hint;
             if(errorHint) AppState.groups[AppState.ui.editingGroupIndex].errorHint = errorHint; else delete AppState.groups[AppState.ui.editingGroupIndex].errorHint;
             if(explain) AppState.groups[AppState.ui.editingGroupIndex].explain = explain; else delete AppState.groups[AppState.ui.editingGroupIndex].explain;
@@ -4573,7 +4641,9 @@ function saveGroupFromModal() {
 }
 
 function removeGroup(index) { 
+    const oldLabel = AppState.groups[index] && AppState.groups[index].label;
     AppState.removeGroup(index); 
+    pruneUnusedLabel(oldLabel);
 }
 
 function adjustGroupStart(groupIndex, delta) {
