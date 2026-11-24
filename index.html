@@ -4457,11 +4457,32 @@ function linkDecorate() {
         const el = document.getElementById('word-' + i); if (!el) return;
         const k = heads.indexOf(head); el.classList.add('linked', cls); el.dataset.lhead = head; el.style.setProperty('--lk', pal[k % pal.length]);
         const b = document.createElement('span'); b.className = 'lk-badge'; b.textContent = text(k + 1); el.appendChild(b);
+        // a 💡 on the same word would sit under the badge on short words: move it just to the right of the badge
+        const hi = el.querySelector(':scope > .hint-icon');
+        if (hi && el.offsetWidth) {
+            const need = b.offsetLeft + b.offsetWidth + 2, natural = el.clientWidth + 8 - hi.offsetWidth;
+            if (natural < need) { hi.style.right = 'auto'; hi.style.left = need + 'px'; }
+        }
     };
     heads.forEach(h => { if (byUid[h] != null) mark(byUid[h], h, n => n, 'lk-head'); });
     AppState.words.forEach((w, i) => { if (w.lto && byUid[w.lto] != null) mark(i, w.lto, n => '→' + n, 'lk-dep'); });
     if (DOM.linkOptRow) DOM.linkOptRow.style.display = heads.length ? '' : 'none';
     if (DOM.linkAfterSolve) DOM.linkAfterSolve.checked = !!AppState.linkAfterSolve;
+    // a 💡 at the right edge of a word can reach over the badge of the next word: widen the gap until both are visible
+    if (heads.length) document.querySelectorAll('.tag-word > .hint-icon').forEach(hi => {
+        const word = hi.parentElement;
+        for (let tries = 0; tries < 3; tries++) {
+            const r = hi.getBoundingClientRect(); if (!r.width) return;
+            const hit = [...document.querySelectorAll('.lk-badge')].find(bd => {
+                if (bd.parentElement === word) return false;
+                const q = bd.getBoundingClientRect();
+                return !(q.right <= r.left || r.right <= q.left || q.bottom <= r.top || r.bottom <= q.top);
+            });
+            if (!hit) return;
+            const q = hit.getBoundingClientRect();
+            word.style.marginRight = (parseFloat(getComputedStyle(word).marginRight) || 0) + Math.ceil(r.right - q.left) + 3 + 'px';
+        }
+    });
 }
 function handleWordDoubleClick(el, e) {
     e.stopPropagation();
