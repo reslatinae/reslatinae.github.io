@@ -165,7 +165,7 @@
 
     <main class="content">
         <div class="instruction-box">
-            <p class="l-de">Hier findest du alle Deklinationen im Überblick. Die Fälle stehen in der Reihenfolge Nominativ, Genitiv, Dativ, Akkusativ, Ablativ; den Vokativ findest du nur dort, wo er eine eigene Form hat. Mit den Schaltern links kannst du die Vokallängen ein- und ausblenden und die Endungen hervorheben.</p>
+            <p class="l-de">Hier finden Sie alle Deklinationen im Überblick. Die Fälle stehen in der Reihenfolge Nominativ, Genitiv, Dativ, Akkusativ, Ablativ; den Vokativ finden Sie nur dort, wo er eine eigene Form hat. Mit den Schaltern links können Sie die Vokallängen ein- und ausblenden und die Endungen hervorheben.</p>
             <p class="l-en">Here you find all declensions at a glance. The cases are given in the order nominative, genitive, dative, accusative, ablative; the vocative is only shown where it has a form of its own. With the switches on the left you can show or hide vowel lengths and highlight the endings.</p>
         </div>
         <section class="card" id="overview">
@@ -327,7 +327,7 @@ function sectionNouns() {
     const amica = col('amīca, -ae f.', { de: 'Freundin', en: 'friend (female)' }, ['amīc|a', 'amīc|ae', 'amīc|ae', 'amīc|am', 'amīc|ā'], ['amīc|ae', 'amīc|ārum', 'amīc|īs', 'amīc|ās', 'amīc|īs']);
     const agricola = col('agricola, -ae m.', { de: 'Bauer', en: 'farmer' }, ['agricol|a', 'agricol|ae', 'agricol|ae', 'agricol|am', 'agricol|ā'], ['agricol|ae', 'agricol|ārum', 'agricol|īs', 'agricol|ās', 'agricol|īs']);
     h += `<h3 id="n-a">${tr({ de: 'a-Deklination', en: '1st (a-) declension' })}</h3>
-        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -ae · <b>Genus:</b> ${tr({ de: 'meist Femininum', en: 'mostly feminine' })}</p>
+        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> <i>-ae</i> · <b>Genus:</b> ${tr({ de: 'meist Femininum', en: 'mostly feminine' })}</p>
         <div class="tables">${table({ cols: [amica, agricola], rows: caseRows([amica, agricola]) })}</div>` + notes([
         { de: 'Maskulinum sind einige Wörter, die (meist) männliche Personen bezeichnen: <i>agricola</i> (Bauer), <i>nauta</i> (Seemann), <i>poēta</i> (Dichter), <i>incola</i> (Einwohner). Adjektive stehen dann im Maskulinum: <i>nauta bonus</i>.', en: 'A few words that (mostly) denote male persons are masculine: <i>agricola</i> (farmer), <i>nauta</i> (sailor), <i>poēta</i> (poet), <i>incola</i> (inhabitant). Adjectives with them are masculine: <i>nauta bonus</i>.' },
         { de: '<i>dea</i> und <i>fīlia</i> bilden Dativ/Ablativ Plural auf <i>-ābus</i> (<i>deābus, fīliābus</i>), um sie von <i>deīs, fīliīs</i> zu unterscheiden.', en: '<i>dea</i> and <i>fīlia</i> form the dative/ablative plural in <i>-ābus</i> (<i>deābus, fīliābus</i>) to keep them apart from <i>deīs, fīliīs</i>.' }
@@ -339,10 +339,10 @@ function sectionNouns() {
     const templ = col('templum, -ī n.', { de: 'Tempel', en: 'temple' }, ['templ|um', 'templ|ī', 'templ|ō', 'templ|um', 'templ|ō'], ['templ|a', 'templ|ōrum', 'templ|īs', 'templ|a', 'templ|īs'], { sgVoc: 'templ|um' });
     const o = [dom, puer, ager, templ];
     h += `<h3 id="n-o">${tr({ de: 'o-Deklination', en: '2nd (o-) declension' })}</h3>
-        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -ī · <b>Genus:</b> ${tr({ de: 'auf -us/-er meist Maskulinum, auf -um Neutrum', en: '-us/-er mostly masculine, -um neuter' })}</p>
+        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> <i>-ī</i> · <b>Genus:</b> ${tr({ de: 'auf <i>-us/-er</i> meist Maskulinum, auf <i>-um</i> Neutrum', en: '<i>-us/-er</i> mostly masculine, <i>-um</i> neuter' })}</p>
         <div class="tables">${table({ cols: o, rows: caseRows(o, { vocSg: true }) })}</div>` + notes([
         { de: 'Einen eigenen Vokativ hat nur die Endung <i>-us</i>: <i>amīce!</i> Bei <i>-ius</i> wird er zu <i>-ī</i>: <i>fīlī, Gāī</i>; von <i>meus</i> heisst er <i>mī</i>.', en: 'Only nouns in <i>-us</i> have a vocative of their own: <i>amīce!</i> Nouns in <i>-ius</i> form it in <i>-ī</i>: <i>fīlī, Gāī</i>; the vocative of <i>meus</i> is <i>mī</i>.' },
-        { de: 'Bei <i>puer</i> bleibt das <i>e</i> erhalten, bei <i>ager</i> fällt es weg (<i>agrī</i>). Das zeigt dir der Genitiv im Wörterbuch.', en: 'In <i>puer</i> the <i>e</i> stays, in <i>ager</i> it drops out (<i>agrī</i>). The genitive in the dictionary tells you which.' },
+        { de: 'Bei <i>puer</i> bleibt das <i>e</i> erhalten, bei <i>ager</i> fällt es weg (<i>agrī</i>). Ob das <i>e</i> bleibt oder wegfällt, sehen Sie am Genitiv im Wörterbuch: <i>puer, puerī</i> – <i>ager, agrī</i>.', en: 'In <i>puer</i> the <i>e</i> stays, in <i>ager</i> it drops out (<i>agrī</i>). Whether the <i>e</i> stays or drops out is shown by the genitive in the dictionary: <i>puer, puerī</i> – <i>ager, agrī</i>.' },
         { de: 'Femininum sind u. a. Bäume, Länder, Städte und Inseln: <i>humus, Aegyptus, Corinthus</i>.', en: 'Feminine are, among others, trees, countries, cities and islands: <i>humus, Aegyptus, Corinthus</i>.' }
     ]);
     // consonant declension
@@ -351,9 +351,9 @@ function sectionNouns() {
     const corp = col('corpus, corporis n.', { de: 'Körper', en: 'body' }, ['corpus', 'corpor|is', 'corpor|ī', 'corpus', 'corpor|e'], ['corpor|a', 'corpor|um', 'corpor|ibus', 'corpor|a', 'corpor|ibus']);
     const kons = [rex, homo, corp];
     h += `<h3 id="n-k">${tr({ de: 'Konsonantische Deklination', en: '3rd declension (consonant stems)' })}</h3>
-        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -is · <b>Genus:</b> ${tr({ de: 'alle drei Genera möglich – im Wörterbuch nachsehen', en: 'all three genders – check the dictionary' })}</p>
+        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> <i>-is</i> · <b>Genus:</b> ${tr({ de: 'alle drei Genera möglich – im Wörterbuch nachsehen', en: 'all three genders – check the dictionary' })}</p>
         <div class="tables">${table({ cols: kons, rows: caseRows(kons) })}</div>` + notes([
-        { de: 'Der Nominativ Singular ist oft verändert. Den Stamm, an den alle anderen Endungen treten, zeigt erst der Genitiv: <i>rēx → rēg-is, homō → homin-is, corpus → corpor-is</i>. Lerne Substantive deshalb immer mit Genitiv.', en: 'The nominative singular is often changed. Only the genitive shows the stem to which all other endings are added: <i>rēx → rēg-is, homō → homin-is, corpus → corpor-is</i>. So always learn nouns with their genitive.' }
+        { de: 'Der Nominativ Singular ist oft verändert. Den Stamm, an den alle anderen Endungen treten, zeigt erst der Genitiv: <i>rēx → rēg-is, homō → homin-is, corpus → corpor-is</i>. Lernen Sie Substantive deshalb immer mit Genitiv.', en: 'The nominative singular is often changed. Only the genitive shows the stem to which all other endings are added: <i>rēx → rēg-is, homō → homin-is, corpus → corpor-is</i>. So always learn nouns with their genitive.' }
     ]);
     // i-stems
     const civis = col('cīvis, -is m./f.', { de: 'Bürger, Bürgerin', en: 'citizen' }, ['cīv|is', 'cīv|is', 'cīv|ī', 'cīv|em', 'cīv|e'], ['cīv|ēs', 'cīv|ium', 'cīv|ibus', 'cīv|ēs', 'cīv|ibus']);
@@ -372,7 +372,7 @@ function sectionNouns() {
     const fructus = col('frūctus, -ūs m.', { de: 'Frucht', en: 'fruit' }, ['frūct|us', 'frūct|ūs', 'frūct|uī', 'frūct|um', 'frūct|ū'], ['frūct|ūs', 'frūct|uum', 'frūct|ibus', 'frūct|ūs', 'frūct|ibus']);
     const cornu = col('cornū, -ūs n.', { de: 'Horn, Flügel', en: 'horn, wing' }, ['corn|ū', 'corn|ūs', 'corn|ū', 'corn|ū', 'corn|ū'], ['corn|ua', 'corn|uum', 'corn|ibus', 'corn|ua', 'corn|ibus']);
     h += `<h3 id="n-u">${tr({ de: 'u-Deklination', en: '4th (u-) declension' })}</h3>
-        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -ūs · <b>Genus:</b> ${tr({ de: 'meist Maskulinum; auf -ū Neutrum', en: 'mostly masculine; -ū neuter' })}</p>
+        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> <i>-ūs</i> · <b>Genus:</b> ${tr({ de: 'meist Maskulinum; auf <i>-ū</i> Neutrum', en: 'mostly masculine; <i>-ū</i> neuter' })}</p>
         <div class="tables">${table({ cols: [fructus, cornu], rows: caseRows([fructus, cornu]) })}</div>` + notes([
         { de: 'Femininum sind <i>manus</i> (Hand, Schar), <i>domus</i> (Haus, siehe unten) und <i>Īdūs</i> (die Iden).', en: 'Feminine are <i>manus</i> (hand, band), <i>domus</i> (house, see below) and <i>Īdūs</i> (the Ides).' },
         { de: 'Vorsicht: <i>-us</i> kann o- oder u-Deklination sein, und <i>-ūs</i> steht für vier Formen (Gen. Sg., Nom./Akk. Pl.). Der Genitiv im Wörterbuch entscheidet.', en: 'Careful: <i>-us</i> can be 2nd or 4th declension, and <i>-ūs</i> stands for several forms (gen. sg., nom./acc. pl.). The genitive in the dictionary decides.' }
@@ -381,7 +381,7 @@ function sectionNouns() {
     const res = col('rēs, reī f.', { de: 'Sache', en: 'thing, matter' }, ['r|ēs', 'r|eī', 'r|eī', 'r|em', 'r|ē'], ['r|ēs', 'r|ērum', 'r|ēbus', 'r|ēs', 'r|ēbus']);
     const dies = col('diēs, diēī m.', { de: 'Tag', en: 'day' }, ['di|ēs', 'di|ēī', 'di|ēī', 'di|em', 'di|ē'], ['di|ēs', 'di|ērum', 'di|ēbus', 'di|ēs', 'di|ēbus']);
     h += `<h3 id="n-e">${tr({ de: 'e-Deklination', en: '5th (e-) declension' })}</h3>
-        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> -eī / -ēī · <b>Genus:</b> ${tr({ de: 'Femininum; <i>diēs</i> meist Maskulinum', en: 'feminine; <i>diēs</i> mostly masculine' })}</p>
+        <p class="meta"><b>${tr({ de: 'Genitiv', en: 'Genitive' })}:</b> <i>-eī / -ēī</i> · <b>Genus:</b> ${tr({ de: 'Femininum; <i>diēs</i> meist Maskulinum', en: 'feminine; <i>diēs</i> mostly masculine' })}</p>
         <div class="tables">${table({ cols: [res, dies], rows: caseRows([res, dies]) })}</div>` + notes([
         { de: 'Nach Vokal steht <i>-ēī</i> (<i>diēī</i>), nach Konsonant <i>-eī</i> (<i>reī</i>). Einen vollständigen Plural haben nur <i>rēs</i> und <i>diēs</i>.', en: 'After a vowel the ending is <i>-ēī</i> (<i>diēī</i>), after a consonant <i>-eī</i> (<i>reī</i>). Only <i>rēs</i> and <i>diēs</i> have a full plural.' },
         { de: '<i>rēs</i> hat viele Bedeutungen: <i>rēs pūblica</i> (Staat), <i>rēs gestae</i> (Taten), <i>rēs adversae</i> (Unglück).', en: '<i>rēs</i> has many meanings: <i>rēs pūblica</i> (state), <i>rēs gestae</i> (deeds), <i>rēs adversae</i> (misfortune).' }
@@ -426,9 +426,9 @@ function sectionAdjectives() {
     ];
     h += `<h3 id="a-3">${tr({ de: '3. Deklination: drei-, zwei- und einendig', en: '3rd declension: three, two and one ending' })}</h3>
         <div class="tables">
-            ${table({ caption: { de: 'dreiendig: ācer, ācris, ācre – scharf', en: 'three endings: ācer, ācris, ācre – sharp' }, cols: acer, rows: caseRows(acer) })}
-            ${table({ caption: { de: 'zweiendig: fortis, forte – tapfer', en: 'two endings: fortis, forte – brave' }, cols: fortis, rows: caseRows(fortis) })}
-            ${table({ caption: { de: 'einendig: fēlīx, fēlīcis – glücklich', en: 'one ending: fēlīx, fēlīcis – happy' }, cols: felix, rows: caseRows(felix) })}
+            ${table({ caption: { de: 'dreiendig: <i>ācer, ācris, ācre</i> – scharf', en: 'three endings: <i>ācer, ācris, ācre</i> – sharp' }, cols: acer, rows: caseRows(acer) })}
+            ${table({ caption: { de: 'zweiendig: <i>fortis, forte</i> – tapfer', en: 'two endings: <i>fortis, forte</i> – brave' }, cols: fortis, rows: caseRows(fortis) })}
+            ${table({ caption: { de: 'einendig: <i>fēlīx, fēlīcis</i> – glücklich', en: 'one ending: <i>fēlīx, fēlīcis</i> – happy' }, cols: felix, rows: caseRows(felix) })}
         </div>` + notes([
         { de: 'Die Adjektive der 3. Deklination folgen der i-Deklination: Ablativ Singular <i>-ī</i>, Genitiv Plural <i>-ium</i>, Neutrum Plural <i>-ia</i>.', en: 'Third-declension adjectives follow the i-stems: ablative singular <i>-ī</i>, genitive plural <i>-ium</i>, neuter plural <i>-ia</i>.' },
         { de: 'Ausnahmen mit Ablativ <i>-e</i>, Genitiv Plural <i>-um</i> und Neutrum Plural <i>-a</i>: <i>vetus</i> (alt), <i>pauper</i> (arm), <i>dīves</i> (reich), <i>prīnceps</i> (erster) und der Komparativ (siehe unten).', en: 'Exceptions with ablative <i>-e</i>, genitive plural <i>-um</i> and neuter plural <i>-a</i>: <i>vetus</i> (old), <i>pauper</i> (poor), <i>dīves</i> (rich), <i>prīnceps</i> (first) and the comparative (see below).' },
@@ -440,7 +440,7 @@ function sectionAdjectives() {
     ];
     h += `<h3 id="a-comp">${tr({ de: 'Steigerung (Komparation)', en: 'Comparison of adjectives' })}</h3>
         <p class="meta">${tr({ de: '<b>Komparativ:</b> Stamm + <i>-ior</i> (m./f.), <i>-ius</i> (n.) · <b>Superlativ:</b> Stamm + <i>-issimus, -a, -um</i> (wie <i>bonus</i>)', en: '<b>Comparative:</b> stem + <i>-ior</i> (m./f.), <i>-ius</i> (n.) · <b>Superlative:</b> stem + <i>-issimus, -a, -um</i> (like <i>bonus</i>)' })}</p>
-        <div class="tables">${table({ caption: { de: 'Komparativ: longior, longius – länger', en: 'Comparative: longior, longius – longer' }, cols: comp, rows: caseRows(comp) })}
+        <div class="tables">${table({ caption: { de: 'Komparativ: <i>longior, longius</i> – länger', en: 'Comparative: <i>longior, longius</i> – longer' }, cols: comp, rows: caseRows(comp) })}
         ${table({ caption: { de: 'Unregelmässige Steigerung', en: 'Irregular comparison' }, cols: [{ h: { de: 'Positiv', en: 'Positive' } }, { h: { de: 'Komparativ', en: 'Comparative' } }, { h: { de: 'Superlativ', en: 'Superlative' } }],
             rows: [
                 { h: { de: 'gut', en: 'good' }, cells: ['bonus', 'melior, melius', 'optimus'] },
@@ -497,7 +497,7 @@ function sectionPronouns() {
             { h: { de: '3. (reflexiv)', en: '3rd (reflexive)' }, cells: ['suus, sua, suum', { de: 'sein, ihr (eigener)', en: 'his, her, their (own)' }, 'bonus'] },
             { h: { de: '1. Pl.', en: '1st pl.' }, cells: ['noster, nostra, nostrum', { de: 'unser', en: 'our' }, 'pulcher'] },
             { h: { de: '2. Pl.', en: '2nd pl.' }, cells: ['vester, vestra, vestrum', { de: 'euer', en: 'your' }, 'pulcher'] },
-            { h: { de: '3. (nicht refl.)', en: '3rd (non-refl.)' }, cells: ['eius; eōrum, eārum', { de: 'sein, ihr (eines anderen)', en: 'his, her, their (someone else’s)' }, { de: 'Genitiv von is, ea, id', en: 'genitive of is, ea, id' }] }
+            { h: { de: '3. (nicht refl.)', en: '3rd (non-refl.)' }, cells: ['eius; eōrum, eārum', { de: 'sein, ihr (eines anderen)', en: 'his, her, their (someone else’s)' }, { de: 'Genitiv von <i>is, ea, id</i>', en: 'genitive of <i>is, ea, id</i>' }] }
         ].map(r => ({ h: r.h, cells: r.cells.map((c, i) => i === 1 ? { html: c } : c) })) })}</div>`;
     const is_ = mfn([['is', 'eius', 'eī', 'eum', 'eō'], ['eī / iī / ī', 'eōrum', 'eīs / iīs / īs', 'eōs', 'eīs / iīs / īs']], [['ea', 'eius', 'eī', 'eam', 'eā'], ['eae', 'eārum', 'eīs / iīs / īs', 'eās', 'eīs / iīs / īs']], [['id', 'eius', 'eī', 'id', 'eō'], ['ea', 'eōrum', 'eīs / iīs / īs', 'ea', 'eīs / iīs / īs']]);
     const hic = mfn([['hic', 'huius', 'huic', 'hunc', 'hōc'], ['hī', 'hōrum', 'hīs', 'hōs', 'hīs']], [['haec', 'huius', 'huic', 'hanc', 'hāc'], ['hae', 'hārum', 'hīs', 'hās', 'hīs']], [['hoc', 'huius', 'huic', 'hoc', 'hōc'], ['haec', 'hōrum', 'hīs', 'haec', 'hīs']]);
@@ -506,11 +506,11 @@ function sectionPronouns() {
     const idem = mfn([['īdem', 'eiusdem', 'eīdem', 'eundem', 'eōdem'], ['eīdem / īdem', 'eōrundem', 'eīsdem / īsdem', 'eōsdem', 'eīsdem / īsdem']], [['eadem', 'eiusdem', 'eīdem', 'eandem', 'eādem'], ['eaedem', 'eārundem', 'eīsdem / īsdem', 'eāsdem', 'eīsdem / īsdem']], [['idem', 'eiusdem', 'eīdem', 'idem', 'eōdem'], ['eadem', 'eōrundem', 'eīsdem / īsdem', 'eadem', 'eīsdem / īsdem']]);
     h += `<h3 id="p-dem">${tr({ de: 'Demonstrativpronomen', en: 'Demonstrative pronouns' })}</h3>
         <div class="tables">
-            ${table({ caption: { de: 'is, ea, id – dieser; er, sie, es', en: 'is, ea, id – this, that; he, she, it' }, cols: is_, rows: caseRows(is_) })}
-            ${table({ caption: { de: 'hic, haec, hoc – dieser (hier)', en: 'hic, haec, hoc – this (here)' }, cols: hic, rows: caseRows(hic) })}
-            ${table({ caption: { de: 'ille, illa, illud – jener', en: 'ille, illa, illud – that (there)' }, cols: ille, rows: caseRows(ille) })}
-            ${table({ caption: { de: 'ipse, ipsa, ipsum – selbst', en: 'ipse, ipsa, ipsum – -self, very' }, cols: ipse, rows: caseRows(ipse) })}
-            ${table({ caption: { de: 'īdem, eadem, idem – derselbe', en: 'īdem, eadem, idem – the same' }, cols: idem, rows: caseRows(idem) })}
+            ${table({ caption: { de: '<i>is, ea, id</i> – dieser; er, sie, es', en: '<i>is, ea, id</i> – this, that; he, she, it' }, cols: is_, rows: caseRows(is_) })}
+            ${table({ caption: { de: '<i>hic, haec, hoc</i> – dieser (hier)', en: '<i>hic, haec, hoc</i> – this (here)' }, cols: hic, rows: caseRows(hic) })}
+            ${table({ caption: { de: '<i>ille, illa, illud</i> – jener', en: '<i>ille, illa, illud</i> – that (there)' }, cols: ille, rows: caseRows(ille) })}
+            ${table({ caption: { de: '<i>ipse, ipsa, ipsum</i> – selbst', en: '<i>ipse, ipsa, ipsum</i> – -self, very' }, cols: ipse, rows: caseRows(ipse) })}
+            ${table({ caption: { de: '<i>īdem, eadem, idem</i> – derselbe', en: '<i>īdem, eadem, idem</i> – the same' }, cols: idem, rows: caseRows(idem) })}
         </div>` + notes([
         { de: '<i>iste, ista, istud</i> („dieser da“, oft abwertend) wird wie <i>ille</i> dekliniert.', en: '<i>iste, ista, istud</i> (“that … of yours”, often disparaging) is declined like <i>ille</i>.' },
         { de: 'Typisch für die Pronomina: Genitiv Singular auf <i>-īus</i> (bei <i>is, hic</i>: <i>eius, huius</i>) und Dativ Singular auf <i>-ī</i> für alle drei Genera.', en: 'Typical of pronouns: genitive singular in <i>-īus</i> (for <i>is, hic</i>: <i>eius, huius</i>) and dative singular in <i>-ī</i> for all three genders.' },
@@ -520,8 +520,8 @@ function sectionPronouns() {
     const quis = [col({ de: 'm./f.', en: 'm./f.' }, { de: 'wer?', en: 'who?' }, ['quis', 'cuius', 'cui', 'quem', 'quō'], null), col({ de: 'Neutrum', en: 'Neut.' }, { de: 'was?', en: 'what?' }, ['quid', 'cuius', 'cui', 'quid', 'quō'], null)];
     h += `<h3 id="p-rel">${tr({ de: 'Relativ- und Interrogativpronomen', en: 'Relative and interrogative pronouns' })}</h3>
         <div class="tables">
-            ${table({ caption: { de: 'quī, quae, quod – der, die, das; welcher', en: 'quī, quae, quod – who, which, that' }, cols: qui, rows: caseRows(qui) })}
-            ${table({ caption: { de: 'quis, quid – wer? was? (substantivisch)', en: 'quis, quid – who? what? (as a noun)' }, cols: quis, rows: caseRows(quis, { sgOnly: true, noSections: true }) })}
+            ${table({ caption: { de: '<i>quī, quae, quod</i> – der, die, das; welcher', en: '<i>quī, quae, quod</i> – who, which, that' }, cols: qui, rows: caseRows(qui) })}
+            ${table({ caption: { de: '<i>quis, quid</i> – wer? was? (substantivisch)', en: '<i>quis, quid</i> – who? what? (as a noun)' }, cols: quis, rows: caseRows(quis, { sgOnly: true, noSections: true }) })}
         </div>` + notes([
         { de: 'Das <b>adjektivische</b> Fragepronomen „welcher?“ hat dieselben Formen wie das Relativpronomen: <i>quī vir? quae fēmina? quod templum?</i> Der Plural von <i>quis, quid</i> lautet wie der von <i>quī, quae, quod</i>.', en: 'The <b>adjectival</b> interrogative “which?” has the same forms as the relative: <i>quī vir? quae fēmina? quod templum?</i> The plural of <i>quis, quid</i> is the same as that of <i>quī, quae, quod</i>.' },
         { de: 'Das Relativpronomen richtet sich in Genus und Numerus nach seinem Bezugswort, im Kasus nach seiner Aufgabe im Relativsatz.', en: 'The relative pronoun takes its gender and number from the word it refers to, its case from its job in the relative clause.' },
@@ -530,7 +530,7 @@ function sectionPronouns() {
     h += `<h3 id="p-ind">${tr({ de: 'Indefinitpronomen', en: 'Indefinite pronouns' })}</h3>
         <div class="tables">${table({ cols: [{ h: { de: 'substantivisch', en: 'as a noun' } }, { h: { de: 'adjektivisch', en: 'as an adjective' } }, { h: { de: 'Bedeutung', en: 'Meaning' } }], rows: [
             { h: 'aliquis', cells: ['aliquis, aliquid', 'aliquī, aliqua, aliquod', { html: { de: 'irgendjemand, irgendetwas; irgendein', en: 'someone, something; some' } }] },
-            { h: 'quis', cells: ['quis, quid', 'quī, qua, quod', { html: { de: 'irgendwer (nach sī, nisi, nē, num)', en: 'anyone (after sī, nisi, nē, num)' } }] },
+            { h: 'quis', cells: ['quis, quid', 'quī, qua, quod', { html: { de: 'irgendwer (nach <i>sī, nisi, nē, num</i>)', en: 'anyone (after <i>sī, nisi, nē, num</i>)' } }] },
             { h: 'quīdam', cells: ['quīdam, quaedam, quiddam', 'quīdam, quaedam, quoddam', { html: { de: 'ein gewisser, jemand', en: 'a certain (one)' } }] },
             { h: 'quisque', cells: ['quisque, quidque', 'quisque, quaeque, quodque', { html: { de: 'jeder', en: 'each' } }] },
             { h: 'quisquam', cells: ['quisquam, quicquam', 'ūllus, -a, -um', { html: { de: '(irgend)jemand – in verneinten Sätzen', en: 'anyone at all – in negative sentences' } }] },
@@ -541,7 +541,7 @@ function sectionPronouns() {
     ]);
     const unus = mfn([['ūn|us', 'ūn|īus', 'ūn|ī', 'ūn|um', 'ūn|ō'], null], [['ūn|a', 'ūn|īus', 'ūn|ī', 'ūn|am', 'ūn|ā'], null], [['ūn|um', 'ūn|īus', 'ūn|ī', 'ūn|um', 'ūn|ō'], null]);
     h += `<h3 id="p-unus">${tr({ de: 'Pronominaladjektive („ūnus nauta“)', en: 'Pronominal adjectives (“ūnus nauta”)' })}</h3>
-        <div class="tables">${table({ caption: { de: 'ūnus, ūna, ūnum – einer, ein einziger', en: 'ūnus, ūna, ūnum – one, a single' }, cols: unus, rows: caseRows(unus, { sgOnly: true, noSections: true }) })}</div>` + notes([
+        <div class="tables">${table({ caption: { de: '<i>ūnus, ūna, ūnum</i> – einer, ein einziger', en: '<i>ūnus, ūna, ūnum</i> – one, a single' }, cols: unus, rows: caseRows(unus, { sgOnly: true, noSections: true }) })}</div>` + notes([
         { de: 'Wie <i>ūnus</i> (Genitiv <i>-īus</i>, Dativ <i>-ī</i>, sonst wie <i>bonus</i>) gehen: <b>ū</b>nus, <b>ū</b>llus, <b>n</b>ūllus, <b>s</b>ōlus, <b>n</b>euter, <b>a</b>lius, <b>u</b>ter, <b>t</b>ōtus, <b>a</b>lter – Merkwort <b>ŪNUS NAUTA</b>.', en: 'Like <i>ūnus</i> (genitive <i>-īus</i>, dative <i>-ī</i>, otherwise like <i>bonus</i>): <b>ū</b>nus, <b>ū</b>llus, <b>n</b>ūllus, <b>s</b>ōlus, <b>n</b>euter, <b>a</b>lius, <b>u</b>ter, <b>t</b>ōtus, <b>a</b>lter – mnemonic <b>ŪNUS NAUTA</b>.' },
         { de: '<i>alius</i> hat im Neutrum <i>aliud</i>; als Genitiv dient meist <i>alterīus</i>. Der Plural aller dieser Wörter geht regelmässig wie <i>bonī, bonae, bona</i>.', en: '<i>alius</i> has the neuter <i>aliud</i>; its genitive is usually supplied by <i>alterīus</i>. The plural of all these words is regular, like <i>bonī, bonae, bona</i>.' }
     ]);
@@ -554,9 +554,9 @@ function sectionNumerals() {
     const milia = [col({ de: 'Neutrum Pl.', en: 'Neut. pl.' }, null, ['mīl|ia', 'mīl|ium', 'mīl|ibus', 'mīl|ia', 'mīl|ibus'], null)];
     const nums = [['I', 'ūnus, -a, -um', 'prīmus'], ['II', 'duo, duae, duo', 'secundus / alter'], ['III', 'trēs, tria', 'tertius'], ['IV', 'quattuor', 'quārtus'], ['V', 'quīnque', 'quīntus'], ['VI', 'sex', 'sextus'], ['VII', 'septem', 'septimus'], ['VIII', 'octō', 'octāvus'], ['IX', 'novem', 'nōnus'], ['X', 'decem', 'decimus'], ['XI', 'ūndecim', 'ūndecimus'], ['XII', 'duodecim', 'duodecimus'], ['XX', 'vīgintī', 'vīcēsimus'], ['C', 'centum', 'centēsimus'], ['M', 'mīlle', 'mīllēsimus']];
     return `<div class="tables">
-            ${table({ caption: { de: 'duo, duae, duo – zwei', en: 'duo, duae, duo – two' }, cols: duo, rows: caseRows(duo, { sgOnly: true, noSections: true }) })}
-            ${table({ caption: { de: 'trēs, tria – drei', en: 'trēs, tria – three' }, cols: tres, rows: caseRows(tres, { sgOnly: true, noSections: true }) })}
-            ${table({ caption: { de: 'mīlia – Tausende', en: 'mīlia – thousands' }, cols: milia, rows: caseRows(milia, { sgOnly: true, noSections: true }) })}
+            ${table({ caption: { de: '<i>duo, duae, duo</i> – zwei', en: '<i>duo, duae, duo</i> – two' }, cols: duo, rows: caseRows(duo, { sgOnly: true, noSections: true }) })}
+            ${table({ caption: { de: '<i>trēs, tria</i> – drei', en: '<i>trēs, tria</i> – three' }, cols: tres, rows: caseRows(tres, { sgOnly: true, noSections: true }) })}
+            ${table({ caption: { de: '<i>mīlia</i> – Tausende', en: '<i>mīlia</i> – thousands' }, cols: milia, rows: caseRows(milia, { sgOnly: true, noSections: true }) })}
             ${table({ caption: { de: 'Grund- und Ordnungszahlen', en: 'Cardinal and ordinal numbers' }, cols: [{ h: { de: 'Grundzahl', en: 'Cardinal' } }, { h: { de: 'Ordnungszahl', en: 'Ordinal' } }], rows: nums.map(n => ({ h: n[0], cells: [n[1], n[2]] })) })}
         </div>` + notes([
         { de: '<i>ūnus</i> siehe Pronominaladjektive; <i>ambō</i> (beide) geht wie <i>duo</i>. Von 4 bis 100 sind die Grundzahlen unveränderlich.', en: 'For <i>ūnus</i> see pronominal adjectives; <i>ambō</i> (both) goes like <i>duo</i>. From 4 to 100 the cardinals do not change.' },
