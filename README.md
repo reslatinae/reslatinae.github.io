@@ -10,7 +10,7 @@ The site is static (GitHub Pages) and needs no installation. Open `index.html` i
 2. **Analyze** with "Mit KI analysieren" / "Analyze with AI". The analysis appears in the editor: colour-coded phrases with their function, brackets for clauses, underlines for genitive attributes. Click a word to change its label, draw brackets, split or merge phrases, add hints. Keyboard shortcuts are listed in the editor's instructions.
 3. **Export** the student page with "Schülerseite exportieren". The result is one HTML file that works offline. Save your work as a project file at any time and load it again later.
 
-The exported exercises in this repository (`cic_cael_*.html`, `example_page*.html`) are examples of that output: Cicero, *Pro Caelio*.
+`example_page.html` and `example_page_de.html` are examples of that output. `cicero_pro_caelio.html` is a text page: Cicero's *Pro Caelio* with its analysed passages, which the page stores itself and opens in the tool, as a student page ("Analyse öffnen") or in the editor ("bearbeiten").
 
 ## The AI step and the API key
 
@@ -38,7 +38,8 @@ Grammar-side rules (the prompt, the label sets, the preposition list, the enclit
 | `worker/` | The Cloudflare Worker that holds the OpenAI key (optional), with its own README |
 | `docs/syntax-analyse-review.md` | Review of the syntax-analysis logic with proposals (German) |
 | `tests/` | Automated tests for `src/latin-core.js` |
-| `cic_cael_*.html`, `example_page*.html` | Exported student exercises |
+| `example_page*.html` | Exported student exercises (the examples linked from the tool) |
+| `cicero_pro_caelio.html` | Cicero, *Pro Caelio*: the text, with the analysed passages stored on the page and opened in the tool |
 
 ## Development
 
