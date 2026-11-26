@@ -2747,6 +2747,7 @@ const CONFIG = {
     CVD_SAFE: ['#77dd66', '#ffaabb', '#ffeeaa', '#bb9988', '#6699ff', '#66ddff', '#ccffdd', '#aaaacc', '#999955', '#889999'],
     AI: {
         ENDPOINT: 'https://api.openai.com/v1/responses',
+        // The messages aiErrAuthProxy / aiErrBillingProxy name the person who holds the key behind the proxy.
         PROXY_URL: 'https://latin-syntax-proxy.latin-syntax-proxy.workers.dev/',            // set to the deployed worker URL (see worker/README.md): requests then go there WITHOUT a key and the key button disappears
         MODEL: 'gpt-5.6-luna',    // cheapest current tier (checked 2026-09-04); 'gpt-5.6-terra' is the next step up
         EFFORT: 'low',            // reasoning effort: none | low | medium | high (reasoning tokens are billed as output)
@@ -2801,6 +2802,7 @@ const CONFIG = {
             aiErrNoKey: "Please enter your OpenAI API key first.", aiErrNoText: "Please paste a Latin text first.",
             aiErrAuth: "OpenAI rejected the API key (401). Please check the key.",
             aiErrBilling: "Your OpenAI credit or spend limit is used up. Top up or raise the limit at platform.openai.com.",
+            aiErrAuthProxy: "The AI analysis is currently unavailable (API key rejected). Please contact Anke Walter.", aiErrBillingProxy: "The AI credit is used up. Please contact Anke Walter.",
             aiErrRate: "OpenAI rate limit reached. Please wait a moment and try again.",
             aiErrRefusal: "The model refused to analyze this text.", aiErrIncomplete: "The answer was cut off. Please try a shorter text.",
             aiErrNetwork: "Could not reach OpenAI (network problem or timeout). Please check your connection and try again.",
@@ -2851,6 +2853,7 @@ const CONFIG = {
             aiErrNoKey: "Bitte zuerst den OpenAI-API-Schlüssel eingeben.", aiErrNoText: "Bitte zuerst einen lateinischen Text einfügen.",
             aiErrAuth: "OpenAI hat den API-Schlüssel abgelehnt (401). Bitte Schlüssel prüfen.",
             aiErrBilling: "Ihr OpenAI-Guthaben bzw. Ausgabenlimit ist aufgebraucht. Bitte auf platform.openai.com aufladen oder das Limit erhöhen.",
+            aiErrAuthProxy: "Die KI-Analyse ist zurzeit nicht verfügbar (API-Schlüssel abgelehnt). Bitte wenden Sie sich an Anke Walter.", aiErrBillingProxy: "Das KI-Guthaben ist aufgebraucht. Bitte wenden Sie sich an Anke Walter.",
             aiErrRate: "OpenAI-Ratenlimit erreicht. Bitte kurz warten und erneut versuchen.",
             aiErrRefusal: "Das Modell hat die Analyse dieses Textes verweigert.", aiErrIncomplete: "Die Antwort wurde abgeschnitten. Bitte einen kürzeren Text versuchen.",
             aiErrNetwork: "OpenAI nicht erreichbar (Netzwerkproblem oder Zeitüberschreitung). Bitte Verbindung prüfen und erneut versuchen.",
@@ -4952,8 +4955,9 @@ async function callAI(input, schemaName, schema) {
         const err = (data && data.error) || {};
         if (!res.ok) {
             const billingCodes = ['credit_balance_exhausted', 'organization_spend_limit_exceeded', 'project_spend_limit_exceeded', 'insufficient_quota'];
-            if (res.status === 401) alert(t.aiErrAuth);
-            else if (res.status === 429 && billingCodes.includes(err.code)) alert(t.aiErrBilling);
+            // Through the proxy the key is the site's own: users can neither check it nor top it up, so these two messages name whom to tell.
+            if (res.status === 401) alert(useProxy ? t.aiErrAuthProxy : t.aiErrAuth);
+            else if (res.status === 429 && billingCodes.includes(err.code)) alert(useProxy ? t.aiErrBillingProxy : t.aiErrBilling);
             else if (res.status === 429) alert(t.aiErrRate);
             else alert(t.aiErrOther + (err.message || ('HTTP ' + res.status)));
             return null;
