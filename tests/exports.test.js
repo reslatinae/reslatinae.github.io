@@ -1,7 +1,9 @@
-// The student pages in this repository use current label names, offer sensible answer menus and can colour
-// every answer. Two kinds of page exist: exported pages (labels sit in data-ans / data-val attributes) and the
-// example pages, which build the exercise in the browser from an `exerciseData` object. Both are read into the
+// The example pages in this repository use current label names, offer sensible answer menus and can colour
+// every answer. Two kinds of page are understood: exported pages (labels sit in data-ans / data-val attributes) and
+// pages that build the exercise in the browser from an `exerciseData` object. Both are read into the
 // same shape, so the checks below apply to both.
+// The Pro Caelio analyses are not checked here: cicero_pro_caelio.html stores them as project files, and the tool
+// maps their labels onto current ones when it opens them.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -9,7 +11,7 @@ const path = require('node:path');
 const L = require('../src/latin-labels.js');
 
 const root = path.join(__dirname, '..');
-const pages = fs.readdirSync(root).filter(f => /^(cic_cael|example_page).*\.html$/.test(f));
+const pages = fs.readdirSync(root).filter(f => /^example_page.*\.html$/.test(f));
 const attr = (html, name) => [...html.matchAll(new RegExp(name + '="([^"]*)"', 'g'))].map(m => m[1]);
 
 // -> { kind, lang, answers[], offered[], colors{} }
@@ -38,8 +40,7 @@ const read = (f) => pageData(fs.readFileSync(path.join(root, f), 'utf8'));
 const standardFor = (lang) => new Set([...L.PRESETS[lang].advanced, ...L.GROUP_LABELS[lang]]);
 const uniq = (a) => [...new Set(a)];
 
-test('there are pages to check, including the two example pages', () => {
-    assert.ok(pages.length >= 15);
+test('the two example pages are there to check', () => {
     assert.ok(pages.includes('example_page.html') && pages.includes('example_page_de.html'));
 });
 
